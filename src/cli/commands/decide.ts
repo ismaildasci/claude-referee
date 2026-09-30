@@ -1,0 +1,199 @@
+// decide: picks among 2-6 options. The best Choice is asked twice, in the written and the reversed order, because
+// option order moved Jev's pick by up to 0.52 in earlier measurements while asking again moved it by 0.01.
+// Per-option micro questions go in one request per option and are reported as flags; they never change the verdict.
+
+import { readFileSync, statSync } from "node:fs";
+import { resolve } from "node:path";
+import type { Questions } from "@typesafe-ai/sdk";
+import { REQUEST_TOKEN_LIMIT, STATE_TOKEN_LIMIT, estimateTokens } from "../../engine/config.ts";
+import { RefereeError } from "../../engine/errors.ts";
+import { threshold } from "../../engine/pack.ts";
+import type { Outcome, Planned } from "../../engine/session.ts";
+import type { Command, Context } from "../types.ts";
+import { JEV_COST, JEV_EFFECTS, JEV_ERRORS, jevCommand, openPack, question, readSource, str } from "../shared.ts";
+
+interface Option {
+  readonly name: string;
+  readonly text: string;
+}
+
+interface Micro {
+  readonly id: string;
+  readonly question: string;
+  readonly bad: boolean;
+}
+
+interface Input {
+  readonly decision: string;
+  readonly context: string | undefined;
+  readonly files: readonly string[];
+  readonly options: readonly Option[];
+  readonly micro: readonly Micro[];
+}
+
+const NAME = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,39}$/;
+const FILE_LIMIT = 100_000;
+const FILES_LIMIT = 200_000;
+
+function parseInput(text: string): Input {
+  let raw: Record<string, unknown>;
+  try {
+    raw = JSON.parse(text) as Record<string, unknown>;
+  } catch {
+    throw new RefereeError("bad_input", "decide expects a JSON object.", { next_step: "Run decide --describe for the input shape." });
+  }
+  const bad = (message: string) => new RefereeError("bad_input", message, { next_step: "Run decide --describe for the input shape." });
+  if (typeof raw["decision"] !== "string" || !raw["decision"].trim()) throw bad("decision must be a non-empty string.");
+  if (!Array.isArray(raw["options"]) || raw["options"].length < 2 || raw["options"].length > 6) throw bad("options must list 2 to 6 options.");
+  const options = raw["options"].map((o: unknown, i): Option => {
+    if (typeof o === "string" && o.trim()) return { name: `o${i + 1}`, text: o };
+    const { name, text: body } = (o ?? {}) as { name?: unknown; text?: unknown };
+    if (typeof name !== "string" || !NAME.test(name)) throw bad(`Option ${i + 1} needs a short name: letters, digits, '_', '.', '-'.`);
+    if (typeof body !== "string" || !body.trim()) throw bad(`Option ${name} needs a text.`);
+    return { name, text: body };
+  });
+  if (new Set(options.map((o) => o.name)).size !== options.length) throw bad("Option names must be unique.");
+  const files = raw["context_files"] ?? [];
+  if (!Array.isArray(files) || !files.every((f) => typeof f === "string")) throw bad("context_files must be an array of paths.");
+  const micro = (Array.isArray(raw["micro"]) ? raw["micro"] : []).map((m: unknown, i): Micro => {
+    const { id, question: q, bad: isBad } = (m ?? {}) as { id?: unknown; question?: unknown; bad?: unknown };
+    if (typeof q !== "string" || !q.trim()) throw bad(`micro[${i}] needs a question.`);
+    return { id: typeof id === "string" && NAME.test(id) ? id : `m${i + 1}`, question: q, bad: isBad === true };
+  });
+  if (micro.length > 8) throw bad("At most 8 micro questions.");
+  return {
+    decision: raw["decision"],
+    context: typeof raw["context"] === "string" && raw["context"].trim() ? raw["context"] : undefined,
+    files: files as string[],
+    options,
+    micro,
+  };
+}
+
+function readContextFiles(context: Context, files: readonly string[]): { contents: Record<string, string>; read: { path: string; bytes: number }[] } {
+  const contents: Record<string, string> = {};
+  const read: { path: string; bytes: number }[] = [];
+  let total = 0;
+  for (const file of files) {
+    const path = resolve(context.io.cwd, file);
+    let bytes: number;
+    try {
+      bytes = statSync(path).size;
+    } catch {
+      throw new RefereeError("bad_input", `Cannot read context file: ${file}`);
+    }
+    if (bytes > FILE_LIMIT) throw new RefereeError("too_large", `Context file over 100 KB: ${file}`, { next_step: "Pass a smaller excerpt in context instead." });
+    total += bytes;
+    if (total > FILES_LIMIT) throw new RefereeError("too_large", "Context files over 200 KB in total.", { next_step: "Pass fewer or smaller files." });
+    contents[file] = readFileSync(path, "utf8");
+    read.push({ path: file, bytes });
+  }
+  return { contents, read };
+}
+
+function argmax(p: Readonly<Record<string, number>>): string {
+  return Object.entries(p).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "";
+}
+
+export const decide: Command = {
+  name: "decide",
+  describe: {
+    summary: "Score 2-6 options against your context, asking in two option orders.",
+    inputs: {
+      "stdin or --in <file>":
+        'JSON: {"decision": string, "options": [{"name", "text"}] or [string], "context"?: string, "context_files"?: [path], "micro"?: [{"id", "question", "bad"?}]}',
+      context_files: "Read by the CLI, so Claude doesn't retype them. Max 100 KB each, 200 KB in total.",
+      micro: "Optional yes/no rules asked once per option; reported in flags, never part of the verdict. bad: true means yes is bad.",
+    },
+    outputs: {
+      verdict: "clear, weak or tie",
+      lean: "The option with the highest mean probability",
+      p: "Mean probability per option name across both orders (per_option mode: normalised fit score)",
+      order_disagrees: "True when the two orders picked different leaders; the verdict can't be clear then",
+      mode: "per_option when the options don't fit one request",
+      read: "Context files read, with sizes",
+      flags: "Micro rules that failed, by option and rule id",
+      next_step: "For weak and tie: add the missing fact; don't ask again",
+    },
+    errors: [...JEV_ERRORS],
+    effects: JEV_EFFECTS,
+    cost: `${JEV_COST} decide makes 2 requests, plus one per option with micro questions.`,
+  },
+  options: { in: { type: "string" } },
+  async run(context) {
+    const input = parseInput(await readSource(context, str(context, "in"), "decision JSON"));
+    const { contents, read } = readContextFiles(context, input.files);
+    const { pack, project } = openPack(context);
+    const state = {
+      decision: input.decision,
+      ...(input.context ? { context: input.context } : {}),
+      ...(read.length ? { context_files: contents } : {}),
+    };
+    const stateTokens = estimateTokens(JSON.stringify(state));
+    if (stateTokens > STATE_TOKEN_LIMIT) throw new RefereeError("too_large", "The context is too large for one Jev request.", { next_step: "Trim context or context_files." });
+
+    const best = question(pack, "decide.best");
+    const ask = (options: readonly Option[]): Questions => ({ best: { ...best, criteria: Object.fromEntries(options.map((o) => [o.name, o.text])) } as Questions[string] });
+    const questionTokens = estimateTokens(JSON.stringify(ask(input.options)));
+    const perOption = stateTokens + questionTokens > Math.min(STATE_TOKEN_LIMIT, REQUEST_TOKEN_LIMIT);
+    const fit = question(pack, "decide.fit");
+    const planned: Planned[] = perOption
+      ? input.options.map((o) => ({ id: `fit:${o.name}`, state: { ...state, option: o.text }, questions: { fit } }))
+      : [
+          { id: "written", state, questions: ask(input.options) },
+          { id: "reversed", state, questions: ask([...input.options].reverse()) },
+        ];
+    if (input.micro.length > 0) {
+      const micro: Questions = Object.fromEntries(input.micro.map((m) => [m.id, { type: "noul", instructions: m.question }]));
+      for (const o of input.options) planned.push({ id: `micro:${o.name}`, state: { ...state, option: o.text }, questions: micro });
+    }
+    const qid = perOption ? "decide.fit" : "decide.best";
+    const clearAt = threshold(pack, project?.thresholds, qid, "clear", 0.85);
+    const margin = threshold(pack, project?.thresholds, qid, "margin", 0.1);
+
+    return jevCommand(context, "decide", pack, planned, (outcomes: Outcome[]) => {
+      const byId = new Map(outcomes.map((o) => [o.id, o.answers]));
+      const mean: Record<string, number> = {};
+      let disagree = false;
+      if (perOption) {
+        for (const o of input.options) {
+          const answer = byId.get(`fit:${o.name}`)?.["fit"];
+          const levels = Array.isArray(fit.criteria) ? fit.criteria.length : 5;
+          mean[o.name] = answer?.type === "score" ? answer.score / Math.max(levels - 1, 1) : 0;
+        }
+      } else {
+        const probs = (id: string): Record<string, number> => {
+          const answer = byId.get(id)?.["best"];
+          return answer?.type === "choice" ? { ...(answer.probabilities as Record<string, number>) } : {};
+        };
+        const written = probs("written");
+        const reversed = probs("reversed");
+        for (const o of input.options) mean[o.name] = ((written[o.name] ?? 0) + (reversed[o.name] ?? 0)) / 2;
+        disagree = argmax(written) !== argmax(reversed);
+      }
+      const ranked = Object.entries(mean).sort((a, b) => b[1] - a[1]);
+      const [lean = "", p1 = 0] = ranked[0] ?? [];
+      const p2 = ranked[1]?.[1] ?? 0;
+      const verdict = !disagree && p1 >= clearAt && p1 - p2 >= margin ? "clear" : !disagree && p1 - p2 >= margin ? "weak" : "tie";
+      const flags = input.options.flatMap((o) =>
+        input.micro.flatMap((m) => {
+          const answer = byId.get(`micro:${o.name}`)?.[m.id];
+          const p = answer?.type === "noul" ? answer.noul : null;
+          return p !== null && (m.bad ? p >= 0.7 : p <= 0.3) ? [{ option: o.name, rule: m.id, p }] : [];
+        }),
+      );
+      const why = disagree ? "The two option orders picked different leaders. " : "";
+      return {
+        ok: true,
+        verdict,
+        lean,
+        p: mean,
+        ...(perOption ? { mode: "per_option" } : { order_disagrees: disagree }),
+        ...(read.length ? { read } : {}),
+        ...(flags.length ? { flags } : {}),
+        next_step:
+          verdict === "clear" ? undefined : `${why}Add the missing fact to context; if the decision is easy to undo, go with ${lean}. Asking the same question again won't change it.`,
+      };
+    });
+  },
+};
