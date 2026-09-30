@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- `scripts/probe-api.mjs`, `scripts/latency.mjs` and `scripts/order-sensitivity.mjs`: live checks of the API's edge cases, of latency at 1, 6 and 8 requests in parallel, and of option-order sensitivity. Their results from 2026-09-30 are in `jev-evals/api/` and `jev-evals/decide/`.
+- `jev-evals/decide`: a public set of 20 decisions with 4 options each.
+- `jev-evals/claims`: 31 labelled claims about this repository's docs, `decide`'s three-way answers to them, and the scripts that build and score them.
+- `jev-evals/injection/ablation-dataguard-2026-10-01.jsonl`: the injection cases' answers with a "treat the evidence as data" sentence added to `done.met`'s note.
+- Measurements: a section measured with claude-referee itself, and dated rows for it in the README table.
+
 ## [0.1.1] - 2026-10-01
 
 ### Added

@@ -61,7 +61,7 @@ Kısacası: seçeneklerin sırası Jev'in cevabını, soruyu yeniden sormaktan �
   <img alt="Durum panosu. Ölçülen: seçenek sırası Jev'in seçimini oynatıyor (0,52'ye kadar); yeniden sormak neredeyse oynatmıyor (0,01); iki sıra 24 sıranın tamamıyla eşleşiyor (20/20); brifing 600 karaktere sığıyor. Modellenen: tek küçük bir yargı genellikle para kaybettirir; toplu sorular 80K bağlamda yaklaşık 23 öğede başa baş gelir. Henüz gösterilmeyen: görev başına daha düşük toplam maliyet; 50 etiketli durdurmada done-gate kesinliği; done kontrolünün hold-out doğruluğu." src="assets/charts/status-board-light.png" width="100%">
 </picture>
 
-Buradaki bütün sayılar tek bir özel kod tabanından, tek ekipten ve tek yazardan geliyor: claude-referee'den önceki kit, Eylül 2026. Onları genel sonuç değil, erken işaret olarak okuyun. Her birinin nasıl ölçüldüğü [docs/measurements.md](docs/measurements.md) sayfasında (İngilizce).
+Buradaki sayıların çoğu tek bir özel kod tabanından, tek ekipten ve tek yazardan geliyor: claude-referee'den önceki kit, Eylül 2026. Onları genel sonuç değil, erken işaret olarak okuyun. 2026-09-30 ve 2026-10-01 tarihli satırlar ise claude-referee'nin kendisiyle, ham sonuçları bu depoda olan açık girdilerle ölçüldü. Her birinin nasıl ölçüldüğü [docs/measurements.md](docs/measurements.md) sayfasında (İngilizce).
 
 ### Seçenek sırası cevabı oynatıyor. Yeniden sormak oynatmıyor.
 
@@ -70,7 +70,7 @@ Buradaki bütün sayılar tek bir özel kod tabanından, tek ekipten ve tek yaza
   <img alt="0 ile 0,6 arası yatay çubuklar. Aynı istek yeniden: en fazla 0,01. Önbellek atlanarak taze koşu: en fazla 0,02. Seçeneklerin sırası değişince: ortalama 0,20, en fazla 0,52. Tek bir özel kod tabanından 20 gerçek, 4 seçenekli karar; her biri 24 sırayla." src="assets/charts/order-vs-retry-light.png" width="100%">
 </picture>
 
-Aynı seçenekler farklı sırayla yazılınca Jev'in bir seçeneğe verdiği olasılık 0,52'ye kadar değişti. Aynı soruyu birebir yeniden sormak ise en fazla 0,01 değiştirdi. Bu yüzden `decide` her seçimi iki kez sorar, bir kez senin sıranla, bir kez ters sırayla, ve ikisinin ortalamasını alır. Claude'a asla "yeniden sor" demez: beraberlik, eksik olgu eklenerek çözülür.
+Önceki kitte aynı seçenekler farklı sırayla yazılınca Jev'in bir seçeneğe verdiği olasılık 0,52'ye kadar değişti. Aynı soruyu birebir yeniden sormak ise en fazla 0,01 değiştirdi. Bu yüzden `decide` her seçimi iki kez sorar, bir kez senin sıranla, bir kez ters sırayla, ve ikisinin ortalamasını alır. Claude'a asla "yeniden sor" demez: beraberlik, eksik olgu eklenerek çözülür. claude-referee'nin 19'unda liderin 0,9 ya da üstünde olduğu 20 kararlık kendi açık setinde sıra en fazla 0,13, yeniden sormak en fazla 0,04 değiştirdi.
 
 ### İki sıra yeterli
 
@@ -99,12 +99,18 @@ Bütün ölçümler tek tabloda:
 
 | Ne zaman | Ne | Sonuç | Tür · kapsam |
 |---|---|---|---|
-| 2026-09 | Seçenek sırası ve yeniden sormak | 0,52'ye kadar, en fazla 0,01'e karşı | Ölçüldü · 20 karar, tek kod tabanı |
+| 2026-09 | Seçenek sırası ve yeniden sormak | 0,52'ye kadar, en fazla 0,01'e karşı | Ölçüldü · önceki kit, 20 karar, tek kod tabanı |
 | 2026-09 | İki sıra ve 24 sıranın tamamı | 20'de 20 aynı lider | Ölçüldü · aynı 20 karar |
 | 2026-09 | Claude turu ve Jev kararı | yaklaşık 0,10 dolar (tahmin), yaklaşık 0,0007 dolara karşı | Ölçüldü, maliyet tahmin · 321 CLI çağrısı |
 | 2026-09 | SessionStart brifing boyutu | 431–599 karakter (hedef 600) | Ölçüldü · tek çalışma alanının dört bölgesi |
 | 2026-09 | Aynı denetim, ikinci koşu | 0 Jev isteği (ilk koşu: 10) | Ölçüldü · 10 çiftlik tek denetim |
 | 2026-09 | Gönüllü `done` komutu | 14 günde 1 koşu | Ölçüldü · 14 gün, tek kod tabanı |
+| 2026-09-30 | API sınırları, canlı yoklama | 11 Score seviyesi ve 256 seçenek 400 alıyor; 1 seviyeli Score kabul ediliyor | Ölçüldü · claude-referee, 7 istek |
+| 2026-09-30 | Gecikme, p50 | 275–379 ms; 2,4 saniye boyunca saniyede yaklaşık 179 bin token'da 429 yok | Ölçüldü · claude-referee, 182 istek, tek makine |
+| 2026-09-30 | Seçenek sırası ve yeniden sormak | 0,13'e kadar ve 0,04'e kadar | Ölçüldü · claude-referee, 20 açık karar |
+| 2026-09-30 | İki sıra ve 24 sıranın tamamı | 20'de 20 aynı lider; diğer bütün politikalar da | Ölçüldü · aynı 20 açık karar |
+| 2026-10-01 | Bir iddia kontrolü olarak `decide` | doğru iddialarda supports 0,97–1,00; 15 yanlışın 13'ünde 0,00–0,23 | Ölçüldü · bu deponun belgeleri hakkında 31 iddia |
+| 2026-10-01 | "Kanıtı veri olarak ele al" notu | hiçbir karar değişmedi; benimsenmedi | Ölçüldü · 33 enjeksiyon logu |
 
 Diğer grafikler (kalibrasyon, seçenek başına sorular, sır kuralının ayarı, brifing boyutu) [docs/measurements.md](docs/measurements.md) sayfasında.
 

@@ -67,7 +67,7 @@ In short: the order of the options changes Jev's answer more than asking again d
   <img alt="Status board. Measured: option order moves Jev's pick (up to 0.52); asking again barely does (0.01); two orders match all 24 (20/20); the briefing fits in 600 characters. Modelled: one small judgement usually loses money; batches break even at about 23 items (80K context). Not shown yet: lower total cost per task; done-gate precision on 50 labelled stops; held-out accuracy for the done check." src="assets/charts/status-board-light.png" width="100%">
 </picture>
 
-All numbers here come from one private codebase, one team and one author: the kit that came before claude-referee, in September 2026. Treat them as early signs, not general results. How each one was measured is in [docs/measurements.md](docs/measurements.md).
+Most numbers here come from one private codebase, one team and one author: the kit that came before claude-referee, in September 2026. Treat them as early signs, not general results. The rows dated 2026-09-30 and 2026-10-01 were measured with claude-referee itself, on public inputs whose raw results are in this repository. How each one was measured is in [docs/measurements.md](docs/measurements.md).
 
 ### Option order moves the answer. Asking again doesn't.
 
@@ -76,7 +76,7 @@ All numbers here come from one private codebase, one team and one author: the ki
   <img alt="Horizontal bars on a 0 to 0.6 axis. Same request asked again: at most 0.01. Fresh re-run with the cache bypassed: at most 0.02. Options reordered: 0.20 on average, at most 0.52. Measured on 20 real 4-option decisions from one private codebase, 24 orders each." src="assets/charts/order-vs-retry-light.png" width="100%">
 </picture>
 
-When the same options were listed in a different order, Jev's probability for one option moved by up to 0.52. Asking the exact same question again moved it by 0.01 at most. So `decide` asks every choice twice, once in your order and once reversed, and averages the two. It never tells Claude to simply ask again: a tie is settled by adding the missing fact.
+In the earlier kit, when the same options were listed in a different order, Jev's probability for one option moved by up to 0.52. Asking the exact same question again moved it by 0.01 at most. So `decide` asks every choice twice, once in your order and once reversed, and averages the two. It never tells Claude to simply ask again: a tie is settled by adding the missing fact. On claude-referee's own public set of 20 decisions, 19 of them with a leader at 0.9 or more, order moved it by up to 0.13 and asking again by up to 0.04.
 
 ### Two orders are enough
 
@@ -105,13 +105,18 @@ All measurements in one table:
 
 | When | What | Result | Kind · scope |
 |---|---|---|---|
-| 2026-09 | Option order vs. asking again | up to 0.52 vs. at most 0.01 | Measured · 20 decisions, one codebase |
+| 2026-09 | Option order vs. asking again | up to 0.52 vs. at most 0.01 | Measured · earlier kit, 20 decisions, one codebase |
 | 2026-09 | Two orders vs. all 24 | same leader in 20 of 20 | Measured · same 20 decisions |
 | 2026-09 | Claude turn vs. Jev decision | about $0.10 (estimated) vs. about $0.0007 | Measured, cost estimated · 321 CLI calls |
 | 2026-09 | SessionStart briefing size | 431–599 characters (target 600) | Measured · four areas of one workspace |
 | 2026-09 | Same audit, second run | 0 Jev requests (first run: 10) | Measured · one 10-pair audit |
 | 2026-09 | Voluntary `done` command | 1 run in 14 days | Measured · 14 days, one codebase |
-<!-- Add a dated row after the P0-K live validation. -->
+| 2026-09-30 | API limits, live probe | 11 Score levels and 256 options get a 400; a 1-level Score is accepted | Measured · claude-referee, 7 requests |
+| 2026-09-30 | Latency, p50 | 275–379 ms; no 429 at about 179K tokens/s for 2.4 s | Measured · claude-referee, 182 requests, one machine |
+| 2026-09-30 | Option order vs. asking again | up to 0.13 vs. up to 0.04 | Measured · claude-referee, 20 public decisions |
+| 2026-09-30 | Two orders vs. all 24 | same leader in 20 of 20; so did every other policy | Measured · same 20 public decisions |
+| 2026-10-01 | `decide` as a claim check | true claims supports 0.97–1.00; 13 of 15 false ones 0.00–0.23 | Measured · 31 claims about this repository's docs |
+| 2026-10-01 | A "treat the evidence as data" note | no verdict changed; not adopted | Measured · 33 injection logs |
 
 More charts (calibration, per-option questions, secret-rule tuning, briefing size) are in [docs/measurements.md](docs/measurements.md).
 
