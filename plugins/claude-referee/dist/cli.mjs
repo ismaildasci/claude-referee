@@ -50,7 +50,7 @@ var init_dist = __esm({
       #parseResponse;
       #parsed;
       constructor(responsePromise, parseResponse) {
-        super((resolve2) => resolve2(void 0));
+        super((resolve3) => resolve3(void 0));
         this.#responsePromise = responsePromise;
         this.#parseResponse = parseResponse;
       }
@@ -142,7 +142,7 @@ var init_dist = __esm({
       const exponential = Math.min(policy.backoffInitialMs * 2 ** attempt, policy.backoffMaxMs);
       return Math.round(exponential * (1 - random() * policy.backoffJitter));
     }, "retryDelayMs");
-    sleep = /* @__PURE__ */ __name((ms, signal) => new Promise((resolve2, reject) => {
+    sleep = /* @__PURE__ */ __name((ms, signal) => new Promise((resolve3, reject) => {
       if (signal?.aborted) return reject(signal.reason);
       const onAbort = /* @__PURE__ */ __name(() => {
         clearTimeout(timer);
@@ -150,7 +150,7 @@ var init_dist = __esm({
       }, "onAbort");
       const timer = setTimeout(() => {
         signal?.removeEventListener("abort", onAbort);
-        resolve2();
+        resolve3();
       }, ms);
       signal?.addEventListener("abort", onAbort, { once: true });
     }), "sleep");
@@ -365,10 +365,10 @@ var init_dist = __esm({
     }, "choice");
     validateQuestions = /* @__PURE__ */ __name((questions) => {
       if (Object.keys(questions).length === 0) throw new TypeSafeError("At least one question is required.");
-      for (const [name, question] of Object.entries(questions)) {
-        if (question.type !== "score") continue;
-        if (!Array.isArray(question.criteria)) throw new TypeSafeError(`Score question "${name}" has criteria that are not a list; score criteria must be a list of descriptions indexed by score from zero.`);
-        if (question.criteria.length < 2) throw new TypeSafeError(`Score question "${name}" has ${question.criteria.length} criteria; at least two scores are required.`);
+      for (const [name, question2] of Object.entries(questions)) {
+        if (question2.type !== "score") continue;
+        if (!Array.isArray(question2.criteria)) throw new TypeSafeError(`Score question "${name}" has criteria that are not a list; score criteria must be a list of descriptions indexed by score from zero.`);
+        if (question2.criteria.length < 2) throw new TypeSafeError(`Score question "${name}" has ${question2.criteria.length} criteria; at least two scores are required.`);
       }
     }, "validateQuestions");
     Models = class {
@@ -805,6 +805,18 @@ async function guarded(options, fn) {
   }
 }
 __name(guarded, "guarded");
+function callJev(call, options) {
+  return guarded(options, async (client, signal) => {
+    const { data, requestId } = await client.systemOne({ state: call.state, questions: call.questions, model: call.model }, { signal }).withResponse();
+    return {
+      answers: data.answers,
+      model: data.model,
+      inputTokens: data.usage.input_tokens,
+      requestId
+    };
+  });
+}
+__name(callJev, "callJev");
 function listModels(options) {
   return guarded(options, async (client, signal) => (await client.models.list({ signal })).map((m) => m.name));
 }
@@ -815,6 +827,9 @@ var KIT = "claude-referee";
 var VERSION2 = "0.1.0";
 var DEFAULT_MODEL = "jev-1.13.0";
 var MARKETPLACE = "claude-referee";
+var USD_PER_MTOK = {
+  "jev-1.13.0": 0.042
+};
 var DETAIL_LIMIT = 1500;
 var ERROR_LIMIT = 2e3;
 var CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1e3;
@@ -826,8 +841,19 @@ function resolveModel(env) {
   return env["TYPESAFE_MODEL"]?.trim() || env["CLAUDE_PLUGIN_OPTION_MODEL"]?.trim() || DEFAULT_MODEL;
 }
 __name(resolveModel, "resolveModel");
+function costUsd(model, inputTokens) {
+  const price = USD_PER_MTOK[model];
+  return price === void 0 ? null : inputTokens * price / 1e6;
+}
+__name(costUsd, "costUsd");
+function estimateTokens(text) {
+  return Math.ceil(text.length / 3);
+}
+__name(estimateTokens, "estimateTokens");
 
 // src/engine/datadir.ts
+import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readdirSync, realpathSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 function pluginDataId() {
@@ -842,6 +868,24 @@ function resolveDataDir(env, home, cwd, flag) {
   return join(configDir, "plugins", "data", pluginDataId());
 }
 __name(resolveDataDir, "resolveDataDir");
+function projectRoot(cwd) {
+  let root = cwd;
+  try {
+    root = execFileSync("git", ["rev-parse", "--show-toplevel"], { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], timeout: 2e3 }).trim() || cwd;
+  } catch {
+    root = cwd;
+  }
+  try {
+    return realpathSync(root);
+  } catch {
+    return root;
+  }
+}
+__name(projectRoot, "projectRoot");
+function projectId(cwd) {
+  return createHash("sha256").update(projectRoot(cwd)).digest("hex").slice(0, 12);
+}
+__name(projectId, "projectId");
 function dirSize(dir) {
   let total = 0;
   let entries;
@@ -865,12 +909,12 @@ __name(tildify, "tildify");
 
 // src/engine/key.ts
 import { execFile } from "node:child_process";
-var runCommand = /* @__PURE__ */ __name((file, args, timeoutMs) => new Promise((resolve2) => {
+var runCommand = /* @__PURE__ */ __name((file, args, timeoutMs) => new Promise((resolve3) => {
   execFile(
     file,
     [...args],
     { timeout: timeoutMs, encoding: "utf8", windowsHide: true, maxBuffer: 64 * 1024 },
-    (error, stdout) => resolve2(error ? null : stdout)
+    (error, stdout) => resolve3(error ? null : stdout)
   );
 }), "runCommand");
 var processMemo = /* @__PURE__ */ new Map();
@@ -950,10 +994,11 @@ async function resolveKey(env, platform, runner = runCommand, memo = processMemo
 __name(resolveKey, "resolveKey");
 
 // src/engine/pack.ts
-import { createHash } from "node:crypto";
+import { createHash as createHash2 } from "node:crypto";
 import { existsSync, readFileSync, readdirSync as readdirSync2 } from "node:fs";
 import { dirname, join as join2 } from "node:path";
 import { fileURLToPath } from "node:url";
+var NAME = /^[a-z0-9][a-z0-9-]{0,63}$/;
 function bundledPackDirs() {
   const here = dirname(fileURLToPath(import.meta.url));
   return [join2(here, "..", "packs"), join2(here, "packs"), join2(here, "..", "..", "plugins", "claude-referee", "packs")];
@@ -977,8 +1022,12 @@ function readJson(path) {
   }
 }
 __name(readJson, "readJson");
+function listFiles(dir, ext) {
+  return existsSync(dir) ? readdirSync2(dir).filter((f) => f.endsWith(ext)).sort() : [];
+}
+__name(listFiles, "listFiles");
 function hashDir(dir) {
-  const hash = createHash("sha256");
+  const hash = createHash2("sha256");
   const walk = /* @__PURE__ */ __name((d, rel) => {
     for (const entry of readdirSync2(d, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
       const path = join2(d, entry.name);
@@ -990,6 +1039,66 @@ function hashDir(dir) {
   return hash.digest("hex").slice(0, 12);
 }
 __name(hashDir, "hashDir");
+function checkQuestions(raw, file) {
+  if (typeof raw !== "object" || raw === null || Array.isArray(raw)) throw new RefereeError("bad_pack", `Questions file must be an object: ${file}`);
+  for (const [id, q] of Object.entries(raw)) {
+    const type = q.type;
+    if (type !== "noul" && type !== "choice" && type !== "score") throw new RefereeError("bad_pack", `Question ${id} has no valid type.`);
+  }
+  return raw;
+}
+__name(checkQuestions, "checkQuestions");
+function checkThresholds(raw) {
+  const out = {};
+  for (const [id, values] of Object.entries(raw ?? {})) {
+    out[id] = {};
+    for (const [k, v] of Object.entries(values ?? {})) {
+      if (typeof v !== "number" || v < 0 || v > 1) throw new RefereeError("bad_pack", `Threshold ${id}.${k} must be a number from 0 to 1.`);
+      out[id][k] = v;
+    }
+  }
+  return out;
+}
+__name(checkThresholds, "checkThresholds");
+function findPackDir(name, dirs) {
+  for (const { dir } of dirs) {
+    const candidate = join2(dir, name);
+    if (existsSync(join2(candidate, "pack.json"))) return candidate;
+  }
+  return null;
+}
+__name(findPackDir, "findPackDir");
+function loadPack(name, dirs, seen = []) {
+  if (!NAME.test(name)) throw new RefereeError("pack_not_found", `Invalid pack name: ${name.slice(0, 64)}`);
+  if (seen.includes(name)) throw new RefereeError("bad_pack", `Pack extends itself: ${[...seen, name].join(" > ")}`);
+  const dir = findPackDir(name, dirs);
+  if (!dir) {
+    throw new RefereeError("pack_not_found", `Pack not found: ${name}`, { next_step: "Check the pack name in .claude/referee.json and the packs_dir setting." });
+  }
+  const meta = readJson(join2(dir, "pack.json"));
+  const parent = typeof meta.extends === "string" ? loadPack(meta.extends, dirs, [...seen, name]) : null;
+  const questions = { ...parent?.questions };
+  for (const file of listFiles(join2(dir, "questions"), ".json")) Object.assign(questions, checkQuestions(readJson(join2(dir, "questions", file)), file));
+  const thresholds = { ...parent?.thresholds, ...existsSync(join2(dir, "thresholds.json")) ? checkThresholds(readJson(join2(dir, "thresholds.json"))) : {} };
+  const cheatsheet = { ...parent?.cheatsheet };
+  for (const file of listFiles(join2(dir, "cheatsheet"), ".md")) cheatsheet[file.replace(/\.md$/, "")] = readFileSync(join2(dir, "cheatsheet", file), "utf8");
+  const own = existsSync(join2(dir, "redact.json")) ? readJson(join2(dir, "redact.json")) : void 0;
+  const redact3 = parent?.redact || own ? { stop: [...parent?.redact?.stop ?? [], ...own?.stop ?? []], replace: [...parent?.redact?.replace ?? [], ...own?.replace ?? []] } : void 0;
+  const areas = existsSync(join2(dir, "areas.json")) ? readJson(join2(dir, "areas.json")) : parent?.areas;
+  return {
+    name,
+    version: typeof meta.version === "string" ? meta.version : "0.0.0",
+    model: typeof meta.model === "string" ? meta.model : parent?.model ?? "",
+    dir,
+    hash: hashDir(dir),
+    questions,
+    thresholds,
+    cheatsheet,
+    redact: redact3,
+    areas
+  };
+}
+__name(loadPack, "loadPack");
 function listPacks(dirs) {
   const seen = /* @__PURE__ */ new Set();
   const out = [];
@@ -1005,10 +1114,42 @@ function listPacks(dirs) {
   return out.sort((a, b) => a.name.localeCompare(b.name));
 }
 __name(listPacks, "listPacks");
+function threshold(pack, project, question2, key, fallback) {
+  const base = pack.thresholds[question2]?.[key] ?? fallback;
+  const override = project?.[question2]?.[key];
+  return typeof override === "number" && override > base ? Math.min(override, 1) : base;
+}
+__name(threshold, "threshold");
 
 // src/engine/project.ts
 import { existsSync as existsSync2, readFileSync as readFileSync2 } from "node:fs";
 import { dirname as dirname2, join as join3, relative, sep } from "node:path";
+function readProjectFile(path) {
+  try {
+    const raw = JSON.parse(readFileSync2(path, "utf8"));
+    if (typeof raw !== "object" || raw === null || Array.isArray(raw)) throw new Error("not an object");
+    return raw;
+  } catch {
+    throw new RefereeError("bad_project", `Project file is not a JSON object: .claude/${path.split(/[\\/]/).pop()}`);
+  }
+}
+__name(readProjectFile, "readProjectFile");
+function checkAreas(raw) {
+  if (raw === void 0) return void 0;
+  if (!Array.isArray(raw)) throw new RefereeError("bad_project", "areas must be an array.");
+  return raw.map((a) => {
+    if (typeof a?.prefix !== "string" || !Array.isArray(a.checks) || !a.checks.every((c) => typeof c === "string")) {
+      throw new RefereeError("bad_project", "Each area needs a prefix string and a checks array of strings.");
+    }
+    return {
+      prefix: a.prefix,
+      checks: a.checks,
+      ...Array.isArray(a.evidence) ? { evidence: a.evidence.filter((e) => typeof e === "string") } : {},
+      ...typeof a.pack === "string" ? { pack: a.pack } : {}
+    };
+  });
+}
+__name(checkAreas, "checkAreas");
 function findProjectFile(cwd) {
   let dir = cwd;
   for (; ; ) {
@@ -1020,6 +1161,28 @@ function findProjectFile(cwd) {
   }
 }
 __name(findProjectFile, "findProjectFile");
+function loadProject(cwd) {
+  const file = findProjectFile(cwd);
+  if (!file) return null;
+  const base = readProjectFile(file);
+  const localFile = join3(dirname2(file), "referee.local.json");
+  const local = existsSync2(localFile) ? readProjectFile(localFile) : {};
+  const merged = { ...base, ...local, hooks: { ...base.hooks, ...local.hooks } };
+  if (typeof merged.pack !== "string" || !merged.pack) throw new RefereeError("bad_project", 'The project file needs a pack name, for example {"pack": "generic"}.');
+  const gate = merged.hooks?.stopGate;
+  return {
+    root: dirname2(dirname2(file)),
+    pack: merged.pack,
+    areas: checkAreas(merged.areas),
+    hooks: {
+      sessionStart: merged.hooks?.sessionStart !== false,
+      stopGate: gate === "shadow" || gate === "active" ? gate : "off",
+      preModelSwitch: merged.hooks?.preModelSwitch === true
+    },
+    thresholds: typeof merged.thresholds === "object" && merged.thresholds !== null ? merged.thresholds : void 0
+  };
+}
+__name(loadProject, "loadProject");
 
 // src/cli/commands/doctor.ts
 function nodeOk(version) {
@@ -1090,8 +1253,476 @@ var doctor = {
   }
 };
 
+// src/cli/shared.ts
+import { readFileSync as readFileSync5, statSync as statSync2 } from "node:fs";
+import { resolve as resolve2 } from "node:path";
+
+// src/engine/cache.ts
+import { createHash as createHash3 } from "node:crypto";
+import { mkdirSync, readFileSync as readFileSync3, writeFileSync } from "node:fs";
+import { join as join4 } from "node:path";
+function sha256(text) {
+  return createHash3("sha256").update(text).digest("hex");
+}
+__name(sha256, "sha256");
+function cacheKey(parts) {
+  return sha256(JSON.stringify([parts.pack, parts.packVersion, parts.model, parts.questions, parts.state]));
+}
+__name(cacheKey, "cacheKey");
+function readCache(dataDir, key, now, ttlMs) {
+  try {
+    const entry = JSON.parse(readFileSync3(join4(dataDir, "cache", `${key}.json`), "utf8"));
+    return now - entry.ts <= ttlMs ? entry : null;
+  } catch {
+    return null;
+  }
+}
+__name(readCache, "readCache");
+function writeCache(dataDir, key, entry) {
+  const dir = join4(dataDir, "cache");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join4(dir, `${key}.json`), JSON.stringify(entry));
+}
+__name(writeCache, "writeCache");
+
+// src/engine/receipts.ts
+import { appendFileSync, existsSync as existsSync3, mkdirSync as mkdirSync2, readdirSync as readdirSync3, readFileSync as readFileSync4 } from "node:fs";
+import { join as join5 } from "node:path";
+function newReceiptId(now, random = Math.random) {
+  const tail = Math.floor(random() * 36 ** 4).toString(36).padStart(4, "0");
+  return `r${now.toString(36)}${tail}`;
+}
+__name(newReceiptId, "newReceiptId");
+function receiptsDir(dataDir) {
+  return join5(dataDir, "receipts");
+}
+__name(receiptsDir, "receiptsDir");
+function appendReceipt(dataDir, receipt) {
+  const dir = join5(receiptsDir(dataDir), receipt.project);
+  mkdirSync2(dir, { recursive: true });
+  appendFileSync(join5(dir, `${receipt.ts.slice(0, 7)}.jsonl`), JSON.stringify(receipt) + "\n");
+}
+__name(appendReceipt, "appendReceipt");
+
+// src/engine/redact.ts
+var STOP = [
+  { kind: "private_key", regex: /-----BEGIN (?:[A-Z0-9]+ )*PRIVATE KEY-----/ },
+  { kind: "aws_access_key", regex: /\b(?:AKIA|ASIA)[0-9A-Z]{16}\b/ },
+  { kind: "github_token", regex: /\b(?:gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{22,})/ },
+  { kind: "slack_token", regex: /\bxox[abposr]-[A-Za-z0-9-]{10,}/ },
+  { kind: "anthropic_key", regex: /\bsk-ant-[A-Za-z0-9_-]{20,}/ },
+  { kind: "openai_key", regex: /\bsk-(?!ant-)(?:proj-|svcacct-|admin-)?[A-Za-z0-9_-]{20,}/ },
+  { kind: "typesafe_key", regex: /\bapikey_[0-9a-f]{16,}_[0-9a-f]{16,}/i },
+  { kind: "jwt", regex: /\beyJ[A-Za-z0-9_-]{8,}\.eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}/ },
+  { kind: "url_credentials", regex: /\b[a-z][a-z0-9+.-]*:\/\/[^\s:@/]+:[^\s@/]+@/i }
+];
+var ASSIGNMENT = /([A-Za-z_][A-Za-z0-9_.-]*)["']?\s*[:=]\s*["'`]?([^\s"'`,;)}\]]+)/g;
+var SECRET_NAME = /key|token|secret|passw(?:or)?d|pwd/i;
+var NOT_SECRET_NAME = /page|cursor|next|continuation|label|placeholder|hint|length|type|name|algorithm/i;
+var ID_NAME = /(?:[_.-](?:id|ID)|Id|ID)$/;
+var IDENTIFIER = /^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$/;
+var TYPE_NAME = /^[A-Z]?[a-z]+(?:[A-Z][a-z0-9]*)*$/;
+var SECRET_CHARS = /^[A-Za-z0-9+/=_\-.~!@#$%^&*]+$/;
+var PLACEHOLDER = /^(?:x{3,}|\*{3,}|\.{3}|changeme|your[_-].*|example.*|dummy.*|fake.*|test.*|placeholder.*|redacted.*|\$.*|process\.env.*|env\..*)$/i;
+var EMAIL = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}\b/g;
+var IPV4 = /\b(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)\b/g;
+function looksSecret(name, value) {
+  if (!SECRET_NAME.test(name) || NOT_SECRET_NAME.test(name) || ID_NAME.test(name)) return false;
+  if (value.length < 12 || !SECRET_CHARS.test(value)) return false;
+  if (IDENTIFIER.test(value) || TYPE_NAME.test(value) || PLACEHOLDER.test(value)) return false;
+  const classes = [/[a-z]/, /[A-Z]/, /[0-9]/, /[^A-Za-z0-9]/].filter((r) => r.test(value)).length;
+  return classes >= 3 || classes >= 2 && value.length >= 20 && /[0-9]/.test(value);
+}
+__name(looksSecret, "looksSecret");
+function compile(specs, global) {
+  return (specs ?? []).map((spec) => {
+    try {
+      const flags = [...new Set(((spec.flags ?? "") + (global ? "g" : "")).split(""))].join("");
+      return { kind: spec.kind, regex: new RegExp(spec.pattern, flags) };
+    } catch {
+      throw new RefereeError("bad_pack", `Invalid redaction pattern for ${spec.kind}.`);
+    }
+  });
+}
+__name(compile, "compile");
+function stopsIn(text, extra) {
+  const kinds = [];
+  for (const { kind, regex } of [...STOP, ...extra]) {
+    if (regex.test(text)) kinds.push(kind);
+  }
+  for (const match of text.matchAll(ASSIGNMENT)) {
+    if (looksSecret(match[1] ?? "", match[2] ?? "")) {
+      kinds.push("secret_assignment");
+      break;
+    }
+  }
+  return kinds;
+}
+__name(stopsIn, "stopsIn");
+function isVersionContext(text, start, end) {
+  const before = text.slice(Math.max(0, start - 10), start);
+  const after = text.slice(end, end + 2);
+  return /(?:\bv|version|ver|@|=|[\d.])\s*$/i.test(before) || /^(?:\.\d|[-+][0-9A-Za-z])/.test(after);
+}
+__name(isVersionContext, "isVersionContext");
+function replaceIn(text, home, extra, counts) {
+  const bump = /* @__PURE__ */ __name((kind) => {
+    counts[kind] = (counts[kind] ?? 0) + 1;
+  }, "bump");
+  let out = text;
+  if (home && home.length > 1 && out.includes(home)) {
+    out = out.split(home).join("~");
+    bump("home");
+  }
+  out = out.replace(EMAIL, () => {
+    bump("email");
+    return "[REDACTED:email]";
+  });
+  out = out.replace(IPV4, (match, offset, whole) => {
+    if (isVersionContext(whole, offset, offset + match.length)) return match;
+    bump("ip");
+    return "[REDACTED:ip]";
+  });
+  for (const { kind, regex } of extra) {
+    out = out.replace(regex, () => {
+      bump(kind);
+      return `[REDACTED:${kind}]`;
+    });
+  }
+  return out;
+}
+__name(replaceIn, "replaceIn");
+function redact2(value, options = {}) {
+  const extraStop = compile(options.extra?.stop, false);
+  const extraReplace = compile(options.extra?.replace, true);
+  const maxField = options.maxField ?? 6e4;
+  const replaced = {};
+  const stopped = [];
+  const walk = /* @__PURE__ */ __name((node, field) => {
+    if (typeof node === "string") {
+      for (const kind of stopsIn(node, extraStop)) stopped.push({ kind, field });
+      const clipped = node.length > maxField ? `${node.slice(0, maxField)}[TRUNCATED:${node.length - maxField}]` : node;
+      return replaceIn(clipped, options.home, extraReplace, replaced);
+    }
+    if (Array.isArray(node)) return node.map((item, i) => walk(item, `${field}[${i}]`));
+    if (node !== null && typeof node === "object") {
+      const out = {};
+      for (const [key, child] of Object.entries(node)) {
+        for (const kind of stopsIn(key, extraStop)) stopped.push({ kind, field: `${field}.<key>` });
+        out[key] = walk(child, field ? `${field}.${key}` : key);
+      }
+      return out;
+    }
+    return node;
+  }, "walk");
+  return { value: walk(value, ""), replaced, stopped };
+}
+__name(redact2, "redact");
+function stopError(stopped) {
+  const first = stopped[0];
+  const where = first ? `${first.kind} in ${first.field || "input"}` : "credential";
+  return new RefereeError("credential_in_state", `Request not sent: found something shaped like a credential (${where}).`, {
+    next_step: "Remove the credential from the input, or run with --dry-run to see what would be sent."
+  });
+}
+__name(stopError, "stopError");
+
+// src/engine/session.ts
+var Session = class {
+  static {
+    __name(this, "Session");
+  }
+  model;
+  dataDir;
+  receiptId;
+  options;
+  started;
+  inflight = /* @__PURE__ */ new Map();
+  keyPromise;
+  requests = 0;
+  cachedCount = 0;
+  inputTokens = 0;
+  cost = 0;
+  replacedCount = 0;
+  stoppedCount = 0;
+  answeredModel;
+  requestIds = [];
+  questionHashes = /* @__PURE__ */ new Set();
+  constructor(options) {
+    this.options = options;
+    this.started = options.now();
+    this.model = resolveModel(options.env);
+    this.dataDir = resolveDataDir(options.env, options.home, options.cwd, options.dataDir);
+    this.receiptId = newReceiptId(this.started);
+  }
+  prepare(planned) {
+    return planned.map((p) => {
+      const result = redact2({ state: p.state, questions: p.questions }, { home: this.options.home, extra: this.options.pack.redact });
+      this.replacedCount += Object.values(result.replaced).reduce((a, b) => a + b, 0);
+      this.questionHashes.add(sha256(JSON.stringify(p.questions)).slice(0, 12));
+      return { planned: p, body: result.value, stops: result.stopped };
+    });
+  }
+  dryRun(planned) {
+    const prepared = this.prepare(planned);
+    const stops = prepared.flatMap((p) => p.stops);
+    if (stops.length > 0) throw stopError(stops);
+    const bodies = prepared.map((p) => ({ id: p.planned.id, model: this.model, ...p.body }));
+    const estTokens = bodies.reduce((sum, b) => sum + estimateTokens(JSON.stringify(b)), 0);
+    return { ok: true, verdict: "would_send", dry_run: true, requests: bodies.length, est_tokens: estTokens, replaced: this.replacedCount, sent: bodies };
+  }
+  async run(planned, options = {}) {
+    const prepared = this.prepare(planned);
+    const stops = prepared.flatMap((p) => p.stops);
+    if (stops.length > 0 && !options.batch) throw stopError(stops);
+    const outcomes = new Array(prepared.length);
+    let next = 0;
+    const worker = /* @__PURE__ */ __name(async () => {
+      while (next < prepared.length) {
+        const index = next++;
+        const item = prepared[index];
+        if (!item) continue;
+        outcomes[index] = await this.one(item);
+      }
+    }, "worker");
+    const width = Math.max(1, Math.min(options.concurrency ?? 6, prepared.length));
+    await Promise.all(Array.from({ length: width }, worker));
+    return outcomes;
+  }
+  async one(item) {
+    const id = item.planned.id;
+    if (item.stops.length > 0) {
+      this.stoppedCount += 1;
+      return { id, answers: null, stopped: item.stops, cached: false };
+    }
+    const pack = this.options.pack;
+    const key = cacheKey({ pack: pack.name, packVersion: pack.version, model: this.model, questions: item.body.questions, state: item.body.state });
+    if (!this.options.fresh) {
+      const hit = readCache(this.dataDir, key, this.options.now(), CACHE_TTL_MS);
+      if (hit) {
+        this.cachedCount += 1;
+        this.answeredModel = hit.model;
+        return { id, answers: hit.answers, stopped: [], cached: true };
+      }
+    }
+    let pending = this.inflight.get(key);
+    if (!pending) {
+      pending = this.call(item.body, key);
+      this.inflight.set(key, pending);
+    } else {
+      this.cachedCount += 1;
+    }
+    const reply = await pending;
+    return { id, answers: reply.answers, stopped: [], cached: false };
+  }
+  async call(body, key) {
+    this.keyPromise ??= resolveKey(this.options.env, this.options.platform);
+    const { key: apiKey } = await this.keyPromise;
+    const reply = await callJev(
+      { state: body.state, questions: body.questions, model: this.model },
+      { key: apiKey, budget: PROFILES[this.options.profile ?? "cli"], baseURL: this.options.env["TYPESAFE_BASE_URL"] }
+    );
+    this.requests += 1;
+    this.inputTokens += reply.inputTokens;
+    this.cost += costUsd(reply.model, reply.inputTokens) ?? 0;
+    this.answeredModel = reply.model;
+    if (reply.requestId) this.requestIds.push(reply.requestId);
+    writeCache(this.dataDir, key, { ts: this.options.now(), model: reply.model, answers: reply.answers, inputTokens: reply.inputTokens });
+    return reply;
+  }
+  stats() {
+    return { requests: this.requests, cached: this.cachedCount };
+  }
+  record(fields = {}) {
+    const env = this.options.env;
+    const receipt = {
+      id: this.receiptId,
+      ts: new Date(this.options.now()).toISOString(),
+      command: this.options.command,
+      project: projectId(this.options.cwd),
+      pack: this.options.pack.name,
+      model: this.answeredModel ?? this.model,
+      ...fields.verdict !== void 0 ? { verdict: fields.verdict } : {},
+      ...fields.error !== void 0 ? { error: fields.error.code } : {},
+      requests: this.requests,
+      cached: this.cachedCount,
+      input_tokens: this.inputTokens,
+      cost_usd: Number(this.cost.toFixed(8)),
+      ...this.requestIds.length > 0 ? { request_ids: this.requestIds } : {},
+      ...this.questionHashes.size > 0 ? { qhash: [...this.questionHashes].sort().join(",") } : {},
+      ...this.options.fresh ? { fresh: true } : {},
+      ...this.stoppedCount > 0 ? { stopped: this.stoppedCount } : {},
+      ...this.replacedCount > 0 ? { replaced: this.replacedCount } : {},
+      ...fields.chars !== void 0 ? { chars: fields.chars } : {},
+      ms: Math.max(0, this.options.now() - this.started),
+      ...env["EVAL_RUN_ID"] ? { run_id: env["EVAL_RUN_ID"] } : {},
+      ...this.options.sessionId ? { session_id: this.options.sessionId } : {}
+    };
+    appendReceipt(this.dataDir, receipt);
+    return receipt;
+  }
+};
+
+// src/cli/shared.ts
+var JEV_COST = "One Jev request per input at $0.042 per million input tokens; output tokens are free. Repeats come from the local cache.";
+var JEV_ERRORS = [
+  "bad_input",
+  "no_api_key",
+  "invalid_api_key",
+  "auth_failed",
+  "rate_limited",
+  "timeout",
+  "service_unavailable",
+  "bad_request",
+  "credential_in_state",
+  "pack_not_found",
+  "bad_pack",
+  "bad_project",
+  "too_large"
+];
+var JEV_EFFECTS = "Sends the redacted input to the TypeSafe API unless --dry-run; writes a receipt and cache entries to the data directory.";
+function str(context, key) {
+  const value = context.values[key];
+  return typeof value === "string" ? value : void 0;
+}
+__name(str, "str");
+function list(context, key) {
+  const value = context.values[key];
+  if (Array.isArray(value)) return value.filter((v) => typeof v === "string");
+  return typeof value === "string" ? [value] : [];
+}
+__name(list, "list");
+async function readSource(context, source, what) {
+  if (source === void 0 || source === "-") {
+    const text = await context.io.readStdin();
+    if (!text.trim()) throw new RefereeError("bad_input", `No ${what} on stdin.`, { next_step: `Pipe the ${what} in, or pass a file path.` });
+    return text;
+  }
+  const path = resolve2(context.io.cwd, source);
+  try {
+    if (statSync2(path).size > 5e6) throw new RefereeError("too_large", `The ${what} file is larger than 5 MB.`);
+    return readFileSync5(path, "utf8");
+  } catch (error) {
+    if (isRefereeError(error)) throw error;
+    throw new RefereeError("bad_input", `Cannot read the ${what} file: ${source}`);
+  }
+}
+__name(readSource, "readSource");
+function stripAnsi(text) {
+  return text.replace(/\u001b\[[0-9;?]*[ -/]*[@-~]/g, "");
+}
+__name(stripAnsi, "stripAnsi");
+function clip(text, head, tail) {
+  if (text.length <= head + tail) return text;
+  return `${text.slice(0, head)}
+[… ${text.length - head - tail} characters omitted …]
+${text.slice(-tail)}`;
+}
+__name(clip, "clip");
+function openPack(context) {
+  const project = loadProject(context.io.cwd);
+  const name = context.flags.pack ?? context.io.env["REFEREE_PACK"]?.trim() ?? project?.pack ?? "generic";
+  return { pack: loadPack(name || "generic", packDirs(context.io.env)), project };
+}
+__name(openPack, "openPack");
+function question(pack, id) {
+  const q = pack.questions[id];
+  if (!q) throw new RefereeError("bad_pack", `Pack ${pack.name} has no question ${id}.`);
+  return q;
+}
+__name(question, "question");
+function withData(instructions, data) {
+  const base = typeof instructions === "object" && instructions !== null && !Array.isArray(instructions) ? instructions : { question: instructions };
+  return { ...base, ...data };
+}
+__name(withData, "withData");
+async function jevCommand(context, command, pack, planned, finish, options = {}) {
+  const { io, flags } = context;
+  const session = new Session({
+    command,
+    env: io.env,
+    cwd: io.cwd,
+    home: io.home,
+    platform: io.platform,
+    now: io.now,
+    pack: { name: pack.name, version: `${pack.version}+${pack.hash}`, redact: pack.redact },
+    dataDir: flags.dataDir,
+    fresh: flags.fresh
+  });
+  if (flags.dryRun) return session.dryRun(planned);
+  try {
+    const outcomes = await session.run(planned, options);
+    const result = finish(outcomes, session);
+    const receipt = session.record(typeof result["verdict"] === "string" ? { verdict: result["verdict"] } : {});
+    return reorder({ ...result, ...session.stats(), receipt: receipt.id });
+  } catch (error) {
+    if (isRefereeError(error)) session.record({ error });
+    throw error;
+  }
+}
+__name(jevCommand, "jevCommand");
+function reorder(result) {
+  const { ok, verdict, next_step, receipt, ...rest } = result;
+  return { ok, verdict, ...rest, next_step, receipt };
+}
+__name(reorder, "reorder");
+
+// src/cli/commands/done.ts
+var NEXT = {
+  missing: "The evidence doesn't show the criterion. Run the check that proves it and pipe its output in; the same evidence gives the same answer.",
+  unsure: "The evidence is ambiguous. Pipe the full output of the check that proves the criterion, or narrow the criterion."
+};
+var done = {
+  name: "done",
+  describe: {
+    summary: "Check whether piped test or lint output shows that each criterion holds.",
+    inputs: {
+      "--criteria <text>": 'What must hold, e.g. "all tests pass". Repeat for several; max 10.',
+      "--evidence <file|->": "The check output. '-' or omitted reads stdin. ANSI colours are stripped; long output keeps its first 2,000 and last 12,000 characters."
+    },
+    outputs: {
+      verdict: "met, unsure or missing; the lowest across criteria",
+      p: "Lowest probability that a criterion holds",
+      criteria: "Per criterion, by position, when more than one",
+      next_step: "Only when not met"
+    },
+    errors: [...JEV_ERRORS],
+    effects: JEV_EFFECTS,
+    cost: JEV_COST
+  },
+  options: { criteria: { type: "string", multiple: true }, evidence: { type: "string" } },
+  async run(context) {
+    const criteria = list(context, "criteria").map((c) => c.trim()).filter(Boolean);
+    if (criteria.length === 0) throw new RefereeError("bad_input", "Give at least one --criteria.", { next_step: 'Example: --criteria "all tests pass"' });
+    if (criteria.length > 10) throw new RefereeError("bad_input", "At most 10 criteria per call.");
+    const evidence = clip(stripAnsi(await readSource(context, str(context, "evidence"), "evidence")), 2e3, 12e3);
+    if (!evidence.trim()) throw new RefereeError("bad_input", "The evidence is empty.");
+    const { pack, project } = openPack(context);
+    const base = question(pack, "done.met");
+    const questions = Object.fromEntries(criteria.map((criterion, i) => [`c${i + 1}`, { ...base, instructions: withData(base.instructions, { criterion }) }]));
+    const met = threshold(pack, project?.thresholds, "done.met", "met", 0.7);
+    const missing = threshold(pack, project?.thresholds, "done.met", "missing", 0.5);
+    return jevCommand(context, "done", pack, [{ id: "done", state: { evidence }, questions }], ([outcome]) => {
+      const per = criteria.map((_, i) => {
+        const answer = outcome?.answers?.[`c${i + 1}`];
+        const p = answer?.type === "noul" ? answer.noul : 0;
+        const verdict2 = p >= met ? "met" : p < missing ? "missing" : "unsure";
+        return { i: i + 1, verdict: verdict2, p };
+      });
+      const verdict = per.some((c) => c.verdict === "missing") ? "missing" : per.some((c) => c.verdict === "unsure") ? "unsure" : "met";
+      return {
+        ok: true,
+        verdict,
+        p: Math.min(...per.map((c) => c.p)),
+        ...per.length > 1 ? { criteria: per } : {},
+        next_step: verdict === "met" ? void 0 : NEXT[verdict]
+      };
+    });
+  }
+};
+
 // src/cli/commands/index.ts
-var commands = [doctor];
+var commands = [done, doctor];
 
 // src/cli/io.ts
 import { homedir } from "node:os";
@@ -1117,12 +1748,12 @@ function processIo() {
 __name(processIo, "processIo");
 
 // src/cli/run.ts
-import { join as join5 } from "node:path";
+import { join as join7 } from "node:path";
 import { parseArgs } from "node:util";
 
 // src/engine/output.ts
-import { mkdirSync, writeFileSync } from "node:fs";
-import { join as join4 } from "node:path";
+import { mkdirSync as mkdirSync3, writeFileSync as writeFileSync2 } from "node:fs";
+import { join as join6 } from "node:path";
 function roundNumber(key, value) {
   if (Number.isInteger(value)) return value;
   const digits = key.endsWith("_usd") ? 6 : 2;
@@ -1162,9 +1793,9 @@ function render(result, options = {}) {
   if (options.pretty) return JSON.stringify(rounded, null, 2);
   const line = JSON.stringify(rounded);
   if (line.length <= DETAIL_LIMIT || !options.detailsDir || !options.receipt) return line;
-  mkdirSync(options.detailsDir, { recursive: true });
-  const path = join4(options.detailsDir, `${options.receipt}.json`);
-  writeFileSync(path, JSON.stringify(rounded, null, 2) + "\n");
+  mkdirSync3(options.detailsDir, { recursive: true });
+  const path = join6(options.detailsDir, `${options.receipt}.json`);
+  writeFileSync2(path, JSON.stringify(rounded, null, 2) + "\n");
   return JSON.stringify(summarize(rounded, path));
 }
 __name(render, "render");
@@ -1206,15 +1837,15 @@ function usage(commands2) {
 }
 __name(usage, "usage");
 function flagsFrom(values) {
-  const str = /* @__PURE__ */ __name((key) => typeof values[key] === "string" ? values[key] : void 0, "str");
+  const str2 = /* @__PURE__ */ __name((key) => typeof values[key] === "string" ? values[key] : void 0, "str");
   return {
     pretty: values["pretty"] === true,
     dryRun: values["dry-run"] === true,
     fresh: values["fresh"] === true,
     verbose: values["verbose"] === true,
-    dataDir: str("data-dir"),
-    pack: str("pack"),
-    failOn: (str("fail-on") ?? "").split(",").map((v) => v.trim()).filter(Boolean)
+    dataDir: str2("data-dir"),
+    pack: str2("pack"),
+    failOn: (str2("fail-on") ?? "").split(",").map((v) => v.trim()).filter(Boolean)
   };
 }
 __name(flagsFrom, "flagsFrom");
@@ -1251,7 +1882,7 @@ async function run(argv, io, commands2) {
     }
     const result = await command.run({ io, flags, values: parsed.values, positionals: parsed.positionals });
     const receipt = typeof result["receipt"] === "string" ? result["receipt"] : null;
-    const detailsDir = flags.dryRun ? null : join5(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
+    const detailsDir = flags.dryRun ? null : join7(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
     io.write(render(result, { pretty, detailsDir, receipt }) + "\n");
     const verdict = result["verdict"];
     return typeof verdict === "string" && flags.failOn.includes(verdict) ? 3 : 0;

@@ -2,5 +2,6 @@
 
 import type { Command } from "../types.ts";
 import { doctor } from "./doctor.ts";
+import { done } from "./done.ts";
 
-export const commands: readonly Command[] = [doctor];
+export const commands: readonly Command[] = [done, doctor];
