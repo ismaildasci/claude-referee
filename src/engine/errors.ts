@@ -14,6 +14,7 @@ export type ErrorCode =
   | "bad_pack"
   | "bad_project"
   | "too_large"
+  | "breaker_open"
   | "internal";
 
 export interface ErrorDetails {

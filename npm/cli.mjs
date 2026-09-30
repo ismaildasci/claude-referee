@@ -703,7 +703,7 @@ var init_dist = __esm({
 });
 
 // src/cli/commands/decide.ts
-import { readFileSync as readFileSync6, statSync as statSync3 } from "node:fs";
+import { readFileSync as readFileSync7, statSync as statSync3 } from "node:fs";
 import { resolve as resolve3 } from "node:path";
 
 // src/engine/config.ts
@@ -887,7 +887,7 @@ function threshold(pack, project, question2, key, fallback) {
 __name(threshold, "threshold");
 
 // src/cli/shared.ts
-import { readFileSync as readFileSync5, statSync as statSync2 } from "node:fs";
+import { readFileSync as readFileSync6, statSync as statSync2 } from "node:fs";
 import { resolve as resolve2 } from "node:path";
 
 // src/engine/output.ts
@@ -1015,10 +1015,43 @@ function loadProject(cwd) {
 }
 __name(loadProject, "loadProject");
 
-// src/engine/cache.ts
-import { createHash as createHash2 } from "node:crypto";
+// src/engine/breaker.ts
 import { mkdirSync as mkdirSync2, readFileSync as readFileSync3, writeFileSync as writeFileSync2 } from "node:fs";
 import { join as join4 } from "node:path";
+var LIMIT = 3;
+var STALE_MS = 24 * 60 * 60 * 1e3;
+var BREAKER_CODES = /* @__PURE__ */ new Set(["timeout", "service_unavailable", "rate_limited"]);
+function read(dataDir) {
+  try {
+    const state = JSON.parse(readFileSync3(join4(dataDir, "breaker.json"), "utf8"));
+    return state && typeof state.sessions === "object" && state.sessions !== null ? state : { sessions: {} };
+  } catch {
+    return { sessions: {} };
+  }
+}
+__name(read, "read");
+function breakerOpen(dataDir, sessionId) {
+  return (read(dataDir).sessions[sessionId]?.failures ?? 0) >= LIMIT;
+}
+__name(breakerOpen, "breakerOpen");
+function recordBreaker(dataDir, sessionId, ok, now) {
+  const state = read(dataDir);
+  for (const [id, entry] of Object.entries(state.sessions)) if (now - entry.ts > STALE_MS) delete state.sessions[id];
+  if (ok) delete state.sessions[sessionId];
+  else state.sessions[sessionId] = { failures: (state.sessions[sessionId]?.failures ?? 0) + 1, ts: now };
+  try {
+    mkdirSync2(dataDir, { recursive: true });
+    writeFileSync2(join4(dataDir, "breaker.json"), JSON.stringify(state));
+  } catch {
+    return;
+  }
+}
+__name(recordBreaker, "recordBreaker");
+
+// src/engine/cache.ts
+import { createHash as createHash2 } from "node:crypto";
+import { mkdirSync as mkdirSync3, readFileSync as readFileSync4, writeFileSync as writeFileSync3 } from "node:fs";
+import { join as join5 } from "node:path";
 function sha256(text) {
   return createHash2("sha256").update(text).digest("hex");
 }
@@ -1029,7 +1062,7 @@ function cacheKey(parts) {
 __name(cacheKey, "cacheKey");
 function readCache(dataDir, key, now, ttlMs) {
   try {
-    const entry = JSON.parse(readFileSync3(join4(dataDir, "cache", `${key}.json`), "utf8"));
+    const entry = JSON.parse(readFileSync4(join5(dataDir, "cache", `${key}.json`), "utf8"));
     return now - entry.ts <= ttlMs ? entry : null;
   } catch {
     return null;
@@ -1038,9 +1071,9 @@ function readCache(dataDir, key, now, ttlMs) {
 __name(readCache, "readCache");
 function writeCache(dataDir, key, entry) {
   try {
-    const dir = join4(dataDir, "cache");
-    mkdirSync2(dir, { recursive: true });
-    writeFileSync2(join4(dir, `${key}.json`), JSON.stringify(entry));
+    const dir = join5(dataDir, "cache");
+    mkdirSync3(dir, { recursive: true });
+    writeFileSync3(join5(dir, `${key}.json`), JSON.stringify(entry));
     return true;
   } catch {
     return false;
@@ -1174,7 +1207,7 @@ __name(listModels, "listModels");
 import { execFileSync } from "node:child_process";
 import { createHash as createHash3 } from "node:crypto";
 import { readdirSync as readdirSync2, realpathSync, statSync } from "node:fs";
-import { join as join5, resolve } from "node:path";
+import { join as join6, resolve } from "node:path";
 function pluginDataId() {
   return `${KIT}@${MARKETPLACE}`.replace(/[^A-Za-z0-9_-]/g, "-");
 }
@@ -1183,8 +1216,8 @@ function resolveDataDir(env, home, cwd, flag) {
   if (flag) return resolve(cwd, flag);
   const fromEnv = env["CLAUDE_PLUGIN_DATA"]?.trim() || env["REFEREE_DATA_DIR"]?.trim();
   if (fromEnv) return fromEnv;
-  const configDir = env["CLAUDE_CONFIG_DIR"]?.trim() || join5(home, ".claude");
-  return join5(configDir, "plugins", "data", pluginDataId());
+  const configDir = env["CLAUDE_CONFIG_DIR"]?.trim() || join6(home, ".claude");
+  return join6(configDir, "plugins", "data", pluginDataId());
 }
 __name(resolveDataDir, "resolveDataDir");
 function projectRoot(cwd) {
@@ -1214,7 +1247,7 @@ function dirSize(dir) {
     return 0;
   }
   for (const entry of entries) {
-    const path = join5(dir, entry.name);
+    const path = join6(dir, entry.name);
     if (entry.isDirectory()) total += dirSize(path);
     else if (entry.isFile()) total += statSync(path).size;
   }
@@ -1313,22 +1346,22 @@ async function resolveKey(env, platform, runner = runCommand, memo = processMemo
 __name(resolveKey, "resolveKey");
 
 // src/engine/receipts.ts
-import { appendFileSync, existsSync as existsSync3, mkdirSync as mkdirSync3, readdirSync as readdirSync3, readFileSync as readFileSync4 } from "node:fs";
-import { join as join6 } from "node:path";
+import { appendFileSync, existsSync as existsSync3, mkdirSync as mkdirSync4, readdirSync as readdirSync3, readFileSync as readFileSync5 } from "node:fs";
+import { join as join7 } from "node:path";
 function newReceiptId(now, random = Math.random) {
   const tail = Math.floor(random() * 36 ** 4).toString(36).padStart(4, "0");
   return `r${now.toString(36)}${tail}`;
 }
 __name(newReceiptId, "newReceiptId");
 function receiptsDir(dataDir) {
-  return join6(dataDir, "receipts");
+  return join7(dataDir, "receipts");
 }
 __name(receiptsDir, "receiptsDir");
 function appendReceipt(dataDir, receipt) {
   try {
-    const dir = join6(receiptsDir(dataDir), receipt.project);
-    mkdirSync3(dir, { recursive: true });
-    appendFileSync(join6(dir, `${receipt.ts.slice(0, 7)}.jsonl`), JSON.stringify(receipt) + "\n");
+    const dir = join7(receiptsDir(dataDir), receipt.project);
+    mkdirSync4(dir, { recursive: true });
+    appendFileSync(join7(dir, `${receipt.ts.slice(0, 7)}.jsonl`), JSON.stringify(receipt) + "\n");
     return true;
   } catch {
     return false;
@@ -1341,10 +1374,10 @@ function readReceipts(dataDir, project) {
   const projects = project ? [project] : readdirSync3(root);
   const out = [];
   for (const p of projects.sort()) {
-    const dir = join6(root, p);
+    const dir = join7(root, p);
     if (!existsSync3(dir)) continue;
     for (const file of readdirSync3(dir).filter((f) => f.endsWith(".jsonl")).sort()) {
-      for (const line of readFileSync4(join6(dir, file), "utf8").split("\n")) {
+      for (const line of readFileSync5(join7(dir, file), "utf8").split("\n")) {
         if (!line.trim()) continue;
         try {
           out.push(JSON.parse(line));
@@ -1611,12 +1644,23 @@ var Session = class {
     return { id, answers: reply.answers, stopped: [], cached: false };
   }
   async call(body, key, signal) {
+    const breakerSession = this.options.profile === "hook" ? this.options.sessionId : void 0;
+    if (breakerSession && breakerOpen(this.dataDir, breakerSession)) {
+      throw new RefereeError("breaker_open", "Skipped: Jev failed three times in a row in this session.", { next_step: "Hooks skip Jev until the session ends; the CLI still calls it." });
+    }
     this.keyPromise ??= resolveKey(this.options.env, this.options.platform);
     const { key: apiKey } = await this.keyPromise;
-    const reply = await callJev(
-      { state: body.state, questions: body.questions, model: this.model },
-      { key: apiKey, budget: PROFILES[this.options.profile ?? "cli"], baseURL: this.options.env["TYPESAFE_BASE_URL"], signal }
-    );
+    let reply;
+    try {
+      reply = await callJev(
+        { state: body.state, questions: body.questions, model: this.model },
+        { key: apiKey, budget: PROFILES[this.options.profile ?? "cli"], baseURL: this.options.env["TYPESAFE_BASE_URL"], signal }
+      );
+    } catch (error) {
+      if (breakerSession && isRefereeError(error) && BREAKER_CODES.has(error.code)) recordBreaker(this.dataDir, breakerSession, false, this.options.now());
+      throw error;
+    }
+    if (breakerSession) recordBreaker(this.dataDir, breakerSession, true, this.options.now());
     this.requests += 1;
     this.inputTokens += reply.inputTokens;
     this.cost += costUsd(reply.model, reply.inputTokens) ?? 0;
@@ -1699,7 +1743,7 @@ async function readSource(context, source, what) {
   const path = resolve2(context.io.cwd, source);
   try {
     if (statSync2(path).size > 5e6) throw new RefereeError("too_large", `The ${what} file is larger than 5 MB.`);
-    return readFileSync5(path, "utf8");
+    return readFileSync6(path, "utf8");
   } catch (error) {
     if (isRefereeError(error)) throw error;
     throw new RefereeError("bad_input", `Cannot read the ${what} file: ${source}`);
@@ -1842,7 +1886,7 @@ function parseInput(text) {
 __name(parseInput, "parseInput");
 function readContextFiles(context, files) {
   const contents = {};
-  const read = [];
+  const read2 = [];
   let total = 0;
   for (const file of files) {
     const path = resolve3(context.io.cwd, file);
@@ -1855,10 +1899,10 @@ function readContextFiles(context, files) {
     if (bytes > FILE_LIMIT) throw new RefereeError("too_large", `Context file over 100 KB: ${file}`, { next_step: "Pass a smaller excerpt in context instead." });
     total += bytes;
     if (total > FILES_LIMIT) throw new RefereeError("too_large", "Context files over 200 KB in total.", { next_step: "Pass fewer or smaller files." });
-    contents[file] = readFileSync6(path, "utf8");
-    read.push({ path: file, bytes });
+    contents[file] = readFileSync7(path, "utf8");
+    read2.push({ path: file, bytes });
   }
-  return { contents, read };
+  return { contents, read: read2 };
 }
 __name(readContextFiles, "readContextFiles");
 function argmax(p) {
@@ -1892,12 +1936,12 @@ var decide = {
   options: { in: { type: "string" } },
   async run(context) {
     const input = parseInput(await readSource(context, str(context, "in"), "decision JSON"));
-    const { contents, read } = readContextFiles(context, input.files);
+    const { contents, read: read2 } = readContextFiles(context, input.files);
     const { pack, project } = openPack(context);
     const state = {
       decision: input.decision,
       ...input.context ? { context: input.context } : {},
-      ...read.length ? { context_files: contents } : {}
+      ...read2.length ? { context_files: contents } : {}
     };
     const stateTokens = estimateTokens(JSON.stringify(state));
     if (stateTokens > STATE_TOKEN_LIMIT) throw new RefereeError("too_large", "The context is too large for one Jev request.", { next_step: "Trim context or context_files." });
@@ -1959,7 +2003,7 @@ var decide = {
         lean,
         p: mean,
         ...perOption ? { mode: "per_option" } : { order_disagrees: disagree },
-        ...read.length ? { read } : {},
+        ...read2.length ? { read: read2 } : {},
         ...flags.length ? { flags } : {},
         next_step: verdict === "clear" ? void 0 : `${why}Add the missing fact to context; if the decision is easy to undo, go with ${lean}. Asking the same question again won't change it.`
       };
@@ -2121,8 +2165,8 @@ var done = {
 };
 
 // src/cli/commands/eval.ts
-import { appendFileSync as appendFileSync2, existsSync as existsSync4, readdirSync as readdirSync4, readFileSync as readFileSync7 } from "node:fs";
-import { join as join7, resolve as resolve4 } from "node:path";
+import { appendFileSync as appendFileSync2, existsSync as existsSync4, readdirSync as readdirSync4, readFileSync as readFileSync8 } from "node:fs";
+import { join as join8, resolve as resolve4 } from "node:path";
 
 // src/engine/evals.ts
 var MIN_PER_CLASS = 10;
@@ -2211,13 +2255,13 @@ __name(sweep, "sweep");
 // src/cli/commands/eval.ts
 var LIST_LIMIT = 20;
 function readSuite(root, name) {
-  const dir = join7(root, name);
-  if (!existsSync4(join7(dir, "suite.json")) || !existsSync4(join7(dir, "cases.jsonl"))) {
+  const dir = join8(root, name);
+  if (!existsSync4(join8(dir, "suite.json")) || !existsSync4(join8(dir, "cases.jsonl"))) {
     throw new RefereeError("bad_input", `No eval suite ${name}: it needs suite.json and cases.jsonl.`, { next_step: `Look in ${root}.` });
   }
   let raw;
   try {
-    raw = JSON.parse(readFileSync7(join7(dir, "suite.json"), "utf8"));
+    raw = JSON.parse(readFileSync8(join8(dir, "suite.json"), "utf8"));
   } catch {
     throw new RefereeError("bad_input", `Suite ${name}: suite.json is not valid JSON.`);
   }
@@ -2228,20 +2272,20 @@ function readSuite(root, name) {
     positive: typeof raw["positive"] === "string" ? raw["positive"] : "met",
     max_wrong_positive: typeof raw["max_wrong_positive"] === "number" ? raw["max_wrong_positive"] : 0
   };
-  const recorded = join7(dir, "recorded.jsonl");
+  const recorded = join8(dir, "recorded.jsonl");
   return {
     name,
     dir,
     config,
-    cases: parseCases(readFileSync7(join7(dir, "cases.jsonl"), "utf8")),
-    recordings: existsSync4(recorded) ? parseRecordings(readFileSync7(recorded, "utf8")) : []
+    cases: parseCases(readFileSync8(join8(dir, "cases.jsonl"), "utf8")),
+    recordings: existsSync4(recorded) ? parseRecordings(readFileSync8(recorded, "utf8")) : []
   };
 }
 __name(readSuite, "readSuite");
 function suites(root, name) {
   if (name !== "all") return [readSuite(root, name)];
   if (!existsSync4(root)) return [];
-  return readdirSync4(root, { withFileTypes: true }).filter((d) => d.isDirectory() && existsSync4(join7(root, d.name, "suite.json"))).map((d) => readSuite(root, d.name)).sort((a, b) => a.name.localeCompare(b.name));
+  return readdirSync4(root, { withFileTypes: true }).filter((d) => d.isDirectory() && existsSync4(join8(root, d.name, "suite.json"))).map((d) => readSuite(root, d.name)).sort((a, b) => a.name.localeCompare(b.name));
 }
 __name(suites, "suites");
 function criteriaFor(suite, item) {
@@ -2305,7 +2349,7 @@ async function record(context, pack, list2) {
       answers: outcome.answers,
       recorded_at: new Date(io.now()).toISOString()
     };
-    appendFileSync2(join7(req.suite.dir, "recorded.jsonl"), JSON.stringify(line) + "\n");
+    appendFileSync2(join8(req.suite.dir, "recorded.jsonl"), JSON.stringify(line) + "\n");
     recorded += 1;
   });
   const receipt = session.record({ verdict: failed.length ? "partial" : "recorded" });
@@ -2531,8 +2575,179 @@ var judge = {
 };
 
 // src/cli/commands/receipts.ts
-import { mkdirSync as mkdirSync4, writeFileSync as writeFileSync3 } from "node:fs";
+import { mkdirSync as mkdirSync5, writeFileSync as writeFileSync4 } from "node:fs";
 import { dirname as dirname3, resolve as resolve5 } from "node:path";
+
+// src/engine/usage.ts
+import { existsSync as existsSync5, readdirSync as readdirSync5, readFileSync as readFileSync9 } from "node:fs";
+import { join as join9 } from "node:path";
+var SEPARATORS = /* @__PURE__ */ new Set(["&&", "||", "|", "|&", ";", "&", "\n", "(", ")"]);
+var ASSIGNMENT2 = /^[A-Za-z_][A-Za-z0-9_]*=/;
+function withoutHeredocs(command) {
+  const out = [];
+  let delimiter = null;
+  for (const line of command.split("\n")) {
+    if (delimiter) {
+      if ((delimiter.strip ? line.replace(/^\t+/, "") : line) === delimiter.word) delimiter = null;
+      continue;
+    }
+    out.push(line);
+    const match = /<<(-?)\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\2/.exec(line);
+    if (match) delimiter = { word: match[3] ?? "", strip: match[1] === "-" };
+  }
+  return out.join("\n");
+}
+__name(withoutHeredocs, "withoutHeredocs");
+function tokenize(command) {
+  const tokens = [];
+  let current = "";
+  let quote = null;
+  const flush = /* @__PURE__ */ __name(() => {
+    if (current) tokens.push(current);
+    current = "";
+  }, "flush");
+  for (let i = 0; i < command.length; i++) {
+    const ch = command[i] ?? "";
+    if (quote) {
+      if (ch === quote) quote = null;
+      else if (ch === "\\" && quote === '"' && i + 1 < command.length) current += command[++i];
+      else current += ch;
+      continue;
+    }
+    if (ch === "'" || ch === '"') {
+      quote = ch;
+      continue;
+    }
+    const two = command.slice(i, i + 2);
+    if (two === "&&" || two === "||" || two === "|&") {
+      flush();
+      tokens.push(two);
+      i++;
+    } else if (ch === "|" || ch === ";" || ch === "&" || ch === "\n" || ch === "(" || ch === ")") {
+      flush();
+      tokens.push(ch);
+    } else if (ch === " " || ch === "	") {
+      flush();
+    } else {
+      current += ch;
+    }
+  }
+  flush();
+  return tokens;
+}
+__name(tokenize, "tokenize");
+function subcommand(token) {
+  return token && /^[a-z][a-z-]*$/.test(token) ? token : "other";
+}
+__name(subcommand, "subcommand");
+function callIn(segment) {
+  let i = 0;
+  while (i < segment.length && (ASSIGNMENT2.test(segment[i] ?? "") || ["{", "time", "exec", "command", "env"].includes(segment[i] ?? ""))) i++;
+  const first = segment[i];
+  if (first === "claude-referee") return subcommand(segment[i + 1]);
+  if (first === "npx") {
+    i++;
+    while ((segment[i] ?? "").startsWith("-")) i += segment[i] === "--package" || segment[i] === "-p" ? 2 : 1;
+    const name = segment[i] ?? "";
+    return name === "claude-referee" || name.startsWith("claude-referee@") ? subcommand(segment[i + 1]) : null;
+  }
+  if (first === "node") {
+    i++;
+    while ((segment[i] ?? "").startsWith("-")) i++;
+    const path = segment[i] ?? "";
+    return path.endsWith("/dist/cli.mjs") && path.includes("claude-referee") ? subcommand(segment[i + 1]) : null;
+  }
+  return null;
+}
+__name(callIn, "callIn");
+function cliCallsIn(command) {
+  const calls = [];
+  let segment = [];
+  for (const token of [...tokenize(withoutHeredocs(command)), ";"]) {
+    if (!SEPARATORS.has(token)) {
+      segment.push(token);
+      continue;
+    }
+    const call = callIn(segment);
+    if (call) calls.push(call);
+    segment = [];
+  }
+  return calls;
+}
+__name(cliCallsIn, "cliCallsIn");
+function transcriptFiles(dir) {
+  if (!existsSync5(dir)) return [];
+  const files = [];
+  for (const entry of readdirSync5(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+    if (entry.isFile() && entry.name.endsWith(".jsonl")) files.push({ path: join9(dir, entry.name), subagent: false });
+    const sub = join9(dir, entry.name, "subagents");
+    if (entry.isDirectory() && existsSync5(sub)) {
+      for (const name of readdirSync5(sub).filter((n) => n.endsWith(".jsonl")).sort()) files.push({ path: join9(sub, name), subagent: true });
+    }
+  }
+  return files;
+}
+__name(transcriptFiles, "transcriptFiles");
+function resultChars(content) {
+  if (typeof content === "string") return content.length;
+  if (!Array.isArray(content)) return 0;
+  return content.reduce((total, item) => total + (typeof item?.text === "string" ? item.text.length : 0), 0);
+}
+__name(resultChars, "resultChars");
+function projectTranscriptDirs(env, home, cwd) {
+  const configDir = env["CLAUDE_CONFIG_DIR"]?.trim() || join9(home, ".claude");
+  return [.../* @__PURE__ */ new Set([cwd, projectRoot(cwd)])].map((p) => join9(configDir, "projects", p.replace(/[^A-Za-z0-9]/g, "-")));
+}
+__name(projectTranscriptDirs, "projectTranscriptDirs");
+function scanUsage(dirs, since) {
+  const files = [...new Map(dirs.flatMap(transcriptFiles).map((f) => [f.path, f])).values()];
+  const calls = /* @__PURE__ */ new Map();
+  const sizes = /* @__PURE__ */ new Map();
+  for (const file of files) {
+    for (const line of readFileSync9(file.path, "utf8").split("\n")) {
+      if (!line.trim()) continue;
+      let entry;
+      try {
+        entry = JSON.parse(line);
+      } catch {
+        continue;
+      }
+      const content = entry.message?.content;
+      if (!Array.isArray(content)) continue;
+      const ts = typeof entry.timestamp === "string" ? entry.timestamp : "";
+      for (const item of content) {
+        if (item.type === "tool_use" && item.name === "Bash" && typeof item.id === "string" && typeof item.input?.command === "string" && !calls.has(item.id)) {
+          if (ts < since) continue;
+          const commands2 = cliCallsIn(item.input.command);
+          if (commands2.length) calls.set(item.id, { day: ts.slice(0, 10), commands: commands2, subagent: file.subagent });
+        } else if (item.type === "tool_result" && typeof item.tool_use_id === "string" && !sizes.has(item.tool_use_id)) {
+          sizes.set(item.tool_use_id, resultChars(item.content));
+        }
+      }
+    }
+  }
+  const rows = /* @__PURE__ */ new Map();
+  for (const [id, call] of calls) {
+    call.commands.forEach((command, i) => {
+      const key = `${call.day}|${command}`;
+      const row = rows.get(key) ?? { calls: 0, subagent_calls: 0, result_chars: 0 };
+      row.calls += 1;
+      if (call.subagent) row.subagent_calls += 1;
+      if (i === 0) row.result_chars += sizes.get(id) ?? 0;
+      rows.set(key, row);
+    });
+  }
+  return {
+    transcripts: files.length,
+    rows: [...rows.entries()].sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([key, row]) => {
+      const [day = "", command = ""] = key.split("|");
+      return { day, command, ...row };
+    })
+  };
+}
+__name(scanUsage, "scanUsage");
+
+// src/cli/commands/receipts.ts
 function sum(receipts2, key) {
   return receipts2.reduce((total, r) => total + (r[key] ?? 0), 0);
 }
@@ -2540,27 +2755,28 @@ __name(sum, "sum");
 var receipts = {
   name: "receipts",
   describe: {
-    summary: "Show totals from the local receipts, per day with --tokens, or export them.",
+    summary: "Show totals from the local receipts, per day with --tokens, Claude-side calls with --usage, or export them.",
     inputs: {
       export: "Positional: write every receipt, all projects, to --out as JSON lines.",
       "--out <file>": "Target file for export.",
       "--tokens": "Rows per day and command: runs, requests, cache hits, input tokens and the share of --fresh runs.",
-      "--usage": "The same as --tokens: Jev-side usage per day and command.",
+      "--usage": "Claude-side: claude-referee CLI calls per day and command, counted from this project's Claude Code transcripts (subagents included, each tool call once), with the size of what each call returned. Nothing from the transcripts is printed.",
       "--all": "Every project instead of the current one.",
       "--days <n>": "How many days back to include; default 30, or 14 with --tokens."
     },
     outputs: {
-      verdict: "summary, tokens or exported",
+      verdict: "summary, tokens, usage or exported",
       runs: "Command runs in the window",
       requests: "Jev requests made",
       cached: "Answers served from the cache or merged with an identical request",
       input_tokens: "Input tokens billed",
       cost_usd: "Estimated cost at list price",
       by_command: "Runs per command",
-      rows: "With --tokens: one row per day and command"
+      rows: "With --tokens: one row per day and command. With --usage: day, command, calls, subagent_calls and result_chars",
+      transcripts: "With --usage: how many transcript files were read"
     },
     errors: ["bad_input"],
-    effects: "Reads the data directory; export writes one file.",
+    effects: "Reads the data directory, and with --usage this project's Claude Code transcripts; export writes one file.",
     cost: "Free."
   },
   options: { out: { type: "string" }, tokens: { type: "boolean" }, usage: { type: "boolean" }, all: { type: "boolean" }, days: { type: "string" } },
@@ -2572,15 +2788,20 @@ var receipts = {
       if (!out) throw new RefereeError("bad_input", "export needs --out <file>.");
       const all = readReceipts(dataDir);
       const path = resolve5(io.cwd, out);
-      mkdirSync4(dirname3(path), { recursive: true });
-      writeFileSync3(path, all.map((r) => JSON.stringify(r)).join("\n") + (all.length ? "\n" : ""));
+      mkdirSync5(dirname3(path), { recursive: true });
+      writeFileSync4(path, all.map((r) => JSON.stringify(r)).join("\n") + (all.length ? "\n" : ""));
       return { ok: true, verdict: "exported", receipts: all.length, out: tildify(path, io.home) };
     }
     if (positionals.length > 0) throw new RefereeError("bad_input", `Unknown receipts action: ${positionals[0]}`);
-    const tokens = values["tokens"] === true || values["usage"] === true;
-    const days = Number(str(context, "days") ?? (tokens ? 14 : 30));
+    const tokens = values["tokens"] === true;
+    const usage2 = values["usage"] === true;
+    const days = Number(str(context, "days") ?? (tokens || usage2 ? 14 : 30));
     if (!Number.isInteger(days) || days < 1 || days > 366) throw new RefereeError("bad_input", "--days must be a whole number from 1 to 366.");
     const since = new Date(io.now() - days * 864e5).toISOString();
+    if (usage2) {
+      const { transcripts, rows } = scanUsage(projectTranscriptDirs(io.env, io.home, io.cwd), since);
+      return { ok: true, verdict: "usage", days, project: projectId(io.cwd), transcripts, calls: rows.reduce((n, r) => n + r.calls, 0), rows };
+    }
     const scoped = readReceipts(dataDir, values["all"] === true ? void 0 : projectId(io.cwd)).filter((r) => r.ts >= since);
     if (tokens) {
       const groups = /* @__PURE__ */ new Map();
@@ -2742,7 +2963,7 @@ function processIo() {
 __name(processIo, "processIo");
 
 // src/cli/run.ts
-import { join as join8 } from "node:path";
+import { join as join10 } from "node:path";
 import { parseArgs } from "node:util";
 var GLOBAL_OPTIONS = {
   describe: { type: "boolean" },
@@ -2831,7 +3052,7 @@ async function run(argv, io, commands2) {
     }
     const result = await command.run({ io, flags, values: parsed.values, positionals: parsed.positionals });
     const receipt = typeof result["receipt"] === "string" ? result["receipt"] : null;
-    const detailsDir = flags.dryRun ? null : join8(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
+    const detailsDir = flags.dryRun ? null : join10(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
     io.write(render(result, { pretty, detailsDir, receipt }) + "\n");
     const verdict = result["verdict"];
     return typeof verdict === "string" && flags.failOn.includes(verdict) ? 3 : 0;

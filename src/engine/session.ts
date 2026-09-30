@@ -2,12 +2,13 @@
 // calls Jev within the profile budget and totals the run into a single local receipt.
 
 import type { EntryType, Questions } from "@typesafe-ai/sdk";
+import { BREAKER_CODES, breakerOpen, recordBreaker } from "./breaker.ts";
 import { cacheKey, readCache, sha256, writeCache } from "./cache.ts";
 import { classify } from "./classify.ts";
 import { callJev, type Answer, type JevReply } from "./client.ts";
 import { BATCH_DEADLINE_MS, CACHE_TTL_MS, PROFILES, costUsd, estimateTokens, resolveModel, type Env } from "./config.ts";
 import { resolveDataDir, projectId } from "./datadir.ts";
-import { RefereeError, type ErrorCode } from "./errors.ts";
+import { RefereeError, isRefereeError, type ErrorCode } from "./errors.ts";
 import { resolveKey, type ResolvedKey } from "./key.ts";
 import { appendReceipt, newReceiptId, type Receipt } from "./receipts.ts";
 import { redact, stopError, type PackPatterns, type Stop } from "./redact.ts";
@@ -181,12 +182,23 @@ export class Session {
   }
 
   private async call(body: Prepared["body"], key: string, signal?: AbortSignal): Promise<JevReply> {
+    const breakerSession = this.options.profile === "hook" ? this.options.sessionId : undefined;
+    if (breakerSession && breakerOpen(this.dataDir, breakerSession)) {
+      throw new RefereeError("breaker_open", "Skipped: Jev failed three times in a row in this session.", { next_step: "Hooks skip Jev until the session ends; the CLI still calls it." });
+    }
     this.keyPromise ??= resolveKey(this.options.env, this.options.platform);
     const { key: apiKey } = await this.keyPromise;
-    const reply = await callJev(
-      { state: body.state, questions: body.questions, model: this.model },
-      { key: apiKey, budget: PROFILES[this.options.profile ?? "cli"], baseURL: this.options.env["TYPESAFE_BASE_URL"], signal },
-    );
+    let reply: JevReply;
+    try {
+      reply = await callJev(
+        { state: body.state, questions: body.questions, model: this.model },
+        { key: apiKey, budget: PROFILES[this.options.profile ?? "cli"], baseURL: this.options.env["TYPESAFE_BASE_URL"], signal },
+      );
+    } catch (error) {
+      if (breakerSession && isRefereeError(error) && BREAKER_CODES.has(error.code)) recordBreaker(this.dataDir, breakerSession, false, this.options.now());
+      throw error;
+    }
+    if (breakerSession) recordBreaker(this.dataDir, breakerSession, true, this.options.now());
     this.requests += 1;
     this.inputTokens += reply.inputTokens;
     this.cost += costUsd(reply.model, reply.inputTokens) ?? 0;
