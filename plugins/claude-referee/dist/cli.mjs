@@ -50,7 +50,7 @@ var init_dist = __esm({
       #parseResponse;
       #parsed;
       constructor(responsePromise, parseResponse) {
-        super((resolve4) => resolve4(void 0));
+        super((resolve5) => resolve5(void 0));
         this.#responsePromise = responsePromise;
         this.#parseResponse = parseResponse;
       }
@@ -142,7 +142,7 @@ var init_dist = __esm({
       const exponential = Math.min(policy.backoffInitialMs * 2 ** attempt, policy.backoffMaxMs);
       return Math.round(exponential * (1 - random() * policy.backoffJitter));
     }, "retryDelayMs");
-    sleep = /* @__PURE__ */ __name((ms, signal) => new Promise((resolve4, reject) => {
+    sleep = /* @__PURE__ */ __name((ms, signal) => new Promise((resolve5, reject) => {
       if (signal?.aborted) return reject(signal.reason);
       const onAbort = /* @__PURE__ */ __name(() => {
         clearTimeout(timer);
@@ -150,7 +150,7 @@ var init_dist = __esm({
       }, "onAbort");
       const timer = setTimeout(() => {
         signal?.removeEventListener("abort", onAbort);
-        resolve4();
+        resolve5();
       }, ms);
       signal?.addEventListener("abort", onAbort, { once: true });
     }), "sleep");
@@ -1138,12 +1138,12 @@ __name(tildify, "tildify");
 
 // src/engine/key.ts
 import { execFile } from "node:child_process";
-var runCommand = /* @__PURE__ */ __name((file, args, timeoutMs) => new Promise((resolve4) => {
+var runCommand = /* @__PURE__ */ __name((file, args, timeoutMs) => new Promise((resolve5) => {
   execFile(
     file,
     [...args],
     { timeout: timeoutMs, encoding: "utf8", windowsHide: true, maxBuffer: 64 * 1024 },
-    (error, stdout) => resolve4(error ? null : stdout)
+    (error, stdout) => resolve5(error ? null : stdout)
   );
 }), "runCommand");
 var processMemo = /* @__PURE__ */ new Map();
@@ -1240,6 +1240,28 @@ function appendReceipt(dataDir, receipt) {
   appendFileSync(join5(dir, `${receipt.ts.slice(0, 7)}.jsonl`), JSON.stringify(receipt) + "\n");
 }
 __name(appendReceipt, "appendReceipt");
+function readReceipts(dataDir, project) {
+  const root = receiptsDir(dataDir);
+  if (!existsSync3(root)) return [];
+  const projects = project ? [project] : readdirSync3(root);
+  const out = [];
+  for (const p of projects.sort()) {
+    const dir = join5(root, p);
+    if (!existsSync3(dir)) continue;
+    for (const file of readdirSync3(dir).filter((f) => f.endsWith(".jsonl")).sort()) {
+      for (const line of readFileSync4(join5(dir, file), "utf8").split("\n")) {
+        if (!line.trim()) continue;
+        try {
+          out.push(JSON.parse(line));
+        } catch {
+          continue;
+        }
+      }
+    }
+  }
+  return out;
+}
+__name(readReceipts, "readReceipts");
 
 // src/engine/redact.ts
 var STOP = [
@@ -1405,7 +1427,7 @@ var Session = class {
     const stops = prepared.flatMap((p) => p.stops);
     if (stops.length > 0) throw stopError(stops);
     const bodies = prepared.map((p) => ({ id: p.planned.id, model: this.model, ...p.body }));
-    const estTokens = bodies.reduce((sum, b) => sum + estimateTokens(JSON.stringify(b)), 0);
+    const estTokens = bodies.reduce((sum2, b) => sum2 + estimateTokens(JSON.stringify(b)), 0);
     return { ok: true, verdict: "would_send", dry_run: true, requests: bodies.length, est_tokens: estTokens, replaced: this.replacedCount, sent: bodies };
   }
   async run(planned, options = {}) {
@@ -2010,6 +2032,93 @@ var judge = {
   }
 };
 
+// src/cli/commands/receipts.ts
+import { mkdirSync as mkdirSync3, writeFileSync as writeFileSync2 } from "node:fs";
+import { dirname as dirname3, resolve as resolve4 } from "node:path";
+function sum(receipts2, key) {
+  return receipts2.reduce((total, r) => total + (r[key] ?? 0), 0);
+}
+__name(sum, "sum");
+var receipts = {
+  name: "receipts",
+  describe: {
+    summary: "Show totals from the local receipts, per day with --tokens, or export them.",
+    inputs: {
+      export: "Positional: write every receipt, all projects, to --out as JSON lines.",
+      "--out <file>": "Target file for export.",
+      "--tokens": "Rows per day and command: runs, requests, cache hits, input tokens and the share of --fresh runs.",
+      "--all": "Every project instead of the current one.",
+      "--days <n>": "How many days back to include; default 30, or 14 with --tokens."
+    },
+    outputs: {
+      verdict: "summary, tokens or exported",
+      runs: "Command runs in the window",
+      requests: "Jev requests made",
+      cached: "Answers served from the cache or merged with an identical request",
+      input_tokens: "Input tokens billed",
+      cost_usd: "Estimated cost at list price",
+      by_command: "Runs per command",
+      rows: "With --tokens: one row per day and command"
+    },
+    errors: ["bad_input"],
+    effects: "Reads the data directory; export writes one file.",
+    cost: "Free."
+  },
+  options: { out: { type: "string" }, tokens: { type: "boolean" }, all: { type: "boolean" }, days: { type: "string" } },
+  async run(context) {
+    const { io, flags, values, positionals } = context;
+    const dataDir = resolveDataDir(io.env, io.home, io.cwd, flags.dataDir);
+    if (positionals[0] === "export") {
+      const out = str(context, "out");
+      if (!out) throw new RefereeError("bad_input", "export needs --out <file>.");
+      const all = readReceipts(dataDir);
+      const path = resolve4(io.cwd, out);
+      mkdirSync3(dirname3(path), { recursive: true });
+      writeFileSync2(path, all.map((r) => JSON.stringify(r)).join("\n") + (all.length ? "\n" : ""));
+      return { ok: true, verdict: "exported", receipts: all.length, out: tildify(path, io.home) };
+    }
+    if (positionals.length > 0) throw new RefereeError("bad_input", `Unknown receipts action: ${positionals[0]}`);
+    const tokens = values["tokens"] === true;
+    const days = Number(str(context, "days") ?? (tokens ? 14 : 30));
+    if (!Number.isInteger(days) || days < 1 || days > 366) throw new RefereeError("bad_input", "--days must be a whole number from 1 to 366.");
+    const since = new Date(io.now() - days * 864e5).toISOString();
+    const scoped = readReceipts(dataDir, values["all"] === true ? void 0 : projectId(io.cwd)).filter((r) => r.ts >= since);
+    if (tokens) {
+      const groups = /* @__PURE__ */ new Map();
+      for (const r of scoped) {
+        const key = `${r.ts.slice(0, 10)}|${r.command}`;
+        groups.set(key, [...groups.get(key) ?? [], r]);
+      }
+      const rows = [...groups.entries()].sort().map(([key, rs]) => {
+        const [day, command] = key.split("|");
+        return {
+          day,
+          command,
+          runs: rs.length,
+          requests: sum(rs, "requests"),
+          cached: sum(rs, "cached"),
+          input_tokens: sum(rs, "input_tokens"),
+          fresh_share: rs.filter((r) => r.fresh).length / rs.length
+        };
+      });
+      return { ok: true, verdict: "tokens", days, rows };
+    }
+    const byCommand = {};
+    for (const r of scoped) byCommand[r.command] = (byCommand[r.command] ?? 0) + 1;
+    return {
+      ok: true,
+      verdict: "summary",
+      days,
+      runs: scoped.length,
+      requests: sum(scoped, "requests"),
+      cached: sum(scoped, "cached"),
+      input_tokens: sum(scoped, "input_tokens"),
+      cost_usd: sum(scoped, "cost_usd"),
+      by_command: byCommand
+    };
+  }
+};
+
 // src/cli/commands/verify.ts
 var MAX_CLAIMS = 100;
 var verify = {
@@ -2095,7 +2204,7 @@ var verify = {
 };
 
 // src/cli/commands/index.ts
-var commands = [done, decide, judge, verify, doctor];
+var commands = [done, decide, judge, verify, receipts, doctor];
 
 // src/cli/io.ts
 import { homedir } from "node:os";
@@ -2125,7 +2234,7 @@ import { join as join7 } from "node:path";
 import { parseArgs } from "node:util";
 
 // src/engine/output.ts
-import { mkdirSync as mkdirSync3, writeFileSync as writeFileSync2 } from "node:fs";
+import { mkdirSync as mkdirSync4, writeFileSync as writeFileSync3 } from "node:fs";
 import { join as join6 } from "node:path";
 function roundNumber(key, value) {
   if (Number.isInteger(value)) return value;
@@ -2166,9 +2275,9 @@ function render(result, options = {}) {
   if (options.pretty) return JSON.stringify(rounded, null, 2);
   const line = JSON.stringify(rounded);
   if (line.length <= DETAIL_LIMIT || !options.detailsDir || !options.receipt) return line;
-  mkdirSync3(options.detailsDir, { recursive: true });
+  mkdirSync4(options.detailsDir, { recursive: true });
   const path = join6(options.detailsDir, `${options.receipt}.json`);
-  writeFileSync2(path, JSON.stringify(rounded, null, 2) + "\n");
+  writeFileSync3(path, JSON.stringify(rounded, null, 2) + "\n");
   return JSON.stringify(summarize(rounded, path));
 }
 __name(render, "render");
