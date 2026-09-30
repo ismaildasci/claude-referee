@@ -1,0 +1,18 @@
+{
+  "name": "claude-referee",
+  "owner": {
+    "name": "İsmail Daşcı",
+    "email": "hello@ismaildasci.com",
+    "url": "https://github.com/ismaildasci"
+  },
+  "metadata": {
+    "description": "claude-referee: an unofficial Claude Code plugin that checks \"done\" claims and small judgement calls with TypeSafe Jev, and keeps local receipts."
+  },
+  "plugins": [
+    {
+      "name": "claude-referee",
+      "source": "./plugins/claude-referee",
+      "description": "Checks \"done\" claims and small judgement calls with TypeSafe Jev, and keeps local receipts. Unofficial."
+    }
+  ]
+}

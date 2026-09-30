@@ -1,0 +1,48 @@
+{
+  "name": "claude-referee",
+  "displayName": "claude-referee (unofficial)",
+  "version": "0.1.0",
+  "description": "Checks \"done\" claims and small judgement calls with TypeSafe Jev, and keeps local receipts. Unofficial; not affiliated with Anthropic or TypeSafe.",
+  "author": {
+    "name": "İsmail Daşcı",
+    "email": "hello@ismaildasci.com",
+    "url": "https://github.com/ismaildasci"
+  },
+  "homepage": "https://github.com/ismaildasci/claude-referee",
+  "repository": "https://github.com/ismaildasci/claude-referee",
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "jev",
+    "typesafe",
+    "hooks",
+    "evals"
+  ],
+  "userConfig": {
+    "api_key": {
+      "type": "string",
+      "title": "TypeSafe API key",
+      "description": "Used by the referee's hooks. Commands Claude runs in the shell can't read it; see the README for the Keychain or TYPESAFE_API_KEY_CMD.",
+      "sensitive": true,
+      "required": false
+    },
+    "packs_dir": {
+      "type": "directory",
+      "title": "Packs directory",
+      "description": "Optional directory with your own packs, for example a private repository.",
+      "required": false
+    },
+    "hooks_enabled": {
+      "type": "boolean",
+      "title": "Enable hooks",
+      "description": "Turn off to silence every claude-referee hook, whatever the project file says.",
+      "default": true
+    },
+    "model": {
+      "type": "string",
+      "title": "Jev model",
+      "description": "The model the bundled pack thresholds were tuned on is jev-1.13.0.",
+      "default": "jev-1.13.0"
+    }
+  }
+}
