@@ -17,6 +17,7 @@ await build({
   format: "esm",
   platform: "node",
   target: "node20",
+  keepNames: true,
   legalComments: "none",
   charset: "utf8",
   logLevel: "warning",

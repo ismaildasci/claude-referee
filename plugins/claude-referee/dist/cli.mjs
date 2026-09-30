@@ -1,3 +1,6 @@
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+
 // src/cli/commands/index.ts
 var commands = [];
 
@@ -9,18 +12,20 @@ async function readAll(stream) {
   for await (const chunk of stream) chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
   return Buffer.concat(chunks).toString("utf8");
 }
+__name(readAll, "readAll");
 function processIo() {
   return {
     env: process.env,
     cwd: process.cwd(),
     home: homedir(),
     platform: process.platform,
-    readStdin: () => readAll(process.stdin),
-    write: (text) => void process.stdout.write(text),
-    warn: (text) => void process.stderr.write(text),
-    now: () => Date.now()
+    readStdin: /* @__PURE__ */ __name(() => readAll(process.stdin), "readStdin"),
+    write: /* @__PURE__ */ __name((text) => void process.stdout.write(text), "write"),
+    warn: /* @__PURE__ */ __name((text) => void process.stderr.write(text), "warn"),
+    now: /* @__PURE__ */ __name(() => Date.now(), "now")
   };
 }
+__name(processIo, "processIo");
 
 // src/cli/run.ts
 import { join as join3 } from "node:path";
@@ -39,6 +44,7 @@ import { join, resolve } from "node:path";
 function pluginDataId() {
   return `${KIT}@${MARKETPLACE}`.replace(/[^A-Za-z0-9_-]/g, "-");
 }
+__name(pluginDataId, "pluginDataId");
 function resolveDataDir(env, home, cwd, flag) {
   if (flag) return resolve(cwd, flag);
   const fromEnv = env["CLAUDE_PLUGIN_DATA"]?.trim() || env["REFEREE_DATA_DIR"]?.trim();
@@ -46,9 +52,13 @@ function resolveDataDir(env, home, cwd, flag) {
   const configDir = env["CLAUDE_CONFIG_DIR"]?.trim() || join(home, ".claude");
   return join(configDir, "plugins", "data", pluginDataId());
 }
+__name(resolveDataDir, "resolveDataDir");
 
 // src/engine/errors.ts
 var RefereeError = class extends Error {
+  static {
+    __name(this, "RefereeError");
+  }
   code;
   details;
   constructor(code, message, details = {}) {
@@ -61,6 +71,7 @@ var RefereeError = class extends Error {
 function isRefereeError(value) {
   return value instanceof RefereeError;
 }
+__name(isRefereeError, "isRefereeError");
 
 // src/engine/output.ts
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -70,6 +81,7 @@ function roundNumber(key, value) {
   const digits = key.endsWith("_usd") ? 6 : 2;
   return Number(value.toFixed(digits));
 }
+__name(roundNumber, "roundNumber");
 function roundDeep(value, key = "") {
   if (typeof value === "number") return roundNumber(key, value);
   if (Array.isArray(value)) return value.map((item) => roundDeep(item, key));
@@ -82,9 +94,11 @@ function roundDeep(value, key = "") {
   }
   return value;
 }
+__name(roundDeep, "roundDeep");
 function isScalar(value) {
   return value === null || ["string", "number", "boolean"].includes(typeof value);
 }
+__name(isScalar, "isScalar");
 function summarize(result, path) {
   const out = {};
   for (const [k, v] of Object.entries(result)) {
@@ -95,6 +109,7 @@ function summarize(result, path) {
   if (result["receipt"] !== void 0) out["receipt"] = result["receipt"];
   return out;
 }
+__name(summarize, "summarize");
 function render(result, options = {}) {
   const rounded = roundDeep(result);
   if (options.pretty) return JSON.stringify(rounded, null, 2);
@@ -105,6 +120,7 @@ function render(result, options = {}) {
   writeFileSync(path, JSON.stringify(rounded, null, 2) + "\n");
   return JSON.stringify(summarize(rounded, path));
 }
+__name(render, "render");
 function renderError(error, pretty = false) {
   const body = { ok: false, error: error.code, message: error.message.slice(0, 500) };
   if (error.details.status !== void 0) body["status"] = error.details.status;
@@ -113,6 +129,7 @@ function renderError(error, pretty = false) {
   const text = pretty ? JSON.stringify(body, null, 2) : JSON.stringify(body);
   return text.length <= ERROR_LIMIT ? text : JSON.stringify({ ok: false, error: error.code });
 }
+__name(renderError, "renderError");
 
 // src/cli/run.ts
 var GLOBAL_OPTIONS = {
@@ -140,8 +157,9 @@ function usage(commands2) {
     "Commands that ask Jev also accept --dry-run, --fresh and --fail-on <verdict,...>."
   ].join("\n");
 }
+__name(usage, "usage");
 function flagsFrom(values) {
-  const str = (key) => typeof values[key] === "string" ? values[key] : void 0;
+  const str = /* @__PURE__ */ __name((key) => typeof values[key] === "string" ? values[key] : void 0, "str");
   return {
     pretty: values["pretty"] === true,
     dryRun: values["dry-run"] === true,
@@ -152,6 +170,7 @@ function flagsFrom(values) {
     failOn: (str("fail-on") ?? "").split(",").map((v) => v.trim()).filter(Boolean)
   };
 }
+__name(flagsFrom, "flagsFrom");
 async function run(argv, io, commands2) {
   const [name, ...rest] = argv;
   if (name === void 0 || name === "help" || name === "--help" || name === "-h") {
@@ -195,6 +214,7 @@ async function run(argv, io, commands2) {
     return 1;
   }
 }
+__name(run, "run");
 
 // src/cli/main.ts
 process.exitCode = await run(process.argv.slice(2), processIo(), commands);
