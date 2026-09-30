@@ -1,7 +1,7 @@
 // The only module that talks to TypeSafe. The SDK is imported lazily, so commands that never ask Jev never load it.
 // Each call gets a total budget on top of the SDK's per-attempt timeout, because the SDK has no retry budget.
 
-import type { ChoiceResponse, EntryType, NoulResponse, Questions, ScoreResponse } from "@typesafe-ai/sdk";
+import type { ChoiceResponse, EntryType, NoulResponse, Questions, ScoreResponse, TypeSafeClient } from "@typesafe-ai/sdk";
 import { classify } from "./classify.ts";
 import type { Budget } from "./config.ts";
 import { RefereeError } from "./errors.ts";
@@ -35,7 +35,7 @@ const stderrLogger = {
   error: (message: string) => void process.stderr.write(`[claude-referee] ${message}\n`),
 };
 
-export async function callJev(call: JevCall, options: CallOptions): Promise<JevReply> {
+async function guarded<T>(options: CallOptions, fn: (client: TypeSafeClient, signal: AbortSignal) => Promise<T>): Promise<T> {
   const sdk = await import("@typesafe-ai/sdk");
   const budgetSignal = AbortSignal.timeout(options.budget.budgetMs);
   const signal = options.signal ? AbortSignal.any([options.signal, budgetSignal]) : budgetSignal;
@@ -48,13 +48,7 @@ export async function callJev(call: JevCall, options: CallOptions): Promise<JevR
       retry: { maxRetries: options.budget.maxRetries },
       ...(options.baseURL ? { baseURL: options.baseURL } : {}),
     });
-    const { data, requestId } = await client.systemOne({ state: call.state, questions: call.questions, model: call.model }, { signal }).withResponse();
-    return {
-      answers: data.answers as Readonly<Record<string, Answer>>,
-      model: data.model,
-      inputTokens: data.usage.input_tokens,
-      requestId,
-    };
+    return await fn(client, signal);
   } catch (error) {
     if (budgetSignal.aborted) {
       throw new RefereeError("timeout", `Jev did not answer within ${options.budget.budgetMs} ms.`, {
@@ -63,4 +57,20 @@ export async function callJev(call: JevCall, options: CallOptions): Promise<JevR
     }
     throw classify(error);
   }
+}
+
+export function callJev(call: JevCall, options: CallOptions): Promise<JevReply> {
+  return guarded(options, async (client, signal) => {
+    const { data, requestId } = await client.systemOne({ state: call.state, questions: call.questions, model: call.model }, { signal }).withResponse();
+    return {
+      answers: data.answers as Readonly<Record<string, Answer>>,
+      model: data.model,
+      inputTokens: data.usage.input_tokens,
+      requestId,
+    };
+  });
+}
+
+export function listModels(options: CallOptions): Promise<string[]> {
+  return guarded(options, async (client, signal) => (await client.models.list({ signal })).map((m) => m.name));
 }

@@ -44,6 +44,11 @@ export function defaultAnswer(request: FakeRequest): Record<string, unknown> {
 export async function fakeJev(answer: Answerer = defaultAnswer, options: { hang?: boolean; status?: number } = {}): Promise<FakeJev> {
   const requests: FakeRequest[] = [];
   const server: Server = createServer(async (req, res) => {
+    if (req.method === "GET") {
+      res.writeHead(options.status ?? 200, { "content-type": "application/json" });
+      res.end(JSON.stringify({ models: [{ name: "jev-latest", description: "fake", release_date: "2026-09-01" }] }));
+      return;
+    }
     const body = JSON.parse(await readBody(req)) as FakeRequest;
     requests.push(body);
     if (options.hang) return;
