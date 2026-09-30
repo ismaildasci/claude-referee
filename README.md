@@ -197,11 +197,16 @@ Or set `TYPESAFE_API_KEY`. `/plugin configure claude-referee` also stores the ke
 npx claude-referee doctor            # add --online to check the key with one free call
 ```
 
+If `doctor` works but Claude sees no briefing, Claude Code probably can't find Node on its `PATH`. Windows isn't tested yet.
+
 ### Try it
 
 ```sh
 # Is it done? Pipe the check output straight in, so Claude never has to read it.
 npm test 2>&1 | npx claude-referee done --criteria "all tests pass" --evidence -
+
+# Run one yes/no rule over many items: here, every added line of a diff.
+git diff -U0 --no-ext-diff | grep '^+[^+]' | npx claude-referee judge --question line.risky --items -
 
 # Pick between options. The referee reads the context files itself.
 npx claude-referee decide <<'EOF'
@@ -259,6 +264,7 @@ The reasoning behind each one is in [MANIFESTO.md](MANIFESTO.md) ([Türkçe](MAN
 - [Measurements](docs/measurements.md): every number above, with its method and limits
 - [FAQ](docs/faq.md), [Roadmap](ROADMAP.md) and [Changelog](CHANGELOG.md)
 - [Contributing](CONTRIBUTING.md): no API key needed, tests run offline. Security reports: [SECURITY.md](SECURITY.md)
+- Writing your own TypeSafe code? TypeSafe's official plugin gives Claude the full API context: `claude plugin marketplace add typesafe-ai/skills`, then `claude plugin install typesafe@typesafe-ai`. claude-referee doesn't need it.
 
 ---
 

@@ -15,6 +15,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
+- README: a `judge` example, a pointer to TypeSafe's official plugin, and notes on Node's `PATH` and on Windows being untested. Diff examples use `git diff --no-ext-diff`, so an external diff tool can't empty the pipe.
 - The session briefing prints the CLI path once and fits in 600 characters with a long installed plugin path.
 - CI also runs the tests on macOS.
 - The README uses the final design: new images, the yellow-card mark and plainer wording, checked section by section with Jev.

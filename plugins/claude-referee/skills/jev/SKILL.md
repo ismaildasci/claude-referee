@@ -29,7 +29,7 @@ EOF_JSON
 ```
 
 ```bash
-git diff -U0 | grep '^+[^+]' | node "${CLAUDE_PLUGIN_ROOT}/dist/cli.mjs" judge --question line.risky --items -
+git diff -U0 --no-ext-diff | grep '^+[^+]' | node "${CLAUDE_PLUGIN_ROOT}/dist/cli.mjs" judge --question line.risky --items -
 ```
 
 ## Rules

@@ -190,11 +190,16 @@ Ya da `TYPESAFE_API_KEY` tanımla. `/plugin configure claude-referee` de anahtar
 npx claude-referee doctor            # anahtarı tek bir ücretsiz çağrıyla denetlemek için --online ekle
 ```
 
+`doctor` çalışıyor ama Claude brifingi görmüyorsa Claude Code büyük olasılıkla `PATH` üzerinde Node'u bulamıyordur. Windows henüz test edilmedi.
+
 ### Dene
 
 ```sh
 # Bitti mi? Kontrol çıktısını doğrudan boruyla ver; Claude'un okumasına gerek kalmaz.
 npm test 2>&1 | npx claude-referee done --criteria "all tests pass" --evidence -
+
+# Tek bir evet/hayır kuralını birçok öğeye uygula: burada bir diff'in eklenen her satırı.
+git diff -U0 --no-ext-diff | grep '^+[^+]' | npx claude-referee judge --question line.risky --items -
 
 # Seçenekler arasında seç. Bağlam dosyalarını hakem kendisi okur.
 npx claude-referee decide <<'EOF'
@@ -253,6 +258,7 @@ Belgeler İngilizce:
 - [Ölçümler](docs/measurements.md): yukarıdaki her sayı, yöntemi ve sınırlarıyla
 - [SSS](docs/faq.md), [yol haritası](ROADMAP.md) ve [değişiklik günlüğü](CHANGELOG.md)
 - [Katkı](CONTRIBUTING.md): API anahtarı gerekmez, testler çevrimdışı çalışır. Güvenlik bildirimleri: [SECURITY.md](SECURITY.md)
+- Kendi TypeSafe kodunu mu yazıyorsun? TypeSafe'in resmî eklentisi Claude'a API'nin tüm bağlamını verir: `claude plugin marketplace add typesafe-ai/skills`, ardından `claude plugin install typesafe@typesafe-ai`. claude-referee'nin buna ihtiyacı yok.
 
 ---
 
