@@ -283,7 +283,7 @@ __name(fit, "fit");
 async function sessionStart(io2, pluginRoot2) {
   const started = io2.now();
   const { env } = io2;
-  if (env["REFEREE_HOOKS"] === "off" || env["CLAUDE_PLUGIN_OPTION_HOOKS_ENABLED"] === "false") return null;
+  if (env["REFEREE_HOOKS"] === "off" || ["false", "0"].includes(env["CLAUDE_PLUGIN_OPTION_HOOKS_ENABLED"] ?? "")) return null;
   let input;
   try {
     input = JSON.parse(await io2.readStdin());
@@ -310,6 +310,8 @@ async function sessionStart(io2, pluginRoot2) {
     const lines = [`export REFEREE_DATA_DIR=${quote(dataDir)}`, `export REFEREE_PACK=${quote(pack.name)}`];
     const packsDir = env["CLAUDE_PLUGIN_OPTION_PACKS_DIR"]?.trim();
     if (packsDir) lines.push(`export REFEREE_PACKS_DIR=${quote(packsDir)}`);
+    const model = env["CLAUDE_PLUGIN_OPTION_MODEL"]?.trim();
+    if (model) lines.push(`export REFEREE_MODEL=${quote(model)}`);
     appendFileSync2(envFile, lines.join("\n") + "\n");
   }
   appendReceipt(dataDir, {

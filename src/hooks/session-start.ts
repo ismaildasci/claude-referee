@@ -31,7 +31,7 @@ function fit(text: string): string {
 export async function sessionStart(io: HookIo, pluginRoot: string): Promise<string | null> {
   const started = io.now();
   const { env } = io;
-  if (env["REFEREE_HOOKS"] === "off" || env["CLAUDE_PLUGIN_OPTION_HOOKS_ENABLED"] === "false") return null;
+  if (env["REFEREE_HOOKS"] === "off" || ["false", "0"].includes(env["CLAUDE_PLUGIN_OPTION_HOOKS_ENABLED"] ?? "")) return null;
   let input: { cwd?: unknown; session_id?: unknown };
   try {
     input = JSON.parse(await io.readStdin()) as typeof input;
@@ -65,6 +65,8 @@ export async function sessionStart(io: HookIo, pluginRoot: string): Promise<stri
     const lines = [`export REFEREE_DATA_DIR=${quote(dataDir)}`, `export REFEREE_PACK=${quote(pack.name)}`];
     const packsDir = env["CLAUDE_PLUGIN_OPTION_PACKS_DIR"]?.trim();
     if (packsDir) lines.push(`export REFEREE_PACKS_DIR=${quote(packsDir)}`);
+    const model = env["CLAUDE_PLUGIN_OPTION_MODEL"]?.trim();
+    if (model) lines.push(`export REFEREE_MODEL=${quote(model)}`);
     appendFileSync(envFile, lines.join("\n") + "\n");
   }
   appendReceipt(dataDir, {

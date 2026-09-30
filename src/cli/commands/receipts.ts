@@ -21,6 +21,7 @@ export const receipts: Command = {
       export: "Positional: write every receipt, all projects, to --out as JSON lines.",
       "--out <file>": "Target file for export.",
       "--tokens": "Rows per day and command: runs, requests, cache hits, input tokens and the share of --fresh runs.",
+      "--usage": "The same as --tokens: Jev-side usage per day and command.",
       "--all": "Every project instead of the current one.",
       "--days <n>": "How many days back to include; default 30, or 14 with --tokens.",
     },
@@ -38,7 +39,7 @@ export const receipts: Command = {
     effects: "Reads the data directory; export writes one file.",
     cost: "Free.",
   },
-  options: { out: { type: "string" }, tokens: { type: "boolean" }, all: { type: "boolean" }, days: { type: "string" } },
+  options: { out: { type: "string" }, tokens: { type: "boolean" }, usage: { type: "boolean" }, all: { type: "boolean" }, days: { type: "string" } },
   async run(context) {
     const { io, flags, values, positionals } = context;
     const dataDir = resolveDataDir(io.env, io.home, io.cwd, flags.dataDir);
@@ -52,7 +53,7 @@ export const receipts: Command = {
       return { ok: true, verdict: "exported", receipts: all.length, out: tildify(path, io.home) };
     }
     if (positionals.length > 0) throw new RefereeError("bad_input", `Unknown receipts action: ${positionals[0]}`);
-    const tokens = values["tokens"] === true;
+    const tokens = values["tokens"] === true || values["usage"] === true;
     const days = Number(str(context, "days") ?? (tokens ? 14 : 30));
     if (!Number.isInteger(days) || days < 1 || days > 366) throw new RefereeError("bad_input", "--days must be a whole number from 1 to 366.");
     const since = new Date(io.now() - days * 86_400_000).toISOString();

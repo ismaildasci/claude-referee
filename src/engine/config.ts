@@ -30,7 +30,7 @@ export const PROFILES = {
 export type Env = Readonly<Record<string, string | undefined>>;
 
 export function resolveModel(env: Env): string {
-  return env["TYPESAFE_MODEL"]?.trim() || env["CLAUDE_PLUGIN_OPTION_MODEL"]?.trim() || DEFAULT_MODEL;
+  return env["TYPESAFE_MODEL"]?.trim() || env["CLAUDE_PLUGIN_OPTION_MODEL"]?.trim() || env["REFEREE_MODEL"]?.trim() || DEFAULT_MODEL;
 }
 
 export function costUsd(model: string, inputTokens: number): number | null {

@@ -724,7 +724,7 @@ var PROFILES = {
   hook: { budgetMs: 2e3, perAttemptMs: 1500, maxRetries: 0 }
 };
 function resolveModel(env) {
-  return env["TYPESAFE_MODEL"]?.trim() || env["CLAUDE_PLUGIN_OPTION_MODEL"]?.trim() || DEFAULT_MODEL;
+  return env["TYPESAFE_MODEL"]?.trim() || env["CLAUDE_PLUGIN_OPTION_MODEL"]?.trim() || env["REFEREE_MODEL"]?.trim() || DEFAULT_MODEL;
 }
 __name(resolveModel, "resolveModel");
 function costUsd(model, inputTokens) {
@@ -1187,7 +1187,7 @@ function validateKey(raw, source) {
 }
 __name(validateKey, "validateKey");
 function noKeyNextStep(platform) {
-  const hooks = "Hooks can also use /plugin configure claude-referee.";
+  const hooks = "Hooks can also use /plugin configure claude-referee or claude plugin configure claude-referee --values-stdin.";
   if (platform === "darwin") {
     return `Store the key in the Keychain: security add-generic-password -a "$USER" -s TYPESAFE_API_KEY -w (it prompts for the key). ${hooks}`;
   }
@@ -1614,6 +1614,7 @@ async function jevCommand(context, command, pack, planned, finish, options = {})
     const outcomes = await session.run(planned, options);
     const result = finish(outcomes, session);
     const receipt = session.record(typeof result["verdict"] === "string" ? { verdict: result["verdict"] } : {});
+    if (flags.verbose) io.warn(JSON.stringify({ requests: receipt.requests, cached: receipt.cached, input_tokens: receipt.input_tokens, cost_usd: receipt.cost_usd, model: receipt.model, ms: receipt.ms }) + "\n");
     return reorder({ ...result, ...session.stats(), receipt: receipt.id });
   } catch (error) {
     if (isRefereeError(error)) session.record({ error });
@@ -1698,7 +1699,7 @@ var decide = {
     inputs: {
       "stdin or --in <file>": 'JSON: {"decision": string, "options": [{"name", "text"}] or [string], "context"?: string, "context_files"?: [path], "micro"?: [{"id", "question", "bad"?}]}',
       context_files: "Read by the CLI, so Claude doesn't retype them. Max 100 KB each, 200 KB in total.",
-      micro: "Optional yes/no rules asked once per option; reported in flags, never part of the verdict. bad: true means yes is bad."
+      micro: `Optional yes/no rules asked once per option; reported in flags, never part of the verdict. bad: true means yes is bad. Without micro, a pack's decide.micro.* questions are used; a threshold of {"bad": 1} marks yes as bad.`
     },
     outputs: {
       verdict: "clear, weak or tie",
@@ -1735,8 +1736,12 @@ var decide = {
       { id: "written", state, questions: ask(input.options) },
       { id: "reversed", state, questions: ask([...input.options].reverse()) }
     ];
-    if (input.micro.length > 0) {
-      const micro = Object.fromEntries(input.micro.map((m) => [m.id, { type: "noul", instructions: m.question }]));
+    const packMicro = Object.entries(pack.questions).filter(([id, q]) => id.startsWith("decide.micro.") && q.type === "noul").map(([id]) => ({ id: id.slice("decide.micro.".length), question: "", bad: (pack.thresholds[id]?.["bad"] ?? 0) >= 1 }));
+    const micros = input.micro.length > 0 ? input.micro : packMicro;
+    if (micros.length > 0) {
+      const micro = Object.fromEntries(
+        micros.map((m) => [m.id, input.micro.length > 0 ? { type: "noul", instructions: m.question } : question(pack, `decide.micro.${m.id}`)])
+      );
       for (const o of input.options) planned.push({ id: `micro:${o.name}`, state: { ...state, option: o.text }, questions: micro });
     }
     const qid = perOption ? "decide.fit" : "decide.best";
@@ -1767,7 +1772,7 @@ var decide = {
       const p2 = ranked[1]?.[1] ?? 0;
       const verdict = !disagree && p1 >= clearAt && p1 - p2 >= margin ? "clear" : !disagree && p1 - p2 >= margin ? "weak" : "tie";
       const flags = input.options.flatMap(
-        (o) => input.micro.flatMap((m) => {
+        (o) => micros.flatMap((m) => {
           const answer = byId.get(`micro:${o.name}`)?.[m.id];
           const p = answer?.type === "noul" ? answer.noul : null;
           return p !== null && (m.bad ? p >= 0.7 : p <= 0.3) ? [{ option: o.name, rule: m.id, p }] : [];
@@ -2048,6 +2053,7 @@ var receipts = {
       export: "Positional: write every receipt, all projects, to --out as JSON lines.",
       "--out <file>": "Target file for export.",
       "--tokens": "Rows per day and command: runs, requests, cache hits, input tokens and the share of --fresh runs.",
+      "--usage": "The same as --tokens: Jev-side usage per day and command.",
       "--all": "Every project instead of the current one.",
       "--days <n>": "How many days back to include; default 30, or 14 with --tokens."
     },
@@ -2065,7 +2071,7 @@ var receipts = {
     effects: "Reads the data directory; export writes one file.",
     cost: "Free."
   },
-  options: { out: { type: "string" }, tokens: { type: "boolean" }, all: { type: "boolean" }, days: { type: "string" } },
+  options: { out: { type: "string" }, tokens: { type: "boolean" }, usage: { type: "boolean" }, all: { type: "boolean" }, days: { type: "string" } },
   async run(context) {
     const { io, flags, values, positionals } = context;
     const dataDir = resolveDataDir(io.env, io.home, io.cwd, flags.dataDir);
@@ -2079,7 +2085,7 @@ var receipts = {
       return { ok: true, verdict: "exported", receipts: all.length, out: tildify(path, io.home) };
     }
     if (positionals.length > 0) throw new RefereeError("bad_input", `Unknown receipts action: ${positionals[0]}`);
-    const tokens = values["tokens"] === true;
+    const tokens = values["tokens"] === true || values["usage"] === true;
     const days = Number(str(context, "days") ?? (tokens ? 14 : 30));
     if (!Number.isInteger(days) || days < 1 || days > 366) throw new RefereeError("bad_input", "--days must be a whole number from 1 to 366.");
     const since = new Date(io.now() - days * 864e5).toISOString();

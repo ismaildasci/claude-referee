@@ -103,7 +103,7 @@ export const decide: Command = {
       "stdin or --in <file>":
         'JSON: {"decision": string, "options": [{"name", "text"}] or [string], "context"?: string, "context_files"?: [path], "micro"?: [{"id", "question", "bad"?}]}',
       context_files: "Read by the CLI, so Claude doesn't retype them. Max 100 KB each, 200 KB in total.",
-      micro: "Optional yes/no rules asked once per option; reported in flags, never part of the verdict. bad: true means yes is bad.",
+      micro: "Optional yes/no rules asked once per option; reported in flags, never part of the verdict. bad: true means yes is bad. Without micro, a pack's decide.micro.* questions are used; a threshold of {\"bad\": 1} marks yes as bad.",
     },
     outputs: {
       verdict: "clear, weak or tie",
@@ -143,8 +143,14 @@ export const decide: Command = {
           { id: "written", state, questions: ask(input.options) },
           { id: "reversed", state, questions: ask([...input.options].reverse()) },
         ];
-    if (input.micro.length > 0) {
-      const micro: Questions = Object.fromEntries(input.micro.map((m) => [m.id, { type: "noul", instructions: m.question }]));
+    const packMicro: Micro[] = Object.entries(pack.questions)
+      .filter(([id, q]) => id.startsWith("decide.micro.") && q.type === "noul")
+      .map(([id]) => ({ id: id.slice("decide.micro.".length), question: "", bad: (pack.thresholds[id]?.["bad"] ?? 0) >= 1 }));
+    const micros = input.micro.length > 0 ? input.micro : packMicro;
+    if (micros.length > 0) {
+      const micro: Questions = Object.fromEntries(
+        micros.map((m) => [m.id, input.micro.length > 0 ? { type: "noul", instructions: m.question } : question(pack, `decide.micro.${m.id}`)]),
+      );
       for (const o of input.options) planned.push({ id: `micro:${o.name}`, state: { ...state, option: o.text }, questions: micro });
     }
     const qid = perOption ? "decide.fit" : "decide.best";
@@ -176,7 +182,7 @@ export const decide: Command = {
       const p2 = ranked[1]?.[1] ?? 0;
       const verdict = !disagree && p1 >= clearAt && p1 - p2 >= margin ? "clear" : !disagree && p1 - p2 >= margin ? "weak" : "tie";
       const flags = input.options.flatMap((o) =>
-        input.micro.flatMap((m) => {
+        micros.flatMap((m) => {
           const answer = byId.get(`micro:${o.name}`)?.[m.id];
           const p = answer?.type === "noul" ? answer.noul : null;
           return p !== null && (m.bad ? p >= 0.7 : p <= 0.3) ? [{ option: o.name, rule: m.id, p }] : [];

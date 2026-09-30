@@ -41,6 +41,10 @@ test("receipts sums this project's runs, per day with --tokens, and exports them
   assert.equal(rows[0]?.runs, 3);
   assert.ok(Math.abs((rows[0]?.fresh_share ?? 0) - 0.33) < 0.01);
 
+  const usage = memoryIo({ env, cwd });
+  await run(["receipts", "--usage"], usage, commands);
+  assert.deepEqual(usage.json()["rows"], tokens.json()["rows"]);
+
   const out = join(tempDir(), "receipts.jsonl");
   const exported = memoryIo({ env, cwd });
   await run(["receipts", "export", "--out", out], exported, commands);
