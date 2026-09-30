@@ -184,7 +184,7 @@ Run on 2026-09-30 (UTC) and 2026-10-01 against `jev-1.13.0`, from one machine, w
 
 - True claims with a covering excerpt: supports 0.97–1.00 in all 12.
 - True claims with an excerpt that doesn't cover them: says_nothing led in all 4, at 0.99–1.00.
-- False claims: 13 of 15 leaned contradicts, with supports 0.00–0.23. The two that leaned supports, at 0.88 and 0.94, were a swapped number (the 0.52 reorder figure attributed to asking again) and a flipped direction (a verdict said to go from met to missing instead of from missing to met). Our method sends numbers and directions of change to a script over the data, not to this check.
+- False claims: 13 of 15 leaned contradicts, with supports 0.00–0.23. The two that leaned supports, at 0.88 and 0.94, were a swapped number (the 0.52 reorder figure attributed to asking again) and a flipped direction (a verdict said to go from met to missing instead of from missing to met). The verification method for these docs sends numbers and directions of change to a script over the data, not to the three-way check.
 - The two orders never disagreed.
 - On this set, 0.95 is the lowest threshold that keeps no false claim; 0.8 lets through only the swapped number and the flipped direction. Only 6 of the 15 false claims have no measured number in them (c02, c05, c14, c19, c20, c26; our classification), with supports of 0.06 at most. With 0 of 6 above 0.8, the 95% upper bound (exact binomial) on how often such a claim would pass 0.8 is still 39%. The 0.8 we use to check these docs stays provisional.
 
