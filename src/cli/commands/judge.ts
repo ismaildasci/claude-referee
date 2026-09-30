@@ -56,7 +56,7 @@ export const judge: Command = {
       "--context <text>": "Optional shared context for every item, e.g. the file name.",
     },
     outputs: {
-      verdict: "flagged when any answer is yes, review when some are unsure, clear otherwise",
+      verdict: "flagged when any answer is yes, review when some are unsure or unanswered, clear otherwise",
       items: "Number of items judged",
       yes: "Answers in the yes band",
       no: "Answers in the no band",
@@ -64,6 +64,7 @@ export const judge: Command = {
       flagged: "Item ids with a yes (first 20; 'id/question' when several questions)",
       review_ids: "Item ids to review (first 20)",
       stopped: "Item ids not sent because they held something shaped like a credential",
+      unanswered: "Item ids with no answer because of an API error or the 90-second deadline (first 20)",
     },
     errors: [...JEV_ERRORS],
     effects: JEV_EFFECTS,
@@ -99,7 +100,12 @@ export const judge: Command = {
         const flagged: string[] = [];
         const reviewIds: string[] = [];
         const stopped: string[] = [];
+        const unanswered: string[] = [];
         for (const outcome of outcomes) {
+          if (outcome.error) {
+            unanswered.push(outcome.id);
+            continue;
+          }
           if (!outcome.answers) {
             stopped.push(outcome.id);
             continue;
@@ -120,7 +126,7 @@ export const judge: Command = {
             }
           }
         }
-        const verdict = yes > 0 ? "flagged" : review > 0 ? "review" : "clear";
+        const verdict = yes > 0 ? "flagged" : review > 0 || unanswered.length > 0 ? "review" : "clear";
         return {
           ok: true,
           verdict,
@@ -131,6 +137,7 @@ export const judge: Command = {
           ...(flagged.length ? { flagged: flagged.slice(0, LIST_LIMIT) } : {}),
           ...(reviewIds.length ? { review_ids: reviewIds.slice(0, LIST_LIMIT) } : {}),
           ...(stopped.length ? { stopped } : {}),
+          ...(unanswered.length ? { unanswered: unanswered.slice(0, LIST_LIMIT), next_step: "Some items got no answer; run judge again on those items." } : {}),
         };
       },
       { batch: true },

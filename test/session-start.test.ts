@@ -105,3 +105,11 @@ test("session-start still prints the briefing when it can't write the env file o
   const out = await sessionStart(hookIo(event(project()), { CLAUDE_ENV_FILE: tempDir(), REFEREE_DATA_DIR: join(blocker, "data") }), pluginRoot);
   assert.ok(out && JSON.parse(out).hookSpecificOutput.additionalContext.length > 0);
 });
+
+test("session-start briefing fits in 600 characters with a long installed plugin path", async () => {
+  const installed = "/Users/averageusername/.claude/plugins/cache/claude-referee/claude-referee/0.1.1";
+  const out = await sessionStart(hookIo(event(project())), installed);
+  const text = (JSON.parse(out ?? "{}") as { hookSpecificOutput: { additionalContext: string } }).hookSpecificOutput.additionalContext;
+  assert.ok(text.includes(join(installed, "dist", "cli.mjs")));
+  assert.ok(text.length <= 600, `${text.length} characters`);
+});

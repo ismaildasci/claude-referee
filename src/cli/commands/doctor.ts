@@ -2,13 +2,30 @@
 // --online also lists the models the key can use, which checks the key without spending tokens.
 
 import { listModels } from "../../engine/client.ts";
-import { PROFILES, VERSION, resolveModel } from "../../engine/config.ts";
+import { DEFAULT_BASE_URL, PROFILES, VERSION, resolveModel } from "../../engine/config.ts";
 import { dirSize, resolveDataDir, tildify } from "../../engine/datadir.ts";
 import { isRefereeError } from "../../engine/errors.ts";
 import { noKeyNextStep, resolveKey, runCommand, type KeySource } from "../../engine/key.ts";
 import { listPacks, packDirs } from "../../engine/pack.ts";
 import { findProjectFile } from "../../engine/project.ts";
 import type { Command } from "../types.ts";
+
+function shownBaseUrl(raw: string | undefined): string | undefined {
+  const value = raw?.trim();
+  if (!value) return undefined;
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    return "invalid";
+  }
+  url.username = "";
+  url.password = "";
+  url.search = "";
+  url.hash = "";
+  const shown = url.toString().replace(/\/+$/, "");
+  return shown === DEFAULT_BASE_URL ? undefined : shown;
+}
 
 function nodeOk(version: string): boolean {
   const [major = 0, minor = 0] = version.replace(/^v/, "").split(".").map(Number);
@@ -24,6 +41,7 @@ export const doctor: Command = {
       verdict: "ready or not_ready",
       key_source: "Where the key was found: plugin_setting, TYPESAFE_API_KEY, EVAL_TYPESAFE_API_KEY, TYPESAFE_API_KEY_CMD or keychain. Never the key.",
       packs: "Installed packs with version, content hash and source.",
+      base_url: "Only when TYPESAFE_BASE_URL points somewhere other than the default; credentials and query are removed.",
       next_step: "What to fix when not ready.",
     },
     errors: ["bad_input"],
@@ -54,6 +72,7 @@ export const doctor: Command = {
         online = isRefereeError(error) ? error.code : "internal";
       }
     }
+    const baseUrl = shownBaseUrl(io.env["TYPESAFE_BASE_URL"]);
     const dataDir = resolveDataDir(io.env, io.home, io.cwd, flags.dataDir);
     const projectFile = findProjectFile(io.cwd);
     const ready = nodeOk(node) && keySource !== null && (online === null || online === "ok");
@@ -77,6 +96,7 @@ export const doctor: Command = {
       ...(online ? { online } : {}),
       ...(models ? { models } : {}),
       model: resolveModel(io.env),
+      ...(baseUrl ? { base_url: baseUrl } : {}),
       data_dir: tildify(dataDir, io.home),
       data_bytes: dirSize(dataDir),
       packs: listPacks(packDirs(io.env)),

@@ -3,8 +3,9 @@
 
 import { readFileSync, statSync } from "node:fs";
 import { resolve } from "node:path";
+import { DETAIL_LIMIT } from "../engine/config.ts";
 import { RefereeError, isRefereeError } from "../engine/errors.ts";
-import type { Result } from "../engine/output.ts";
+import { roundDeep, type Result } from "../engine/output.ts";
 import { loadPack, packDirs, type Pack } from "../engine/pack.ts";
 import { loadProject, type ProjectConfig } from "../engine/project.ts";
 import { Session, type Outcome, type Planned } from "../engine/session.ts";
@@ -90,7 +91,7 @@ export async function jevCommand(
   pack: Pack,
   planned: readonly Planned[],
   finish: (outcomes: Outcome[], session: Session) => Result,
-  options: { batch?: boolean } = {},
+  options: { batch?: boolean; partial?: boolean } = {},
 ): Promise<Result> {
   const { io, flags } = context;
   const session = new Session({
@@ -104,7 +105,10 @@ export async function jevCommand(
     dataDir: flags.dataDir,
     fresh: flags.fresh,
   });
-  if (flags.dryRun) return session.dryRun(planned);
+  if (flags.dryRun) {
+    const result = session.dryRun(planned);
+    return flags.pretty ? result : fitLine(result);
+  }
   try {
     const outcomes = await session.run(planned, options);
     const result = finish(outcomes, session);
@@ -116,6 +120,32 @@ export async function jevCommand(
     if (isRefereeError(error)) session.record({ error });
     throw error;
   }
+}
+
+function shorten(value: unknown, max: number): unknown {
+  if (typeof value === "string") return value.length > max ? clip(value, Math.floor(max / 2), Math.floor(max / 2)) : value;
+  if (Array.isArray(value)) return value.map((item) => shorten(item, max));
+  if (value !== null && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, shorten(v, max)]));
+  return value;
+}
+
+export function fitLine(result: Result): Result {
+  const fits = (candidate: Result) => JSON.stringify(roundDeep(candidate)).length <= DETAIL_LIMIT;
+  if (fits(result)) return result;
+  const sent = Array.isArray(result["sent"]) ? (result["sent"] as unknown[]) : [];
+  for (const max of [1000, 400, 160, 60]) {
+    const candidate = { ...result, sent: shorten(sent, max) };
+    if (fits(candidate)) return candidate;
+  }
+  const short = shorten(sent, 60) as unknown[];
+  let low = 0;
+  let high = short.length;
+  while (low < high) {
+    const mid = Math.ceil((low + high) / 2);
+    if (fits({ ...result, sent: short.slice(0, mid), sent_shown: mid })) low = mid;
+    else high = mid - 1;
+  }
+  return { ...result, sent: short.slice(0, low), sent_shown: low };
 }
 
 export function reorder(result: Result): Result {

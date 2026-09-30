@@ -11,7 +11,7 @@ import { FAKE, tempDir } from "./helpers.ts";
 
 const pack = { name: "generic", version: "0.1.0" };
 
-function session(server: FakeJev | null, dataDir: string, extra: { fresh?: boolean } = {}): Session {
+function session(server: FakeJev | null, dataDir: string, extra: { fresh?: boolean; deadlineMs?: number } = {}): Session {
   const home = tempDir("referee-home-");
   return new Session({
     command: "test",
@@ -120,6 +120,48 @@ test("session receipt totals the run without paths or request text", async () =>
     assert.ok(existsSync(dir));
     const text = readFileSync(join(dir, readdirSync(dir)[0] ?? ""), "utf8");
     assert.ok(!text.includes("secret-free text") && !text.includes(dataDir) && !text.includes("/Users/"));
+  } finally {
+    await server.close();
+  }
+});
+
+const text = (r: { state: unknown }) => (r.state as { text: string }).text;
+
+test("session batch keeps the other answers when one item fails", async () => {
+  const server = await fakeJev(undefined, { behave: (r) => (text(r) === "bad" ? { status: 400 } : undefined) });
+  try {
+    const out = await session(server, tempDir()).run([noul("a", "ok"), noul("b", "bad"), noul("c", "fine")], { batch: true });
+    assert.deepEqual(
+      out.map((o) => [o.id, o.answers !== null, o.error ?? null]),
+      [
+        ["a", true, null],
+        ["b", false, "bad_request"],
+        ["c", true, null],
+      ],
+    );
+  } finally {
+    await server.close();
+  }
+});
+
+test("session batch stops at the deadline and marks the rest unanswered", async () => {
+  const server = await fakeJev(undefined, { behave: (r) => (text(r) === "slow" ? { hang: true } : undefined) });
+  const started = Date.now();
+  try {
+    const out = await session(server, tempDir(), { deadlineMs: 400 }).run([noul("a", "ok"), noul("b", "slow")], { batch: true });
+    assert.notEqual(out[0]?.answers, null);
+    assert.equal(out[1]?.answers, null);
+    assert.equal(out[1]?.error, "timeout");
+    assert.ok(Date.now() - started < 2000, `took ${Date.now() - started} ms`);
+  } finally {
+    await server.close();
+  }
+});
+
+test("session batch still fails when no item got an answer", async () => {
+  const server = await fakeJev(undefined, { status: 401 });
+  try {
+    await assert.rejects(session(server, tempDir()).run([noul("a", "x"), noul("b", "y")], { batch: true }), (e) => e instanceof RefereeError && e.code === "auth_failed");
   } finally {
     await server.close();
   }

@@ -74,3 +74,7 @@ test("key command splitting handles quotes", () => {
   assert.deepEqual(splitCommand("  op read  op://vault/item  "), ["op", "read", "op://vault/item"]);
   assert.throws(() => splitCommand("pass 'open"), RefereeError);
 });
+
+test("the no-key hint names the Claude Code version that --values-stdin needs", () => {
+  for (const platform of ["darwin", "linux"] as const) assert.match(noKeyNextStep(platform), /--values-stdin \(Claude Code 2\.1\.285\+\)/);
+});

@@ -3,10 +3,11 @@
 
 import type { EntryType, Questions } from "@typesafe-ai/sdk";
 import { cacheKey, readCache, sha256, writeCache } from "./cache.ts";
+import { classify } from "./classify.ts";
 import { callJev, type Answer, type JevReply } from "./client.ts";
-import { CACHE_TTL_MS, PROFILES, costUsd, estimateTokens, resolveModel, type Env } from "./config.ts";
+import { BATCH_DEADLINE_MS, CACHE_TTL_MS, PROFILES, costUsd, estimateTokens, resolveModel, type Env } from "./config.ts";
 import { resolveDataDir, projectId } from "./datadir.ts";
-import { RefereeError } from "./errors.ts";
+import { RefereeError, type ErrorCode } from "./errors.ts";
 import { resolveKey, type ResolvedKey } from "./key.ts";
 import { appendReceipt, newReceiptId, type Receipt } from "./receipts.ts";
 import { redact, stopError, type PackPatterns, type Stop } from "./redact.ts";
@@ -22,6 +23,7 @@ export interface Outcome {
   readonly answers: Readonly<Record<string, Answer>> | null;
   readonly stopped: readonly Stop[];
   readonly cached: boolean;
+  readonly error?: ErrorCode;
 }
 
 export interface PackRef {
@@ -42,6 +44,7 @@ export interface SessionOptions {
   readonly fresh?: boolean;
   readonly profile?: keyof typeof PROFILES;
   readonly sessionId?: string | undefined;
+  readonly deadlineMs?: number;
 }
 
 interface Prepared {
@@ -98,26 +101,42 @@ export class Session {
     return { ok: true, verdict: "would_send", dry_run: true, requests: bodies.length, est_tokens: estTokens, replaced: this.replacedCount, sent: bodies };
   }
 
-  async run(planned: readonly Planned[], options: { batch?: boolean; concurrency?: number } = {}): Promise<Outcome[]> {
+  async run(planned: readonly Planned[], options: { batch?: boolean; partial?: boolean; concurrency?: number } = {}): Promise<Outcome[]> {
     const prepared = this.prepare(planned);
     const stops = prepared.flatMap((p) => p.stops);
     if (stops.length > 0 && !options.batch) throw stopError(stops);
+    const partial = options.batch === true || options.partial === true;
+    const deadline = partial ? AbortSignal.timeout(this.options.deadlineMs ?? BATCH_DEADLINE_MS) : undefined;
     const outcomes: Outcome[] = new Array(prepared.length);
+    const failures: RefereeError[] = [];
     let next = 0;
     const worker = async () => {
       while (next < prepared.length) {
         const index = next++;
         const item = prepared[index];
         if (!item) continue;
-        outcomes[index] = await this.one(item);
+        if (!partial) {
+          outcomes[index] = await this.one(item);
+          continue;
+        }
+        try {
+          if (deadline?.aborted) throw new RefereeError("timeout", "The batch deadline passed.");
+          outcomes[index] = await this.one(item, deadline);
+        } catch (error) {
+          const known = classify(error);
+          failures.push(known);
+          outcomes[index] = { id: item.planned.id, answers: null, stopped: [], cached: false, error: known.code };
+        }
       }
     };
     const width = Math.max(1, Math.min(options.concurrency ?? 6, prepared.length));
     await Promise.all(Array.from({ length: width }, worker));
+    const [firstFailure] = failures;
+    if (firstFailure && !outcomes.some((o) => o.answers !== null)) throw firstFailure;
     return outcomes;
   }
 
-  private async one(item: Prepared): Promise<Outcome> {
+  private async one(item: Prepared, signal?: AbortSignal): Promise<Outcome> {
     const id = item.planned.id;
     if (item.stops.length > 0) {
       this.stoppedCount += 1;
@@ -135,7 +154,7 @@ export class Session {
     }
     let pending = this.inflight.get(key);
     if (!pending) {
-      pending = this.call(item.body, key);
+      pending = this.call(item.body, key, signal);
       this.inflight.set(key, pending);
     } else {
       this.cachedCount += 1;
@@ -144,12 +163,12 @@ export class Session {
     return { id, answers: reply.answers, stopped: [], cached: false };
   }
 
-  private async call(body: Prepared["body"], key: string): Promise<JevReply> {
+  private async call(body: Prepared["body"], key: string, signal?: AbortSignal): Promise<JevReply> {
     this.keyPromise ??= resolveKey(this.options.env, this.options.platform);
     const { key: apiKey } = await this.keyPromise;
     const reply = await callJev(
       { state: body.state, questions: body.questions, model: this.model },
-      { key: apiKey, budget: PROFILES[this.options.profile ?? "cli"], baseURL: this.options.env["TYPESAFE_BASE_URL"] },
+      { key: apiKey, budget: PROFILES[this.options.profile ?? "cli"], baseURL: this.options.env["TYPESAFE_BASE_URL"], signal },
     );
     this.requests += 1;
     this.inputTokens += reply.inputTokens;

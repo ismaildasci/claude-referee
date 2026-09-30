@@ -83,22 +83,23 @@ test("done --dry-run shows the redacted request and touches neither network nor 
   }
 });
 
-test("done --dry-run moves a long request to a details file and writes nothing else", async () => {
+test("done --dry-run shortens a long request, writes no file, and --pretty shows it in full", async () => {
   const server = await fakeJev();
   const dataDir = tempDir();
   try {
-    const evidence = "PASS src/app.test.ts ok\n".repeat(200);
+    const evidence = "PASS src/app.test.ts ok\n".repeat(100) + "MIDDLE_MARKER\n" + "PASS src/app.test.ts ok\n".repeat(100);
     const out = io(server, evidence, dataDir);
     assert.equal(await run(["done", "--criteria", "all tests pass", "--dry-run"], out, commands), 0);
     const line = out.out.join("").trim();
     assert.ok(line.length <= 1500, `${line.length}`);
-    const result = out.json();
-    assert.equal(result["verdict"], "would_send");
-    assert.equal("sent" in result, false);
-    const full = JSON.parse(readFileSync(String(result["details"]), "utf8")) as { sent: { state: { evidence: string } }[] };
-    assert.equal(full.sent[0]?.state.evidence, evidence);
+    assert.equal(out.json()["verdict"], "would_send");
+    assert.match(line, /characters omitted/);
+    assert.ok(!line.includes("MIDDLE_MARKER"));
+    const pretty = io(server, evidence, dataDir);
+    assert.equal(await run(["done", "--criteria", "all tests pass", "--dry-run", "--pretty"], pretty, commands), 0);
+    assert.equal((pretty.json()["sent"] as { state: { evidence: string } }[])[0]?.state.evidence, evidence);
     assert.equal(server.requests.length, 0);
-    assert.deepEqual(readdirSync(dataDir), ["results"]);
+    assert.deepEqual(readdirSync(dataDir, { recursive: true }), []);
   } finally {
     await server.close();
   }

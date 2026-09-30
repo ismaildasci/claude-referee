@@ -47,3 +47,15 @@ test("doctor --online checks the key by listing models", async () => {
     await bad.close();
   }
 });
+
+test("doctor shows a non-default base URL without credentials, and hides the default", async () => {
+  const custom = memoryIo({ env: { TYPESAFE_API_KEY: "ts_test", TYPESAFE_BASE_URL: "https://user:hunter2secret@proxy.example.com:8443/jev/" } });
+  await run(["doctor"], custom, commands);
+  assert.equal(custom.json()["base_url"], "https://proxy.example.com:8443/jev");
+  assert.ok(!custom.out.join("").includes("hunter2secret"));
+  for (const value of [undefined, "https://api.typesafe.ai", "https://api.typesafe.ai/"]) {
+    const io = memoryIo({ env: { TYPESAFE_API_KEY: "ts_test", ...(value ? { TYPESAFE_BASE_URL: value } : {}) } });
+    await run(["doctor"], io, commands);
+    assert.equal(io.json()["base_url"], undefined, String(value));
+  }
+});

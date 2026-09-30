@@ -22,11 +22,12 @@ export const verify: Command = {
       "--claims <file>": "Claims as a JSON array of strings or {id, text}, JSON lines, or plain lines. Max 100.",
     },
     outputs: {
-      verdict: "supported when every claim is, unsupported when any is, unsure otherwise",
+      verdict: "supported when every claim is, unsupported when any is, unsure otherwise (including claims with no answer)",
       claims: "Number of claims checked",
       supported: "Number of supported claims",
       unsupported: "Ids of unsupported claims",
       unsure: "Ids of claims between the bands",
+      unanswered: "Ids of claims with no answer because of an API error or the 90-second deadline",
       p: "Probability of support for each unsupported or unsure claim, by id",
     },
     errors: [...JEV_ERRORS],
@@ -76,10 +77,15 @@ export const verify: Command = {
       let supported = 0;
       const unsupported: string[] = [];
       const unsure: string[] = [];
+      const unanswered: string[] = [];
       const listed: Record<string, number> = {};
       for (const claim of claims) {
         const answer = answers[`claim:${claim.id}`];
-        const p = answer?.type === "noul" && typeof answer.noul === "number" ? answer.noul : 0.5;
+        if (!answer) {
+          unanswered.push(claim.id);
+          continue;
+        }
+        const p = answer.type === "noul" && typeof answer.noul === "number" ? answer.noul : 0.5;
         if (p >= supportedAt) {
           supported += 1;
           continue;
@@ -87,7 +93,7 @@ export const verify: Command = {
         (p <= unsupportedAt ? unsupported : unsure).push(claim.id);
         listed[claim.id] = p;
       }
-      const verdict = unsupported.length ? "unsupported" : unsure.length ? "unsure" : "supported";
+      const verdict = unsupported.length ? "unsupported" : unsure.length || unanswered.length ? "unsure" : "supported";
       return {
         ok: true,
         verdict,
@@ -95,9 +101,10 @@ export const verify: Command = {
         supported,
         ...(unsupported.length ? { unsupported } : {}),
         ...(unsure.length ? { unsure } : {}),
+        ...(unanswered.length ? { unanswered } : {}),
         ...(Object.keys(listed).length ? { p: listed } : {}),
         next_step: verdict === "supported" ? undefined : "Fix or drop the listed claims, or cite the part of the source that supports them.",
       };
-    });
+    }, { partial: true });
   },
 };

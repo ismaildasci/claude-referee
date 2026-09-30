@@ -11,6 +11,13 @@ export interface FakeRequest {
 
 export type Answerer = (request: FakeRequest) => Record<string, unknown>;
 
+export interface Behaviour {
+  readonly status?: number;
+  readonly retryAfter?: string;
+  readonly hang?: boolean;
+  readonly body?: unknown;
+}
+
 export interface FakeJev {
   readonly url: string;
   readonly requests: FakeRequest[];
@@ -41,7 +48,10 @@ export function defaultAnswer(request: FakeRequest): Record<string, unknown> {
   return answers;
 }
 
-export async function fakeJev(answer: Answerer = defaultAnswer, options: { hang?: boolean; status?: number } = {}): Promise<FakeJev> {
+export async function fakeJev(
+  answer: Answerer = defaultAnswer,
+  options: { hang?: boolean; status?: number; retryAfter?: string; behave?: (request: FakeRequest) => Behaviour | undefined } = {},
+): Promise<FakeJev> {
   const requests: FakeRequest[] = [];
   const server: Server = createServer(async (req, res) => {
     if (req.method === "GET") {
@@ -51,10 +61,11 @@ export async function fakeJev(answer: Answerer = defaultAnswer, options: { hang?
     }
     const body = JSON.parse(await readBody(req)) as FakeRequest;
     requests.push(body);
-    if (options.hang) return;
-    if (options.status) {
-      res.writeHead(options.status, { "content-type": "application/json" });
-      res.end(JSON.stringify({ error: "fake" }));
+    const behaviour = options.behave?.(body) ?? options;
+    if (behaviour.hang) return;
+    if (behaviour.status) {
+      res.writeHead(behaviour.status, { "content-type": "application/json", ...(behaviour.retryAfter ? { "retry-after": behaviour.retryAfter } : {}) });
+      res.end(JSON.stringify("body" in behaviour ? behaviour.body : { error: "fake" }));
       return;
     }
     res.writeHead(200, { "content-type": "application/json", "x-typesafe-request-id": `req_${requests.length}` });

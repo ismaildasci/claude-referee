@@ -1,17 +1,17 @@
 // judge and verify: item formats, bands, batch stops, claim batching and verdicts.
 
 import assert from "node:assert/strict";
-import { writeFileSync } from "node:fs";
+import { readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { commands } from "../src/cli/commands/index.ts";
 import { parseItems } from "../src/cli/commands/judge.ts";
 import { run } from "../src/cli/run.ts";
-import { fakeJev, type Answerer } from "./fake-jev.ts";
+import { fakeJev, type Answerer, type Behaviour, type FakeRequest } from "./fake-jev.ts";
 import { FAKE, memoryIo, tempDir } from "./helpers.ts";
 
-async function call(args: string[], answer: Answerer, stdin = "", cwd?: string) {
-  const server = await fakeJev(answer);
+async function call(args: string[], answer: Answerer, stdin = "", cwd?: string, behave?: (r: FakeRequest) => Behaviour | undefined) {
+  const server = await fakeJev(answer, behave ? { behave } : {});
   try {
     const io = memoryIo({ stdin, env: { TYPESAFE_API_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: tempDir() }, ...(cwd ? { cwd } : {}) });
     const code = await run(args, io, commands);
@@ -113,4 +113,39 @@ test("judge prints the whole result when the details file can't be written", asy
   } finally {
     await server.close();
   }
+});
+
+test("judge lists items that got no answer and never calls the run clear", async () => {
+  const fails = (r: FakeRequest) => ((r.state as { item: string }).item === "b" ? { status: 400 } : undefined);
+  const { code, out } = await call(["judge", "--question", "line.risky"], byItem({ a: 0.02, c: 0.02 }), "a\nb\nc\n", undefined, fails);
+  assert.equal(code, 0);
+  assert.equal(out["verdict"], "review");
+  assert.equal(out["no"], 2);
+  assert.deepEqual(out["unanswered"], ["2"]);
+});
+
+test("verify keeps the answers of parts that worked when another part fails", async () => {
+  const cwd = tempDir();
+  writeFileSync(join(cwd, "src.md"), "Redis runs in every region.");
+  writeFileSync(join(cwd, "claims.jsonl"), Array.from({ length: 100 }, (_, i) => JSON.stringify({ id: `c${i + 1}`, text: `Claim ${i + 1}: ${"x".repeat(2500)}` })).join("\n"));
+  const answer: Answerer = (r) => Object.fromEntries(Object.keys(r.questions).map((k) => [k, { type: "noul", noul: 0.95 }]));
+  const fails = (r: FakeRequest) => ("claim:c1" in r.questions ? { status: 400 } : undefined);
+  const { code, out, requests } = await call(["verify", "--source", "src.md", "--claims", "claims.jsonl"], answer, "", cwd, fails);
+  assert.ok(requests.length >= 2, `${requests.length} requests`);
+  assert.equal(code, 0);
+  const unanswered = out["unanswered"] as string[];
+  assert.ok(unanswered.includes("c1"));
+  assert.equal((out["supported"] as number) + unanswered.length, 100);
+  assert.equal(out["verdict"], "unsure");
+});
+
+test("judge --dry-run of 200 items stays under 1,500 characters and writes no file", async () => {
+  const dataDir = tempDir();
+  const stdin = Array.from({ length: 200 }, (_, i) => `line ${i} ${"y".repeat(50)}`).join("\n");
+  const io = memoryIo({ stdin, env: { TYPESAFE_API_KEY: "ts_test", REFEREE_DATA_DIR: dataDir } });
+  assert.equal(await run(["judge", "--question", "line.risky", "--dry-run"], io, commands), 0);
+  const line = io.out.join("").trim();
+  assert.ok(line.length <= 1500, `${line.length}`);
+  assert.equal(io.json()["requests"], 200);
+  assert.deepEqual(readdirSync(dataDir, { recursive: true }), []);
 });

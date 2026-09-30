@@ -49,6 +49,11 @@ function parseInput(text: string): Input {
     if (typeof o === "string" && o.trim()) return { name: `o${i + 1}`, text: o };
     const { name, text: body } = (o ?? {}) as { name?: unknown; text?: unknown };
     if (typeof name !== "string" || !NAME.test(name)) throw bad(`Option ${i + 1} needs a short name: letters, digits, '_', '.', '-'.`);
+    if (/^\d+$/.test(name)) {
+      throw new RefereeError("bad_input", `Option ${i + 1} is named "${name}"; a name made only of digits loses its place in the reversed order.`, {
+        next_step: "Use a name that starts with a letter, e.g. o1.",
+      });
+    }
     if (typeof body !== "string" || !body.trim()) throw bad(`Option ${name} needs a text.`);
     return { name, text: body };
   });
@@ -102,6 +107,7 @@ export const decide: Command = {
     inputs: {
       "stdin or --in <file>":
         'JSON: {"decision": string, "options": [{"name", "text"}] or [string], "context"?: string, "context_files"?: [path], "micro"?: [{"id", "question", "bad"?}]}',
+      name: "Up to 40 letters, digits, '_', '.', '-'; not only digits.",
       context_files: "Read by the CLI, so Claude doesn't retype them. Max 100 KB each, 200 KB in total.",
       micro: "Optional yes/no rules asked once per option; reported in flags, never part of the verdict. bad: true means yes is bad. Without micro, a pack's decide.micro.* questions are used; a threshold of {\"bad\": 1} marks yes as bad.",
     },

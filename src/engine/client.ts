@@ -1,6 +1,8 @@
 // The only module that talks to TypeSafe. The SDK is imported lazily, so commands that never ask Jev never load it.
 // Each call gets a total budget on top of the SDK's per-attempt timeout, because the SDK has no retry budget.
+// 429s are retried here, not by the SDK: a Retry-After longer than the budget ends the call as rate_limited.
 
+import { setTimeout as sleep } from "node:timers/promises";
 import type { ChoiceResponse, EntryType, NoulResponse, Questions, ScoreResponse, TypeSafeClient } from "@typesafe-ai/sdk";
 import { classify } from "./classify.ts";
 import type { Budget } from "./config.ts";
@@ -28,6 +30,14 @@ export interface CallOptions {
   readonly signal?: AbortSignal | undefined;
 }
 
+const SDK_RETRY_STATUSES: ReadonlySet<number> = new Set([408, ...Array.from({ length: 100 }, (_, i) => 500 + i)]);
+
+function rateLimitWait(error: unknown, attempt: number): number | undefined {
+  const e = (typeof error === "object" && error !== null ? error : {}) as { name?: unknown; retryAfterMs?: unknown };
+  if (e.name !== "RateLimitError") return undefined;
+  return typeof e.retryAfterMs === "number" ? e.retryAfterMs : Math.min(500 * 2 ** attempt, 5000);
+}
+
 const stderrLogger = {
   debug: () => {},
   info: () => {},
@@ -35,8 +45,9 @@ const stderrLogger = {
   error: (message: string) => void process.stderr.write(`[claude-referee] ${message}\n`),
 };
 
-async function guarded<T>(options: CallOptions, fn: (client: TypeSafeClient, signal: AbortSignal) => Promise<T>): Promise<T> {
+async function guarded<T>(options: CallOptions, fn: (client: TypeSafeClient, signal: AbortSignal) => Promise<T>, model?: string): Promise<T> {
   const sdk = await import("@typesafe-ai/sdk");
+  const endsAt = Date.now() + options.budget.budgetMs;
   const budgetSignal = AbortSignal.timeout(options.budget.budgetMs);
   const signal = options.signal ? AbortSignal.any([options.signal, budgetSignal]) : budgetSignal;
   try {
@@ -45,17 +56,25 @@ async function guarded<T>(options: CallOptions, fn: (client: TypeSafeClient, sig
       logLevel: "warn",
       logger: stderrLogger,
       timeout: options.budget.perAttemptMs,
-      retry: { maxRetries: options.budget.maxRetries },
+      retry: { maxRetries: options.budget.maxRetries, httpStatuses: SDK_RETRY_STATUSES },
       ...(options.baseURL ? { baseURL: options.baseURL } : {}),
     });
-    return await fn(client, signal);
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return await fn(client, signal);
+      } catch (error) {
+        const wait = rateLimitWait(error, attempt);
+        if (wait === undefined || attempt >= options.budget.maxRetries || wait >= endsAt - Date.now()) throw error;
+        await sleep(wait, undefined, { signal });
+      }
+    }
   } catch (error) {
     if (budgetSignal.aborted) {
       throw new RefereeError("timeout", `Jev did not answer within ${options.budget.budgetMs} ms.`, {
         next_step: "Try again later; the verdict is unknown, not negative.",
       });
     }
-    throw classify(error);
+    throw classify(error, model ? { model } : {});
   }
 }
 
@@ -68,7 +87,7 @@ export function callJev(call: JevCall, options: CallOptions): Promise<JevReply> 
       inputTokens: data.usage.input_tokens,
       requestId,
     };
-  });
+  }, call.model);
 }
 
 export function listModels(options: CallOptions): Promise<string[]> {

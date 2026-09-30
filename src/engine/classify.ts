@@ -14,6 +14,7 @@ const BY_NAME: Readonly<Record<string, ErrorCode>> = {
   NotFoundError: "bad_request",
   InternalServerError: "service_unavailable",
   APIUserAbortError: "timeout",
+  AbortError: "timeout",
 };
 
 const MESSAGES: Readonly<Partial<Record<ErrorCode, readonly [string, string]>>> = {
@@ -40,7 +41,7 @@ function byMessage(message: string): ErrorCode | undefined {
   return undefined;
 }
 
-export function classify(error: unknown): RefereeError {
+export function classify(error: unknown, context: { model?: string } = {}): RefereeError {
   if (error instanceof RefereeError) return error;
   const e = (typeof error === "object" && error !== null ? error : {}) as { name?: unknown; status?: unknown; message?: unknown; retryAfterMs?: unknown };
   const status = typeof e.status === "number" ? e.status : undefined;
@@ -49,7 +50,12 @@ export function classify(error: unknown): RefereeError {
     (status !== undefined ? byStatus(status) : undefined) ??
     byMessage(typeof e.message === "string" ? e.message : String(error)) ??
     "internal";
-  const [message, next] = MESSAGES[code] ?? MESSAGES.internal ?? ["Unexpected error.", ""];
+  const [message, generic] = MESSAGES[code] ?? MESSAGES.internal ?? ["Unexpected error.", ""];
+  const raw = typeof e.message === "string" ? e.message : "";
+  const next =
+    code === "bad_request" && context.model && /\bunknown model\b/i.test(raw)
+      ? `TypeSafe doesn't know the model "${context.model.slice(0, 80)}". Run doctor --online to list the models your key can use.`
+      : generic;
   return new RefereeError(code, message, {
     next_step: next,
     ...(status !== undefined ? { status } : {}),

@@ -711,6 +711,7 @@ var KIT = "claude-referee";
 var VERSION = "0.1.0";
 var DEFAULT_MODEL = "jev-1.13.0";
 var MARKETPLACE = "claude-referee";
+var DEFAULT_BASE_URL = "https://api.typesafe.ai";
 var USD_PER_MTOK = {
   "jev-1.13.0": 0.042
 };
@@ -719,6 +720,7 @@ var ERROR_LIMIT = 2e3;
 var STATE_TOKEN_LIMIT = 32e3;
 var REQUEST_TOKEN_LIMIT = 64e3;
 var CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1e3;
+var BATCH_DEADLINE_MS = 9e4;
 var PROFILES = {
   cli: { budgetMs: 3e4, perAttemptMs: 1e4, maxRetries: 2 },
   hook: { budgetMs: 2e3, perAttemptMs: 1500, maxRetries: 0 }
@@ -888,9 +890,71 @@ __name(threshold, "threshold");
 import { readFileSync as readFileSync5, statSync as statSync2 } from "node:fs";
 import { resolve as resolve2 } from "node:path";
 
+// src/engine/output.ts
+import { mkdirSync, writeFileSync } from "node:fs";
+import { join as join2 } from "node:path";
+function roundNumber(key, value) {
+  if (Number.isInteger(value)) return value;
+  const digits = key.endsWith("_usd") ? 6 : 2;
+  return Number(value.toFixed(digits));
+}
+__name(roundNumber, "roundNumber");
+function roundDeep(value, key = "") {
+  if (typeof value === "number") return roundNumber(key, value);
+  if (Array.isArray(value)) return value.map((item) => roundDeep(item, key));
+  if (value !== null && typeof value === "object") {
+    const out = {};
+    for (const [k, v] of Object.entries(value)) {
+      if (v !== void 0) out[k] = roundDeep(v, k);
+    }
+    return out;
+  }
+  return value;
+}
+__name(roundDeep, "roundDeep");
+function isScalar(value) {
+  return value === null || ["string", "number", "boolean"].includes(typeof value);
+}
+__name(isScalar, "isScalar");
+function summarize(result, path) {
+  const out = {};
+  for (const [k, v] of Object.entries(result)) {
+    if (k === "receipt") continue;
+    if (isScalar(v) && JSON.stringify(v).length <= 300) out[k] = v;
+  }
+  out["details"] = path;
+  if (result["receipt"] !== void 0) out["receipt"] = result["receipt"];
+  return out;
+}
+__name(summarize, "summarize");
+function render(result, options = {}) {
+  const rounded = roundDeep(result);
+  if (options.pretty) return JSON.stringify(rounded, null, 2);
+  const line = JSON.stringify(rounded);
+  if (line.length <= DETAIL_LIMIT || !options.detailsDir || !options.receipt) return line;
+  const path = join2(options.detailsDir, `${options.receipt}.json`);
+  try {
+    mkdirSync(options.detailsDir, { recursive: true });
+    writeFileSync(path, JSON.stringify(rounded, null, 2) + "\n");
+  } catch {
+    return line;
+  }
+  return JSON.stringify(summarize(rounded, path));
+}
+__name(render, "render");
+function renderError(error, pretty = false) {
+  const body = { ok: false, error: error.code, message: error.message.slice(0, 500) };
+  if (error.details.status !== void 0) body["status"] = error.details.status;
+  if (error.details.retry_after_ms !== void 0) body["retry_after_ms"] = error.details.retry_after_ms;
+  if (error.details.next_step !== void 0) body["next_step"] = error.details.next_step.slice(0, 600);
+  const text = pretty ? JSON.stringify(body, null, 2) : JSON.stringify(body);
+  return text.length <= ERROR_LIMIT ? text : JSON.stringify({ ok: false, error: error.code });
+}
+__name(renderError, "renderError");
+
 // src/engine/project.ts
 import { existsSync as existsSync2, readFileSync as readFileSync2 } from "node:fs";
-import { dirname as dirname2, join as join2, relative, sep } from "node:path";
+import { dirname as dirname2, join as join3, relative, sep } from "node:path";
 function readProjectFile(path) {
   try {
     const raw = JSON.parse(readFileSync2(path, "utf8"));
@@ -920,7 +984,7 @@ __name(checkAreas, "checkAreas");
 function findProjectFile(cwd) {
   let dir = cwd;
   for (; ; ) {
-    const file = join2(dir, ".claude", "referee.json");
+    const file = join3(dir, ".claude", "referee.json");
     if (existsSync2(file)) return file;
     const parent = dirname2(dir);
     if (parent === dir) return null;
@@ -932,7 +996,7 @@ function loadProject(cwd) {
   const file = findProjectFile(cwd);
   if (!file) return null;
   const base = readProjectFile(file);
-  const localFile = join2(dirname2(file), "referee.local.json");
+  const localFile = join3(dirname2(file), "referee.local.json");
   const local = existsSync2(localFile) ? readProjectFile(localFile) : {};
   const merged = { ...base, ...local, hooks: { ...base.hooks, ...local.hooks } };
   if (typeof merged.pack !== "string" || !merged.pack) throw new RefereeError("bad_project", 'The project file needs a pack name, for example {"pack": "generic"}.');
@@ -953,8 +1017,8 @@ __name(loadProject, "loadProject");
 
 // src/engine/cache.ts
 import { createHash as createHash2 } from "node:crypto";
-import { mkdirSync, readFileSync as readFileSync3, writeFileSync } from "node:fs";
-import { join as join3 } from "node:path";
+import { mkdirSync as mkdirSync2, readFileSync as readFileSync3, writeFileSync as writeFileSync2 } from "node:fs";
+import { join as join4 } from "node:path";
 function sha256(text) {
   return createHash2("sha256").update(text).digest("hex");
 }
@@ -965,7 +1029,7 @@ function cacheKey(parts) {
 __name(cacheKey, "cacheKey");
 function readCache(dataDir, key, now, ttlMs) {
   try {
-    const entry = JSON.parse(readFileSync3(join3(dataDir, "cache", `${key}.json`), "utf8"));
+    const entry = JSON.parse(readFileSync3(join4(dataDir, "cache", `${key}.json`), "utf8"));
     return now - entry.ts <= ttlMs ? entry : null;
   } catch {
     return null;
@@ -974,9 +1038,9 @@ function readCache(dataDir, key, now, ttlMs) {
 __name(readCache, "readCache");
 function writeCache(dataDir, key, entry) {
   try {
-    const dir = join3(dataDir, "cache");
-    mkdirSync(dir, { recursive: true });
-    writeFileSync(join3(dir, `${key}.json`), JSON.stringify(entry));
+    const dir = join4(dataDir, "cache");
+    mkdirSync2(dir, { recursive: true });
+    writeFileSync2(join4(dir, `${key}.json`), JSON.stringify(entry));
     return true;
   } catch {
     return false;
@@ -995,7 +1059,8 @@ var BY_NAME = {
   UnprocessableEntityError: "bad_request",
   NotFoundError: "bad_request",
   InternalServerError: "service_unavailable",
-  APIUserAbortError: "timeout"
+  APIUserAbortError: "timeout",
+  AbortError: "timeout"
 };
 var MESSAGES = {
   timeout: ["Jev did not answer in time.", "Try again later; the verdict is unknown, not negative."],
@@ -1020,12 +1085,14 @@ function byMessage(message) {
   return void 0;
 }
 __name(byMessage, "byMessage");
-function classify(error) {
+function classify(error, context = {}) {
   if (error instanceof RefereeError) return error;
   const e = typeof error === "object" && error !== null ? error : {};
   const status = typeof e.status === "number" ? e.status : void 0;
   const code = (typeof e.name === "string" ? BY_NAME[e.name] : void 0) ?? (status !== void 0 ? byStatus(status) : void 0) ?? byMessage(typeof e.message === "string" ? e.message : String(error)) ?? "internal";
-  const [message, next] = MESSAGES[code] ?? MESSAGES.internal ?? ["Unexpected error.", ""];
+  const [message, generic] = MESSAGES[code] ?? MESSAGES.internal ?? ["Unexpected error.", ""];
+  const raw = typeof e.message === "string" ? e.message : "";
+  const next = code === "bad_request" && context.model && /\bunknown model\b/i.test(raw) ? `TypeSafe doesn't know the model "${context.model.slice(0, 80)}". Run doctor --online to list the models your key can use.` : generic;
   return new RefereeError(code, message, {
     next_step: next,
     ...status !== void 0 ? { status } : {},
@@ -1035,6 +1102,14 @@ function classify(error) {
 __name(classify, "classify");
 
 // src/engine/client.ts
+import { setTimeout as sleep2 } from "node:timers/promises";
+var SDK_RETRY_STATUSES = /* @__PURE__ */ new Set([408, ...Array.from({ length: 100 }, (_, i) => 500 + i)]);
+function rateLimitWait(error, attempt) {
+  const e = typeof error === "object" && error !== null ? error : {};
+  if (e.name !== "RateLimitError") return void 0;
+  return typeof e.retryAfterMs === "number" ? e.retryAfterMs : Math.min(500 * 2 ** attempt, 5e3);
+}
+__name(rateLimitWait, "rateLimitWait");
 var stderrLogger = {
   debug: /* @__PURE__ */ __name(() => {
   }, "debug"),
@@ -1045,8 +1120,9 @@ var stderrLogger = {
   error: /* @__PURE__ */ __name((message) => void process.stderr.write(`[claude-referee] ${message}
 `), "error")
 };
-async function guarded(options, fn) {
+async function guarded(options, fn, model) {
   const sdk = await Promise.resolve().then(() => (init_dist(), dist_exports));
+  const endsAt = Date.now() + options.budget.budgetMs;
   const budgetSignal = AbortSignal.timeout(options.budget.budgetMs);
   const signal = options.signal ? AbortSignal.any([options.signal, budgetSignal]) : budgetSignal;
   try {
@@ -1055,17 +1131,25 @@ async function guarded(options, fn) {
       logLevel: "warn",
       logger: stderrLogger,
       timeout: options.budget.perAttemptMs,
-      retry: { maxRetries: options.budget.maxRetries },
+      retry: { maxRetries: options.budget.maxRetries, httpStatuses: SDK_RETRY_STATUSES },
       ...options.baseURL ? { baseURL: options.baseURL } : {}
     });
-    return await fn(client, signal);
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return await fn(client, signal);
+      } catch (error) {
+        const wait = rateLimitWait(error, attempt);
+        if (wait === void 0 || attempt >= options.budget.maxRetries || wait >= endsAt - Date.now()) throw error;
+        await sleep2(wait, void 0, { signal });
+      }
+    }
   } catch (error) {
     if (budgetSignal.aborted) {
       throw new RefereeError("timeout", `Jev did not answer within ${options.budget.budgetMs} ms.`, {
         next_step: "Try again later; the verdict is unknown, not negative."
       });
     }
-    throw classify(error);
+    throw classify(error, model ? { model } : {});
   }
 }
 __name(guarded, "guarded");
@@ -1078,7 +1162,7 @@ function callJev(call, options) {
       inputTokens: data.usage.input_tokens,
       requestId
     };
-  });
+  }, call.model);
 }
 __name(callJev, "callJev");
 function listModels(options) {
@@ -1090,7 +1174,7 @@ __name(listModels, "listModels");
 import { execFileSync } from "node:child_process";
 import { createHash as createHash3 } from "node:crypto";
 import { readdirSync as readdirSync2, realpathSync, statSync } from "node:fs";
-import { join as join4, resolve } from "node:path";
+import { join as join5, resolve } from "node:path";
 function pluginDataId() {
   return `${KIT}@${MARKETPLACE}`.replace(/[^A-Za-z0-9_-]/g, "-");
 }
@@ -1099,8 +1183,8 @@ function resolveDataDir(env, home, cwd, flag) {
   if (flag) return resolve(cwd, flag);
   const fromEnv = env["CLAUDE_PLUGIN_DATA"]?.trim() || env["REFEREE_DATA_DIR"]?.trim();
   if (fromEnv) return fromEnv;
-  const configDir = env["CLAUDE_CONFIG_DIR"]?.trim() || join4(home, ".claude");
-  return join4(configDir, "plugins", "data", pluginDataId());
+  const configDir = env["CLAUDE_CONFIG_DIR"]?.trim() || join5(home, ".claude");
+  return join5(configDir, "plugins", "data", pluginDataId());
 }
 __name(resolveDataDir, "resolveDataDir");
 function projectRoot(cwd) {
@@ -1130,7 +1214,7 @@ function dirSize(dir) {
     return 0;
   }
   for (const entry of entries) {
-    const path = join4(dir, entry.name);
+    const path = join5(dir, entry.name);
     if (entry.isDirectory()) total += dirSize(path);
     else if (entry.isFile()) total += statSync(path).size;
   }
@@ -1192,7 +1276,7 @@ function validateKey(raw, source) {
 }
 __name(validateKey, "validateKey");
 function noKeyNextStep(platform) {
-  const hooks = "Hooks can also use /plugin configure claude-referee or claude plugin configure claude-referee --values-stdin.";
+  const hooks = "Hooks can also use /plugin configure claude-referee or claude plugin configure claude-referee --values-stdin (Claude Code 2.1.285+).";
   if (platform === "darwin") {
     return `Store the key in the Keychain: security add-generic-password -a "$USER" -s TYPESAFE_API_KEY -w (it prompts for the key). ${hooks}`;
   }
@@ -1229,22 +1313,22 @@ async function resolveKey(env, platform, runner = runCommand, memo = processMemo
 __name(resolveKey, "resolveKey");
 
 // src/engine/receipts.ts
-import { appendFileSync, existsSync as existsSync3, mkdirSync as mkdirSync2, readdirSync as readdirSync3, readFileSync as readFileSync4 } from "node:fs";
-import { join as join5 } from "node:path";
+import { appendFileSync, existsSync as existsSync3, mkdirSync as mkdirSync3, readdirSync as readdirSync3, readFileSync as readFileSync4 } from "node:fs";
+import { join as join6 } from "node:path";
 function newReceiptId(now, random = Math.random) {
   const tail = Math.floor(random() * 36 ** 4).toString(36).padStart(4, "0");
   return `r${now.toString(36)}${tail}`;
 }
 __name(newReceiptId, "newReceiptId");
 function receiptsDir(dataDir) {
-  return join5(dataDir, "receipts");
+  return join6(dataDir, "receipts");
 }
 __name(receiptsDir, "receiptsDir");
 function appendReceipt(dataDir, receipt) {
   try {
-    const dir = join5(receiptsDir(dataDir), receipt.project);
-    mkdirSync2(dir, { recursive: true });
-    appendFileSync(join5(dir, `${receipt.ts.slice(0, 7)}.jsonl`), JSON.stringify(receipt) + "\n");
+    const dir = join6(receiptsDir(dataDir), receipt.project);
+    mkdirSync3(dir, { recursive: true });
+    appendFileSync(join6(dir, `${receipt.ts.slice(0, 7)}.jsonl`), JSON.stringify(receipt) + "\n");
     return true;
   } catch {
     return false;
@@ -1257,10 +1341,10 @@ function readReceipts(dataDir, project) {
   const projects = project ? [project] : readdirSync3(root);
   const out = [];
   for (const p of projects.sort()) {
-    const dir = join5(root, p);
+    const dir = join6(root, p);
     if (!existsSync3(dir)) continue;
     for (const file of readdirSync3(dir).filter((f) => f.endsWith(".jsonl")).sort()) {
-      for (const line of readFileSync4(join5(dir, file), "utf8").split("\n")) {
+      for (const line of readFileSync4(join6(dir, file), "utf8").split("\n")) {
         if (!line.trim()) continue;
         try {
           out.push(JSON.parse(line));
@@ -1453,21 +1537,37 @@ var Session = class {
     const prepared = this.prepare(planned);
     const stops = prepared.flatMap((p) => p.stops);
     if (stops.length > 0 && !options.batch) throw stopError(stops);
+    const partial = options.batch === true || options.partial === true;
+    const deadline = partial ? AbortSignal.timeout(this.options.deadlineMs ?? BATCH_DEADLINE_MS) : void 0;
     const outcomes = new Array(prepared.length);
+    const failures = [];
     let next = 0;
     const worker = /* @__PURE__ */ __name(async () => {
       while (next < prepared.length) {
         const index = next++;
         const item = prepared[index];
         if (!item) continue;
-        outcomes[index] = await this.one(item);
+        if (!partial) {
+          outcomes[index] = await this.one(item);
+          continue;
+        }
+        try {
+          if (deadline?.aborted) throw new RefereeError("timeout", "The batch deadline passed.");
+          outcomes[index] = await this.one(item, deadline);
+        } catch (error) {
+          const known = classify(error);
+          failures.push(known);
+          outcomes[index] = { id: item.planned.id, answers: null, stopped: [], cached: false, error: known.code };
+        }
       }
     }, "worker");
     const width = Math.max(1, Math.min(options.concurrency ?? 6, prepared.length));
     await Promise.all(Array.from({ length: width }, worker));
+    const [firstFailure] = failures;
+    if (firstFailure && !outcomes.some((o) => o.answers !== null)) throw firstFailure;
     return outcomes;
   }
-  async one(item) {
+  async one(item, signal) {
     const id = item.planned.id;
     if (item.stops.length > 0) {
       this.stoppedCount += 1;
@@ -1485,7 +1585,7 @@ var Session = class {
     }
     let pending = this.inflight.get(key);
     if (!pending) {
-      pending = this.call(item.body, key);
+      pending = this.call(item.body, key, signal);
       this.inflight.set(key, pending);
     } else {
       this.cachedCount += 1;
@@ -1493,12 +1593,12 @@ var Session = class {
     const reply = await pending;
     return { id, answers: reply.answers, stopped: [], cached: false };
   }
-  async call(body, key) {
+  async call(body, key, signal) {
     this.keyPromise ??= resolveKey(this.options.env, this.options.platform);
     const { key: apiKey } = await this.keyPromise;
     const reply = await callJev(
       { state: body.state, questions: body.questions, model: this.model },
-      { key: apiKey, budget: PROFILES[this.options.profile ?? "cli"], baseURL: this.options.env["TYPESAFE_BASE_URL"] }
+      { key: apiKey, budget: PROFILES[this.options.profile ?? "cli"], baseURL: this.options.env["TYPESAFE_BASE_URL"], signal }
     );
     this.requests += 1;
     this.inputTokens += reply.inputTokens;
@@ -1630,7 +1730,10 @@ async function jevCommand(context, command, pack, planned, finish, options = {})
     dataDir: flags.dataDir,
     fresh: flags.fresh
   });
-  if (flags.dryRun) return session.dryRun(planned);
+  if (flags.dryRun) {
+    const result = session.dryRun(planned);
+    return flags.pretty ? result : fitLine(result);
+  }
   try {
     const outcomes = await session.run(planned, options);
     const result = finish(outcomes, session);
@@ -1644,6 +1747,32 @@ async function jevCommand(context, command, pack, planned, finish, options = {})
   }
 }
 __name(jevCommand, "jevCommand");
+function shorten(value, max) {
+  if (typeof value === "string") return value.length > max ? clip(value, Math.floor(max / 2), Math.floor(max / 2)) : value;
+  if (Array.isArray(value)) return value.map((item) => shorten(item, max));
+  if (value !== null && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, shorten(v, max)]));
+  return value;
+}
+__name(shorten, "shorten");
+function fitLine(result) {
+  const fits = /* @__PURE__ */ __name((candidate) => JSON.stringify(roundDeep(candidate)).length <= DETAIL_LIMIT, "fits");
+  if (fits(result)) return result;
+  const sent = Array.isArray(result["sent"]) ? result["sent"] : [];
+  for (const max of [1e3, 400, 160, 60]) {
+    const candidate = { ...result, sent: shorten(sent, max) };
+    if (fits(candidate)) return candidate;
+  }
+  const short = shorten(sent, 60);
+  let low = 0;
+  let high = short.length;
+  while (low < high) {
+    const mid = Math.ceil((low + high) / 2);
+    if (fits({ ...result, sent: short.slice(0, mid), sent_shown: mid })) low = mid;
+    else high = mid - 1;
+  }
+  return { ...result, sent: short.slice(0, low), sent_shown: low };
+}
+__name(fitLine, "fitLine");
 function reorder(result) {
   const { ok, verdict, next_step, receipt, ...rest } = result;
   return { ok, verdict, ...rest, next_step, receipt };
@@ -1668,6 +1797,11 @@ function parseInput(text) {
     if (typeof o === "string" && o.trim()) return { name: `o${i + 1}`, text: o };
     const { name, text: body } = o ?? {};
     if (typeof name !== "string" || !NAME2.test(name)) throw bad(`Option ${i + 1} needs a short name: letters, digits, '_', '.', '-'.`);
+    if (/^\d+$/.test(name)) {
+      throw new RefereeError("bad_input", `Option ${i + 1} is named "${name}"; a name made only of digits loses its place in the reversed order.`, {
+        next_step: "Use a name that starts with a letter, e.g. o1."
+      });
+    }
     if (typeof body !== "string" || !body.trim()) throw bad(`Option ${name} needs a text.`);
     return { name, text: body };
   });
@@ -1720,6 +1854,7 @@ var decide = {
     summary: "Score 2-6 options against your context, asking in two option orders.",
     inputs: {
       "stdin or --in <file>": 'JSON: {"decision": string, "options": [{"name", "text"}] or [string], "context"?: string, "context_files"?: [path], "micro"?: [{"id", "question", "bad"?}]}',
+      name: "Up to 40 letters, digits, '_', '.', '-'; not only digits.",
       context_files: "Read by the CLI, so Claude doesn't retype them. Max 100 KB each, 200 KB in total.",
       micro: `Optional yes/no rules asked once per option; reported in flags, never part of the verdict. bad: true means yes is bad. Without micro, a pack's decide.micro.* questions are used; a threshold of {"bad": 1} marks yes as bad.`
     },
@@ -1816,6 +1951,23 @@ var decide = {
 };
 
 // src/cli/commands/doctor.ts
+function shownBaseUrl(raw) {
+  const value = raw?.trim();
+  if (!value) return void 0;
+  let url;
+  try {
+    url = new URL(value);
+  } catch {
+    return "invalid";
+  }
+  url.username = "";
+  url.password = "";
+  url.search = "";
+  url.hash = "";
+  const shown = url.toString().replace(/\/+$/, "");
+  return shown === DEFAULT_BASE_URL ? void 0 : shown;
+}
+__name(shownBaseUrl, "shownBaseUrl");
 function nodeOk(version) {
   const [major = 0, minor = 0] = version.replace(/^v/, "").split(".").map(Number);
   return major > 20 || major === 20 && minor >= 3;
@@ -1830,6 +1982,7 @@ var doctor = {
       verdict: "ready or not_ready",
       key_source: "Where the key was found: plugin_setting, TYPESAFE_API_KEY, EVAL_TYPESAFE_API_KEY, TYPESAFE_API_KEY_CMD or keychain. Never the key.",
       packs: "Installed packs with version, content hash and source.",
+      base_url: "Only when TYPESAFE_BASE_URL points somewhere other than the default; credentials and query are removed.",
       next_step: "What to fix when not ready."
     },
     errors: ["bad_input"],
@@ -1860,6 +2013,7 @@ var doctor = {
         online = isRefereeError(error) ? error.code : "internal";
       }
     }
+    const baseUrl = shownBaseUrl(io.env["TYPESAFE_BASE_URL"]);
     const dataDir = resolveDataDir(io.env, io.home, io.cwd, flags.dataDir);
     const projectFile = findProjectFile(io.cwd);
     const ready = nodeOk(node) && keySource !== null && (online === null || online === "ok");
@@ -1875,6 +2029,7 @@ var doctor = {
       ...online ? { online } : {},
       ...models ? { models } : {},
       model: resolveModel(io.env),
+      ...baseUrl ? { base_url: baseUrl } : {},
       data_dir: tildify(dataDir, io.home),
       data_bytes: dirSize(dataDir),
       packs: listPacks(packDirs(io.env)),
@@ -1979,14 +2134,15 @@ var judge = {
       "--context <text>": "Optional shared context for every item, e.g. the file name."
     },
     outputs: {
-      verdict: "flagged when any answer is yes, review when some are unsure, clear otherwise",
+      verdict: "flagged when any answer is yes, review when some are unsure or unanswered, clear otherwise",
       items: "Number of items judged",
       yes: "Answers in the yes band",
       no: "Answers in the no band",
       review: "Answers between the bands",
       flagged: "Item ids with a yes (first 20; 'id/question' when several questions)",
       review_ids: "Item ids to review (first 20)",
-      stopped: "Item ids not sent because they held something shaped like a credential"
+      stopped: "Item ids not sent because they held something shaped like a credential",
+      unanswered: "Item ids with no answer because of an API error or the 90-second deadline (first 20)"
     },
     errors: [...JEV_ERRORS],
     effects: JEV_EFFECTS,
@@ -2021,7 +2177,12 @@ var judge = {
         const flagged = [];
         const reviewIds = [];
         const stopped = [];
+        const unanswered = [];
         for (const outcome of outcomes) {
+          if (outcome.error) {
+            unanswered.push(outcome.id);
+            continue;
+          }
           if (!outcome.answers) {
             stopped.push(outcome.id);
             continue;
@@ -2042,7 +2203,7 @@ var judge = {
             }
           }
         }
-        const verdict = yes > 0 ? "flagged" : review > 0 ? "review" : "clear";
+        const verdict = yes > 0 ? "flagged" : review > 0 || unanswered.length > 0 ? "review" : "clear";
         return {
           ok: true,
           verdict,
@@ -2052,7 +2213,8 @@ var judge = {
           review,
           ...flagged.length ? { flagged: flagged.slice(0, LIST_LIMIT) } : {},
           ...reviewIds.length ? { review_ids: reviewIds.slice(0, LIST_LIMIT) } : {},
-          ...stopped.length ? { stopped } : {}
+          ...stopped.length ? { stopped } : {},
+          ...unanswered.length ? { unanswered: unanswered.slice(0, LIST_LIMIT), next_step: "Some items got no answer; run judge again on those items." } : {}
         };
       },
       { batch: true }
@@ -2061,7 +2223,7 @@ var judge = {
 };
 
 // src/cli/commands/receipts.ts
-import { mkdirSync as mkdirSync3, writeFileSync as writeFileSync2 } from "node:fs";
+import { mkdirSync as mkdirSync4, writeFileSync as writeFileSync3 } from "node:fs";
 import { dirname as dirname3, resolve as resolve4 } from "node:path";
 function sum(receipts2, key) {
   return receipts2.reduce((total, r) => total + (r[key] ?? 0), 0);
@@ -2102,8 +2264,8 @@ var receipts = {
       if (!out) throw new RefereeError("bad_input", "export needs --out <file>.");
       const all = readReceipts(dataDir);
       const path = resolve4(io.cwd, out);
-      mkdirSync3(dirname3(path), { recursive: true });
-      writeFileSync2(path, all.map((r) => JSON.stringify(r)).join("\n") + (all.length ? "\n" : ""));
+      mkdirSync4(dirname3(path), { recursive: true });
+      writeFileSync3(path, all.map((r) => JSON.stringify(r)).join("\n") + (all.length ? "\n" : ""));
       return { ok: true, verdict: "exported", receipts: all.length, out: tildify(path, io.home) };
     }
     if (positionals.length > 0) throw new RefereeError("bad_input", `Unknown receipts action: ${positionals[0]}`);
@@ -2160,11 +2322,12 @@ var verify = {
       "--claims <file>": "Claims as a JSON array of strings or {id, text}, JSON lines, or plain lines. Max 100."
     },
     outputs: {
-      verdict: "supported when every claim is, unsupported when any is, unsure otherwise",
+      verdict: "supported when every claim is, unsupported when any is, unsure otherwise (including claims with no answer)",
       claims: "Number of claims checked",
       supported: "Number of supported claims",
       unsupported: "Ids of unsupported claims",
       unsure: "Ids of claims between the bands",
+      unanswered: "Ids of claims with no answer because of an API error or the 90-second deadline",
       p: "Probability of support for each unsupported or unsure claim, by id"
     },
     errors: [...JEV_ERRORS],
@@ -2212,10 +2375,15 @@ var verify = {
       let supported = 0;
       const unsupported = [];
       const unsure = [];
+      const unanswered = [];
       const listed = {};
       for (const claim of claims) {
         const answer = answers[`claim:${claim.id}`];
-        const p = answer?.type === "noul" && typeof answer.noul === "number" ? answer.noul : 0.5;
+        if (!answer) {
+          unanswered.push(claim.id);
+          continue;
+        }
+        const p = answer.type === "noul" && typeof answer.noul === "number" ? answer.noul : 0.5;
         if (p >= supportedAt) {
           supported += 1;
           continue;
@@ -2223,7 +2391,7 @@ var verify = {
         (p <= unsupportedAt ? unsupported : unsure).push(claim.id);
         listed[claim.id] = p;
       }
-      const verdict = unsupported.length ? "unsupported" : unsure.length ? "unsure" : "supported";
+      const verdict = unsupported.length ? "unsupported" : unsure.length || unanswered.length ? "unsure" : "supported";
       return {
         ok: true,
         verdict,
@@ -2231,10 +2399,11 @@ var verify = {
         supported,
         ...unsupported.length ? { unsupported } : {},
         ...unsure.length ? { unsure } : {},
+        ...unanswered.length ? { unanswered } : {},
         ...Object.keys(listed).length ? { p: listed } : {},
         next_step: verdict === "supported" ? void 0 : "Fix or drop the listed claims, or cite the part of the source that supports them."
       };
-    });
+    }, { partial: true });
   }
 };
 
@@ -2267,70 +2436,6 @@ __name(processIo, "processIo");
 // src/cli/run.ts
 import { join as join7 } from "node:path";
 import { parseArgs } from "node:util";
-
-// src/engine/output.ts
-import { mkdirSync as mkdirSync4, writeFileSync as writeFileSync3 } from "node:fs";
-import { join as join6 } from "node:path";
-function roundNumber(key, value) {
-  if (Number.isInteger(value)) return value;
-  const digits = key.endsWith("_usd") ? 6 : 2;
-  return Number(value.toFixed(digits));
-}
-__name(roundNumber, "roundNumber");
-function roundDeep(value, key = "") {
-  if (typeof value === "number") return roundNumber(key, value);
-  if (Array.isArray(value)) return value.map((item) => roundDeep(item, key));
-  if (value !== null && typeof value === "object") {
-    const out = {};
-    for (const [k, v] of Object.entries(value)) {
-      if (v !== void 0) out[k] = roundDeep(v, k);
-    }
-    return out;
-  }
-  return value;
-}
-__name(roundDeep, "roundDeep");
-function isScalar(value) {
-  return value === null || ["string", "number", "boolean"].includes(typeof value);
-}
-__name(isScalar, "isScalar");
-function summarize(result, path) {
-  const out = {};
-  for (const [k, v] of Object.entries(result)) {
-    if (k === "receipt") continue;
-    if (isScalar(v) && JSON.stringify(v).length <= 300) out[k] = v;
-  }
-  out["details"] = path;
-  if (result["receipt"] !== void 0) out["receipt"] = result["receipt"];
-  return out;
-}
-__name(summarize, "summarize");
-function render(result, options = {}) {
-  const rounded = roundDeep(result);
-  if (options.pretty) return JSON.stringify(rounded, null, 2);
-  const line = JSON.stringify(rounded);
-  if (line.length <= DETAIL_LIMIT || !options.detailsDir || !options.receipt) return line;
-  const path = join6(options.detailsDir, `${options.receipt}.json`);
-  try {
-    mkdirSync4(options.detailsDir, { recursive: true });
-    writeFileSync3(path, JSON.stringify(rounded, null, 2) + "\n");
-  } catch {
-    return line;
-  }
-  return JSON.stringify(summarize(rounded, path));
-}
-__name(render, "render");
-function renderError(error, pretty = false) {
-  const body = { ok: false, error: error.code, message: error.message.slice(0, 500) };
-  if (error.details.status !== void 0) body["status"] = error.details.status;
-  if (error.details.retry_after_ms !== void 0) body["retry_after_ms"] = error.details.retry_after_ms;
-  if (error.details.next_step !== void 0) body["next_step"] = error.details.next_step.slice(0, 600);
-  const text = pretty ? JSON.stringify(body, null, 2) : JSON.stringify(body);
-  return text.length <= ERROR_LIMIT ? text : JSON.stringify({ ok: false, error: error.code });
-}
-__name(renderError, "renderError");
-
-// src/cli/run.ts
 var GLOBAL_OPTIONS = {
   describe: { type: "boolean" },
   pretty: { type: "boolean" },
@@ -2346,7 +2451,7 @@ var SHARED_CONTRACT = {
     "--pretty": "Indented JSON for people.",
     "--data-dir <dir>": "Use another data directory for receipts, cache and results.",
     "--pack <name>": "Use this pack instead of the project's.",
-    "--dry-run": "Commands that ask Jev: print the redacted request and a token estimate; send, cache and log nothing. A request too long for one line goes to a details file instead.",
+    "--dry-run": "Commands that ask Jev: print the redacted request and a token estimate; send, cache and log nothing. Long requests are shortened; --pretty shows them in full.",
     "--fresh": "Commands that ask Jev: skip the answer cache.",
     "--fail-on <verdict,...>": "Exit with code 3 when the verdict is one of these, e.g. --fail-on missing,unsure."
   },
@@ -2417,8 +2522,8 @@ async function run(argv, io, commands2) {
       return 0;
     }
     const result = await command.run({ io, flags, values: parsed.values, positionals: parsed.positionals });
-    const receipt = typeof result["receipt"] === "string" ? result["receipt"] : flags.dryRun ? `dry-run-${newReceiptId(io.now())}` : null;
-    const detailsDir = join7(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
+    const receipt = typeof result["receipt"] === "string" ? result["receipt"] : null;
+    const detailsDir = flags.dryRun ? null : join7(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
     io.write(render(result, { pretty, detailsDir, receipt }) + "\n");
     const verdict = result["verdict"];
     return typeof verdict === "string" && flags.failOn.includes(verdict) ? 3 : 0;

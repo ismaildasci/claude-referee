@@ -7,11 +7,13 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Added
 
 - `receipts --usage`, the same as `--tokens`.
+- `doctor` shows `base_url` when `TYPESAFE_BASE_URL` points somewhere other than the default, without credentials or query.
 - `jev-evals/injection`: 33 test logs, with and without a note addressed to the judge, and Jev's answers from 2026-10-01. The measurements page and SECURITY.md describe the result.
 
 ### Changed
 
-- `--dry-run` moves a request too long for one line to a details file; it still sends nothing to the API.
+- The session briefing prints the CLI path once and fits in 600 characters with a long installed plugin path.
+- CI also runs the tests on macOS.
 - The README uses the final design: new images, the yellow-card mark and plainer wording, checked section by section with Jev.
 - Measurements now include the cache re-run and label the briefing numbers by version.
 
@@ -25,6 +27,12 @@ All notable changes to this project are documented here. The format follows [Kee
 - `decide` uses a pack's `decide.micro.*` questions when the input has no `micro`.
 - The session hook treats `false`, `0`, `no` and `off` in `hooks_enabled` as off.
 - Code such as `inputTokens: reply.inputTokens` or `apiKey = config.apiKey` no longer stops a request as a secret assignment: a value made only of dotted letter segments, with no digits, is treated as code.
+- `judge` and `verify` keep the answers they got when one request fails or the 90-second batch deadline passes; items without an answer are listed in `unanswered`, and `judge` never calls such a run clear.
+- The client reports `rate_limited` at once when a 429's Retry-After is longer than the time budget.
+- An unknown model now gets a `next_step` that names the model and points to `doctor --online`.
+- `decide` rejects option names made only of digits, which would defeat the reversed order.
+- `--dry-run` writes nothing to disk; long requests are shortened inline, and `--pretty` shows them in full.
+- The no-key hint says `--values-stdin` needs Claude Code 2.1.285 or later.
 
 ## [0.1.0] - 2026-09-30
 

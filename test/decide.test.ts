@@ -158,3 +158,23 @@ test("decide uses a pack's decide.micro questions when the input has none; bad: 
     await server.close();
   }
 });
+
+test("decide's two requests differ in option order for every accepted kind of name", async () => {
+  for (const names of [["redis", "memory", "edge"], ["o1", "o2", "o3"], ["1a", "2b", "3c"], ["1.5", "2.5"], ["v1.5", "v2.0"]]) {
+    const input = { decision: "d", options: names.map((name) => ({ name, text: `Option ${name}` })) };
+    const io = memoryIo({ stdin: JSON.stringify(input), env: { TYPESAFE_API_KEY: "ts_test", REFEREE_DATA_DIR: tempDir() } });
+    assert.equal(await run(["decide", "--dry-run", "--pretty"], io, commands), 0, names.join(","));
+    const sent = io.json()["sent"] as { id: string; questions: { best: { criteria: object } } }[];
+    const order = (id: string) => Object.keys(sent.find((s) => s.id === id)?.questions.best.criteria ?? {});
+    assert.deepEqual(order("written"), names);
+    assert.deepEqual(order("reversed"), [...names].reverse());
+  }
+});
+
+test("decide rejects option names made only of digits, which would defeat the reversed order", async () => {
+  const input = { decision: "d", options: [{ name: "1", text: "one" }, { name: "2", text: "two" }, { name: "3", text: "three" }] };
+  const { code, out } = await decideWith(favour({}), input);
+  assert.equal(code, 1);
+  assert.equal(out["error"], "bad_input");
+  assert.match(String(out["next_step"]), /starts with a letter/);
+});

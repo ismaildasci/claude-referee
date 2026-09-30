@@ -5,6 +5,7 @@ export const KIT = "claude-referee";
 export const VERSION = "0.1.0";
 export const DEFAULT_MODEL = "jev-1.13.0";
 export const MARKETPLACE = "claude-referee";
+export const DEFAULT_BASE_URL = "https://api.typesafe.ai";
 
 export const USD_PER_MTOK: Readonly<Record<string, number>> = {
   "jev-1.13.0": 0.042,
@@ -15,6 +16,7 @@ export const ERROR_LIMIT = 2000;
 export const STATE_TOKEN_LIMIT = 32_000;
 export const REQUEST_TOKEN_LIMIT = 64_000;
 export const CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+export const BATCH_DEADLINE_MS = 90_000;
 
 export interface Budget {
   readonly budgetMs: number;
