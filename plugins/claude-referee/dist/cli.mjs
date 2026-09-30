@@ -1888,8 +1888,214 @@ var done = {
   }
 };
 
+// src/cli/commands/judge.ts
+var MAX_ITEMS = 500;
+var LIST_LIMIT = 20;
+function parseItems(text) {
+  const trimmed = text.trim();
+  const toItem = /* @__PURE__ */ __name((value, i) => {
+    if (typeof value === "string") return value.trim() ? { id: String(i + 1), text: value } : null;
+    const { id, text: body } = value ?? {};
+    if (typeof body !== "string" || !body.trim()) return null;
+    return { id: typeof id === "string" || typeof id === "number" ? String(id) : String(i + 1), text: body };
+  }, "toItem");
+  if (trimmed.startsWith("[")) {
+    try {
+      return JSON.parse(trimmed).map(toItem).filter((x) => x !== null);
+    } catch {
+      throw new RefereeError("bad_input", "Items look like a JSON array but don't parse.");
+    }
+  }
+  const lines = text.split(/\r?\n/);
+  const jsonl = lines.filter((l) => l.trim()).every((l) => l.trim().startsWith("{"));
+  return lines.map((line, i) => {
+    if (!line.trim()) return null;
+    if (!jsonl) return { id: String(i + 1), text: line };
+    try {
+      return toItem(JSON.parse(line), i);
+    } catch {
+      throw new RefereeError("bad_input", `Items line ${i + 1} is not valid JSON.`);
+    }
+  }).filter((x) => x !== null);
+}
+__name(parseItems, "parseItems");
+var judge = {
+  name: "judge",
+  describe: {
+    summary: "Run a pack's yes/no questions over many items: lines, strings, failures.",
+    inputs: {
+      "--question <id[,id]>": "Pack question ids, e.g. line.risky or failure.env.",
+      "--items <file|->": "A JSON array of strings or {id, text}, JSON lines, or plain lines (id = line number). Max 500 items.",
+      "--context <text>": "Optional shared context for every item, e.g. the file name."
+    },
+    outputs: {
+      verdict: "flagged when any answer is yes, review when some are unsure, clear otherwise",
+      items: "Number of items judged",
+      yes: "Answers in the yes band",
+      no: "Answers in the no band",
+      review: "Answers between the bands",
+      flagged: "Item ids with a yes (first 20; 'id/question' when several questions)",
+      review_ids: "Item ids to review (first 20)",
+      stopped: "Item ids not sent because they held something shaped like a credential"
+    },
+    errors: [...JEV_ERRORS],
+    effects: JEV_EFFECTS,
+    cost: `${JEV_COST} judge makes one request per item, six at a time.`
+  },
+  options: { question: { type: "string" }, items: { type: "string" }, context: { type: "string" } },
+  async run(context) {
+    const ids = (str(context, "question") ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+    if (ids.length === 0) throw new RefereeError("bad_input", "Give --question with one or more pack question ids.", { next_step: "The generic pack has line.risky and failure.env." });
+    const items = parseItems(await readSource(context, str(context, "items"), "items"));
+    if (items.length === 0) throw new RefereeError("bad_input", "No items to judge.");
+    if (items.length > MAX_ITEMS) throw new RefereeError("too_large", `At most ${MAX_ITEMS} items per call.`, { next_step: "Split the items into several calls." });
+    const { pack, project } = openPack(context);
+    const questions = {};
+    for (const id of ids) {
+      const q = question(pack, id);
+      if (q.type !== "noul") throw new RefereeError("bad_input", `judge needs yes/no questions; ${id} is a ${q.type}.`);
+      questions[id] = q;
+    }
+    const shared = str(context, "context");
+    const planned = items.map((item) => ({ id: item.id, state: { item: clip(item.text, 4e3, 4e3), ...shared ? { context: shared } : {} }, questions }));
+    const auto = Object.fromEntries(ids.map((id) => [id, threshold(pack, project?.thresholds, id, "auto", 0.9)]));
+    return jevCommand(
+      context,
+      "judge",
+      pack,
+      planned,
+      (outcomes) => {
+        let yes = 0;
+        let no = 0;
+        let review = 0;
+        const flagged = [];
+        const reviewIds = [];
+        const stopped = [];
+        for (const outcome of outcomes) {
+          if (!outcome.answers) {
+            stopped.push(outcome.id);
+            continue;
+          }
+          for (const id of ids) {
+            const answer = outcome.answers[id];
+            const p = answer?.type === "noul" ? answer.noul : 0.5;
+            const band = auto[id] ?? 0.9;
+            const label = ids.length > 1 ? `${outcome.id}/${id}` : outcome.id;
+            if (p >= band) {
+              yes += 1;
+              flagged.push(label);
+            } else if (p <= 1 - band) {
+              no += 1;
+            } else {
+              review += 1;
+              reviewIds.push(label);
+            }
+          }
+        }
+        const verdict = yes > 0 ? "flagged" : review > 0 ? "review" : "clear";
+        return {
+          ok: true,
+          verdict,
+          items: items.length,
+          yes,
+          no,
+          review,
+          ...flagged.length ? { flagged: flagged.slice(0, LIST_LIMIT) } : {},
+          ...reviewIds.length ? { review_ids: reviewIds.slice(0, LIST_LIMIT) } : {},
+          ...stopped.length ? { stopped } : {}
+        };
+      },
+      { batch: true }
+    );
+  }
+};
+
+// src/cli/commands/verify.ts
+var MAX_CLAIMS = 100;
+var verify = {
+  name: "verify",
+  describe: {
+    summary: "Check claims against a source text.",
+    inputs: {
+      "--source <file|->": "The text the claims must be supported by. '-' reads stdin.",
+      "--claim <text>": "A claim; repeat for several.",
+      "--claims <file>": "Claims as a JSON array of strings or {id, text}, JSON lines, or plain lines. Max 100."
+    },
+    outputs: {
+      verdict: "supported when every claim is, unsupported when any is, unsure otherwise",
+      claims: "Number of claims checked",
+      supported: "Number of supported claims",
+      unsupported: "Ids of unsupported claims",
+      unsure: "Ids of claims between the bands"
+    },
+    errors: [...JEV_ERRORS],
+    effects: JEV_EFFECTS,
+    cost: `${JEV_COST} verify asks all claims about one source in one request when they fit.`
+  },
+  options: { source: { type: "string" }, claim: { type: "string", multiple: true }, claims: { type: "string" } },
+  async run(context) {
+    const claimsFile = str(context, "claims");
+    const inline = list(context, "claim");
+    if (claimsFile && inline.length) throw new RefereeError("bad_input", "Use --claim or --claims, not both.");
+    if (claimsFile === "-" && (str(context, "source") ?? "-") === "-") throw new RefereeError("bad_input", "Only one of --source and --claims can read stdin.");
+    const claims = (claimsFile ? parseItems(await readSource(context, claimsFile, "claims")) : inline.map((text, i) => ({ id: String(i + 1), text }))).filter(
+      (c) => c.text.trim()
+    );
+    if (claims.length === 0) throw new RefereeError("bad_input", "Give at least one --claim or a --claims file.");
+    if (claims.length > MAX_CLAIMS) throw new RefereeError("too_large", `At most ${MAX_CLAIMS} claims per call.`);
+    const source = stripAnsi(await readSource(context, str(context, "source"), "source"));
+    const { pack, project } = openPack(context);
+    const base = question(pack, "verify.supported");
+    const state = { source };
+    const stateTokens = estimateTokens(JSON.stringify(state));
+    if (stateTokens > STATE_TOKEN_LIMIT) throw new RefereeError("too_large", "The source is too large for one Jev request.", { next_step: "Pass the relevant section of the source." });
+    const planned = [];
+    let batch = {};
+    let batchTokens = stateTokens;
+    const flush = /* @__PURE__ */ __name(() => {
+      if (Object.keys(batch).length) planned.push({ id: `part${planned.length + 1}`, state, questions: batch });
+      batch = {};
+      batchTokens = stateTokens;
+    }, "flush");
+    for (const claim of claims) {
+      const q = { ...base, instructions: withData(base.instructions, { claim: claim.text }) };
+      const tokens = estimateTokens(JSON.stringify(q));
+      if (stateTokens + tokens > STATE_TOKEN_LIMIT) throw new RefereeError("too_large", `Claim ${claim.id} is too long.`);
+      if (batchTokens + tokens > REQUEST_TOKEN_LIMIT) flush();
+      batch[`claim:${claim.id}`] = q;
+      batchTokens += tokens;
+    }
+    flush();
+    const supportedAt = threshold(pack, project?.thresholds, "verify.supported", "supported", 0.9);
+    const unsupportedAt = threshold(pack, project?.thresholds, "verify.supported", "unsupported", 0.1);
+    return jevCommand(context, "verify", pack, planned, (outcomes) => {
+      const answers = Object.assign({}, ...outcomes.map((o) => o.answers ?? {}));
+      let supported = 0;
+      const unsupported = [];
+      const unsure = [];
+      for (const claim of claims) {
+        const answer = answers[`claim:${claim.id}`];
+        const p = answer?.type === "noul" && typeof answer.noul === "number" ? answer.noul : 0.5;
+        if (p >= supportedAt) supported += 1;
+        else if (p <= unsupportedAt) unsupported.push(claim.id);
+        else unsure.push(claim.id);
+      }
+      const verdict = unsupported.length ? "unsupported" : unsure.length ? "unsure" : "supported";
+      return {
+        ok: true,
+        verdict,
+        claims: claims.length,
+        supported,
+        ...unsupported.length ? { unsupported } : {},
+        ...unsure.length ? { unsure } : {},
+        next_step: verdict === "supported" ? void 0 : "Fix or drop the listed claims, or cite the part of the source that supports them."
+      };
+    });
+  }
+};
+
 // src/cli/commands/index.ts
-var commands = [done, decide, doctor];
+var commands = [done, decide, judge, verify, doctor];
 
 // src/cli/io.ts
 import { homedir } from "node:os";

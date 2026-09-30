@@ -4,5 +4,7 @@ import type { Command } from "../types.ts";
 import { decide } from "./decide.ts";
 import { doctor } from "./doctor.ts";
 import { done } from "./done.ts";
+import { judge } from "./judge.ts";
+import { verify } from "./verify.ts";
 
-export const commands: readonly Command[] = [done, decide, doctor];
+export const commands: readonly Command[] = [done, decide, judge, verify, doctor];
