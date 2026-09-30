@@ -10,7 +10,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const outdir = join(root, "plugins/claude-referee/dist");
 
 await build({
-  entryPoints: { cli: join(root, "src/cli/main.ts") },
+  entryPoints: { cli: join(root, "src/cli/main.ts"), hook: join(root, "src/hooks/main.ts") },
   outdir,
   outExtension: { ".js": ".mjs" },
   bundle: true,
