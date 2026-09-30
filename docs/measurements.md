@@ -12,6 +12,11 @@ Setup: 20 real decisions with 4 options each, asked in all 24 orders, twice. No 
 - Position bias was small: 0.02 per slot on average, 0.08 at most. The effect seems to come from how option content interacts with order, which we haven't tested separately.
 - The written order alone matched the all-orders leader in 18 of 20 decisions. Written plus reversed matched it in 20 of 20, with 2 requests. Four rotations matched 19 of 20.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/charts/two-orders-dark.png">
+  <img alt="Dot plot of Jev requests per decision (log scale) against decisions matching the all-orders leader: written order only 1 request 18 of 20; written plus reversed 2 requests 20 of 20; four rotations 4 requests 19 of 20; two orders with all 24 if unsure 10.8 requests on average 20 of 20; all 24 orders is the reference." src="../assets/charts/two-orders-light.png" width="100%">
+</picture>
+
 The comparison is with the average over all orders, not with a known right answer.
 
 **What changed:** `decide` asks the choice twice, in the written and the reversed order, and averages the two.
@@ -23,10 +28,32 @@ The comparison is with the average over all orders, not with a known right answe
 
 **What changed:** nothing tells Claude to retry. A tie comes back with the leading option and a next step: add the missing fact, or go with the leader if the choice is easy to undo.
 
+## Repeated questions come from the cache
+
+One 10-pair audit: the first run made 10 Jev requests with 7,316 input tokens. The same audit run again made 0 requests and used 0 tokens. With `--fresh` it made 10 requests again. The kit cached each request for 30 days, keyed by the model, the questions and the redacted input. (Measured)
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/charts/cache-rerun-dark.png">
+  <img alt="One 10-pair audit: the first run made 10 Jev requests with 7,316 input tokens; the same audit again made 0 requests; again with --fresh made 10 requests." src="../assets/charts/cache-rerun-light.png" width="100%">
+</picture>
+
+**What changed:** claude-referee keeps the same 30-day cache, and identical requests that are in flight at the same time are merged into one.
+
 ## Extra per-option questions: ask them separately, keep them out of the verdict
 
-- Asking every option's extra questions in one request kept the leader in 20 of 20 decisions, but moved those extra scores by up to 0.23, against 0.03 when each option was asked on its own. It also flipped the leaning option of one tie and saved only 7% of input tokens. (Measured)
+- Asking every option's extra questions in one request kept the leader in 20 of 20 decisions, but the largest change in those extra scores averaged 0.09 per decision (0.23 at most), against 0.03 when each option was asked on its own. It also flipped the leaning option of one tie and saved only 7% of input tokens. (Measured)
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/charts/per-option-questions-dark.png">
+  <img alt="Per-option questions drift when asked together: all options in one request 0.09, one request per option 0.03 (average of each decision's largest score change). Asking together saved only 7% of input tokens (17.4K to 16.2K). Measured on 20 real decisions, one private codebase." src="../assets/charts/per-option-questions-light.png" width="100%">
+</picture>
+
 - Generic extra questions didn't separate options: every option scored 0.3–0.7. Seven project rules added as questions scored 0.7–0.85 for every option and resolved none of the ties. Of 27 calibration decisions, 14 were clear, 5 weak and 8 ties. (Observed)
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/charts/calibration-dark.png">
+  <img alt="27 calibration decisions: clear 14, weak 5, tie 8. Observed in 27 calibration decisions, one private codebase." src="../assets/charts/calibration-light.png" width="100%">
+</picture>
 
 **What changed:** extra questions are optional, asked once per option, and reported as flags. The verdict comes from the choice question alone.
 
@@ -48,9 +75,26 @@ Counting correctly took four rules: count a command only in command position, ca
 - On about 10,400 strings the kit actually sent: 0 stops and 0 replacements. (Measured)
 - On 12,166 Bash outputs from 14 days of transcripts: 3 values (0.025%) looked like credentials, and 2,048 values were replaced (UUIDs 1,490, IP addresses 190, emails 178, other identifiers 190). Neither group was reviewed by hand. The slowest output took 14 ms. (Measured)
 - A rule that matched variable names like KEY or PASSWORD, without checking the value, flagged type annotations, translation keys, pagination tokens and SSH algorithm names. Checking the assignment form and the value's shape cut stops from 48 to 12, then to 3, on an earlier scan of about 19,500 outputs. (Observed)
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/charts/secret-rule-dark.png">
+  <img alt="Checking the value's shape cut false stops: name-based rule only 48, identifier-shaped values excluded 12, pagination tokens and SSH algorithm names excluded 3. Observed on an earlier scan of about 19,500 outputs, one private codebase. Not reproduced." src="../assets/charts/secret-rule-light.png" width="100%">
+</picture>
+
 - The IP pattern also matched four-part version strings. No pattern can catch sensitive details written as prose, such as a customer's name.
 
 **What changed:** a request with something shaped like a credential isn't sent at all; personal details are replaced; one false positive skips one item instead of stopping a whole batch.
+
+## The session briefing fits in 600 characters
+
+In the kit that preceded claude-referee (version 0.2.6), the briefing text for four areas of one workspace came to 431–599 characters, under a 600-character target and the 800-character limit. (Measured)
+
+claude-referee v0.1's own briefing from the `generic` pack came to 657 characters on a test project. About a quarter of that is the absolute path of the CLI, which appears twice and differs per machine. (Measured once, 2026-09-30)
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../assets/charts/briefing-size-dark.png">
+  <img alt="The session briefing fits in 600 characters: workspace root 599, web app 484, backend 431, root files 469; target 600, limit 800. Measured on four areas of one private workspace." src="../assets/charts/briefing-size-light.png" width="100%">
+</picture>
 
 ## An evidence check nobody calls doesn't help
 

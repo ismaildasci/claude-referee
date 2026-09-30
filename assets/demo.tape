@@ -1,5 +1,5 @@
 # claude-referee demo for VHS (https://github.com/charmbracelet/vhs): vhs assets/demo.tape -> assets/demo.gif
-# Prerequisites and the decision.json it expects are in assets-src/README.md. Never put the key in this file.
+# Prerequisites and the decision.json it expects are in assets/README.md. Never put the key in this file.
 
 Output assets/demo.gif
 

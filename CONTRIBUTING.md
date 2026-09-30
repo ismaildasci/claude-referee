@@ -32,7 +32,7 @@ claude --plugin-dir plugins/claude-referee
 | `plugins/claude-referee/` | What users install: the manifest, the committed bundle in `dist/`, `hooks/`, `skills/` and `packs/` |
 | `test/` | `node:test` suites; `test/fake-jev.ts` stands in for the API |
 | `scripts/` | The build and the private-terms check |
-| `assets-src/` | Generators for the README images; nothing here ships |
+| `assets/` | README, manifesto and social preview images, and the demo tape; see `assets/README.md` |
 
 ## The bundle is committed
 

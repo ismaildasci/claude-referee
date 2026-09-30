@@ -2,7 +2,6 @@ node_modules/
 .private-terms
 results/
 plugins/*/evals/results/
-_previews/
 coverage/
 *.log
 *.tgz

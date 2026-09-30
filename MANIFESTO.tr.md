@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/manifesto-dark.png">
+    <img alt="Evidence over eloquence (güzel söz değil, kanıt): claude-referee manifestosu, sarı bir hakem kartıyla." src="assets/manifesto-light.png" width="100%">
+  </picture>
+</p>
+
 # Güzel söz değil, kanıt
 
 *claude-referee manifestosu*
