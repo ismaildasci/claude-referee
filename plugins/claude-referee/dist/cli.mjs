@@ -2135,7 +2135,8 @@ var verify = {
       claims: "Number of claims checked",
       supported: "Number of supported claims",
       unsupported: "Ids of unsupported claims",
-      unsure: "Ids of claims between the bands"
+      unsure: "Ids of claims between the bands",
+      p: "Probability of support for each unsupported or unsure claim, by id"
     },
     errors: [...JEV_ERRORS],
     effects: JEV_EFFECTS,
@@ -2182,12 +2183,16 @@ var verify = {
       let supported = 0;
       const unsupported = [];
       const unsure = [];
+      const listed = {};
       for (const claim of claims) {
         const answer = answers[`claim:${claim.id}`];
         const p = answer?.type === "noul" && typeof answer.noul === "number" ? answer.noul : 0.5;
-        if (p >= supportedAt) supported += 1;
-        else if (p <= unsupportedAt) unsupported.push(claim.id);
-        else unsure.push(claim.id);
+        if (p >= supportedAt) {
+          supported += 1;
+          continue;
+        }
+        (p <= unsupportedAt ? unsupported : unsure).push(claim.id);
+        listed[claim.id] = p;
       }
       const verdict = unsupported.length ? "unsupported" : unsure.length ? "unsure" : "supported";
       return {
@@ -2197,6 +2202,7 @@ var verify = {
         supported,
         ...unsupported.length ? { unsupported } : {},
         ...unsure.length ? { unsure } : {},
+        ...Object.keys(listed).length ? { p: listed } : {},
         next_step: verdict === "supported" ? void 0 : "Fix or drop the listed claims, or cite the part of the source that supports them."
       };
     });

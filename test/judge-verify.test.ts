@@ -72,6 +72,7 @@ test("verify asks every claim about one source in a single request", async () =>
   assert.equal(out["supported"], 1);
   assert.deepEqual(out["unsupported"], ["2"]);
   assert.deepEqual(out["unsure"], ["3"]);
+  assert.deepEqual(out["p"], { "2": 0.03, "3": 0.5 });
 });
 
 test("verify all supported, and input errors", async () => {
