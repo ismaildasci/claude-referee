@@ -6,8 +6,8 @@ import { redact, stopError } from "../src/engine/redact.ts";
 import { FAKE } from "./helpers.ts";
 
 const STOPS: ReadonlyArray<readonly [string, string]> = [
-  ["private_key", "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEA"],
-  ["private_key", "-----BEGIN OPENSSH PRIVATE KEY-----"],
+  ["private_key", FAKE.pemRsa],
+  ["private_key", FAKE.pemSsh],
   ["aws_access_key", `aws_access_key_id ${FAKE.aws}`],
   ["github_token", `token ${FAKE.github}`],
   ["github_token", `github_pat_${"11ABCDEFG0".repeat(3)}`],
