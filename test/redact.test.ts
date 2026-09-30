@@ -63,6 +63,12 @@ test("redact replaces emails, IP addresses and the home directory", () => {
   assert.deepEqual(replaced, { home: 1, email: 1, ip: 1 });
 });
 
+test("redact replaces the home directory in object keys too", () => {
+  const { value, replaced } = redact({ context_files: { "/Users/alice/app/adr.md": "We run Redis." } }, { home: "/Users/alice" });
+  assert.deepEqual(value.context_files, { "~/app/adr.md": "We run Redis." });
+  assert.deepEqual(replaced, { home: 1 });
+});
+
 test("redact keeps four-part version strings", () => {
   for (const text of ["version 1.2.3.4", "v10.0.0.1", "build 1.2.3.4-beta", "chrome/120.0.6099.109", "1.2.3.4.5"]) {
     assert.equal(redact({ t: text }).value.t, text, text);

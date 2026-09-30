@@ -77,11 +77,14 @@ export class Session {
   }
 
   prepare(planned: readonly Planned[]): Prepared[] {
+    const options = { home: this.options.home, extra: this.options.pack.redact };
+    const count = (replaced: Readonly<Record<string, number>>) => Object.values(replaced).reduce((a, b) => a + b, 0);
     return planned.map((p) => {
-      const result = redact({ state: p.state, questions: p.questions }, { home: this.options.home, extra: this.options.pack.redact });
-      this.replacedCount += Object.values(result.replaced).reduce((a, b) => a + b, 0);
+      const state = redact({ state: p.state }, options);
+      const questions = redact({ questions: p.questions }, { ...options, keepKeys: true });
+      this.replacedCount += count(state.replaced) + count(questions.replaced);
       this.questionHashes.add(sha256(JSON.stringify(p.questions)).slice(0, 12));
-      return { planned: p, body: result.value, stops: result.stopped };
+      return { planned: p, body: { state: state.value.state, questions: questions.value.questions }, stops: [...state.stopped, ...questions.stopped] };
     });
   }
 

@@ -13,6 +13,10 @@ All notable changes to this project are documented here. The format follows [Kee
 - The README uses the final design: new images, the yellow-card mark and plainer wording, checked section by section with Jev.
 - Measurements now include the cache re-run and label the briefing numbers by version.
 
+### Fixed
+
+- `decide` no longer sends the home directory to TypeSafe in `context_files` paths: object keys in the request state are now redacted like values, so the home directory in a key becomes `~`.
+
 ## [0.1.0] - 2026-09-30
 
 First public release.

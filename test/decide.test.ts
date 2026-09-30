@@ -1,7 +1,7 @@
 // decide: two orders, verdict rules, micro flags, per-option mode, context files and output size.
 
 import assert from "node:assert/strict";
-import { writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { commands } from "../src/cli/commands/index.ts";
@@ -104,6 +104,23 @@ test("decide reads context files itself and reports paths and sizes", async () =
   const { out, requests } = await decideWith(favour({ redis: 0.9, memory: 0.1 }), { decision: "d", options: OPTIONS.slice(0, 2), context_files: ["adr.md"] }, cwd);
   assert.deepEqual(out["read"], [{ path: "adr.md", bytes: 37 }]);
   assert.deepEqual((requests[0]?.state as { context_files: object }).context_files, { "adr.md": "We already run Redis in every region." });
+});
+
+test("decide never sends the home directory in context file paths", async () => {
+  const home = tempDir("referee-home-");
+  const cwd = join(home, "app");
+  mkdirSync(cwd);
+  writeFileSync(join(cwd, "adr.md"), "We already run Redis in every region.");
+  const server = await fakeJev(favour({ redis: 0.9, memory: 0.1 }));
+  try {
+    const input = { decision: "d", options: OPTIONS.slice(0, 2), context_files: [join(cwd, "adr.md")] };
+    const io = memoryIo({ stdin: JSON.stringify(input), home, cwd, env: { TYPESAFE_API_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: tempDir() } });
+    assert.equal(await run(["decide"], io, commands), 0);
+    for (const r of server.requests) assert.ok(!JSON.stringify(r).includes(home), JSON.stringify(r.state));
+    assert.deepEqual(Object.keys((server.requests[0]?.state as { context_files: object }).context_files), ["~/app/adr.md"]);
+  } finally {
+    await server.close();
+  }
 });
 
 test("decide rejects bad input", async () => {

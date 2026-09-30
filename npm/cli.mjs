@@ -1369,7 +1369,8 @@ function redact2(value, options = {}) {
       const out = {};
       for (const [key, child] of Object.entries(node)) {
         for (const kind of stopsIn(key, extraStop)) stopped.push({ kind, field: `${field}.<key>` });
-        out[key] = walk(child, field ? `${field}.${key}` : key);
+        const safeKey = options.keepKeys ? key : replaceIn(key, options.home, extraReplace, replaced);
+        out[safeKey] = walk(child, field ? `${field}.${safeKey}` : safeKey);
       }
       return out;
     }
@@ -1416,11 +1417,14 @@ var Session = class {
     this.receiptId = newReceiptId(this.started);
   }
   prepare(planned) {
+    const options = { home: this.options.home, extra: this.options.pack.redact };
+    const count = /* @__PURE__ */ __name((replaced) => Object.values(replaced).reduce((a, b) => a + b, 0), "count");
     return planned.map((p) => {
-      const result = redact2({ state: p.state, questions: p.questions }, { home: this.options.home, extra: this.options.pack.redact });
-      this.replacedCount += Object.values(result.replaced).reduce((a, b) => a + b, 0);
+      const state = redact2({ state: p.state }, options);
+      const questions = redact2({ questions: p.questions }, { ...options, keepKeys: true });
+      this.replacedCount += count(state.replaced) + count(questions.replaced);
       this.questionHashes.add(sha256(JSON.stringify(p.questions)).slice(0, 12));
-      return { planned: p, body: result.value, stops: result.stopped };
+      return { planned: p, body: { state: state.value.state, questions: questions.value.questions }, stops: [...state.stopped, ...questions.stopped] };
     });
   }
   dryRun(planned) {

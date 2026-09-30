@@ -85,3 +85,15 @@ test("verify all supported, and input errors", async () => {
   const both = await call(["verify", "--claims", "-"], yes, "text");
   assert.equal(both.out["error"], "bad_input");
 });
+
+test("verify maps answers back to claim ids that look like UUIDs", async () => {
+  const cwd = tempDir();
+  writeFileSync(join(cwd, "src.md"), "Redis runs in every region.");
+  const ids = ["3f2a9c1e-77b1-4d2e-9a3b-1c2d3e4f5a6b", "9b1d7a3c-1e2f-4a5b-8c9d-0e1f2a3b4c5d"];
+  const claims = ids.map((id, i) => JSON.stringify({ id, text: i === 0 ? "Redis runs everywhere." : "Redis is down." })).join("\n");
+  writeFileSync(join(cwd, "claims.jsonl"), claims);
+  const answer: Answerer = (r) => Object.fromEntries(Object.keys(r.questions).map((k) => [k, { type: "noul", noul: k.endsWith(ids[0]!) ? 0.95 : 0.05 }]));
+  const { out } = await call(["verify", "--source", "src.md", "--claims", "claims.jsonl"], answer, "", cwd);
+  assert.equal(out["supported"], 1);
+  assert.deepEqual(out["unsupported"], [ids[1]]);
+});

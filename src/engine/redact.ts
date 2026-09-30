@@ -34,6 +34,7 @@ export interface RedactOptions {
   readonly home?: string;
   readonly extra?: PackPatterns | undefined;
   readonly maxField?: number;
+  readonly keepKeys?: boolean;
 }
 
 const STOP: readonly Pattern[] = [
@@ -144,7 +145,8 @@ export function redact<T>(value: T, options: RedactOptions = {}): Redacted<T> {
       const out: Record<string, unknown> = {};
       for (const [key, child] of Object.entries(node)) {
         for (const kind of stopsIn(key, extraStop)) stopped.push({ kind, field: `${field}.<key>` });
-        out[key] = walk(child, field ? `${field}.${key}` : key);
+        const safeKey = options.keepKeys ? key : replaceIn(key, options.home, extraReplace, replaced);
+        out[safeKey] = walk(child, field ? `${field}.${safeKey}` : safeKey);
       }
       return out;
     }
