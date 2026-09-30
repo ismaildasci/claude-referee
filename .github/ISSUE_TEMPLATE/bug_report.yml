@@ -1,0 +1,35 @@
+name: Bug report
+description: Something claude-referee did that it shouldn't, or didn't do that it should.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Security issues go through SECURITY.md, not here. Never paste an API key, a real secret or customer data.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: The command or hook, what you expected and what you got. Paste the JSON line claude-referee printed.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to reproduce
+      description: The smallest input that shows it. `--dry-run` output helps, after you've checked it holds nothing private.
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: doctor output
+      description: The output of `npx claude-referee doctor`. It never contains the key.
+      render: json
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: macOS 15, Ubuntu 24.04, Windows 11 ...

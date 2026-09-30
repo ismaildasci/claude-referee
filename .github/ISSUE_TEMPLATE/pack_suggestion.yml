@@ -1,0 +1,28 @@
+name: Pack or question suggestion
+description: A question Jev could answer for coding agents, or a new pack.
+labels: [pack]
+body:
+  - type: textarea
+    id: judgement
+    attributes:
+      label: The judgement
+      description: What should be decided, and where in a Claude Code session it comes up.
+    validations:
+      required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: Draft question
+      description: One atomic question, with what yes and no (or each option) mean.
+    validations:
+      required: true
+  - type: textarea
+    id: cases
+    attributes:
+      label: Example cases
+      description: A few inputs with the answer you'd expect. Invented or public data only.
+  - type: textarea
+    id: code-first
+    attributes:
+      label: Why code can't decide it
+      description: If a parser or a regex can settle it, the referee should use that instead of a model.
