@@ -4,6 +4,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-01
+
 ### Added
 
 - `receipts --usage` counts claude-referee CLI calls from this project's Claude Code transcripts: per day and command, subagents included, each tool call once, with the size of what each call returned. Nothing from the transcripts is printed.
@@ -58,4 +60,5 @@ First public release.
 - The SessionStart briefing, at most 800 characters, only in projects with `.claude/referee.json`.
 - The `generic` pack and the `jev` skill.
 
+[0.1.1]: https://github.com/ismaildasci/claude-referee/releases/tag/v0.1.1
 [0.1.0]: https://github.com/ismaildasci/claude-referee/releases/tag/v0.1.0
