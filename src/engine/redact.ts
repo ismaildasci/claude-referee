@@ -56,6 +56,7 @@ const ID_NAME = /(?:[_.-](?:id|ID)|Id|ID)$/;
 const IDENTIFIER = /^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$/;
 const TYPE_NAME = /^[A-Z]?[a-z]+(?:[A-Z][a-z0-9]*)*$/;
 const SECRET_CHARS = /^[A-Za-z0-9+/=_\-.~!@#$%^&*]+$/;
+const MEMBER_CHAIN = /^[A-Za-z_$]+(?:\.[A-Za-z_$]+)+$/;
 const PLACEHOLDER = /^(?:x{3,}|\*{3,}|\.{3}|changeme|your[_-].*|example.*|dummy.*|fake.*|test.*|placeholder.*|redacted.*|\$.*|process\.env.*|env\..*)$/i;
 
 const EMAIL = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}\b/g;
@@ -64,7 +65,7 @@ const IPV4 = /\b(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d
 export function looksSecret(name: string, value: string): boolean {
   if (!SECRET_NAME.test(name) || NOT_SECRET_NAME.test(name) || ID_NAME.test(name)) return false;
   if (value.length < 12 || !SECRET_CHARS.test(value)) return false;
-  if (IDENTIFIER.test(value) || TYPE_NAME.test(value) || PLACEHOLDER.test(value)) return false;
+  if (IDENTIFIER.test(value) || TYPE_NAME.test(value) || MEMBER_CHAIN.test(value) || PLACEHOLDER.test(value)) return false;
   const classes = [/[a-z]/, /[A-Z]/, /[0-9]/, /[^A-Za-z0-9]/].filter((r) => r.test(value)).length;
   return classes >= 3 || (classes >= 2 && value.length >= 20 && /[0-9]/.test(value));
 }

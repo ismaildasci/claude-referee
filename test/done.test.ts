@@ -1,7 +1,7 @@
 // done: verdict bands, several criteria, stdin evidence, dry runs and credential stops.
 
 import assert from "node:assert/strict";
-import { readdirSync, writeFileSync } from "node:fs";
+import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { commands } from "../src/cli/commands/index.ts";
@@ -78,6 +78,27 @@ test("done --dry-run shows the redacted request and touches neither network nor 
     assert.match(JSON.stringify(result["sent"]), /\[REDACTED:email\]/);
     assert.equal(server.requests.length, 0);
     assert.deepEqual(readdirSync(dataDir), []);
+  } finally {
+    await server.close();
+  }
+});
+
+test("done --dry-run moves a long request to a details file and writes nothing else", async () => {
+  const server = await fakeJev();
+  const dataDir = tempDir();
+  try {
+    const evidence = "PASS src/app.test.ts ok\n".repeat(200);
+    const out = io(server, evidence, dataDir);
+    assert.equal(await run(["done", "--criteria", "all tests pass", "--dry-run"], out, commands), 0);
+    const line = out.out.join("").trim();
+    assert.ok(line.length <= 1500, `${line.length}`);
+    const result = out.json();
+    assert.equal(result["verdict"], "would_send");
+    assert.equal("sent" in result, false);
+    const full = JSON.parse(readFileSync(String(result["details"]), "utf8")) as { sent: { state: { evidence: string } }[] };
+    assert.equal(full.sent[0]?.state.evidence, evidence);
+    assert.equal(server.requests.length, 0);
+    assert.deepEqual(readdirSync(dataDir), ["results"]);
   } finally {
     await server.close();
   }

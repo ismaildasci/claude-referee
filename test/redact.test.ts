@@ -19,6 +19,8 @@ const STOPS: ReadonlyArray<readonly [string, string]> = [
   ["url_credentials", "DATABASE_URL=postgres://admin:hunter2@db.internal:5432/app"],
   ["secret_assignment", "API_KEY=9f8e7d6c5b4a3f2e1d0c"],
   ["secret_assignment", 'db_password: "Hunter2Hunter2!"'],
+  ["secret_assignment", `access_token=${FAKE.googleOauth}`],
+  ["secret_assignment", "API_KEY=Xk9f2.Qz7Lm4Rt8Wp3"],
 ];
 
 const NEAR_MISSES = ["AKIA123", "sk-short", "https://example.com/path", "git clone git@github.com:owner/repo.git", "xoxb-12"];
@@ -36,6 +38,10 @@ const KEEP = [
   "keyId: 3f2a9c1e-77b1-4d2e-9a3b-1c2d3e4f5a6b",
   "const passwordHint = 'At least 12 characters'",
   "The signing key rotates weekly.",
+  "inputTokens: reply.inputTokens",
+  "const safeKey = options.keepKeys ? key : replaceIn(key, options.home, extraReplace, replaced);",
+  "apiKey = config.apiKey",
+  "token: this.session.accessToken",
 ];
 
 test("redact stops every credential pattern", () => {

@@ -1293,13 +1293,14 @@ var ID_NAME = /(?:[_.-](?:id|ID)|Id|ID)$/;
 var IDENTIFIER = /^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$/;
 var TYPE_NAME = /^[A-Z]?[a-z]+(?:[A-Z][a-z0-9]*)*$/;
 var SECRET_CHARS = /^[A-Za-z0-9+/=_\-.~!@#$%^&*]+$/;
+var MEMBER_CHAIN = /^[A-Za-z_$]+(?:\.[A-Za-z_$]+)+$/;
 var PLACEHOLDER = /^(?:x{3,}|\*{3,}|\.{3}|changeme|your[_-].*|example.*|dummy.*|fake.*|test.*|placeholder.*|redacted.*|\$.*|process\.env.*|env\..*)$/i;
 var EMAIL = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}\b/g;
 var IPV4 = /\b(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)\b/g;
 function looksSecret(name, value) {
   if (!SECRET_NAME.test(name) || NOT_SECRET_NAME.test(name) || ID_NAME.test(name)) return false;
   if (value.length < 12 || !SECRET_CHARS.test(value)) return false;
-  if (IDENTIFIER.test(value) || TYPE_NAME.test(value) || PLACEHOLDER.test(value)) return false;
+  if (IDENTIFIER.test(value) || TYPE_NAME.test(value) || MEMBER_CHAIN.test(value) || PLACEHOLDER.test(value)) return false;
   const classes = [/[a-z]/, /[A-Z]/, /[0-9]/, /[^A-Za-z0-9]/].filter((r) => r.test(value)).length;
   return classes >= 3 || classes >= 2 && value.length >= 20 && /[0-9]/.test(value);
 }
@@ -2345,7 +2346,7 @@ var SHARED_CONTRACT = {
     "--pretty": "Indented JSON for people.",
     "--data-dir <dir>": "Use another data directory for receipts, cache and results.",
     "--pack <name>": "Use this pack instead of the project's.",
-    "--dry-run": "Commands that ask Jev: print the redacted request and a token estimate; send, cache and log nothing.",
+    "--dry-run": "Commands that ask Jev: print the redacted request and a token estimate; send, cache and log nothing. A request too long for one line goes to a details file instead.",
     "--fresh": "Commands that ask Jev: skip the answer cache.",
     "--fail-on <verdict,...>": "Exit with code 3 when the verdict is one of these, e.g. --fail-on missing,unsure."
   },
@@ -2416,8 +2417,8 @@ async function run(argv, io, commands2) {
       return 0;
     }
     const result = await command.run({ io, flags, values: parsed.values, positionals: parsed.positionals });
-    const receipt = typeof result["receipt"] === "string" ? result["receipt"] : null;
-    const detailsDir = flags.dryRun ? null : join7(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
+    const receipt = typeof result["receipt"] === "string" ? result["receipt"] : flags.dryRun ? `dry-run-${newReceiptId(io.now())}` : null;
+    const detailsDir = join7(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
     io.write(render(result, { pretty, detailsDir, receipt }) + "\n");
     const verdict = result["verdict"];
     return typeof verdict === "string" && flags.failOn.includes(verdict) ? 3 : 0;

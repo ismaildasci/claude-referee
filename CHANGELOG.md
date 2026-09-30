@@ -10,6 +10,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
+- `--dry-run` moves a request too long for one line to a details file; it still sends nothing to the API.
 - The README uses the final design: new images, the yellow-card mark and plainer wording, checked section by section with Jev.
 - Measurements now include the cache re-run and label the briefing numbers by version.
 
@@ -22,6 +23,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - `--verbose` prints the run's requests, tokens, cost and time to stderr.
 - `decide` uses a pack's `decide.micro.*` questions when the input has no `micro`.
 - The session hook treats `false`, `0`, `no` and `off` in `hooks_enabled` as off.
+- Code such as `inputTokens: reply.inputTokens` or `apiKey = config.apiKey` no longer stops a request as a secret assignment: a value made only of dotted letter segments, with no digits, is treated as code.
 
 ## [0.1.0] - 2026-09-30
 

@@ -7,6 +7,7 @@ import { KIT, VERSION } from "../engine/config.ts";
 import { resolveDataDir } from "../engine/datadir.ts";
 import { RefereeError, isRefereeError } from "../engine/errors.ts";
 import { render, renderError, type Result } from "../engine/output.ts";
+import { newReceiptId } from "../engine/receipts.ts";
 import type { Command, GlobalFlags, Io } from "./types.ts";
 
 const GLOBAL_OPTIONS: ParseArgsOptionsConfig = {
@@ -25,7 +26,7 @@ const SHARED_CONTRACT = {
     "--pretty": "Indented JSON for people.",
     "--data-dir <dir>": "Use another data directory for receipts, cache and results.",
     "--pack <name>": "Use this pack instead of the project's.",
-    "--dry-run": "Commands that ask Jev: print the redacted request and a token estimate; send, cache and log nothing.",
+    "--dry-run": "Commands that ask Jev: print the redacted request and a token estimate; send, cache and log nothing. A request too long for one line goes to a details file instead.",
     "--fresh": "Commands that ask Jev: skip the answer cache.",
     "--fail-on <verdict,...>": "Exit with code 3 when the verdict is one of these, e.g. --fail-on missing,unsure.",
   },
@@ -99,8 +100,8 @@ export async function run(argv: readonly string[], io: Io, commands: readonly Co
       return 0;
     }
     const result: Result = await command.run({ io, flags, values: parsed.values, positionals: parsed.positionals });
-    const receipt = typeof result["receipt"] === "string" ? result["receipt"] : null;
-    const detailsDir = flags.dryRun ? null : join(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
+    const receipt = typeof result["receipt"] === "string" ? result["receipt"] : flags.dryRun ? `dry-run-${newReceiptId(io.now())}` : null;
+    const detailsDir = join(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
     io.write(render(result, { pretty, detailsDir, receipt }) + "\n");
     const verdict = result["verdict"];
     return typeof verdict === "string" && flags.failOn.includes(verdict) ? 3 : 0;
