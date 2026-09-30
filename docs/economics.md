@@ -95,6 +95,7 @@ Opus 5.5 with 50K tokens of cached context. This is the table behind the README 
 | Situation | Claude-side effect | Why |
 |---|---|---|
 | Automatic check that stays silent (Stop, pre-commit) | ≈$0 extra; a saving if it prevents a check Claude would have run | No extra request, nothing injected |
+| Automatic check that blocks (Stop) | Claude continues instead of stopping; each extra turn costs ≈$0.016 at 80K context on Opus 5.5, plus the check it runs | A blocked stop hands Claude the reason and it carries on |
 | Batched check over many items not yet in context | Saves money above ≈23 items at 80K context | One call replaces dozens of inline reads |
 | Replacing a Haiku `prompt` hook with Jev | ≈$0.002 → ≈$0.0001 per event | The judgement leaves the Claude bill |
 | One small judgement whose content is already in context | Loses money | The extra request re-reads the context |

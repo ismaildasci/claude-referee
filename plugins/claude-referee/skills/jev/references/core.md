@@ -1,12 +1,12 @@
 # TypeSafe Jev: facts the referee relies on
 
-Verified: 2026-09-30 against docs.typesafe.ai and typesafe.ai/legal; model jev-1.13.0.
+Verified: 2026-10-01 against docs.typesafe.ai and typesafe.ai/legal; model jev-1.13.0.
 
 ## Questions
 
 - **Noul**: a yes/no question; the answer is the probability of yes.
-- **Choice**: one label from a named set; the answer has the label, a probability per label and a confidence.
-- **Score**: a level on an ordered rubric of at least two descriptions; the answer is an expected score.
+- **Choice**: one label from a named set of up to 255 options; the answer has the label, a probability per label and a confidence. Add an `other` or `none of the above` option when the list might not cover every input.
+- **Score**: a level on an ordered rubric of 2 to 10 descriptions; the answer is an expected score.
 - All questions in one request are answered against the same `state`, in parallel. Ask everything about one state in one request.
 
 Source: https://docs.typesafe.ai/primitives.md
@@ -18,8 +18,9 @@ Source: https://docs.typesafe.ai/primitives.md
 - 64K tokens per request; 32K for `state` plus the longest question.
 - Rate limits: 100K tokens and 40 requests per second, adjusted without notice while demand is high. A request over a limit gets HTTP 429.
 - English is the primary language; other languages work less well.
+- Documented errors: 401 (missing or invalid key), 422 (invalid request body), 429 (rate limit), 529 (overloaded). An unknown model name got a 400 in a live call on 2026-10-01.
 
-Source: https://docs.typesafe.ai/models.md
+Sources: https://docs.typesafe.ai/models.md, https://docs.typesafe.ai/api.md, https://docs.typesafe.ai/primitives/choice.md, https://docs.typesafe.ai/primitives/score.md
 
 ## Data handling
 

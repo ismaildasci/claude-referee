@@ -37,7 +37,7 @@ claude-referee is an unofficial plugin for Claude Code that checks lines like th
 |---|---|---|
 | **You or Claude run a command** | `done`, `decide`, `judge` or `verify` asks Jev and prints a one-line answer | v0.1 |
 | **A session starts** | Claude gets a short note, at most 800 characters, on how to use the commands | v0.1 |
-| **Claude stops** | If Claude edited files and no test passed since, it can't call the task done; the referee names the check to run | v0.2 |
+| **Claude stops** | Off by default. In `active` mode, when Jev says Claude's "done" is unverified, the stop is blocked and Claude gets a note naming the check to run, at most three times a session. If Jev is slow or down, the hook fails open | v0.2 |
 | **You switch models** | A warning before a switch that would make Claude re-read the whole conversation at full price | v0.2 |
 
 If a check finds nothing, Claude sees nothing. If it finds something, Claude sees a note of 300 characters at most.

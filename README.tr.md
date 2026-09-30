@@ -31,7 +31,7 @@ claude-referee, bu tür cümleleri denetleyen, resmî olmayan bir Claude Code ek
 |---|---|---|
 | **Sen ya da Claude bir komut çalıştırınca** | `done`, `decide`, `judge` ya da `verify` Jev'e sorar ve tek satırlık bir cevap basar | v0.1 |
 | **Oturum başlayınca** | Claude'a komutları nasıl kullanacağını anlatan, en fazla 800 karakterlik kısa bir not gider | v0.1 |
-| **Claude durunca** | Claude dosya düzenlediyse ve o zamandan beri hiçbir test geçmediyse işi bitti sayamaz; hakem koşulacak kontrolü söyler | v0.2 |
+| **Claude durunca** | Varsayılan olarak kapalı. `active` modda Jev, Claude'un "bitti" iddiasını doğrulanmamış bulursa durma engellenir ve Claude koşması gereken kontrolü söyleyen bir not alır; oturum başına en fazla üç kez. Jev yavaşsa ya da çalışmıyorsa hook yolu açık bırakır | v0.2 |
 | **Model değiştirince** | Claude'un tüm konuşmayı tam fiyatla yeniden okumasına yol açacak bir geçişten önce uyarı | v0.2 |
 
 Bir kontrol hiçbir şey bulmazsa Claude hiçbir şey görmez. Bir şey bulursa Claude en fazla 300 karakterlik bir not görür.

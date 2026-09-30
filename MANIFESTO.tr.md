@@ -37,7 +37,7 @@ Aynı soruyu Jev'e iki kez sormak cevabı yaklaşık 0,01 oynatır. Seçenekleri
 
 ## 6. En azını gönder
 
-Makineden yalnızca bir yargının ihtiyaç duyduğu şey çıkar. Sır gibi görünen bir değer isteği durdurur, kişisel bilgiler değiştirilir ve `--dry-run` isteği gitmeden önce gösterir. Kalıplar serbest metni temizleyemez; bu yüzden serbest metin gönderen parçalar siz açana kadar kapalı kalır.
+Makineden yalnızca bir yargının ihtiyaç duyduğu şey çıkar. Sır gibi görünen bir değer isteği durdurur, kişisel bilgiler değiştirilir ve `--dry-run` isteği gitmeden önce gösterir. Kalıplar serbest metni temizleyemez. Komutlar onlara verdiğiniz şeyi gönderir; serbest metni kendiliğinden gönderecek hook'lar siz açana kadar kapalı kalır.
 
 ## 7. Makbuz yoksa olmamıştır
 

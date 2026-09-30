@@ -17,7 +17,7 @@ Hooks stay off in any project without a project file. `hooks_enabled: false` in 
 
 | Where | Who writes it | What it sets |
 |---|---|---|
-| `/plugin configure claude-referee` | You | `api_key` (stored by Claude Code as a sensitive value), `packs_dir`, `hooks_enabled`, `model` (default `jev-1.13.0`) |
+| `/plugin configure claude-referee`, or `claude plugin configure claude-referee --values-stdin` (Claude Code 2.1.285+) | You | `api_key` (stored by Claude Code as a sensitive value), `packs_dir`, `hooks_enabled`, `model` (default `jev-1.13.0`) |
 | `.claude/referee.json` (commit it) | The repository | The pack, optional `areas`, which hooks run, stricter thresholds |
 | `.claude/referee.local.json` (gitignore it) | You | Personal overrides, same schema as the project file |
 | Environment | You | See [environment variables](#environment-variables) |
@@ -100,7 +100,7 @@ claude-referee trims the key and rejects it with a configuration error if it con
 | `TYPESAFE_MODEL` | Overrides the `model` setting. The pack's thresholds were tuned on the default model |
 | `TYPESAFE_BASE_URL` | The API root, `https://api.typesafe.ai` by default. For proxies and tests |
 | `REFEREE_HOOKS=off` | Turns every hook off |
-| `REFEREE_DATA_DIR`, `REFEREE_PACKS_DIR`, `REFEREE_PACK` | Set for you. The session briefing hook exports them to Claude's shell through `CLAUDE_ENV_FILE`, so the commands Claude runs use the same data directory and pack as the hooks. It never exports the key |
+| `REFEREE_DATA_DIR`, `REFEREE_PACKS_DIR`, `REFEREE_PACK`, `REFEREE_MODEL` | Set for you. The session briefing hook exports them to Claude's shell through `CLAUDE_ENV_FILE`, so the commands Claude runs use the same data directory, pack and `model` setting as the hooks. `TYPESAFE_MODEL` still wins over `REFEREE_MODEL`. It never exports the key |
 
 Outside Claude Code, the CLI works out the default data directory itself. Pass `--data-dir` to use another one.
 
@@ -141,6 +141,8 @@ The matching entry in `thresholds.json`:
 ```json
 { "done.met": { "met": 0.7, "missing": 0.5 } }
 ```
+
+Where the bundled numbers come from: `done.met`'s 0.7 and 0.5 were chosen on 25 cases in the earlier private kit, so they're in-sample, with no hold-out yet. The 0.9 bands for `verify.supported` and `judge` follow the kit's rule of acting only at 0.90 or above. `line.risky` and `failure.env` have no eval yet.
 
 `cheatsheet/session.md` may use three placeholders: `{{pack}}`, `{{cli}}` (the absolute path of the bundled CLI) and `{{checks}}` (the area's check commands). The briefing is capped at 800 characters.
 

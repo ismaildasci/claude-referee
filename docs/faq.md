@@ -10,7 +10,7 @@ No. It answers narrow questions with probabilities and stays out of the way belo
 
 ## Will it break my prompt cache?
 
-No. Hooks only append short notes; nothing rewrites your conversation history. The cache guard exists because switching models mid-session re-reads everything uncached.
+It shouldn't. Claude Code caches the conversation by prefix, and the hooks only append short notes; nothing rewrites earlier turns. We haven't measured cache misses with the plugin on yet. The cache guard exists because switching models mid-session re-reads everything uncached.
 
 ## What if TypeSafe is slow or down?
 

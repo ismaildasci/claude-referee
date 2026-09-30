@@ -37,7 +37,7 @@ Asking Jev the same question twice moves the answer by about 0.01. Changing the 
 
 ## 6. Send the minimum
 
-Only what a judgement needs leaves your machine. Something shaped like a secret stops the request, personal details are replaced, and `--dry-run` shows the request before it goes out. Patterns can't clean free text, so the parts that send it stay off until you turn them on.
+Only what a judgement needs leaves your machine. Something shaped like a secret stops the request, personal details are replaced, and `--dry-run` shows the request before it goes out. Patterns can't clean free text. The commands send what you give them, and the hooks that would send free text on their own stay off until you turn them on.
 
 ## 7. Receipts, or it didn't happen
 
