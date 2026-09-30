@@ -32,7 +32,7 @@ export interface Redacted<T = unknown> {
 
 export interface RedactOptions {
   readonly home?: string;
-  readonly extra?: PackPatterns;
+  readonly extra?: PackPatterns | undefined;
   readonly maxField?: number;
 }
 
