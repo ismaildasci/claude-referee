@@ -1,0 +1,13 @@
+{
+  "verify.supported": {
+    "type": "noul",
+    "instructions": {
+      "question": "Does `source` state or directly imply `claim`?",
+      "note": "Judge only by `source`. Outside knowledge does not count."
+    },
+    "criteria": {
+      "true": "The source states the claim or directly implies it.",
+      "false": "The source does not say it, or says something different."
+    }
+  }
+}

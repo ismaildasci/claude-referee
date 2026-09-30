@@ -1,0 +1,13 @@
+{
+  "done.met": {
+    "type": "noul",
+    "instructions": {
+      "question": "Does `evidence` show that `criterion` holds?",
+      "note": "A claim of success in prose is not evidence. Judge only what the check output itself shows."
+    },
+    "criteria": {
+      "true": "The check output directly shows that the criterion holds.",
+      "false": "The output does not show it, or shows that it fails."
+    }
+  }
+}

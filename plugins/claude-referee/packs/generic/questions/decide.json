@@ -1,0 +1,23 @@
+{
+  "decide.best": {
+    "type": "choice",
+    "instructions": {
+      "question": "Which option is the best choice for `decision`, given only the facts in `context`?",
+      "note": "Each option is described by its own text. If a needed fact is missing, weigh only what is given."
+    },
+    "criteria": {}
+  },
+  "decide.fit": {
+    "type": "score",
+    "instructions": {
+      "question": "How well does `option` fit `decision`, given only the facts in `context`?"
+    },
+    "criteria": [
+      "Does not fit: it conflicts with the context.",
+      "Poor fit: it works against important facts in the context.",
+      "Possible fit: the context neither supports nor rules it out.",
+      "Good fit: the context supports it.",
+      "Best fit: the context clearly calls for it."
+    ]
+  }
+}
