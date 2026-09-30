@@ -16,6 +16,12 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Fixed
 
 - `decide` no longer sends the home directory to TypeSafe in `context_files` paths: object keys in the request state are now redacted like values, so the home directory in a key becomes `~`.
+- Two state keys that redact to the same text are both kept; the later one gets a `#2` suffix.
+- A failed write to the data directory no longer loses the verdict: the result still prints, with a one-line warning on stderr.
+- The plugin's `model` setting now reaches the CLI: the session hook exports it as `REFEREE_MODEL`.
+- `--verbose` prints the run's requests, tokens, cost and time to stderr.
+- `decide` uses a pack's `decide.micro.*` questions when the input has no `micro`.
+- The session hook treats `false`, `0`, `no` and `off` in `hooks_enabled` as off.
 
 ## [0.1.0] - 2026-09-30
 

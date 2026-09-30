@@ -69,6 +69,14 @@ test("redact replaces the home directory in object keys too", () => {
   assert.deepEqual(replaced, { home: 1 });
 });
 
+test("redact keeps both keys when two of them redact to the same text", () => {
+  const extra = { replace: [{ kind: "uuid", pattern: "\\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\b", flags: "i" }] };
+  const files = { "3f2a9c1e-77b1-4d2e-9a3b-1c2d3e4f5a6b.md": "a", "9b1d7a3c-1e2f-4a5b-8c9d-0e1f2a3b4c5d.md": "b", "[REDACTED:uuid].md#2": "c" };
+  assert.deepEqual(redact({ files }, { extra }).value.files, { "[REDACTED:uuid].md": "a", "[REDACTED:uuid].md#2": "b", "[REDACTED:uuid].md#2#2": "c" });
+  const home = redact({ files: { "~/a.md": "1", "/Users/alice/a.md": "2" } }, { home: "/Users/alice" });
+  assert.deepEqual(home.value.files, { "~/a.md": "1", "~/a.md#2": "2" });
+});
+
 test("redact keeps four-part version strings", () => {
   for (const text of ["version 1.2.3.4", "v10.0.0.1", "build 1.2.3.4-beta", "chrome/120.0.6099.109", "1.2.3.4.5"]) {
     assert.equal(redact({ t: text }).value.t, text, text);

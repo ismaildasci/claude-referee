@@ -65,6 +65,7 @@ export class Session {
   private replacedCount = 0;
   private stoppedCount = 0;
   private answeredModel: string | undefined;
+  private unsaved = false;
   private readonly requestIds: string[] = [];
   private readonly questionHashes = new Set<string>();
 
@@ -155,12 +156,16 @@ export class Session {
     this.cost += costUsd(reply.model, reply.inputTokens) ?? 0;
     this.answeredModel = reply.model;
     if (reply.requestId) this.requestIds.push(reply.requestId);
-    writeCache(this.dataDir, key, { ts: this.options.now(), model: reply.model, answers: reply.answers, inputTokens: reply.inputTokens });
+    if (!writeCache(this.dataDir, key, { ts: this.options.now(), model: reply.model, answers: reply.answers, inputTokens: reply.inputTokens })) this.unsaved = true;
     return reply;
   }
 
   stats(): { requests: number; cached: number } {
     return { requests: this.requests, cached: this.cachedCount };
+  }
+
+  saved(): boolean {
+    return !this.unsaved;
   }
 
   record(fields: { verdict?: string; error?: RefereeError; chars?: number } = {}): Receipt {
@@ -188,7 +193,7 @@ export class Session {
       ...(env["EVAL_RUN_ID"] ? { run_id: env["EVAL_RUN_ID"] } : {}),
       ...(this.options.sessionId ? { session_id: this.options.sessionId } : {}),
     };
-    appendReceipt(this.dataDir, receipt);
+    if (!appendReceipt(this.dataDir, receipt)) this.unsaved = true;
     return receipt;
   }
 }

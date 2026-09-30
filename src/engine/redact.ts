@@ -145,7 +145,9 @@ export function redact<T>(value: T, options: RedactOptions = {}): Redacted<T> {
       const out: Record<string, unknown> = {};
       for (const [key, child] of Object.entries(node)) {
         for (const kind of stopsIn(key, extraStop)) stopped.push({ kind, field: `${field}.<key>` });
-        const safeKey = options.keepKeys ? key : replaceIn(key, options.home, extraReplace, replaced);
+        const base = options.keepKeys ? key : replaceIn(key, options.home, extraReplace, replaced);
+        let safeKey = base;
+        for (let n = 2; Object.hasOwn(out, safeKey); n++) safeKey = `${base}#${n}`;
         out[safeKey] = walk(child, field ? `${field}.${safeKey}` : safeKey);
       }
       return out;

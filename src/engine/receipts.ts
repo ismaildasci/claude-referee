@@ -39,10 +39,15 @@ export function receiptsDir(dataDir: string): string {
   return join(dataDir, "receipts");
 }
 
-export function appendReceipt(dataDir: string, receipt: Receipt): void {
-  const dir = join(receiptsDir(dataDir), receipt.project);
-  mkdirSync(dir, { recursive: true });
-  appendFileSync(join(dir, `${receipt.ts.slice(0, 7)}.jsonl`), JSON.stringify(receipt) + "\n");
+export function appendReceipt(dataDir: string, receipt: Receipt): boolean {
+  try {
+    const dir = join(receiptsDir(dataDir), receipt.project);
+    mkdirSync(dir, { recursive: true });
+    appendFileSync(join(dir, `${receipt.ts.slice(0, 7)}.jsonl`), JSON.stringify(receipt) + "\n");
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function readReceipts(dataDir: string, project?: string): Receipt[] {

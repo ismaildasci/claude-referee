@@ -130,3 +130,31 @@ test("decide rejects bad input", async () => {
     assert.equal(out["error"], "bad_input");
   }
 });
+
+test("decide uses a pack's decide.micro questions when the input has none; bad: 1 marks yes as bad", async () => {
+  const packs = tempDir();
+  const dir = join(packs, "micro-test");
+  mkdirSync(join(dir, "questions"), { recursive: true });
+  writeFileSync(join(dir, "pack.json"), JSON.stringify({ name: "micro-test", version: "0.0.1", extends: "generic" }));
+  writeFileSync(
+    join(dir, "questions", "micro.json"),
+    JSON.stringify({ "decide.micro.stateless": { type: "noul", instructions: "Does this keep the service stateless?" }, "decide.micro.risky": { type: "noul", instructions: "Is this risky to run?" } }),
+  );
+  writeFileSync(join(dir, "thresholds.json"), JSON.stringify({ "decide.micro.risky": { bad: 1 } }));
+  const answer: Answerer = (r) => {
+    if (r.questions["best"]) return favour({ redis: 0.9, memory: 0.1 })(r);
+    const p = (r.state as { option: string }).option.startsWith("Redis") ? 0.9 : 0.1;
+    return Object.fromEntries(Object.keys(r.questions).map((id) => [id, { type: "noul", noul: p }]));
+  };
+  const server = await fakeJev(answer);
+  try {
+    const input = { decision: "d", options: OPTIONS.slice(0, 2) };
+    const io = memoryIo({ stdin: JSON.stringify(input), env: { TYPESAFE_API_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: tempDir(), REFEREE_PACKS_DIR: packs } });
+    assert.equal(await run(["decide", "--pack", "micro-test"], io, commands), 0);
+    assert.equal(server.requests.length, 4);
+    assert.deepEqual(Object.keys(server.requests[2]?.questions ?? {}), ["stateless", "risky"]);
+    assert.deepEqual(io.json()["flags"], [{ option: "redis", rule: "risky", p: 0.9 }, { option: "memory", rule: "stateless", p: 0.1 }]);
+  } finally {
+    await server.close();
+  }
+});

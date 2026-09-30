@@ -7,6 +7,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { resolveModel } from "../src/engine/config.ts";
 import { BRIEFING_LIMIT, sessionStart } from "../src/hooks/session-start.ts";
 import { tempDir } from "./helpers.ts";
 
@@ -76,4 +77,31 @@ test("session-start briefing's pipe example runs as written", async () => {
     .replace("<what must hold>", "all tests pass");
   const result = execFileSync("bash", ["-c", `${command} --dry-run`], { cwd: root, encoding: "utf8", env: { ...process.env, REFEREE_DATA_DIR: tempDir() } });
   assert.equal((JSON.parse(result) as { verdict: string }).verdict, "would_send");
+});
+
+test("session-start exports the model setting as REFEREE_MODEL, which the CLI then uses", async () => {
+  const envFile = join(tempDir(), "env.sh");
+  writeFileSync(envFile, "");
+  await sessionStart(hookIo(event(project()), { CLAUDE_ENV_FILE: envFile, CLAUDE_PLUGIN_OPTION_MODEL: "jev-9.9.9" }), pluginRoot);
+  assert.match(readFileSync(envFile, "utf8"), /^export REFEREE_MODEL='jev-9\.9\.9'$/m);
+  const plain = join(tempDir(), "env.sh");
+  writeFileSync(plain, "");
+  await sessionStart(hookIo(event(project()), { CLAUDE_ENV_FILE: plain }), pluginRoot);
+  assert.ok(!readFileSync(plain, "utf8").includes("REFEREE_MODEL"));
+  assert.equal(resolveModel({ REFEREE_MODEL: "jev-9.9.9" }), "jev-9.9.9");
+  assert.equal(resolveModel({ REFEREE_MODEL: "jev-9.9.9", TYPESAFE_MODEL: "jev-1.0.0" }), "jev-1.0.0");
+});
+
+test("session-start treats false, 0, no and off in hooks_enabled as off", async () => {
+  for (const value of ["false", "0", "no", "off", "OFF", "False", " off "]) {
+    assert.equal(await sessionStart(hookIo(event(project()), { CLAUDE_PLUGIN_OPTION_HOOKS_ENABLED: value }), pluginRoot), null, value);
+  }
+  assert.ok(await sessionStart(hookIo(event(project()), { CLAUDE_PLUGIN_OPTION_HOOKS_ENABLED: "true" }), pluginRoot));
+});
+
+test("session-start still prints the briefing when it can't write the env file or its receipt", async () => {
+  const blocker = join(tempDir(), "not-a-dir");
+  writeFileSync(blocker, "");
+  const out = await sessionStart(hookIo(event(project()), { CLAUDE_ENV_FILE: tempDir(), REFEREE_DATA_DIR: join(blocker, "data") }), pluginRoot);
+  assert.ok(out && JSON.parse(out).hookSpecificOutput.additionalContext.length > 0);
 });

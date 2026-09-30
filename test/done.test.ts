@@ -1,7 +1,8 @@
 // done: verdict bands, several criteria, stdin evidence, dry runs and credential stops.
 
 import assert from "node:assert/strict";
-import { readdirSync } from "node:fs";
+import { readdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { test } from "node:test";
 import { commands } from "../src/cli/commands/index.ts";
 import { run } from "../src/cli/run.ts";
@@ -93,6 +94,49 @@ test("done with credentials in the evidence sends nothing and prints no secret",
     const live = io(server, "");
     assert.equal(await run(["done", "--criteria", "tests pass", "--evidence", secretsFile()], live, commands), 1);
     assert.equal(server.requests.length, 0);
+  } finally {
+    await server.close();
+  }
+});
+
+test("done sends the model named in REFEREE_MODEL", async () => {
+  const server = await fakeJev(nouls(0.9));
+  try {
+    const out = memoryIo({ stdin: "Tests: 3 passed", env: { TYPESAFE_API_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: tempDir(), REFEREE_MODEL: "jev-9.9.9" } });
+    assert.equal(await run(["done", "--criteria", "all tests pass"], out, commands), 0);
+    assert.equal(server.requests[0]?.model, "jev-9.9.9");
+  } finally {
+    await server.close();
+  }
+});
+
+test("done --verbose writes one usage line to stderr and nothing extra to stdout", async () => {
+  const server = await fakeJev(nouls(0.9));
+  try {
+    const out = io(server, "Tests: 3 passed");
+    assert.equal(await run(["done", "--criteria", "all tests pass", "--verbose"], out, commands), 0);
+    assert.equal(out.out.join("").trim().split("\n").length, 1);
+    assert.equal(out.err.length, 1);
+    const usage = JSON.parse(out.err[0] ?? "") as Record<string, unknown>;
+    assert.deepEqual(Object.keys(usage), ["requests", "cached", "input_tokens", "cost_usd", "model", "ms"]);
+    assert.deepEqual([usage["requests"], usage["cached"], usage["input_tokens"]], [1, 0, 100]);
+  } finally {
+    await server.close();
+  }
+});
+
+test("done still prints its verdict when the data directory can't be written", async () => {
+  const blocker = join(tempDir(), "not-a-dir");
+  writeFileSync(blocker, "");
+  const server = await fakeJev(nouls(0.9));
+  try {
+    const out = io(server, "Tests: 3 passed", join(blocker, "data"));
+    assert.equal(await run(["done", "--criteria", "all tests pass"], out, commands), 0);
+    assert.equal(out.json()["verdict"], "met");
+    assert.equal(server.requests.length, 1);
+    assert.equal(out.err.length, 1);
+    assert.match(out.err[0] ?? "", /could not write/i);
+    assert.ok(!(out.err[0] ?? "").includes(blocker));
   } finally {
     await server.close();
   }

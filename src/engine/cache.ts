@@ -30,8 +30,13 @@ export function readCache(dataDir: string, key: string, now: number, ttlMs: numb
   }
 }
 
-export function writeCache(dataDir: string, key: string, entry: CachedReply): void {
-  const dir = join(dataDir, "cache");
-  mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, `${key}.json`), JSON.stringify(entry));
+export function writeCache(dataDir: string, key: string, entry: CachedReply): boolean {
+  try {
+    const dir = join(dataDir, "cache");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, `${key}.json`), JSON.stringify(entry));
+    return true;
+  } catch {
+    return false;
+  }
 }

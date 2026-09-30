@@ -53,9 +53,13 @@ export function render(result: Result, options: RenderOptions = {}): string {
   if (options.pretty) return JSON.stringify(rounded, null, 2);
   const line = JSON.stringify(rounded);
   if (line.length <= DETAIL_LIMIT || !options.detailsDir || !options.receipt) return line;
-  mkdirSync(options.detailsDir, { recursive: true });
   const path = join(options.detailsDir, `${options.receipt}.json`);
-  writeFileSync(path, JSON.stringify(rounded, null, 2) + "\n");
+  try {
+    mkdirSync(options.detailsDir, { recursive: true });
+    writeFileSync(path, JSON.stringify(rounded, null, 2) + "\n");
+  } catch {
+    return line;
+  }
   return JSON.stringify(summarize(rounded, path));
 }
 

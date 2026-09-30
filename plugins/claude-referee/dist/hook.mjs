@@ -262,9 +262,14 @@ function receiptsDir(dataDir) {
 }
 __name(receiptsDir, "receiptsDir");
 function appendReceipt(dataDir, receipt) {
-  const dir = join4(receiptsDir(dataDir), receipt.project);
-  mkdirSync(dir, { recursive: true });
-  appendFileSync(join4(dir, `${receipt.ts.slice(0, 7)}.jsonl`), JSON.stringify(receipt) + "\n");
+  try {
+    const dir = join4(receiptsDir(dataDir), receipt.project);
+    mkdirSync(dir, { recursive: true });
+    appendFileSync(join4(dir, `${receipt.ts.slice(0, 7)}.jsonl`), JSON.stringify(receipt) + "\n");
+    return true;
+  } catch {
+    return false;
+  }
 }
 __name(appendReceipt, "appendReceipt");
 
@@ -283,7 +288,7 @@ __name(fit, "fit");
 async function sessionStart(io2, pluginRoot2) {
   const started = io2.now();
   const { env } = io2;
-  if (env["REFEREE_HOOKS"] === "off" || ["false", "0"].includes(env["CLAUDE_PLUGIN_OPTION_HOOKS_ENABLED"] ?? "")) return null;
+  if (env["REFEREE_HOOKS"] === "off" || /^(?:false|0|no|off)$/i.test(env["CLAUDE_PLUGIN_OPTION_HOOKS_ENABLED"]?.trim() ?? "")) return null;
   let input;
   try {
     input = JSON.parse(await io2.readStdin());
@@ -312,7 +317,10 @@ async function sessionStart(io2, pluginRoot2) {
     if (packsDir) lines.push(`export REFEREE_PACKS_DIR=${quote(packsDir)}`);
     const model = env["CLAUDE_PLUGIN_OPTION_MODEL"]?.trim();
     if (model) lines.push(`export REFEREE_MODEL=${quote(model)}`);
-    appendFileSync2(envFile, lines.join("\n") + "\n");
+    try {
+      appendFileSync2(envFile, lines.join("\n") + "\n");
+    } catch {
+    }
   }
   appendReceipt(dataDir, {
     id: newReceiptId(started),

@@ -973,9 +973,14 @@ function readCache(dataDir, key, now, ttlMs) {
 }
 __name(readCache, "readCache");
 function writeCache(dataDir, key, entry) {
-  const dir = join3(dataDir, "cache");
-  mkdirSync(dir, { recursive: true });
-  writeFileSync(join3(dir, `${key}.json`), JSON.stringify(entry));
+  try {
+    const dir = join3(dataDir, "cache");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join3(dir, `${key}.json`), JSON.stringify(entry));
+    return true;
+  } catch {
+    return false;
+  }
 }
 __name(writeCache, "writeCache");
 
@@ -1236,9 +1241,14 @@ function receiptsDir(dataDir) {
 }
 __name(receiptsDir, "receiptsDir");
 function appendReceipt(dataDir, receipt) {
-  const dir = join5(receiptsDir(dataDir), receipt.project);
-  mkdirSync2(dir, { recursive: true });
-  appendFileSync(join5(dir, `${receipt.ts.slice(0, 7)}.jsonl`), JSON.stringify(receipt) + "\n");
+  try {
+    const dir = join5(receiptsDir(dataDir), receipt.project);
+    mkdirSync2(dir, { recursive: true });
+    appendFileSync(join5(dir, `${receipt.ts.slice(0, 7)}.jsonl`), JSON.stringify(receipt) + "\n");
+    return true;
+  } catch {
+    return false;
+  }
 }
 __name(appendReceipt, "appendReceipt");
 function readReceipts(dataDir, project) {
@@ -1369,7 +1379,9 @@ function redact2(value, options = {}) {
       const out = {};
       for (const [key, child] of Object.entries(node)) {
         for (const kind of stopsIn(key, extraStop)) stopped.push({ kind, field: `${field}.<key>` });
-        const safeKey = options.keepKeys ? key : replaceIn(key, options.home, extraReplace, replaced);
+        const base = options.keepKeys ? key : replaceIn(key, options.home, extraReplace, replaced);
+        let safeKey = base;
+        for (let n = 2; Object.hasOwn(out, safeKey); n++) safeKey = `${base}#${n}`;
         out[safeKey] = walk(child, field ? `${field}.${safeKey}` : safeKey);
       }
       return out;
@@ -1407,6 +1419,7 @@ var Session = class {
   replacedCount = 0;
   stoppedCount = 0;
   answeredModel;
+  unsaved = false;
   requestIds = [];
   questionHashes = /* @__PURE__ */ new Set();
   constructor(options) {
@@ -1491,11 +1504,14 @@ var Session = class {
     this.cost += costUsd(reply.model, reply.inputTokens) ?? 0;
     this.answeredModel = reply.model;
     if (reply.requestId) this.requestIds.push(reply.requestId);
-    writeCache(this.dataDir, key, { ts: this.options.now(), model: reply.model, answers: reply.answers, inputTokens: reply.inputTokens });
+    if (!writeCache(this.dataDir, key, { ts: this.options.now(), model: reply.model, answers: reply.answers, inputTokens: reply.inputTokens })) this.unsaved = true;
     return reply;
   }
   stats() {
     return { requests: this.requests, cached: this.cachedCount };
+  }
+  saved() {
+    return !this.unsaved;
   }
   record(fields = {}) {
     const env = this.options.env;
@@ -1522,7 +1538,7 @@ var Session = class {
       ...env["EVAL_RUN_ID"] ? { run_id: env["EVAL_RUN_ID"] } : {},
       ...this.options.sessionId ? { session_id: this.options.sessionId } : {}
     };
-    appendReceipt(this.dataDir, receipt);
+    if (!appendReceipt(this.dataDir, receipt)) this.unsaved = true;
     return receipt;
   }
 };
@@ -1618,6 +1634,7 @@ async function jevCommand(context, command, pack, planned, finish, options = {})
     const outcomes = await session.run(planned, options);
     const result = finish(outcomes, session);
     const receipt = session.record(typeof result["verdict"] === "string" ? { verdict: result["verdict"] } : {});
+    if (!session.saved()) io.warn("[claude-referee] Could not write to the data directory; this run was not cached or logged.\n");
     if (flags.verbose) io.warn(JSON.stringify({ requests: receipt.requests, cached: receipt.cached, input_tokens: receipt.input_tokens, cost_usd: receipt.cost_usd, model: receipt.model, ms: receipt.ms }) + "\n");
     return reorder({ ...result, ...session.stats(), receipt: receipt.id });
   } catch (error) {
@@ -2292,9 +2309,13 @@ function render(result, options = {}) {
   if (options.pretty) return JSON.stringify(rounded, null, 2);
   const line = JSON.stringify(rounded);
   if (line.length <= DETAIL_LIMIT || !options.detailsDir || !options.receipt) return line;
-  mkdirSync4(options.detailsDir, { recursive: true });
   const path = join6(options.detailsDir, `${options.receipt}.json`);
-  writeFileSync3(path, JSON.stringify(rounded, null, 2) + "\n");
+  try {
+    mkdirSync4(options.detailsDir, { recursive: true });
+    writeFileSync3(path, JSON.stringify(rounded, null, 2) + "\n");
+  } catch {
+    return line;
+  }
   return JSON.stringify(summarize(rounded, path));
 }
 __name(render, "render");

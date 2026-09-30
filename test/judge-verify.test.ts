@@ -97,3 +97,20 @@ test("verify maps answers back to claim ids that look like UUIDs", async () => {
   assert.equal(out["supported"], 1);
   assert.deepEqual(out["unsupported"], [ids[1]]);
 });
+
+test("judge prints the whole result when the details file can't be written", async () => {
+  const blocker = join(tempDir(), "not-a-dir");
+  writeFileSync(blocker, "");
+  const items = Array.from({ length: 25 }, (_, i) => ({ id: `item-${"x".repeat(80)}-${i}`, text: `rm -rf /tmp/${i}` }));
+  const server = await fakeJev((r) => Object.fromEntries(Object.keys(r.questions).map((id) => [id, { type: "noul", noul: 0.95 }])));
+  try {
+    const io = memoryIo({ stdin: JSON.stringify(items), env: { TYPESAFE_API_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: join(blocker, "data") } });
+    assert.equal(await run(["judge", "--question", "line.risky", "--items", "-"], io, commands), 0);
+    const out = io.json();
+    assert.equal(out["verdict"], "flagged");
+    assert.equal((out["flagged"] as string[]).length, 20);
+    assert.equal("details" in out, false);
+  } finally {
+    await server.close();
+  }
+});
