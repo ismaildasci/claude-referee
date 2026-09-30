@@ -23,14 +23,29 @@ function processIo() {
 }
 
 // src/cli/run.ts
+import { join as join3 } from "node:path";
 import { parseArgs } from "node:util";
 
 // src/engine/config.ts
 var KIT = "claude-referee";
 var VERSION = "0.1.0";
+var MARKETPLACE = "claude-referee";
 var DETAIL_LIMIT = 1500;
 var ERROR_LIMIT = 2e3;
 var CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1e3;
+
+// src/engine/datadir.ts
+import { join, resolve } from "node:path";
+function pluginDataId() {
+  return `${KIT}@${MARKETPLACE}`.replace(/[^A-Za-z0-9_-]/g, "-");
+}
+function resolveDataDir(env, home, cwd, flag) {
+  if (flag) return resolve(cwd, flag);
+  const fromEnv = env["CLAUDE_PLUGIN_DATA"]?.trim() || env["REFEREE_DATA_DIR"]?.trim();
+  if (fromEnv) return fromEnv;
+  const configDir = env["CLAUDE_CONFIG_DIR"]?.trim() || join(home, ".claude");
+  return join(configDir, "plugins", "data", pluginDataId());
+}
 
 // src/engine/errors.ts
 var RefereeError = class extends Error {
@@ -49,7 +64,7 @@ function isRefereeError(value) {
 
 // src/engine/output.ts
 import { mkdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join as join2 } from "node:path";
 function roundNumber(key, value) {
   if (Number.isInteger(value)) return value;
   const digits = key.endsWith("_usd") ? 6 : 2;
@@ -86,7 +101,7 @@ function render(result, options = {}) {
   const line = JSON.stringify(rounded);
   if (line.length <= DETAIL_LIMIT || !options.detailsDir || !options.receipt) return line;
   mkdirSync(options.detailsDir, { recursive: true });
-  const path = join(options.detailsDir, `${options.receipt}.json`);
+  const path = join2(options.detailsDir, `${options.receipt}.json`);
   writeFileSync(path, JSON.stringify(rounded, null, 2) + "\n");
   return JSON.stringify(summarize(rounded, path));
 }
@@ -137,7 +152,7 @@ function flagsFrom(values) {
     failOn: (str("fail-on") ?? "").split(",").map((v) => v.trim()).filter(Boolean)
   };
 }
-async function run(argv, io, commands2, hooks = {}) {
+async function run(argv, io, commands2) {
   const [name, ...rest] = argv;
   if (name === void 0 || name === "help" || name === "--help" || name === "-h") {
     io.write(usage(commands2) + "\n");
@@ -170,7 +185,7 @@ async function run(argv, io, commands2, hooks = {}) {
     }
     const result = await command.run({ io, flags, values: parsed.values, positionals: parsed.positionals });
     const receipt = typeof result["receipt"] === "string" ? result["receipt"] : null;
-    const detailsDir = flags.dryRun ? null : hooks.detailsDir?.(io, flags) ?? null;
+    const detailsDir = flags.dryRun ? null : join3(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
     io.write(render(result, { pretty, detailsDir, receipt }) + "\n");
     const verdict = result["verdict"];
     return typeof verdict === "string" && flags.failOn.includes(verdict) ? 3 : 0;

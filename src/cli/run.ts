@@ -1,8 +1,10 @@
 // CLI runner: parses flags, prints one JSON line, maps verdicts and errors to exit codes.
 // Exit codes: 0 for any verdict, 1 for real errors, 3 when --fail-on matches the verdict.
 
+import { join } from "node:path";
 import { parseArgs, type ParseArgsOptionsConfig } from "node:util";
 import { KIT, VERSION } from "../engine/config.ts";
+import { resolveDataDir } from "../engine/datadir.ts";
 import { RefereeError, isRefereeError } from "../engine/errors.ts";
 import { render, renderError, type Result } from "../engine/output.ts";
 import type { Command, GlobalFlags, Io } from "./types.ts";
@@ -17,10 +19,6 @@ const GLOBAL_OPTIONS: ParseArgsOptionsConfig = {
   pack: { type: "string" },
   "fail-on": { type: "string" },
 };
-
-export interface Hooks {
-  readonly detailsDir?: (io: Io, flags: GlobalFlags) => string | null;
-}
 
 function usage(commands: readonly Command[]): string {
   const width = Math.max(...commands.map((c) => c.name.length), 4);
@@ -54,7 +52,7 @@ function flagsFrom(values: Record<string, unknown>): GlobalFlags {
   };
 }
 
-export async function run(argv: readonly string[], io: Io, commands: readonly Command[], hooks: Hooks = {}): Promise<number> {
+export async function run(argv: readonly string[], io: Io, commands: readonly Command[]): Promise<number> {
   const [name, ...rest] = argv;
   if (name === undefined || name === "help" || name === "--help" || name === "-h") {
     io.write(usage(commands) + "\n");
@@ -86,7 +84,7 @@ export async function run(argv: readonly string[], io: Io, commands: readonly Co
     }
     const result: Result = await command.run({ io, flags, values: parsed.values, positionals: parsed.positionals });
     const receipt = typeof result["receipt"] === "string" ? result["receipt"] : null;
-    const detailsDir = flags.dryRun ? null : (hooks.detailsDir?.(io, flags) ?? null);
+    const detailsDir = flags.dryRun ? null : join(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
     io.write(render(result, { pretty, detailsDir, receipt }) + "\n");
     const verdict = result["verdict"];
     return typeof verdict === "string" && flags.failOn.includes(verdict) ? 3 : 0;
