@@ -1,0 +1,23 @@
+{
+  "name": "claude-referee-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Source, tests and build for the claude-referee Claude Code plugin.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20.3"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node --test \"test/**/*.test.ts\"",
+    "check": "npm run typecheck && npm test && npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.3",
+    "@typesafe-ai/sdk": "0.6.0",
+    "esbuild": "0.28.2",
+    "typescript": "7.0.2"
+  }
+}
