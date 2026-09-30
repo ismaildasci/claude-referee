@@ -14,6 +14,8 @@ test("describe works for every command without a key", async () => {
     const out = io.json();
     assert.equal(out["command"], command.name);
     for (const key of ["summary", "inputs", "outputs", "errors", "effects", "cost"]) assert.ok(key in out, `${command.name}.${key}`);
+    assert.ok(JSON.stringify(out["flags"]).includes("--fail-on"), `${command.name} flags`);
+    assert.deepEqual(Object.keys(out["exit_codes"] as object), ["0", "1", "3"]);
   }
 });
 

@@ -2309,6 +2309,21 @@ var GLOBAL_OPTIONS = {
   pack: { type: "string" },
   "fail-on": { type: "string" }
 };
+var SHARED_CONTRACT = {
+  flags: {
+    "--pretty": "Indented JSON for people.",
+    "--data-dir <dir>": "Use another data directory for receipts, cache and results.",
+    "--pack <name>": "Use this pack instead of the project's.",
+    "--dry-run": "Commands that ask Jev: print the redacted request and a token estimate; send, cache and log nothing.",
+    "--fresh": "Commands that ask Jev: skip the answer cache.",
+    "--fail-on <verdict,...>": "Exit with code 3 when the verdict is one of these, e.g. --fail-on missing,unsure."
+  },
+  exit_codes: {
+    "0": "A verdict, including a negative one such as missing.",
+    "1": "An error; the JSON line holds error, message and next_step.",
+    "3": "The verdict is listed in --fail-on."
+  }
+};
 function usage(commands2) {
   const width = Math.max(...commands2.map((c) => c.name.length), 4);
   const lines = commands2.map((c) => `  ${c.name.padEnd(width)}  ${c.describe.summary}`);
@@ -2366,7 +2381,7 @@ async function run(argv, io, commands2) {
     const flags = flagsFrom(values);
     pretty = flags.pretty;
     if (values["describe"] === true) {
-      io.write(JSON.stringify({ command: command.name, ...command.describe }, null, pretty ? 2 : 0) + "\n");
+      io.write(JSON.stringify({ command: command.name, ...command.describe, ...SHARED_CONTRACT }, null, pretty ? 2 : 0) + "\n");
       return 0;
     }
     const result = await command.run({ io, flags, values: parsed.values, positionals: parsed.positionals });
