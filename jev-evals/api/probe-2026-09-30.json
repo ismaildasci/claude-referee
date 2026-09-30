@@ -1,0 +1,80 @@
+{
+  "date": "2026-09-30T21:42:00.289Z",
+  "endpoint": "https://api.typesafe.ai/v1/systemone",
+  "model": "jev-1.13.0",
+  "requests": 7,
+  "input_tokens": 620,
+  "cost_usd": 0.00002604,
+  "results": [
+    {
+      "id": "baseline",
+      "note": "valid Noul request, control",
+      "status": 200,
+      "ms": 639,
+      "headers": {
+        "x-typesafe-request-id": "req_01a0f44465e87b5c8f32864fa94ff681"
+      },
+      "body_head": "{\"model\":\"jev-1.13.0\",\"answers\":{\"q\":{\"type\":\"noul\",\"noul\":0.99}},\"usage\":{\"input_tokens\":318,\"output_tokens\":20}}"
+    },
+    {
+      "id": "state_null",
+      "note": "state: null",
+      "status": 422,
+      "ms": 229,
+      "headers": {
+        "x-typesafe-request-id": "req_01a0f4446728743bb4ae13060309b4a1"
+      },
+      "body_head": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"state\"],\"msg\":\"Field required\",\"input\":{\"state\":null,\"model\":\"jev-1.13.0\",\"questions\":{\"q\":{\"type\":\"noul\",\"instructions\":\"Does `text` describe a passing test run?\",\"criteria\":{\"true\":\"It says the tests passed.\",\"false\":\"It does not.\"}}}}}]}"
+    },
+    {
+      "id": "score_null_level",
+      "note": "Score criteria with a null level",
+      "status": 422,
+      "ms": 426,
+      "headers": {
+        "x-typesafe-request-id": "req_01a0f44468847632881c06df20186791"
+      },
+      "body_head": "{\"detail\":[{\"type\":\"string_type\",\"loc\":[\"body\",\"questions\",\"q\",\"score\",\"criteria\",1,\"str\"],\"msg\":\"Input should be a valid string\",\"input\":null},{\"type\":\"dict_type\",\"loc\":[\"body\",\"questions\",\"q\",\"score\",\"criteria\",1,\"dict[any,any]\"],\"msg\":\"Input should be a valid dictionary\",\"input\":null},{\"type\":\"list_type\",\"loc\":[\"body\",\"questions\",\"q\",\"score\",\"criteria\",1,\"list[any]\"],\"msg\":\"Input should be a valid list\",\"input\":null}]}"
+    },
+    {
+      "id": "score_1_level",
+      "note": "Score with one level",
+      "status": 200,
+      "ms": 265,
+      "headers": {
+        "x-typesafe-request-id": "req_01a0f44469bb7cb5a988159d112f5742"
+      },
+      "body_head": "{\"model\":\"jev-1.13.0\",\"answers\":{\"q\":{\"type\":\"score\",\"score\":0.0,\"confidence\":1.0,\"legend\":{\"0\":\"only level\"},\"probabilities\":{\"0\":1.0}}},\"usage\":{\"input_tokens\":302,\"output_tokens\":17}}"
+    },
+    {
+      "id": "score_11_levels",
+      "note": "Score with eleven levels",
+      "status": 400,
+      "ms": 262,
+      "headers": {
+        "x-typesafe-request-id": "req_01a0f4446abd7a8d90757641507225d7"
+      },
+      "body_head": "{\"detail\":\"Too many score levels. Must have at most 10 levels.\"}"
+    },
+    {
+      "id": "choice_256_options",
+      "note": "Choice with 256 options",
+      "status": 400,
+      "ms": 257,
+      "headers": {
+        "x-typesafe-request-id": "req_01a0f4446bef7d6a82a95907dfa28617"
+      },
+      "body_head": "{\"detail\":\"Too many choices. Must have at most 255 choices.\"}"
+    },
+    {
+      "id": "unknown_model",
+      "note": "model \"no-such-model\"",
+      "status": 400,
+      "ms": 266,
+      "headers": {
+        "x-typesafe-request-id": "req_01a0f4446cc677a88e257c6d04d963fa"
+      },
+      "body_head": "{\"detail\":{\"error_type\":\"api_usage_error\",\"message\":\"Unknown model: no-such-model\"}}"
+    }
+  ]
+}

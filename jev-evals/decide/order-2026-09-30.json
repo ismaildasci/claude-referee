@@ -1,0 +1,7873 @@
+{
+ "date": "2026-09-30T21:45:49.788Z",
+ "model": "jev-1.13.0",
+ "input": "jev-evals/decide/cases.jsonl",
+ "method": "Each decision's decide.best Choice asked in all 24 option orders (one request each), the written order once more (re-ask), and once as a single request holding two questions: the written and the reversed criteria. Leader = argmax of the mean over the 24 orders. Spread = max - min of one option's probability across orders; per decision the largest over options. Slot residual = mean over orders of p(option in slot) - that option's all-orders mean.",
+ "summary": {
+  "decisions": 20,
+  "requests": 520,
+  "retries_429": 0,
+  "input_tokens": 247221,
+  "cost_usd": 0.010383,
+  "max_spread_mean": 0.026,
+  "max_spread_max": 0.13,
+  "decisions_spread_ge_0_24": 0,
+  "decisions_with_leader_change_across_orders": 0,
+  "policy_agreement_with_all24": {
+   "written": 20,
+   "written_reversed": 20,
+   "rotations4": 20,
+   "same_request_pair": 20
+  },
+  "slot_bias_abs_mean": 0.0016,
+  "slot_bias_abs_max": 0.0099,
+  "reask_max_delta": 0.04,
+  "k3_reversed_max_delta": 0.01,
+  "k3_reversed_mean_delta": 0.0015,
+  "k3_written_max_delta": 0.03
+ },
+ "decisions": [
+  {
+   "id": "rate-limit",
+   "leader_all24": "redis",
+   "p_leader_all24": 1,
+   "max_spread": 0,
+   "spread": {
+    "redis": 0,
+    "memory": 0,
+    "postgres": 0,
+    "edge": 0
+   },
+   "distinct_argmax": 1,
+   "orders_leader_differs": 0,
+   "policy": {
+    "written": true,
+    "written_reversed": true,
+    "rotations4": true,
+    "same_request_pair": true
+   },
+   "slot_residual": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "reask_max_delta": 0,
+   "k3_same_request_vs_separate": {
+    "reversed_max_delta": 0,
+    "written_max_delta": 0
+   }
+  },
+  {
+   "id": "job-queue",
+   "leader_all24": "pgqueue",
+   "p_leader_all24": 0.9812,
+   "max_spread": 0.03,
+   "spread": {
+    "pgqueue": 0.03,
+    "kafka": 0,
+    "cron": 0.03,
+    "inprocess": 0.01
+   },
+   "distinct_argmax": 1,
+   "orders_leader_differs": 0,
+   "policy": {
+    "written": true,
+    "written_reversed": true,
+    "rotations4": true,
+    "same_request_pair": true
+   },
+   "slot_residual": [
+    0.0017,
+    -0.0017,
+    -0.0004,
+    0.0004
+   ],
+   "reask_max_delta": 0,
+   "k3_same_request_vs_separate": {
+    "reversed_max_delta": 0,
+    "written_max_delta": 0
+   }
+  },
+  {
+   "id": "spa-auth",
+   "leader_all24": "cookie",
+   "p_leader_all24": 0.9596,
+   "max_spread": 0.08,
+   "spread": {
+    "cookie": 0.08,
+    "jwtlocal": 0.03,
+    "jwtcookie": 0.07,
+    "basic": 0
+   },
+   "distinct_argmax": 1,
+   "orders_leader_differs": 0,
+   "policy": {
+    "written": true,
+    "written_reversed": true,
+    "rotations4": true,
+    "same_request_pair": true
+   },
+   "slot_residual": [
+    -0.0099,
+    -0.0007,
+    0.0022,
+    0.0084
+   ],
+   "reask_max_delta": 0,
+   "k3_same_request_vs_separate": {
+    "reversed_max_delta": 0.01,
+    "written_max_delta": 0.02
+   }
+  },
+  {
+   "id": "uploads",
+   "leader_all24": "objectstore",
+   "p_leader_all24": 1,
+   "max_spread": 0,
+   "spread": {
+    "objectstore": 0,
+    "localdisk": 0,
+    "database": 0,
+    "nfs": 0
+   },
+   "distinct_argmax": 1,
+   "orders_leader_differs": 0,
+   "policy": {
+    "written": true,
+    "written_reversed": true,
+    "rotations4": true,
+    "same_request_pair": true
+   },
+   "slot_residual": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "reask_max_delta": 0,
+   "k3_same_request_vs_separate": {
+    "reversed_max_delta": 0,
+    "written_max_delta": 0
+   }
+  },
+  {
+   "id": "deploy",
+   "leader_all24": "rolling",
+   "p_leader_all24": 0.9433,
+   "max_spread": 0.06,
+   "spread": {
+    "rolling": 0.06,
+    "recreate": 0,
+    "bluegreen": 0.06,
+    "manual": 0
+   },
+   "distinct_argmax": 1,
+   "orders_leader_differs": 0,
+   "policy": {
+    "written": true,
+    "written_reversed": true,
+    "rotations4": true,
+    "same_request_pair": true
+   },
+   "slot_residual": [
+    0.0037,
+    -0.0004,
+    -0.005,
+    0.0017
+   ],
+   "reask_max_delta": 0.01,
+   "k3_same_request_vs_separate": {
+    "reversed_max_delta": 0,
+    "written_max_delta": 0.02
+   }
+  },
+  {
+   "id": "payment-tests",
+   "leader_all24": "mocks",
+   "p_leader_all24": 0.9983,
+   "max_spread": 0.01,
+   "spread": {
+    "mocks": 0.01,
+    "sandboxci": 0.01,
+    "prodtests": 0,
+    "none": 0
+   },
+   "distinct_argmax": 1,
+   "orders_leader_differs": 0,
+   "policy": {
+    "written": true,
+    "written_reversed": true,
+    "rotations4": true,
+    "same_request_pair": true
+   },
+   "slot_residual": [
+    -0.0008,
+    0,
+    -0.0008,
+    0.0017
+   ],
+   "reask_max_delta": 0,
+   "k3_same_request_vs_separate": {
+    "reversed_max_delta": 0,
+    "written_max_delta": 0
+   }
+  },
+  {
+   "id": "log-format",
+   "leader_all24": "json",
+   "p_leader_all24": 1,
+   "max_spread": 0,
+   "spread": {
+    "json": 0,
+    "text": 0,
+    "csv": 0,
+    "debugall": 0
+   },
+   "distinct_argmax": 1,
+   "orders_leader_differs": 0,
+   "policy": {
+    "written": true,
+    "written_reversed": true,
+    "rotations4": true,
+    "same_request_pair": true
+   },
+   "slot_residual": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "reask_max_delta": 0,
+   "k3_same_request_vs_separate": {
+    "reversed_max_delta": 0,
+    "written_max_delta": 0
+   }
+  },
+  {
+   "id": "feature-flags",
+   "leader_all24": "vendor",
+   "p_leader_all24": 1,
+   "max_spread": 0,
+   "spread": {
+    "vendor": 0,
+    "envvars": 0,
+    "configfile": 0,
+    "dbtable": 0
+   },
+   "distinct_argmax": 1,
+   "orders_leader_differs": 0,
+   "policy": {
+    "written": true,
+    "written_reversed": true,
+    "rotations4": true,
+    "same_request_pair": true
+   },
+   "slot_residual": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "reask_max_delta": 0,
+   "k3_same_request_vs_separate": {
+    "reversed_max_delta": 0,
+    "written_max_delta": 0
+   }
+  },
+  {
+   "id": "search",
+   "leader_all24": "pgtrgm",
+   "p_leader_all24": 0.9625,
+   "max_spread": 0.05,
+   "spread": {
+    "pgtrgm": 0.05,
+    "elastic": 0.05,
+    "like": 0,
+    "client": 0
+   },
+   "distinct_argmax": 1,
+   "orders_leader_differs": 0,
+   "policy": {
+    "written": true,
+    "written_reversed": true,
+    "rotations4": true,
+    "same_request_pair": true
+   },
+   "slot_residual": [
+    -0.0042,
+    -0.0038,
+    0.0017,
+    0.0062
+   ],
+   "reask_max_delta": 0.01,
+   "k3_same_request_vs_separate": {
+    "reversed_max_delta": 0.01,
+    "written_max_delta": 0.02
+   }
+  },
+  {
+   "id": "page-cache",
+   "leader_all24": "cdn",
+   "p_leader_all24": 1,
+   "max_spread": 0,
+   "spread": {
+    "cdn": 0,
+    "redis": 0,
+    "nocache": 0,
+    "browser": 0
+   },
+   "distinct_argmax": 1,
+   "orders_leader_differs": 0,
+   "policy": {
+    "written": true,
+    "written_reversed": true,
+    "rotations4": true,
+    "same_request_pair": true
+   },
+   "slot_residual": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "reask_max_delta": 0,
+   "k3_same_request_vs_separate": {
+    "reversed_max_delta": 0,
+    "written_max_delta": 0
+   }
+  },
+  {
+   "id": "secrets",
+   "leader_all24": "cloudsm",
+   "p_leader_all24": 1,
+   "max_spread": 0,
+   "spread": {
+    "cloudsm": 0,
+    "kubesecrets": 0,
+    "envfile": 0,
+    "wiki": 0
+   },
+   "distinct_argmax": 1,
+   "orders_leader_differs": 0,
+   "policy": {
+    "written": true,
+    "written_reversed": true,
+    "rotations4": true,
+    "same_request_pair": true
+   },
+   "slot_residual": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "reask_max_delta": 0,
+   "k3_same_request_vs_separate": {
+    "reversed_max_delta": 0,
+    "written_max_delta": 0
+   }
+  },
+  {
+   "id": "api-version",
+   "leader_all24": "urlversion",
+   "p_leader_all24": 0.9987,
+   "max_spread": 0.01,
+   "spread": {
+    "urlversion": 0.01,
+    "inplace": 0.01,
+    "header": 0,
+    "newapi": 0
+   },
+   "distinct_argmax": 1,
+   "orders_leader_differs": 0,
+   "policy": {
+    "written": true,
+    "written_reversed": true,
+    "rotations4": true,
+    "same_request_pair": true
+   },
+   "slot_residual": [
+    -0.0008,
+    -0.0004,
+    0.0008,
+    0.0004
+   ],
+   "reask_max_delta": 0,
+   "k3_same_request_vs_separate": {
+    "reversed_max_delta": 0,
+    "written_max_delta": 0
+   }
+  },
+  {
+   "id": "migration",
+   "leader_all24": "batched",
+   "p_leader_all24": 0.9742,
+   "max_spread": 0.04,
+   "spread": {
+    "batched": 0.04,
+    "single": 0.03,
+    "dumprestore": 0.01,
+    "app": 0
+   },
+   "distinct_argmax": 1,
+   "orders_leader_differs": 0,
+   "policy": {
+    "written": true,
+    "written_reversed": true,
+    "rotations4": true,
+    "same_request_pair": true
+   },
+   "slot_residual": [
+    -0.0033,
+    0.0008,
+    0,
+    0.0025
+   ],
+   "reask_max_delta": 0.02,
+   "k3_same_request_vs_separate": {
+    "reversed_max_delta": 0,
+    "written_max_delta": 0.02
+   }
+  },
+  {
+   "id": "alerting",
+   "leader_all24": "slo",
+   "p_leader_all24": 0.97,
+   "max_spread": 0.04,
+   "spread": {
+    "slo": 0.04,
+    "cpu": 0.03,
+    "everything": 0,
+    "none": 0.02
+   },
+   "distinct_argmax": 1,
+   "orders_leader_differs": 0,
+   "policy": {
+    "written": true,
+    "written_reversed": true,
+    "rotations4": true,
+    "same_request_pair": true
+   },
+   "slot_residual": [
+    0.0063,
+    0.0008,
+    -0.0042,
+    -0.0029
+   ],
+   "reask_max_delta": 0,
+   "k3_same_request_vs_separate": {
+    "reversed_max_delta": 0,
+    "written_max_delta": 0.01
+   }
+  },
+  {
+   "id": "offline-sync",
+   "leader_all24": "queuelww",
+   "p_leader_all24": 0.9712,
+   "max_spread": 0.04,
+   "spread": {
+    "queuelww": 0.04,
+    "onlineonly": 0,
+    "fullreplace": 0,
+    "crdt": 0.04
+   },
+   "distinct_argmax": 1,
+   "orders_leader_differs": 0,
+   "policy": {
+    "written": true,
+    "written_reversed": true,
+    "rotations4": true,
+    "same_request_pair": true
+   },
+   "slot_residual": [
+    -0.0004,
+    0.0017,
+    -0.0046,
+    0.0033
+   ],
+   "reask_max_delta": 0.01,
+   "k3_same_request_vs_separate": {
+    "reversed_max_delta": 0.01,
+    "written_max_delta": 0
+   }
+  },
+  {
+   "id": "email",
+   "leader_all24": "provider",
+   "p_leader_all24": 1,
+   "max_spread": 0,
+   "spread": {
+    "provider": 0,
+    "ownsmtp": 0,
+    "gmail": 0,
+    "sendbatch": 0
+   },
+   "distinct_argmax": 1,
+   "orders_leader_differs": 0,
+   "policy": {
+    "written": true,
+    "written_reversed": true,
+    "rotations4": true,
+    "same_request_pair": true
+   },
+   "slot_residual": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "reask_max_delta": 0,
+   "k3_same_request_vs_separate": {
+    "reversed_max_delta": 0,
+    "written_max_delta": 0
+   }
+  },
+  {
+   "id": "repo-layout",
+   "leader_all24": "monorepo",
+   "p_leader_all24": 0.8858,
+   "max_spread": 0.13,
+   "spread": {
+    "monorepo": 0.13,
+    "polyrepo": 0.13,
+    "copy": 0,
+    "submodules": 0
+   },
+   "distinct_argmax": 1,
+   "orders_leader_differs": 0,
+   "policy": {
+    "written": true,
+    "written_reversed": true,
+    "rotations4": true,
+    "same_request_pair": true
+   },
+   "slot_residual": [
+    -0.0096,
+    0.0083,
+    -0.0046,
+    0.0058
+   ],
+   "reask_max_delta": 0.04,
+   "k3_same_request_vs_separate": {
+    "reversed_max_delta": 0,
+    "written_max_delta": 0.03
+   }
+  },
+  {
+   "id": "thumbnails",
+   "leader_all24": "cdntransform",
+   "p_leader_all24": 0.9908,
+   "max_spread": 0.01,
+   "spread": {
+    "cdntransform": 0.01,
+    "worker": 0.01,
+    "request": 0,
+    "client": 0
+   },
+   "distinct_argmax": 1,
+   "orders_leader_differs": 0,
+   "policy": {
+    "written": true,
+    "written_reversed": true,
+    "rotations4": true,
+    "same_request_pair": true
+   },
+   "slot_residual": [
+    0,
+    0.0004,
+    0,
+    -0.0004
+   ],
+   "reask_max_delta": 0,
+   "k3_same_request_vs_separate": {
+    "reversed_max_delta": 0,
+    "written_max_delta": 0
+   }
+  },
+  {
+   "id": "env-config",
+   "leader_all24": "envconfig",
+   "p_leader_all24": 1,
+   "max_spread": 0,
+   "spread": {
+    "envconfig": 0,
+    "images": 0,
+    "branch": 0,
+    "hardcode": 0
+   },
+   "distinct_argmax": 1,
+   "orders_leader_differs": 0,
+   "policy": {
+    "written": true,
+    "written_reversed": true,
+    "rotations4": true,
+    "same_request_pair": true
+   },
+   "slot_residual": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "reask_max_delta": 0,
+   "k3_same_request_vs_separate": {
+    "reversed_max_delta": 0,
+    "written_max_delta": 0
+   }
+  },
+  {
+   "id": "retries",
+   "leader_all24": "backoff",
+   "p_leader_all24": 0.9933,
+   "max_spread": 0.02,
+   "spread": {
+    "backoff": 0.02,
+    "infinite": 0,
+    "noretry": 0.01,
+    "fixed": 0.02
+   },
+   "distinct_argmax": 1,
+   "orders_leader_differs": 0,
+   "policy": {
+    "written": true,
+    "written_reversed": true,
+    "rotations4": true,
+    "same_request_pair": true
+   },
+   "slot_residual": [
+    -0.0037,
+    -0.0012,
+    0.0008,
+    0.0042
+   ],
+   "reask_max_delta": 0.01,
+   "k3_same_request_vs_separate": {
+    "reversed_max_delta": 0,
+    "written_max_delta": 0.01
+   }
+  }
+ ],
+ "raw": [
+  {
+   "id": "rate-limit",
+   "orders": [
+    {
+     "order": [
+      "redis",
+      "memory",
+      "postgres",
+      "edge"
+     ],
+     "p": {
+      "memory": 0,
+      "postgres": 0,
+      "redis": 1,
+      "edge": 0
+     }
+    },
+    {
+     "order": [
+      "redis",
+      "memory",
+      "edge",
+      "postgres"
+     ],
+     "p": {
+      "redis": 1,
+      "memory": 0,
+      "postgres": 0,
+      "edge": 0
+     }
+    },
+    {
+     "order": [
+      "redis",
+      "postgres",
+      "memory",
+      "edge"
+     ],
+     "p": {
+      "redis": 1,
+      "postgres": 0,
+      "memory": 0,
+      "edge": 0
+     }
+    },
+    {
+     "order": [
+      "redis",
+      "postgres",
+      "edge",
+      "memory"
+     ],
+     "p": {
+      "edge": 0,
+      "postgres": 0,
+      "memory": 0,
+      "redis": 1
+     }
+    },
+    {
+     "order": [
+      "redis",
+      "edge",
+      "memory",
+      "postgres"
+     ],
+     "p": {
+      "redis": 1,
+      "postgres": 0,
+      "edge": 0,
+      "memory": 0
+     }
+    },
+    {
+     "order": [
+      "redis",
+      "edge",
+      "postgres",
+      "memory"
+     ],
+     "p": {
+      "postgres": 0,
+      "memory": 0,
+      "redis": 1,
+      "edge": 0
+     }
+    },
+    {
+     "order": [
+      "memory",
+      "redis",
+      "postgres",
+      "edge"
+     ],
+     "p": {
+      "memory": 0,
+      "redis": 1,
+      "postgres": 0,
+      "edge": 0
+     }
+    },
+    {
+     "order": [
+      "memory",
+      "redis",
+      "edge",
+      "postgres"
+     ],
+     "p": {
+      "postgres": 0,
+      "edge": 0,
+      "redis": 1,
+      "memory": 0
+     }
+    },
+    {
+     "order": [
+      "memory",
+      "postgres",
+      "redis",
+      "edge"
+     ],
+     "p": {
+      "redis": 1,
+      "edge": 0,
+      "memory": 0,
+      "postgres": 0
+     }
+    },
+    {
+     "order": [
+      "memory",
+      "postgres",
+      "edge",
+      "redis"
+     ],
+     "p": {
+      "edge": 0,
+      "redis": 1,
+      "postgres": 0,
+      "memory": 0
+     }
+    },
+    {
+     "order": [
+      "memory",
+      "edge",
+      "redis",
+      "postgres"
+     ],
+     "p": {
+      "redis": 1,
+      "postgres": 0,
+      "edge": 0,
+      "memory": 0
+     }
+    },
+    {
+     "order": [
+      "memory",
+      "edge",
+      "postgres",
+      "redis"
+     ],
+     "p": {
+      "edge": 0,
+      "memory": 0,
+      "postgres": 0,
+      "redis": 1
+     }
+    },
+    {
+     "order": [
+      "postgres",
+      "redis",
+      "memory",
+      "edge"
+     ],
+     "p": {
+      "memory": 0,
+      "redis": 1,
+      "postgres": 0,
+      "edge": 0
+     }
+    },
+    {
+     "order": [
+      "postgres",
+      "redis",
+      "edge",
+      "memory"
+     ],
+     "p": {
+      "postgres": 0,
+      "redis": 1,
+      "memory": 0,
+      "edge": 0
+     }
+    },
+    {
+     "order": [
+      "postgres",
+      "memory",
+      "redis",
+      "edge"
+     ],
+     "p": {
+      "edge": 0,
+      "postgres": 0,
+      "redis": 1,
+      "memory": 0
+     }
+    },
+    {
+     "order": [
+      "postgres",
+      "memory",
+      "edge",
+      "redis"
+     ],
+     "p": {
+      "redis": 1,
+      "postgres": 0,
+      "memory": 0,
+      "edge": 0
+     }
+    },
+    {
+     "order": [
+      "postgres",
+      "edge",
+      "redis",
+      "memory"
+     ],
+     "p": {
+      "redis": 1,
+      "postgres": 0,
+      "edge": 0,
+      "memory": 0
+     }
+    },
+    {
+     "order": [
+      "postgres",
+      "edge",
+      "memory",
+      "redis"
+     ],
+     "p": {
+      "edge": 0,
+      "redis": 1,
+      "memory": 0,
+      "postgres": 0
+     }
+    },
+    {
+     "order": [
+      "edge",
+      "redis",
+      "memory",
+      "postgres"
+     ],
+     "p": {
+      "redis": 1,
+      "postgres": 0,
+      "memory": 0,
+      "edge": 0
+     }
+    },
+    {
+     "order": [
+      "edge",
+      "redis",
+      "postgres",
+      "memory"
+     ],
+     "p": {
+      "redis": 1,
+      "edge": 0,
+      "postgres": 0,
+      "memory": 0
+     }
+    },
+    {
+     "order": [
+      "edge",
+      "memory",
+      "redis",
+      "postgres"
+     ],
+     "p": {
+      "edge": 0,
+      "memory": 0,
+      "postgres": 0,
+      "redis": 1
+     }
+    },
+    {
+     "order": [
+      "edge",
+      "memory",
+      "postgres",
+      "redis"
+     ],
+     "p": {
+      "redis": 1,
+      "postgres": 0,
+      "edge": 0,
+      "memory": 0
+     }
+    },
+    {
+     "order": [
+      "edge",
+      "postgres",
+      "redis",
+      "memory"
+     ],
+     "p": {
+      "postgres": 0,
+      "redis": 1,
+      "edge": 0,
+      "memory": 0
+     }
+    },
+    {
+     "order": [
+      "edge",
+      "postgres",
+      "memory",
+      "redis"
+     ],
+     "p": {
+      "postgres": 0,
+      "edge": 0,
+      "redis": 1,
+      "memory": 0
+     }
+    }
+   ],
+   "reask": {
+    "edge": 0,
+    "redis": 1,
+    "postgres": 0,
+    "memory": 0
+   },
+   "pair": {
+    "written": {
+     "memory": 0,
+     "edge": 0,
+     "postgres": 0,
+     "redis": 1
+    },
+    "reversed": {
+     "memory": 0,
+     "edge": 0,
+     "postgres": 0,
+     "redis": 1
+    }
+   }
+  },
+  {
+   "id": "job-queue",
+   "orders": [
+    {
+     "order": [
+      "pgqueue",
+      "kafka",
+      "cron",
+      "inprocess"
+     ],
+     "p": {
+      "inprocess": 0.01,
+      "pgqueue": 0.98,
+      "kafka": 0,
+      "cron": 0.01
+     }
+    },
+    {
+     "order": [
+      "pgqueue",
+      "kafka",
+      "inprocess",
+      "cron"
+     ],
+     "p": {
+      "kafka": 0,
+      "pgqueue": 0.99,
+      "inprocess": 0.01,
+      "cron": 0
+     }
+    },
+    {
+     "order": [
+      "pgqueue",
+      "cron",
+      "kafka",
+      "inprocess"
+     ],
+     "p": {
+      "cron": 0.01,
+      "inprocess": 0,
+      "kafka": 0,
+      "pgqueue": 0.99
+     }
+    },
+    {
+     "order": [
+      "pgqueue",
+      "cron",
+      "inprocess",
+      "kafka"
+     ],
+     "p": {
+      "cron": 0.01,
+      "pgqueue": 0.98,
+      "kafka": 0,
+      "inprocess": 0.01
+     }
+    },
+    {
+     "order": [
+      "pgqueue",
+      "inprocess",
+      "kafka",
+      "cron"
+     ],
+     "p": {
+      "inprocess": 0,
+      "cron": 0.01,
+      "kafka": 0,
+      "pgqueue": 0.99
+     }
+    },
+    {
+     "order": [
+      "pgqueue",
+      "inprocess",
+      "cron",
+      "kafka"
+     ],
+     "p": {
+      "pgqueue": 0.98,
+      "inprocess": 0.01,
+      "cron": 0.01,
+      "kafka": 0
+     }
+    },
+    {
+     "order": [
+      "kafka",
+      "pgqueue",
+      "cron",
+      "inprocess"
+     ],
+     "p": {
+      "kafka": 0,
+      "pgqueue": 0.97,
+      "inprocess": 0.01,
+      "cron": 0.02
+     }
+    },
+    {
+     "order": [
+      "kafka",
+      "pgqueue",
+      "inprocess",
+      "cron"
+     ],
+     "p": {
+      "cron": 0.01,
+      "inprocess": 0.01,
+      "pgqueue": 0.98,
+      "kafka": 0
+     }
+    },
+    {
+     "order": [
+      "kafka",
+      "cron",
+      "pgqueue",
+      "inprocess"
+     ],
+     "p": {
+      "kafka": 0,
+      "inprocess": 0,
+      "cron": 0.01,
+      "pgqueue": 0.99
+     }
+    },
+    {
+     "order": [
+      "kafka",
+      "cron",
+      "inprocess",
+      "pgqueue"
+     ],
+     "p": {
+      "cron": 0.01,
+      "kafka": 0,
+      "pgqueue": 0.98,
+      "inprocess": 0.01
+     }
+    },
+    {
+     "order": [
+      "kafka",
+      "inprocess",
+      "pgqueue",
+      "cron"
+     ],
+     "p": {
+      "kafka": 0,
+      "cron": 0.01,
+      "inprocess": 0.01,
+      "pgqueue": 0.98
+     }
+    },
+    {
+     "order": [
+      "kafka",
+      "inprocess",
+      "cron",
+      "pgqueue"
+     ],
+     "p": {
+      "cron": 0.01,
+      "inprocess": 0,
+      "kafka": 0,
+      "pgqueue": 0.99
+     }
+    },
+    {
+     "order": [
+      "cron",
+      "pgqueue",
+      "kafka",
+      "inprocess"
+     ],
+     "p": {
+      "cron": 0.02,
+      "pgqueue": 0.97,
+      "inprocess": 0.01,
+      "kafka": 0
+     }
+    },
+    {
+     "order": [
+      "cron",
+      "pgqueue",
+      "inprocess",
+      "kafka"
+     ],
+     "p": {
+      "cron": 0.01,
+      "inprocess": 0.01,
+      "kafka": 0,
+      "pgqueue": 0.98
+     }
+    },
+    {
+     "order": [
+      "cron",
+      "kafka",
+      "pgqueue",
+      "inprocess"
+     ],
+     "p": {
+      "inprocess": 0.01,
+      "cron": 0.01,
+      "kafka": 0,
+      "pgqueue": 0.98
+     }
+    },
+    {
+     "order": [
+      "cron",
+      "kafka",
+      "inprocess",
+      "pgqueue"
+     ],
+     "p": {
+      "pgqueue": 0.98,
+      "inprocess": 0.01,
+      "cron": 0.01,
+      "kafka": 0
+     }
+    },
+    {
+     "order": [
+      "cron",
+      "inprocess",
+      "pgqueue",
+      "kafka"
+     ],
+     "p": {
+      "cron": 0.03,
+      "pgqueue": 0.96,
+      "inprocess": 0.01,
+      "kafka": 0
+     }
+    },
+    {
+     "order": [
+      "cron",
+      "inprocess",
+      "kafka",
+      "pgqueue"
+     ],
+     "p": {
+      "inprocess": 0,
+      "kafka": 0,
+      "cron": 0.01,
+      "pgqueue": 0.99
+     }
+    },
+    {
+     "order": [
+      "inprocess",
+      "pgqueue",
+      "kafka",
+      "cron"
+     ],
+     "p": {
+      "cron": 0.01,
+      "inprocess": 0.01,
+      "pgqueue": 0.98,
+      "kafka": 0
+     }
+    },
+    {
+     "order": [
+      "inprocess",
+      "pgqueue",
+      "cron",
+      "kafka"
+     ],
+     "p": {
+      "cron": 0.01,
+      "inprocess": 0.01,
+      "kafka": 0,
+      "pgqueue": 0.98
+     }
+    },
+    {
+     "order": [
+      "inprocess",
+      "kafka",
+      "pgqueue",
+      "cron"
+     ],
+     "p": {
+      "cron": 0.01,
+      "kafka": 0,
+      "pgqueue": 0.98,
+      "inprocess": 0.01
+     }
+    },
+    {
+     "order": [
+      "inprocess",
+      "kafka",
+      "cron",
+      "pgqueue"
+     ],
+     "p": {
+      "cron": 0.01,
+      "kafka": 0,
+      "inprocess": 0,
+      "pgqueue": 0.99
+     }
+    },
+    {
+     "order": [
+      "inprocess",
+      "cron",
+      "pgqueue",
+      "kafka"
+     ],
+     "p": {
+      "kafka": 0,
+      "inprocess": 0.01,
+      "cron": 0.02,
+      "pgqueue": 0.97
+     }
+    },
+    {
+     "order": [
+      "inprocess",
+      "cron",
+      "kafka",
+      "pgqueue"
+     ],
+     "p": {
+      "cron": 0.01,
+      "inprocess": 0,
+      "pgqueue": 0.99,
+      "kafka": 0
+     }
+    }
+   ],
+   "reask": {
+    "kafka": 0,
+    "cron": 0.01,
+    "inprocess": 0.01,
+    "pgqueue": 0.98
+   },
+   "pair": {
+    "written": {
+     "pgqueue": 0.98,
+     "kafka": 0,
+     "inprocess": 0.01,
+     "cron": 0.01
+    },
+    "reversed": {
+     "cron": 0.01,
+     "kafka": 0,
+     "inprocess": 0,
+     "pgqueue": 0.99
+    }
+   }
+  },
+  {
+   "id": "spa-auth",
+   "orders": [
+    {
+     "order": [
+      "cookie",
+      "jwtlocal",
+      "jwtcookie",
+      "basic"
+     ],
+     "p": {
+      "jwtlocal": 0.02,
+      "cookie": 0.93,
+      "basic": 0,
+      "jwtcookie": 0.05
+     }
+    },
+    {
+     "order": [
+      "cookie",
+      "jwtlocal",
+      "basic",
+      "jwtcookie"
+     ],
+     "p": {
+      "jwtlocal": 0.01,
+      "jwtcookie": 0.04,
+      "basic": 0,
+      "cookie": 0.95
+     }
+    },
+    {
+     "order": [
+      "cookie",
+      "jwtcookie",
+      "jwtlocal",
+      "basic"
+     ],
+     "p": {
+      "jwtlocal": 0.02,
+      "cookie": 0.95,
+      "jwtcookie": 0.03,
+      "basic": 0
+     }
+    },
+    {
+     "order": [
+      "cookie",
+      "jwtcookie",
+      "basic",
+      "jwtlocal"
+     ],
+     "p": {
+      "cookie": 0.96,
+      "jwtlocal": 0.02,
+      "basic": 0,
+      "jwtcookie": 0.02
+     }
+    },
+    {
+     "order": [
+      "cookie",
+      "basic",
+      "jwtlocal",
+      "jwtcookie"
+     ],
+     "p": {
+      "basic": 0,
+      "jwtcookie": 0.08,
+      "jwtlocal": 0.02,
+      "cookie": 0.9
+     }
+    },
+    {
+     "order": [
+      "cookie",
+      "basic",
+      "jwtcookie",
+      "jwtlocal"
+     ],
+     "p": {
+      "jwtlocal": 0.03,
+      "basic": 0,
+      "cookie": 0.96,
+      "jwtcookie": 0.01
+     }
+    },
+    {
+     "order": [
+      "jwtlocal",
+      "cookie",
+      "jwtcookie",
+      "basic"
+     ],
+     "p": {
+      "jwtlocal": 0.01,
+      "jwtcookie": 0.03,
+      "basic": 0,
+      "cookie": 0.96
+     }
+    },
+    {
+     "order": [
+      "jwtlocal",
+      "cookie",
+      "basic",
+      "jwtcookie"
+     ],
+     "p": {
+      "jwtlocal": 0.01,
+      "cookie": 0.95,
+      "basic": 0,
+      "jwtcookie": 0.04
+     }
+    },
+    {
+     "order": [
+      "jwtlocal",
+      "jwtcookie",
+      "cookie",
+      "basic"
+     ],
+     "p": {
+      "jwtcookie": 0.03,
+      "cookie": 0.96,
+      "jwtlocal": 0.01,
+      "basic": 0
+     }
+    },
+    {
+     "order": [
+      "jwtlocal",
+      "jwtcookie",
+      "basic",
+      "cookie"
+     ],
+     "p": {
+      "jwtcookie": 0.03,
+      "jwtlocal": 0,
+      "cookie": 0.97,
+      "basic": 0
+     }
+    },
+    {
+     "order": [
+      "jwtlocal",
+      "basic",
+      "cookie",
+      "jwtcookie"
+     ],
+     "p": {
+      "basic": 0,
+      "jwtlocal": 0,
+      "cookie": 0.97,
+      "jwtcookie": 0.03
+     }
+    },
+    {
+     "order": [
+      "jwtlocal",
+      "basic",
+      "jwtcookie",
+      "cookie"
+     ],
+     "p": {
+      "cookie": 0.96,
+      "jwtcookie": 0.03,
+      "basic": 0,
+      "jwtlocal": 0.01
+     }
+    },
+    {
+     "order": [
+      "jwtcookie",
+      "cookie",
+      "jwtlocal",
+      "basic"
+     ],
+     "p": {
+      "cookie": 0.98,
+      "jwtlocal": 0.01,
+      "basic": 0,
+      "jwtcookie": 0.01
+     }
+    },
+    {
+     "order": [
+      "jwtcookie",
+      "cookie",
+      "basic",
+      "jwtlocal"
+     ],
+     "p": {
+      "jwtlocal": 0.01,
+      "jwtcookie": 0.01,
+      "basic": 0,
+      "cookie": 0.98
+     }
+    },
+    {
+     "order": [
+      "jwtcookie",
+      "jwtlocal",
+      "cookie",
+      "basic"
+     ],
+     "p": {
+      "jwtcookie": 0.02,
+      "jwtlocal": 0.01,
+      "cookie": 0.97,
+      "basic": 0
+     }
+    },
+    {
+     "order": [
+      "jwtcookie",
+      "jwtlocal",
+      "basic",
+      "cookie"
+     ],
+     "p": {
+      "cookie": 0.98,
+      "jwtcookie": 0.01,
+      "basic": 0,
+      "jwtlocal": 0.01
+     }
+    },
+    {
+     "order": [
+      "jwtcookie",
+      "basic",
+      "cookie",
+      "jwtlocal"
+     ],
+     "p": {
+      "jwtcookie": 0.01,
+      "cookie": 0.98,
+      "basic": 0,
+      "jwtlocal": 0.01
+     }
+    },
+    {
+     "order": [
+      "jwtcookie",
+      "basic",
+      "jwtlocal",
+      "cookie"
+     ],
+     "p": {
+      "basic": 0,
+      "jwtcookie": 0.01,
+      "jwtlocal": 0.01,
+      "cookie": 0.98
+     }
+    },
+    {
+     "order": [
+      "basic",
+      "cookie",
+      "jwtlocal",
+      "jwtcookie"
+     ],
+     "p": {
+      "basic": 0,
+      "cookie": 0.93,
+      "jwtlocal": 0.01,
+      "jwtcookie": 0.05
+     }
+    },
+    {
+     "order": [
+      "basic",
+      "cookie",
+      "jwtcookie",
+      "jwtlocal"
+     ],
+     "p": {
+      "jwtlocal": 0.01,
+      "jwtcookie": 0.01,
+      "basic": 0,
+      "cookie": 0.98
+     }
+    },
+    {
+     "order": [
+      "basic",
+      "jwtlocal",
+      "cookie",
+      "jwtcookie"
+     ],
+     "p": {
+      "basic": 0,
+      "jwtcookie": 0.06,
+      "jwtlocal": 0.01,
+      "cookie": 0.93
+     }
+    },
+    {
+     "order": [
+      "basic",
+      "jwtlocal",
+      "jwtcookie",
+      "cookie"
+     ],
+     "p": {
+      "jwtcookie": 0.05,
+      "cookie": 0.94,
+      "jwtlocal": 0.01,
+      "basic": 0
+     }
+    },
+    {
+     "order": [
+      "basic",
+      "jwtcookie",
+      "cookie",
+      "jwtlocal"
+     ],
+     "p": {
+      "cookie": 0.98,
+      "jwtlocal": 0.01,
+      "jwtcookie": 0.01,
+      "basic": 0
+     }
+    },
+    {
+     "order": [
+      "basic",
+      "jwtcookie",
+      "jwtlocal",
+      "cookie"
+     ],
+     "p": {
+      "basic": 0,
+      "jwtlocal": 0.01,
+      "cookie": 0.98,
+      "jwtcookie": 0.01
+     }
+    }
+   ],
+   "reask": {
+    "cookie": 0.93,
+    "basic": 0,
+    "jwtcookie": 0.05,
+    "jwtlocal": 0.02
+   },
+   "pair": {
+    "written": {
+     "jwtlocal": 0.01,
+     "basic": 0,
+     "cookie": 0.95,
+     "jwtcookie": 0.04
+    },
+    "reversed": {
+     "jwtlocal": 0.01,
+     "basic": 0,
+     "cookie": 0.99,
+     "jwtcookie": 0
+    }
+   }
+  },
+  {
+   "id": "uploads",
+   "orders": [
+    {
+     "order": [
+      "objectstore",
+      "localdisk",
+      "database",
+      "nfs"
+     ],
+     "p": {
+      "nfs": 0,
+      "localdisk": 0,
+      "objectstore": 1,
+      "database": 0
+     }
+    },
+    {
+     "order": [
+      "objectstore",
+      "localdisk",
+      "nfs",
+      "database"
+     ],
+     "p": {
+      "database": 0,
+      "localdisk": 0,
+      "nfs": 0,
+      "objectstore": 1
+     }
+    },
+    {
+     "order": [
+      "objectstore",
+      "database",
+      "localdisk",
+      "nfs"
+     ],
+     "p": {
+      "objectstore": 1,
+      "nfs": 0,
+      "localdisk": 0,
+      "database": 0
+     }
+    },
+    {
+     "order": [
+      "objectstore",
+      "database",
+      "nfs",
+      "localdisk"
+     ],
+     "p": {
+      "objectstore": 1,
+      "nfs": 0,
+      "localdisk": 0,
+      "database": 0
+     }
+    },
+    {
+     "order": [
+      "objectstore",
+      "nfs",
+      "localdisk",
+      "database"
+     ],
+     "p": {
+      "objectstore": 1,
+      "database": 0,
+      "localdisk": 0,
+      "nfs": 0
+     }
+    },
+    {
+     "order": [
+      "objectstore",
+      "nfs",
+      "database",
+      "localdisk"
+     ],
+     "p": {
+      "localdisk": 0,
+      "objectstore": 1,
+      "nfs": 0,
+      "database": 0
+     }
+    },
+    {
+     "order": [
+      "localdisk",
+      "objectstore",
+      "database",
+      "nfs"
+     ],
+     "p": {
+      "localdisk": 0,
+      "nfs": 0,
+      "database": 0,
+      "objectstore": 1
+     }
+    },
+    {
+     "order": [
+      "localdisk",
+      "objectstore",
+      "nfs",
+      "database"
+     ],
+     "p": {
+      "database": 0,
+      "objectstore": 1,
+      "localdisk": 0,
+      "nfs": 0
+     }
+    },
+    {
+     "order": [
+      "localdisk",
+      "database",
+      "objectstore",
+      "nfs"
+     ],
+     "p": {
+      "database": 0,
+      "localdisk": 0,
+      "nfs": 0,
+      "objectstore": 1
+     }
+    },
+    {
+     "order": [
+      "localdisk",
+      "database",
+      "nfs",
+      "objectstore"
+     ],
+     "p": {
+      "database": 0,
+      "objectstore": 1,
+      "nfs": 0,
+      "localdisk": 0
+     }
+    },
+    {
+     "order": [
+      "localdisk",
+      "nfs",
+      "objectstore",
+      "database"
+     ],
+     "p": {
+      "objectstore": 1,
+      "localdisk": 0,
+      "database": 0,
+      "nfs": 0
+     }
+    },
+    {
+     "order": [
+      "localdisk",
+      "nfs",
+      "database",
+      "objectstore"
+     ],
+     "p": {
+      "objectstore": 1,
+      "database": 0,
+      "nfs": 0,
+      "localdisk": 0
+     }
+    },
+    {
+     "order": [
+      "database",
+      "objectstore",
+      "localdisk",
+      "nfs"
+     ],
+     "p": {
+      "objectstore": 1,
+      "localdisk": 0,
+      "nfs": 0,
+      "database": 0
+     }
+    },
+    {
+     "order": [
+      "database",
+      "objectstore",
+      "nfs",
+      "localdisk"
+     ],
+     "p": {
+      "nfs": 0,
+      "database": 0,
+      "localdisk": 0,
+      "objectstore": 1
+     }
+    },
+    {
+     "order": [
+      "database",
+      "localdisk",
+      "objectstore",
+      "nfs"
+     ],
+     "p": {
+      "database": 0,
+      "nfs": 0,
+      "objectstore": 1,
+      "localdisk": 0
+     }
+    },
+    {
+     "order": [
+      "database",
+      "localdisk",
+      "nfs",
+      "objectstore"
+     ],
+     "p": {
+      "database": 0,
+      "nfs": 0,
+      "objectstore": 1,
+      "localdisk": 0
+     }
+    },
+    {
+     "order": [
+      "database",
+      "nfs",
+      "objectstore",
+      "localdisk"
+     ],
+     "p": {
+      "localdisk": 0,
+      "objectstore": 1,
+      "database": 0,
+      "nfs": 0
+     }
+    },
+    {
+     "order": [
+      "database",
+      "nfs",
+      "localdisk",
+      "objectstore"
+     ],
+     "p": {
+      "localdisk": 0,
+      "database": 0,
+      "nfs": 0,
+      "objectstore": 1
+     }
+    },
+    {
+     "order": [
+      "nfs",
+      "objectstore",
+      "localdisk",
+      "database"
+     ],
+     "p": {
+      "localdisk": 0,
+      "objectstore": 1,
+      "database": 0,
+      "nfs": 0
+     }
+    },
+    {
+     "order": [
+      "nfs",
+      "objectstore",
+      "database",
+      "localdisk"
+     ],
+     "p": {
+      "database": 0,
+      "nfs": 0,
+      "localdisk": 0,
+      "objectstore": 1
+     }
+    },
+    {
+     "order": [
+      "nfs",
+      "localdisk",
+      "objectstore",
+      "database"
+     ],
+     "p": {
+      "localdisk": 0,
+      "nfs": 0,
+      "objectstore": 1,
+      "database": 0
+     }
+    },
+    {
+     "order": [
+      "nfs",
+      "localdisk",
+      "database",
+      "objectstore"
+     ],
+     "p": {
+      "localdisk": 0,
+      "objectstore": 1,
+      "database": 0,
+      "nfs": 0
+     }
+    },
+    {
+     "order": [
+      "nfs",
+      "database",
+      "objectstore",
+      "localdisk"
+     ],
+     "p": {
+      "objectstore": 1,
+      "localdisk": 0,
+      "database": 0,
+      "nfs": 0
+     }
+    },
+    {
+     "order": [
+      "nfs",
+      "database",
+      "localdisk",
+      "objectstore"
+     ],
+     "p": {
+      "localdisk": 0,
+      "nfs": 0,
+      "objectstore": 1,
+      "database": 0
+     }
+    }
+   ],
+   "reask": {
+    "localdisk": 0,
+    "nfs": 0,
+    "objectstore": 1,
+    "database": 0
+   },
+   "pair": {
+    "written": {
+     "database": 0,
+     "localdisk": 0,
+     "objectstore": 1,
+     "nfs": 0
+    },
+    "reversed": {
+     "localdisk": 0,
+     "database": 0,
+     "objectstore": 1,
+     "nfs": 0
+    }
+   }
+  },
+  {
+   "id": "deploy",
+   "orders": [
+    {
+     "order": [
+      "rolling",
+      "recreate",
+      "bluegreen",
+      "manual"
+     ],
+     "p": {
+      "recreate": 0,
+      "bluegreen": 0.05,
+      "rolling": 0.95,
+      "manual": 0
+     }
+    },
+    {
+     "order": [
+      "rolling",
+      "recreate",
+      "manual",
+      "bluegreen"
+     ],
+     "p": {
+      "rolling": 0.95,
+      "bluegreen": 0.05,
+      "manual": 0,
+      "recreate": 0
+     }
+    },
+    {
+     "order": [
+      "rolling",
+      "bluegreen",
+      "recreate",
+      "manual"
+     ],
+     "p": {
+      "manual": 0,
+      "bluegreen": 0.06,
+      "recreate": 0,
+      "rolling": 0.94
+     }
+    },
+    {
+     "order": [
+      "rolling",
+      "bluegreen",
+      "manual",
+      "recreate"
+     ],
+     "p": {
+      "rolling": 0.93,
+      "bluegreen": 0.07,
+      "manual": 0,
+      "recreate": 0
+     }
+    },
+    {
+     "order": [
+      "rolling",
+      "manual",
+      "recreate",
+      "bluegreen"
+     ],
+     "p": {
+      "recreate": 0,
+      "rolling": 0.94,
+      "bluegreen": 0.06,
+      "manual": 0
+     }
+    },
+    {
+     "order": [
+      "rolling",
+      "manual",
+      "bluegreen",
+      "recreate"
+     ],
+     "p": {
+      "rolling": 0.95,
+      "manual": 0,
+      "recreate": 0,
+      "bluegreen": 0.05
+     }
+    },
+    {
+     "order": [
+      "recreate",
+      "rolling",
+      "bluegreen",
+      "manual"
+     ],
+     "p": {
+      "bluegreen": 0.05,
+      "recreate": 0,
+      "rolling": 0.95,
+      "manual": 0
+     }
+    },
+    {
+     "order": [
+      "recreate",
+      "rolling",
+      "manual",
+      "bluegreen"
+     ],
+     "p": {
+      "rolling": 0.94,
+      "recreate": 0,
+      "manual": 0,
+      "bluegreen": 0.06
+     }
+    },
+    {
+     "order": [
+      "recreate",
+      "bluegreen",
+      "rolling",
+      "manual"
+     ],
+     "p": {
+      "recreate": 0,
+      "rolling": 0.93,
+      "bluegreen": 0.07,
+      "manual": 0
+     }
+    },
+    {
+     "order": [
+      "recreate",
+      "bluegreen",
+      "manual",
+      "rolling"
+     ],
+     "p": {
+      "recreate": 0,
+      "bluegreen": 0.04,
+      "manual": 0,
+      "rolling": 0.96
+     }
+    },
+    {
+     "order": [
+      "recreate",
+      "manual",
+      "rolling",
+      "bluegreen"
+     ],
+     "p": {
+      "recreate": 0,
+      "manual": 0,
+      "bluegreen": 0.05,
+      "rolling": 0.95
+     }
+    },
+    {
+     "order": [
+      "recreate",
+      "manual",
+      "bluegreen",
+      "rolling"
+     ],
+     "p": {
+      "recreate": 0,
+      "manual": 0,
+      "bluegreen": 0.04,
+      "rolling": 0.96
+     }
+    },
+    {
+     "order": [
+      "bluegreen",
+      "rolling",
+      "recreate",
+      "manual"
+     ],
+     "p": {
+      "rolling": 0.93,
+      "bluegreen": 0.07,
+      "recreate": 0,
+      "manual": 0
+     }
+    },
+    {
+     "order": [
+      "bluegreen",
+      "rolling",
+      "manual",
+      "recreate"
+     ],
+     "p": {
+      "manual": 0,
+      "recreate": 0,
+      "bluegreen": 0.09,
+      "rolling": 0.91
+     }
+    },
+    {
+     "order": [
+      "bluegreen",
+      "recreate",
+      "rolling",
+      "manual"
+     ],
+     "p": {
+      "rolling": 0.92,
+      "recreate": 0,
+      "bluegreen": 0.08,
+      "manual": 0
+     }
+    },
+    {
+     "order": [
+      "bluegreen",
+      "recreate",
+      "manual",
+      "rolling"
+     ],
+     "p": {
+      "rolling": 0.94,
+      "bluegreen": 0.06,
+      "manual": 0,
+      "recreate": 0
+     }
+    },
+    {
+     "order": [
+      "bluegreen",
+      "manual",
+      "rolling",
+      "recreate"
+     ],
+     "p": {
+      "recreate": 0,
+      "bluegreen": 0.07,
+      "manual": 0,
+      "rolling": 0.93
+     }
+    },
+    {
+     "order": [
+      "bluegreen",
+      "manual",
+      "recreate",
+      "rolling"
+     ],
+     "p": {
+      "bluegreen": 0.06,
+      "manual": 0,
+      "recreate": 0,
+      "rolling": 0.94
+     }
+    },
+    {
+     "order": [
+      "manual",
+      "rolling",
+      "recreate",
+      "bluegreen"
+     ],
+     "p": {
+      "bluegreen": 0.06,
+      "manual": 0,
+      "rolling": 0.94,
+      "recreate": 0
+     }
+    },
+    {
+     "order": [
+      "manual",
+      "rolling",
+      "bluegreen",
+      "recreate"
+     ],
+     "p": {
+      "manual": 0,
+      "rolling": 0.97,
+      "bluegreen": 0.03,
+      "recreate": 0
+     }
+    },
+    {
+     "order": [
+      "manual",
+      "recreate",
+      "rolling",
+      "bluegreen"
+     ],
+     "p": {
+      "bluegreen": 0.04,
+      "rolling": 0.96,
+      "manual": 0,
+      "recreate": 0
+     }
+    },
+    {
+     "order": [
+      "manual",
+      "recreate",
+      "bluegreen",
+      "rolling"
+     ],
+     "p": {
+      "recreate": 0,
+      "rolling": 0.96,
+      "bluegreen": 0.04,
+      "manual": 0
+     }
+    },
+    {
+     "order": [
+      "manual",
+      "bluegreen",
+      "rolling",
+      "recreate"
+     ],
+     "p": {
+      "manual": 0,
+      "rolling": 0.93,
+      "bluegreen": 0.07,
+      "recreate": 0
+     }
+    },
+    {
+     "order": [
+      "manual",
+      "bluegreen",
+      "recreate",
+      "rolling"
+     ],
+     "p": {
+      "rolling": 0.96,
+      "recreate": 0,
+      "manual": 0,
+      "bluegreen": 0.04
+     }
+    }
+   ],
+   "reask": {
+    "recreate": 0,
+    "rolling": 0.94,
+    "bluegreen": 0.06,
+    "manual": 0
+   },
+   "pair": {
+    "written": {
+     "manual": 0,
+     "rolling": 0.93,
+     "recreate": 0,
+     "bluegreen": 0.07
+    },
+    "reversed": {
+     "manual": 0,
+     "rolling": 0.96,
+     "recreate": 0,
+     "bluegreen": 0.04
+    }
+   }
+  },
+  {
+   "id": "payment-tests",
+   "orders": [
+    {
+     "order": [
+      "mocks",
+      "sandboxci",
+      "prodtests",
+      "none"
+     ],
+     "p": {
+      "none": 0,
+      "prodtests": 0,
+      "mocks": 1,
+      "sandboxci": 0
+     }
+    },
+    {
+     "order": [
+      "mocks",
+      "sandboxci",
+      "none",
+      "prodtests"
+     ],
+     "p": {
+      "mocks": 1,
+      "none": 0,
+      "sandboxci": 0,
+      "prodtests": 0
+     }
+    },
+    {
+     "order": [
+      "mocks",
+      "prodtests",
+      "sandboxci",
+      "none"
+     ],
+     "p": {
+      "sandboxci": 0,
+      "none": 0,
+      "mocks": 1,
+      "prodtests": 0
+     }
+    },
+    {
+     "order": [
+      "mocks",
+      "prodtests",
+      "none",
+      "sandboxci"
+     ],
+     "p": {
+      "sandboxci": 0.01,
+      "prodtests": 0,
+      "none": 0,
+      "mocks": 0.99
+     }
+    },
+    {
+     "order": [
+      "mocks",
+      "none",
+      "sandboxci",
+      "prodtests"
+     ],
+     "p": {
+      "mocks": 1,
+      "none": 0,
+      "sandboxci": 0,
+      "prodtests": 0
+     }
+    },
+    {
+     "order": [
+      "mocks",
+      "none",
+      "prodtests",
+      "sandboxci"
+     ],
+     "p": {
+      "prodtests": 0,
+      "none": 0,
+      "mocks": 0.99,
+      "sandboxci": 0.01
+     }
+    },
+    {
+     "order": [
+      "sandboxci",
+      "mocks",
+      "prodtests",
+      "none"
+     ],
+     "p": {
+      "mocks": 1,
+      "sandboxci": 0,
+      "none": 0,
+      "prodtests": 0
+     }
+    },
+    {
+     "order": [
+      "sandboxci",
+      "mocks",
+      "none",
+      "prodtests"
+     ],
+     "p": {
+      "prodtests": 0,
+      "sandboxci": 0,
+      "none": 0,
+      "mocks": 1
+     }
+    },
+    {
+     "order": [
+      "sandboxci",
+      "prodtests",
+      "mocks",
+      "none"
+     ],
+     "p": {
+      "prodtests": 0,
+      "mocks": 1,
+      "sandboxci": 0,
+      "none": 0
+     }
+    },
+    {
+     "order": [
+      "sandboxci",
+      "prodtests",
+      "none",
+      "mocks"
+     ],
+     "p": {
+      "sandboxci": 0,
+      "none": 0,
+      "mocks": 1,
+      "prodtests": 0
+     }
+    },
+    {
+     "order": [
+      "sandboxci",
+      "none",
+      "mocks",
+      "prodtests"
+     ],
+     "p": {
+      "none": 0,
+      "sandboxci": 0,
+      "prodtests": 0,
+      "mocks": 1
+     }
+    },
+    {
+     "order": [
+      "sandboxci",
+      "none",
+      "prodtests",
+      "mocks"
+     ],
+     "p": {
+      "sandboxci": 0,
+      "prodtests": 0,
+      "none": 0,
+      "mocks": 1
+     }
+    },
+    {
+     "order": [
+      "prodtests",
+      "mocks",
+      "sandboxci",
+      "none"
+     ],
+     "p": {
+      "prodtests": 0,
+      "mocks": 1,
+      "sandboxci": 0,
+      "none": 0
+     }
+    },
+    {
+     "order": [
+      "prodtests",
+      "mocks",
+      "none",
+      "sandboxci"
+     ],
+     "p": {
+      "none": 0,
+      "sandboxci": 0,
+      "prodtests": 0,
+      "mocks": 1
+     }
+    },
+    {
+     "order": [
+      "prodtests",
+      "sandboxci",
+      "mocks",
+      "none"
+     ],
+     "p": {
+      "sandboxci": 0,
+      "mocks": 1,
+      "none": 0,
+      "prodtests": 0
+     }
+    },
+    {
+     "order": [
+      "prodtests",
+      "sandboxci",
+      "none",
+      "mocks"
+     ],
+     "p": {
+      "mocks": 1,
+      "prodtests": 0,
+      "none": 0,
+      "sandboxci": 0
+     }
+    },
+    {
+     "order": [
+      "prodtests",
+      "none",
+      "mocks",
+      "sandboxci"
+     ],
+     "p": {
+      "none": 0,
+      "mocks": 0.99,
+      "sandboxci": 0.01,
+      "prodtests": 0
+     }
+    },
+    {
+     "order": [
+      "prodtests",
+      "none",
+      "sandboxci",
+      "mocks"
+     ],
+     "p": {
+      "sandboxci": 0,
+      "prodtests": 0,
+      "mocks": 1,
+      "none": 0
+     }
+    },
+    {
+     "order": [
+      "none",
+      "mocks",
+      "sandboxci",
+      "prodtests"
+     ],
+     "p": {
+      "sandboxci": 0,
+      "prodtests": 0,
+      "mocks": 1,
+      "none": 0
+     }
+    },
+    {
+     "order": [
+      "none",
+      "mocks",
+      "prodtests",
+      "sandboxci"
+     ],
+     "p": {
+      "none": 0,
+      "sandboxci": 0,
+      "prodtests": 0,
+      "mocks": 1
+     }
+    },
+    {
+     "order": [
+      "none",
+      "sandboxci",
+      "mocks",
+      "prodtests"
+     ],
+     "p": {
+      "sandboxci": 0,
+      "mocks": 1,
+      "none": 0,
+      "prodtests": 0
+     }
+    },
+    {
+     "order": [
+      "none",
+      "sandboxci",
+      "prodtests",
+      "mocks"
+     ],
+     "p": {
+      "none": 0,
+      "sandboxci": 0,
+      "prodtests": 0,
+      "mocks": 1
+     }
+    },
+    {
+     "order": [
+      "none",
+      "prodtests",
+      "mocks",
+      "sandboxci"
+     ],
+     "p": {
+      "none": 0,
+      "prodtests": 0,
+      "sandboxci": 0.01,
+      "mocks": 0.99
+     }
+    },
+    {
+     "order": [
+      "none",
+      "prodtests",
+      "sandboxci",
+      "mocks"
+     ],
+     "p": {
+      "none": 0,
+      "sandboxci": 0,
+      "prodtests": 0,
+      "mocks": 1
+     }
+    }
+   ],
+   "reask": {
+    "none": 0,
+    "prodtests": 0,
+    "mocks": 1,
+    "sandboxci": 0
+   },
+   "pair": {
+    "written": {
+     "prodtests": 0,
+     "mocks": 1,
+     "none": 0,
+     "sandboxci": 0
+    },
+    "reversed": {
+     "prodtests": 0,
+     "mocks": 1,
+     "none": 0,
+     "sandboxci": 0
+    }
+   }
+  },
+  {
+   "id": "log-format",
+   "orders": [
+    {
+     "order": [
+      "json",
+      "text",
+      "csv",
+      "debugall"
+     ],
+     "p": {
+      "debugall": 0,
+      "text": 0,
+      "json": 1,
+      "csv": 0
+     }
+    },
+    {
+     "order": [
+      "json",
+      "text",
+      "debugall",
+      "csv"
+     ],
+     "p": {
+      "csv": 0,
+      "text": 0,
+      "debugall": 0,
+      "json": 1
+     }
+    },
+    {
+     "order": [
+      "json",
+      "csv",
+      "text",
+      "debugall"
+     ],
+     "p": {
+      "text": 0,
+      "csv": 0,
+      "json": 1,
+      "debugall": 0
+     }
+    },
+    {
+     "order": [
+      "json",
+      "csv",
+      "debugall",
+      "text"
+     ],
+     "p": {
+      "text": 0,
+      "json": 1,
+      "debugall": 0,
+      "csv": 0
+     }
+    },
+    {
+     "order": [
+      "json",
+      "debugall",
+      "text",
+      "csv"
+     ],
+     "p": {
+      "csv": 0,
+      "debugall": 0,
+      "json": 1,
+      "text": 0
+     }
+    },
+    {
+     "order": [
+      "json",
+      "debugall",
+      "csv",
+      "text"
+     ],
+     "p": {
+      "csv": 0,
+      "text": 0,
+      "debugall": 0,
+      "json": 1
+     }
+    },
+    {
+     "order": [
+      "text",
+      "json",
+      "csv",
+      "debugall"
+     ],
+     "p": {
+      "text": 0,
+      "json": 1,
+      "debugall": 0,
+      "csv": 0
+     }
+    },
+    {
+     "order": [
+      "text",
+      "json",
+      "debugall",
+      "csv"
+     ],
+     "p": {
+      "text": 0,
+      "debugall": 0,
+      "json": 1,
+      "csv": 0
+     }
+    },
+    {
+     "order": [
+      "text",
+      "csv",
+      "json",
+      "debugall"
+     ],
+     "p": {
+      "debugall": 0,
+      "json": 1,
+      "text": 0,
+      "csv": 0
+     }
+    },
+    {
+     "order": [
+      "text",
+      "csv",
+      "debugall",
+      "json"
+     ],
+     "p": {
+      "csv": 0,
+      "json": 1,
+      "text": 0,
+      "debugall": 0
+     }
+    },
+    {
+     "order": [
+      "text",
+      "debugall",
+      "json",
+      "csv"
+     ],
+     "p": {
+      "debugall": 0,
+      "text": 0,
+      "csv": 0,
+      "json": 1
+     }
+    },
+    {
+     "order": [
+      "text",
+      "debugall",
+      "csv",
+      "json"
+     ],
+     "p": {
+      "json": 1,
+      "csv": 0,
+      "debugall": 0,
+      "text": 0
+     }
+    },
+    {
+     "order": [
+      "csv",
+      "json",
+      "text",
+      "debugall"
+     ],
+     "p": {
+      "csv": 0,
+      "debugall": 0,
+      "text": 0,
+      "json": 1
+     }
+    },
+    {
+     "order": [
+      "csv",
+      "json",
+      "debugall",
+      "text"
+     ],
+     "p": {
+      "json": 1,
+      "debugall": 0,
+      "text": 0,
+      "csv": 0
+     }
+    },
+    {
+     "order": [
+      "csv",
+      "text",
+      "json",
+      "debugall"
+     ],
+     "p": {
+      "text": 0,
+      "json": 1,
+      "debugall": 0,
+      "csv": 0
+     }
+    },
+    {
+     "order": [
+      "csv",
+      "text",
+      "debugall",
+      "json"
+     ],
+     "p": {
+      "debugall": 0,
+      "json": 1,
+      "csv": 0,
+      "text": 0
+     }
+    },
+    {
+     "order": [
+      "csv",
+      "debugall",
+      "json",
+      "text"
+     ],
+     "p": {
+      "json": 1,
+      "text": 0,
+      "csv": 0,
+      "debugall": 0
+     }
+    },
+    {
+     "order": [
+      "csv",
+      "debugall",
+      "text",
+      "json"
+     ],
+     "p": {
+      "csv": 0,
+      "debugall": 0,
+      "json": 1,
+      "text": 0
+     }
+    },
+    {
+     "order": [
+      "debugall",
+      "json",
+      "text",
+      "csv"
+     ],
+     "p": {
+      "debugall": 0,
+      "csv": 0,
+      "text": 0,
+      "json": 1
+     }
+    },
+    {
+     "order": [
+      "debugall",
+      "json",
+      "csv",
+      "text"
+     ],
+     "p": {
+      "text": 0,
+      "json": 1,
+      "debugall": 0,
+      "csv": 0
+     }
+    },
+    {
+     "order": [
+      "debugall",
+      "text",
+      "json",
+      "csv"
+     ],
+     "p": {
+      "csv": 0,
+      "debugall": 0,
+      "json": 1,
+      "text": 0
+     }
+    },
+    {
+     "order": [
+      "debugall",
+      "text",
+      "csv",
+      "json"
+     ],
+     "p": {
+      "text": 0,
+      "debugall": 0,
+      "json": 1,
+      "csv": 0
+     }
+    },
+    {
+     "order": [
+      "debugall",
+      "csv",
+      "json",
+      "text"
+     ],
+     "p": {
+      "text": 0,
+      "json": 1,
+      "debugall": 0,
+      "csv": 0
+     }
+    },
+    {
+     "order": [
+      "debugall",
+      "csv",
+      "text",
+      "json"
+     ],
+     "p": {
+      "debugall": 0,
+      "text": 0,
+      "json": 1,
+      "csv": 0
+     }
+    }
+   ],
+   "reask": {
+    "debugall": 0,
+    "text": 0,
+    "json": 1,
+    "csv": 0
+   },
+   "pair": {
+    "written": {
+     "debugall": 0,
+     "csv": 0,
+     "json": 1,
+     "text": 0
+    },
+    "reversed": {
+     "debugall": 0,
+     "json": 1,
+     "csv": 0,
+     "text": 0
+    }
+   }
+  },
+  {
+   "id": "feature-flags",
+   "orders": [
+    {
+     "order": [
+      "vendor",
+      "envvars",
+      "configfile",
+      "dbtable"
+     ],
+     "p": {
+      "configfile": 0,
+      "vendor": 1,
+      "dbtable": 0,
+      "envvars": 0
+     }
+    },
+    {
+     "order": [
+      "vendor",
+      "envvars",
+      "dbtable",
+      "configfile"
+     ],
+     "p": {
+      "configfile": 0,
+      "dbtable": 0,
+      "envvars": 0,
+      "vendor": 1
+     }
+    },
+    {
+     "order": [
+      "vendor",
+      "configfile",
+      "envvars",
+      "dbtable"
+     ],
+     "p": {
+      "configfile": 0,
+      "dbtable": 0,
+      "vendor": 1,
+      "envvars": 0
+     }
+    },
+    {
+     "order": [
+      "vendor",
+      "configfile",
+      "dbtable",
+      "envvars"
+     ],
+     "p": {
+      "vendor": 1,
+      "dbtable": 0,
+      "configfile": 0,
+      "envvars": 0
+     }
+    },
+    {
+     "order": [
+      "vendor",
+      "dbtable",
+      "envvars",
+      "configfile"
+     ],
+     "p": {
+      "envvars": 0,
+      "dbtable": 0,
+      "configfile": 0,
+      "vendor": 1
+     }
+    },
+    {
+     "order": [
+      "vendor",
+      "dbtable",
+      "configfile",
+      "envvars"
+     ],
+     "p": {
+      "dbtable": 0,
+      "envvars": 0,
+      "vendor": 1,
+      "configfile": 0
+     }
+    },
+    {
+     "order": [
+      "envvars",
+      "vendor",
+      "configfile",
+      "dbtable"
+     ],
+     "p": {
+      "configfile": 0,
+      "dbtable": 0,
+      "vendor": 1,
+      "envvars": 0
+     }
+    },
+    {
+     "order": [
+      "envvars",
+      "vendor",
+      "dbtable",
+      "configfile"
+     ],
+     "p": {
+      "envvars": 0,
+      "configfile": 0,
+      "vendor": 1,
+      "dbtable": 0
+     }
+    },
+    {
+     "order": [
+      "envvars",
+      "configfile",
+      "vendor",
+      "dbtable"
+     ],
+     "p": {
+      "dbtable": 0,
+      "configfile": 0,
+      "vendor": 1,
+      "envvars": 0
+     }
+    },
+    {
+     "order": [
+      "envvars",
+      "configfile",
+      "dbtable",
+      "vendor"
+     ],
+     "p": {
+      "dbtable": 0,
+      "configfile": 0,
+      "vendor": 1,
+      "envvars": 0
+     }
+    },
+    {
+     "order": [
+      "envvars",
+      "dbtable",
+      "vendor",
+      "configfile"
+     ],
+     "p": {
+      "vendor": 1,
+      "configfile": 0,
+      "dbtable": 0,
+      "envvars": 0
+     }
+    },
+    {
+     "order": [
+      "envvars",
+      "dbtable",
+      "configfile",
+      "vendor"
+     ],
+     "p": {
+      "envvars": 0,
+      "dbtable": 0,
+      "vendor": 1,
+      "configfile": 0
+     }
+    },
+    {
+     "order": [
+      "configfile",
+      "vendor",
+      "envvars",
+      "dbtable"
+     ],
+     "p": {
+      "dbtable": 0,
+      "envvars": 0,
+      "vendor": 1,
+      "configfile": 0
+     }
+    },
+    {
+     "order": [
+      "configfile",
+      "vendor",
+      "dbtable",
+      "envvars"
+     ],
+     "p": {
+      "vendor": 1,
+      "envvars": 0,
+      "configfile": 0,
+      "dbtable": 0
+     }
+    },
+    {
+     "order": [
+      "configfile",
+      "envvars",
+      "vendor",
+      "dbtable"
+     ],
+     "p": {
+      "configfile": 0,
+      "dbtable": 0,
+      "envvars": 0,
+      "vendor": 1
+     }
+    },
+    {
+     "order": [
+      "configfile",
+      "envvars",
+      "dbtable",
+      "vendor"
+     ],
+     "p": {
+      "configfile": 0,
+      "dbtable": 0,
+      "vendor": 1,
+      "envvars": 0
+     }
+    },
+    {
+     "order": [
+      "configfile",
+      "dbtable",
+      "vendor",
+      "envvars"
+     ],
+     "p": {
+      "envvars": 0,
+      "vendor": 1,
+      "dbtable": 0,
+      "configfile": 0
+     }
+    },
+    {
+     "order": [
+      "configfile",
+      "dbtable",
+      "envvars",
+      "vendor"
+     ],
+     "p": {
+      "dbtable": 0,
+      "configfile": 0,
+      "envvars": 0,
+      "vendor": 1
+     }
+    },
+    {
+     "order": [
+      "dbtable",
+      "vendor",
+      "envvars",
+      "configfile"
+     ],
+     "p": {
+      "configfile": 0,
+      "dbtable": 0,
+      "vendor": 1,
+      "envvars": 0
+     }
+    },
+    {
+     "order": [
+      "dbtable",
+      "vendor",
+      "configfile",
+      "envvars"
+     ],
+     "p": {
+      "configfile": 0,
+      "dbtable": 0,
+      "envvars": 0,
+      "vendor": 1
+     }
+    },
+    {
+     "order": [
+      "dbtable",
+      "envvars",
+      "vendor",
+      "configfile"
+     ],
+     "p": {
+      "vendor": 1,
+      "dbtable": 0,
+      "configfile": 0,
+      "envvars": 0
+     }
+    },
+    {
+     "order": [
+      "dbtable",
+      "envvars",
+      "configfile",
+      "vendor"
+     ],
+     "p": {
+      "dbtable": 0,
+      "vendor": 1,
+      "configfile": 0,
+      "envvars": 0
+     }
+    },
+    {
+     "order": [
+      "dbtable",
+      "configfile",
+      "vendor",
+      "envvars"
+     ],
+     "p": {
+      "dbtable": 0,
+      "envvars": 0,
+      "configfile": 0,
+      "vendor": 1
+     }
+    },
+    {
+     "order": [
+      "dbtable",
+      "configfile",
+      "envvars",
+      "vendor"
+     ],
+     "p": {
+      "vendor": 1,
+      "envvars": 0,
+      "configfile": 0,
+      "dbtable": 0
+     }
+    }
+   ],
+   "reask": {
+    "configfile": 0,
+    "envvars": 0,
+    "dbtable": 0,
+    "vendor": 1
+   },
+   "pair": {
+    "written": {
+     "dbtable": 0,
+     "configfile": 0,
+     "vendor": 1,
+     "envvars": 0
+    },
+    "reversed": {
+     "dbtable": 0,
+     "configfile": 0,
+     "vendor": 1,
+     "envvars": 0
+    }
+   }
+  },
+  {
+   "id": "search",
+   "orders": [
+    {
+     "order": [
+      "pgtrgm",
+      "elastic",
+      "like",
+      "client"
+     ],
+     "p": {
+      "pgtrgm": 0.94,
+      "like": 0,
+      "elastic": 0.06,
+      "client": 0
+     }
+    },
+    {
+     "order": [
+      "pgtrgm",
+      "elastic",
+      "client",
+      "like"
+     ],
+     "p": {
+      "client": 0,
+      "elastic": 0.05,
+      "pgtrgm": 0.95,
+      "like": 0
+     }
+    },
+    {
+     "order": [
+      "pgtrgm",
+      "like",
+      "elastic",
+      "client"
+     ],
+     "p": {
+      "client": 0,
+      "elastic": 0.06,
+      "like": 0,
+      "pgtrgm": 0.94
+     }
+    },
+    {
+     "order": [
+      "pgtrgm",
+      "like",
+      "client",
+      "elastic"
+     ],
+     "p": {
+      "client": 0,
+      "pgtrgm": 0.96,
+      "like": 0,
+      "elastic": 0.04
+     }
+    },
+    {
+     "order": [
+      "pgtrgm",
+      "client",
+      "elastic",
+      "like"
+     ],
+     "p": {
+      "elastic": 0.04,
+      "like": 0,
+      "pgtrgm": 0.96,
+      "client": 0
+     }
+    },
+    {
+     "order": [
+      "pgtrgm",
+      "client",
+      "like",
+      "elastic"
+     ],
+     "p": {
+      "like": 0,
+      "elastic": 0.05,
+      "pgtrgm": 0.95,
+      "client": 0
+     }
+    },
+    {
+     "order": [
+      "elastic",
+      "pgtrgm",
+      "like",
+      "client"
+     ],
+     "p": {
+      "elastic": 0.05,
+      "like": 0,
+      "client": 0,
+      "pgtrgm": 0.95
+     }
+    },
+    {
+     "order": [
+      "elastic",
+      "pgtrgm",
+      "client",
+      "like"
+     ],
+     "p": {
+      "like": 0,
+      "elastic": 0.05,
+      "client": 0,
+      "pgtrgm": 0.95
+     }
+    },
+    {
+     "order": [
+      "elastic",
+      "like",
+      "pgtrgm",
+      "client"
+     ],
+     "p": {
+      "like": 0,
+      "pgtrgm": 0.97,
+      "elastic": 0.03,
+      "client": 0
+     }
+    },
+    {
+     "order": [
+      "elastic",
+      "like",
+      "client",
+      "pgtrgm"
+     ],
+     "p": {
+      "client": 0,
+      "elastic": 0.02,
+      "like": 0,
+      "pgtrgm": 0.98
+     }
+    },
+    {
+     "order": [
+      "elastic",
+      "client",
+      "pgtrgm",
+      "like"
+     ],
+     "p": {
+      "client": 0,
+      "pgtrgm": 0.97,
+      "like": 0,
+      "elastic": 0.03
+     }
+    },
+    {
+     "order": [
+      "elastic",
+      "client",
+      "like",
+      "pgtrgm"
+     ],
+     "p": {
+      "pgtrgm": 0.98,
+      "like": 0,
+      "elastic": 0.02,
+      "client": 0
+     }
+    },
+    {
+     "order": [
+      "like",
+      "pgtrgm",
+      "elastic",
+      "client"
+     ],
+     "p": {
+      "like": 0,
+      "elastic": 0.05,
+      "client": 0,
+      "pgtrgm": 0.95
+     }
+    },
+    {
+     "order": [
+      "like",
+      "pgtrgm",
+      "client",
+      "elastic"
+     ],
+     "p": {
+      "elastic": 0.04,
+      "pgtrgm": 0.96,
+      "client": 0,
+      "like": 0
+     }
+    },
+    {
+     "order": [
+      "like",
+      "elastic",
+      "pgtrgm",
+      "client"
+     ],
+     "p": {
+      "elastic": 0.04,
+      "like": 0,
+      "pgtrgm": 0.96,
+      "client": 0
+     }
+    },
+    {
+     "order": [
+      "like",
+      "elastic",
+      "client",
+      "pgtrgm"
+     ],
+     "p": {
+      "client": 0,
+      "pgtrgm": 0.98,
+      "like": 0,
+      "elastic": 0.02
+     }
+    },
+    {
+     "order": [
+      "like",
+      "client",
+      "pgtrgm",
+      "elastic"
+     ],
+     "p": {
+      "like": 0,
+      "client": 0,
+      "pgtrgm": 0.94,
+      "elastic": 0.06
+     }
+    },
+    {
+     "order": [
+      "like",
+      "client",
+      "elastic",
+      "pgtrgm"
+     ],
+     "p": {
+      "pgtrgm": 0.98,
+      "client": 0,
+      "like": 0,
+      "elastic": 0.02
+     }
+    },
+    {
+     "order": [
+      "client",
+      "pgtrgm",
+      "elastic",
+      "like"
+     ],
+     "p": {
+      "pgtrgm": 0.95,
+      "client": 0,
+      "elastic": 0.05,
+      "like": 0
+     }
+    },
+    {
+     "order": [
+      "client",
+      "pgtrgm",
+      "like",
+      "elastic"
+     ],
+     "p": {
+      "like": 0,
+      "client": 0,
+      "pgtrgm": 0.95,
+      "elastic": 0.05
+     }
+    },
+    {
+     "order": [
+      "client",
+      "elastic",
+      "pgtrgm",
+      "like"
+     ],
+     "p": {
+      "elastic": 0.02,
+      "client": 0,
+      "pgtrgm": 0.98,
+      "like": 0
+     }
+    },
+    {
+     "order": [
+      "client",
+      "elastic",
+      "like",
+      "pgtrgm"
+     ],
+     "p": {
+      "elastic": 0.01,
+      "pgtrgm": 0.99,
+      "client": 0,
+      "like": 0
+     }
+    },
+    {
+     "order": [
+      "client",
+      "like",
+      "pgtrgm",
+      "elastic"
+     ],
+     "p": {
+      "like": 0,
+      "pgtrgm": 0.98,
+      "client": 0,
+      "elastic": 0.02
+     }
+    },
+    {
+     "order": [
+      "client",
+      "like",
+      "elastic",
+      "pgtrgm"
+     ],
+     "p": {
+      "like": 0,
+      "pgtrgm": 0.98,
+      "client": 0,
+      "elastic": 0.02
+     }
+    }
+   ],
+   "reask": {
+    "like": 0,
+    "client": 0,
+    "pgtrgm": 0.95,
+    "elastic": 0.05
+   },
+   "pair": {
+    "written": {
+     "pgtrgm": 0.92,
+     "elastic": 0.08,
+     "client": 0,
+     "like": 0
+    },
+    "reversed": {
+     "pgtrgm": 0.99,
+     "elastic": 0.01,
+     "client": 0,
+     "like": 0
+    }
+   }
+  },
+  {
+   "id": "page-cache",
+   "orders": [
+    {
+     "order": [
+      "cdn",
+      "redis",
+      "nocache",
+      "browser"
+     ],
+     "p": {
+      "redis": 0,
+      "browser": 0,
+      "cdn": 1,
+      "nocache": 0
+     }
+    },
+    {
+     "order": [
+      "cdn",
+      "redis",
+      "browser",
+      "nocache"
+     ],
+     "p": {
+      "nocache": 0,
+      "browser": 0,
+      "cdn": 1,
+      "redis": 0
+     }
+    },
+    {
+     "order": [
+      "cdn",
+      "nocache",
+      "redis",
+      "browser"
+     ],
+     "p": {
+      "cdn": 1,
+      "browser": 0,
+      "redis": 0,
+      "nocache": 0
+     }
+    },
+    {
+     "order": [
+      "cdn",
+      "nocache",
+      "browser",
+      "redis"
+     ],
+     "p": {
+      "redis": 0,
+      "cdn": 1,
+      "nocache": 0,
+      "browser": 0
+     }
+    },
+    {
+     "order": [
+      "cdn",
+      "browser",
+      "redis",
+      "nocache"
+     ],
+     "p": {
+      "redis": 0,
+      "browser": 0,
+      "cdn": 1,
+      "nocache": 0
+     }
+    },
+    {
+     "order": [
+      "cdn",
+      "browser",
+      "nocache",
+      "redis"
+     ],
+     "p": {
+      "nocache": 0,
+      "browser": 0,
+      "redis": 0,
+      "cdn": 1
+     }
+    },
+    {
+     "order": [
+      "redis",
+      "cdn",
+      "nocache",
+      "browser"
+     ],
+     "p": {
+      "redis": 0,
+      "cdn": 1,
+      "nocache": 0,
+      "browser": 0
+     }
+    },
+    {
+     "order": [
+      "redis",
+      "cdn",
+      "browser",
+      "nocache"
+     ],
+     "p": {
+      "browser": 0,
+      "cdn": 1,
+      "redis": 0,
+      "nocache": 0
+     }
+    },
+    {
+     "order": [
+      "redis",
+      "nocache",
+      "cdn",
+      "browser"
+     ],
+     "p": {
+      "nocache": 0,
+      "redis": 0,
+      "browser": 0,
+      "cdn": 1
+     }
+    },
+    {
+     "order": [
+      "redis",
+      "nocache",
+      "browser",
+      "cdn"
+     ],
+     "p": {
+      "cdn": 1,
+      "redis": 0,
+      "browser": 0,
+      "nocache": 0
+     }
+    },
+    {
+     "order": [
+      "redis",
+      "browser",
+      "cdn",
+      "nocache"
+     ],
+     "p": {
+      "nocache": 0,
+      "redis": 0,
+      "cdn": 1,
+      "browser": 0
+     }
+    },
+    {
+     "order": [
+      "redis",
+      "browser",
+      "nocache",
+      "cdn"
+     ],
+     "p": {
+      "cdn": 1,
+      "redis": 0,
+      "nocache": 0,
+      "browser": 0
+     }
+    },
+    {
+     "order": [
+      "nocache",
+      "cdn",
+      "redis",
+      "browser"
+     ],
+     "p": {
+      "redis": 0,
+      "cdn": 1,
+      "nocache": 0,
+      "browser": 0
+     }
+    },
+    {
+     "order": [
+      "nocache",
+      "cdn",
+      "browser",
+      "redis"
+     ],
+     "p": {
+      "cdn": 1,
+      "browser": 0,
+      "nocache": 0,
+      "redis": 0
+     }
+    },
+    {
+     "order": [
+      "nocache",
+      "redis",
+      "cdn",
+      "browser"
+     ],
+     "p": {
+      "nocache": 0,
+      "redis": 0,
+      "browser": 0,
+      "cdn": 1
+     }
+    },
+    {
+     "order": [
+      "nocache",
+      "redis",
+      "browser",
+      "cdn"
+     ],
+     "p": {
+      "redis": 0,
+      "browser": 0,
+      "nocache": 0,
+      "cdn": 1
+     }
+    },
+    {
+     "order": [
+      "nocache",
+      "browser",
+      "cdn",
+      "redis"
+     ],
+     "p": {
+      "cdn": 1,
+      "browser": 0,
+      "redis": 0,
+      "nocache": 0
+     }
+    },
+    {
+     "order": [
+      "nocache",
+      "browser",
+      "redis",
+      "cdn"
+     ],
+     "p": {
+      "browser": 0,
+      "redis": 0,
+      "nocache": 0,
+      "cdn": 1
+     }
+    },
+    {
+     "order": [
+      "browser",
+      "cdn",
+      "redis",
+      "nocache"
+     ],
+     "p": {
+      "redis": 0,
+      "nocache": 0,
+      "browser": 0,
+      "cdn": 1
+     }
+    },
+    {
+     "order": [
+      "browser",
+      "cdn",
+      "nocache",
+      "redis"
+     ],
+     "p": {
+      "redis": 0,
+      "nocache": 0,
+      "cdn": 1,
+      "browser": 0
+     }
+    },
+    {
+     "order": [
+      "browser",
+      "redis",
+      "cdn",
+      "nocache"
+     ],
+     "p": {
+      "browser": 0,
+      "cdn": 1,
+      "nocache": 0,
+      "redis": 0
+     }
+    },
+    {
+     "order": [
+      "browser",
+      "redis",
+      "nocache",
+      "cdn"
+     ],
+     "p": {
+      "nocache": 0,
+      "browser": 0,
+      "cdn": 1,
+      "redis": 0
+     }
+    },
+    {
+     "order": [
+      "browser",
+      "nocache",
+      "cdn",
+      "redis"
+     ],
+     "p": {
+      "nocache": 0,
+      "cdn": 1,
+      "redis": 0,
+      "browser": 0
+     }
+    },
+    {
+     "order": [
+      "browser",
+      "nocache",
+      "redis",
+      "cdn"
+     ],
+     "p": {
+      "nocache": 0,
+      "redis": 0,
+      "browser": 0,
+      "cdn": 1
+     }
+    }
+   ],
+   "reask": {
+    "redis": 0,
+    "browser": 0,
+    "cdn": 1,
+    "nocache": 0
+   },
+   "pair": {
+    "written": {
+     "redis": 0,
+     "nocache": 0,
+     "browser": 0,
+     "cdn": 1
+    },
+    "reversed": {
+     "redis": 0,
+     "nocache": 0,
+     "browser": 0,
+     "cdn": 1
+    }
+   }
+  },
+  {
+   "id": "secrets",
+   "orders": [
+    {
+     "order": [
+      "cloudsm",
+      "kubesecrets",
+      "envfile",
+      "wiki"
+     ],
+     "p": {
+      "wiki": 0,
+      "cloudsm": 1,
+      "envfile": 0,
+      "kubesecrets": 0
+     }
+    },
+    {
+     "order": [
+      "cloudsm",
+      "kubesecrets",
+      "wiki",
+      "envfile"
+     ],
+     "p": {
+      "cloudsm": 1,
+      "envfile": 0,
+      "wiki": 0,
+      "kubesecrets": 0
+     }
+    },
+    {
+     "order": [
+      "cloudsm",
+      "envfile",
+      "kubesecrets",
+      "wiki"
+     ],
+     "p": {
+      "cloudsm": 1,
+      "envfile": 0,
+      "wiki": 0,
+      "kubesecrets": 0
+     }
+    },
+    {
+     "order": [
+      "cloudsm",
+      "envfile",
+      "wiki",
+      "kubesecrets"
+     ],
+     "p": {
+      "kubesecrets": 0,
+      "envfile": 0,
+      "wiki": 0,
+      "cloudsm": 1
+     }
+    },
+    {
+     "order": [
+      "cloudsm",
+      "wiki",
+      "kubesecrets",
+      "envfile"
+     ],
+     "p": {
+      "wiki": 0,
+      "envfile": 0,
+      "kubesecrets": 0,
+      "cloudsm": 1
+     }
+    },
+    {
+     "order": [
+      "cloudsm",
+      "wiki",
+      "envfile",
+      "kubesecrets"
+     ],
+     "p": {
+      "envfile": 0,
+      "kubesecrets": 0,
+      "cloudsm": 1,
+      "wiki": 0
+     }
+    },
+    {
+     "order": [
+      "kubesecrets",
+      "cloudsm",
+      "envfile",
+      "wiki"
+     ],
+     "p": {
+      "cloudsm": 1,
+      "kubesecrets": 0,
+      "wiki": 0,
+      "envfile": 0
+     }
+    },
+    {
+     "order": [
+      "kubesecrets",
+      "cloudsm",
+      "wiki",
+      "envfile"
+     ],
+     "p": {
+      "cloudsm": 1,
+      "kubesecrets": 0,
+      "wiki": 0,
+      "envfile": 0
+     }
+    },
+    {
+     "order": [
+      "kubesecrets",
+      "envfile",
+      "cloudsm",
+      "wiki"
+     ],
+     "p": {
+      "envfile": 0,
+      "wiki": 0,
+      "kubesecrets": 0,
+      "cloudsm": 1
+     }
+    },
+    {
+     "order": [
+      "kubesecrets",
+      "envfile",
+      "wiki",
+      "cloudsm"
+     ],
+     "p": {
+      "wiki": 0,
+      "cloudsm": 1,
+      "kubesecrets": 0,
+      "envfile": 0
+     }
+    },
+    {
+     "order": [
+      "kubesecrets",
+      "wiki",
+      "cloudsm",
+      "envfile"
+     ],
+     "p": {
+      "kubesecrets": 0,
+      "cloudsm": 1,
+      "wiki": 0,
+      "envfile": 0
+     }
+    },
+    {
+     "order": [
+      "kubesecrets",
+      "wiki",
+      "envfile",
+      "cloudsm"
+     ],
+     "p": {
+      "wiki": 0,
+      "envfile": 0,
+      "kubesecrets": 0,
+      "cloudsm": 1
+     }
+    },
+    {
+     "order": [
+      "envfile",
+      "cloudsm",
+      "kubesecrets",
+      "wiki"
+     ],
+     "p": {
+      "kubesecrets": 0,
+      "envfile": 0,
+      "wiki": 0,
+      "cloudsm": 1
+     }
+    },
+    {
+     "order": [
+      "envfile",
+      "cloudsm",
+      "wiki",
+      "kubesecrets"
+     ],
+     "p": {
+      "cloudsm": 1,
+      "envfile": 0,
+      "wiki": 0,
+      "kubesecrets": 0
+     }
+    },
+    {
+     "order": [
+      "envfile",
+      "kubesecrets",
+      "cloudsm",
+      "wiki"
+     ],
+     "p": {
+      "kubesecrets": 0,
+      "wiki": 0,
+      "envfile": 0,
+      "cloudsm": 1
+     }
+    },
+    {
+     "order": [
+      "envfile",
+      "kubesecrets",
+      "wiki",
+      "cloudsm"
+     ],
+     "p": {
+      "wiki": 0,
+      "kubesecrets": 0,
+      "cloudsm": 1,
+      "envfile": 0
+     }
+    },
+    {
+     "order": [
+      "envfile",
+      "wiki",
+      "cloudsm",
+      "kubesecrets"
+     ],
+     "p": {
+      "wiki": 0,
+      "cloudsm": 1,
+      "envfile": 0,
+      "kubesecrets": 0
+     }
+    },
+    {
+     "order": [
+      "envfile",
+      "wiki",
+      "kubesecrets",
+      "cloudsm"
+     ],
+     "p": {
+      "wiki": 0,
+      "envfile": 0,
+      "cloudsm": 1,
+      "kubesecrets": 0
+     }
+    },
+    {
+     "order": [
+      "wiki",
+      "cloudsm",
+      "kubesecrets",
+      "envfile"
+     ],
+     "p": {
+      "wiki": 0,
+      "kubesecrets": 0,
+      "envfile": 0,
+      "cloudsm": 1
+     }
+    },
+    {
+     "order": [
+      "wiki",
+      "cloudsm",
+      "envfile",
+      "kubesecrets"
+     ],
+     "p": {
+      "envfile": 0,
+      "wiki": 0,
+      "kubesecrets": 0,
+      "cloudsm": 1
+     }
+    },
+    {
+     "order": [
+      "wiki",
+      "kubesecrets",
+      "cloudsm",
+      "envfile"
+     ],
+     "p": {
+      "cloudsm": 1,
+      "kubesecrets": 0,
+      "wiki": 0,
+      "envfile": 0
+     }
+    },
+    {
+     "order": [
+      "wiki",
+      "kubesecrets",
+      "envfile",
+      "cloudsm"
+     ],
+     "p": {
+      "wiki": 0,
+      "envfile": 0,
+      "cloudsm": 1,
+      "kubesecrets": 0
+     }
+    },
+    {
+     "order": [
+      "wiki",
+      "envfile",
+      "cloudsm",
+      "kubesecrets"
+     ],
+     "p": {
+      "cloudsm": 1,
+      "kubesecrets": 0,
+      "envfile": 0,
+      "wiki": 0
+     }
+    },
+    {
+     "order": [
+      "wiki",
+      "envfile",
+      "kubesecrets",
+      "cloudsm"
+     ],
+     "p": {
+      "kubesecrets": 0,
+      "cloudsm": 1,
+      "wiki": 0,
+      "envfile": 0
+     }
+    }
+   ],
+   "reask": {
+    "kubesecrets": 0,
+    "cloudsm": 1,
+    "wiki": 0,
+    "envfile": 0
+   },
+   "pair": {
+    "written": {
+     "cloudsm": 1,
+     "envfile": 0,
+     "wiki": 0,
+     "kubesecrets": 0
+    },
+    "reversed": {
+     "cloudsm": 1,
+     "envfile": 0,
+     "wiki": 0,
+     "kubesecrets": 0
+    }
+   }
+  },
+  {
+   "id": "api-version",
+   "orders": [
+    {
+     "order": [
+      "urlversion",
+      "inplace",
+      "header",
+      "newapi"
+     ],
+     "p": {
+      "header": 0,
+      "newapi": 0,
+      "urlversion": 1,
+      "inplace": 0
+     }
+    },
+    {
+     "order": [
+      "urlversion",
+      "inplace",
+      "newapi",
+      "header"
+     ],
+     "p": {
+      "urlversion": 1,
+      "inplace": 0,
+      "header": 0,
+      "newapi": 0
+     }
+    },
+    {
+     "order": [
+      "urlversion",
+      "header",
+      "inplace",
+      "newapi"
+     ],
+     "p": {
+      "header": 0,
+      "inplace": 0,
+      "urlversion": 1,
+      "newapi": 0
+     }
+    },
+    {
+     "order": [
+      "urlversion",
+      "header",
+      "newapi",
+      "inplace"
+     ],
+     "p": {
+      "inplace": 0,
+      "urlversion": 1,
+      "newapi": 0,
+      "header": 0
+     }
+    },
+    {
+     "order": [
+      "urlversion",
+      "newapi",
+      "inplace",
+      "header"
+     ],
+     "p": {
+      "header": 0,
+      "inplace": 0.01,
+      "urlversion": 0.99,
+      "newapi": 0
+     }
+    },
+    {
+     "order": [
+      "urlversion",
+      "newapi",
+      "header",
+      "inplace"
+     ],
+     "p": {
+      "header": 0,
+      "newapi": 0,
+      "inplace": 0.01,
+      "urlversion": 0.99
+     }
+    },
+    {
+     "order": [
+      "inplace",
+      "urlversion",
+      "header",
+      "newapi"
+     ],
+     "p": {
+      "header": 0,
+      "newapi": 0,
+      "urlversion": 1,
+      "inplace": 0
+     }
+    },
+    {
+     "order": [
+      "inplace",
+      "urlversion",
+      "newapi",
+      "header"
+     ],
+     "p": {
+      "newapi": 0,
+      "urlversion": 1,
+      "inplace": 0,
+      "header": 0
+     }
+    },
+    {
+     "order": [
+      "inplace",
+      "header",
+      "urlversion",
+      "newapi"
+     ],
+     "p": {
+      "newapi": 0,
+      "header": 0,
+      "inplace": 0,
+      "urlversion": 1
+     }
+    },
+    {
+     "order": [
+      "inplace",
+      "header",
+      "newapi",
+      "urlversion"
+     ],
+     "p": {
+      "inplace": 0,
+      "urlversion": 1,
+      "newapi": 0,
+      "header": 0
+     }
+    },
+    {
+     "order": [
+      "inplace",
+      "newapi",
+      "urlversion",
+      "header"
+     ],
+     "p": {
+      "newapi": 0,
+      "urlversion": 1,
+      "inplace": 0,
+      "header": 0
+     }
+    },
+    {
+     "order": [
+      "inplace",
+      "newapi",
+      "header",
+      "urlversion"
+     ],
+     "p": {
+      "header": 0,
+      "newapi": 0,
+      "urlversion": 1,
+      "inplace": 0
+     }
+    },
+    {
+     "order": [
+      "header",
+      "urlversion",
+      "inplace",
+      "newapi"
+     ],
+     "p": {
+      "inplace": 0,
+      "urlversion": 1,
+      "header": 0,
+      "newapi": 0
+     }
+    },
+    {
+     "order": [
+      "header",
+      "urlversion",
+      "newapi",
+      "inplace"
+     ],
+     "p": {
+      "newapi": 0,
+      "header": 0,
+      "inplace": 0,
+      "urlversion": 1
+     }
+    },
+    {
+     "order": [
+      "header",
+      "inplace",
+      "urlversion",
+      "newapi"
+     ],
+     "p": {
+      "header": 0,
+      "newapi": 0,
+      "inplace": 0,
+      "urlversion": 1
+     }
+    },
+    {
+     "order": [
+      "header",
+      "inplace",
+      "newapi",
+      "urlversion"
+     ],
+     "p": {
+      "newapi": 0,
+      "urlversion": 1,
+      "header": 0,
+      "inplace": 0
+     }
+    },
+    {
+     "order": [
+      "header",
+      "newapi",
+      "urlversion",
+      "inplace"
+     ],
+     "p": {
+      "newapi": 0,
+      "header": 0,
+      "urlversion": 1,
+      "inplace": 0
+     }
+    },
+    {
+     "order": [
+      "header",
+      "newapi",
+      "inplace",
+      "urlversion"
+     ],
+     "p": {
+      "urlversion": 1,
+      "header": 0,
+      "newapi": 0,
+      "inplace": 0
+     }
+    },
+    {
+     "order": [
+      "newapi",
+      "urlversion",
+      "inplace",
+      "header"
+     ],
+     "p": {
+      "newapi": 0,
+      "header": 0,
+      "urlversion": 0.99,
+      "inplace": 0.01
+     }
+    },
+    {
+     "order": [
+      "newapi",
+      "urlversion",
+      "header",
+      "inplace"
+     ],
+     "p": {
+      "header": 0,
+      "newapi": 0,
+      "urlversion": 1,
+      "inplace": 0
+     }
+    },
+    {
+     "order": [
+      "newapi",
+      "inplace",
+      "urlversion",
+      "header"
+     ],
+     "p": {
+      "newapi": 0,
+      "header": 0,
+      "inplace": 0,
+      "urlversion": 1
+     }
+    },
+    {
+     "order": [
+      "newapi",
+      "inplace",
+      "header",
+      "urlversion"
+     ],
+     "p": {
+      "newapi": 0,
+      "inplace": 0,
+      "urlversion": 1,
+      "header": 0
+     }
+    },
+    {
+     "order": [
+      "newapi",
+      "header",
+      "urlversion",
+      "inplace"
+     ],
+     "p": {
+      "newapi": 0,
+      "header": 0,
+      "urlversion": 1,
+      "inplace": 0
+     }
+    },
+    {
+     "order": [
+      "newapi",
+      "header",
+      "inplace",
+      "urlversion"
+     ],
+     "p": {
+      "newapi": 0,
+      "header": 0,
+      "inplace": 0,
+      "urlversion": 1
+     }
+    }
+   ],
+   "reask": {
+    "header": 0,
+    "newapi": 0,
+    "inplace": 0,
+    "urlversion": 1
+   },
+   "pair": {
+    "written": {
+     "newapi": 0,
+     "urlversion": 1,
+     "header": 0,
+     "inplace": 0
+    },
+    "reversed": {
+     "newapi": 0,
+     "inplace": 0,
+     "header": 0,
+     "urlversion": 1
+    }
+   }
+  },
+  {
+   "id": "migration",
+   "orders": [
+    {
+     "order": [
+      "batched",
+      "single",
+      "dumprestore",
+      "app"
+     ],
+     "p": {
+      "batched": 0.96,
+      "single": 0.03,
+      "dumprestore": 0.01,
+      "app": 0
+     }
+    },
+    {
+     "order": [
+      "batched",
+      "single",
+      "app",
+      "dumprestore"
+     ],
+     "p": {
+      "dumprestore": 0,
+      "single": 0.03,
+      "batched": 0.97,
+      "app": 0
+     }
+    },
+    {
+     "order": [
+      "batched",
+      "dumprestore",
+      "single",
+      "app"
+     ],
+     "p": {
+      "dumprestore": 0.01,
+      "batched": 0.96,
+      "single": 0.03,
+      "app": 0
+     }
+    },
+    {
+     "order": [
+      "batched",
+      "dumprestore",
+      "app",
+      "single"
+     ],
+     "p": {
+      "batched": 0.97,
+      "dumprestore": 0.01,
+      "app": 0,
+      "single": 0.02
+     }
+    },
+    {
+     "order": [
+      "batched",
+      "app",
+      "single",
+      "dumprestore"
+     ],
+     "p": {
+      "single": 0.02,
+      "batched": 0.97,
+      "dumprestore": 0.01,
+      "app": 0
+     }
+    },
+    {
+     "order": [
+      "batched",
+      "app",
+      "dumprestore",
+      "single"
+     ],
+     "p": {
+      "single": 0.04,
+      "dumprestore": 0.01,
+      "app": 0,
+      "batched": 0.95
+     }
+    },
+    {
+     "order": [
+      "single",
+      "batched",
+      "dumprestore",
+      "app"
+     ],
+     "p": {
+      "app": 0,
+      "dumprestore": 0,
+      "single": 0.01,
+      "batched": 0.99
+     }
+    },
+    {
+     "order": [
+      "single",
+      "batched",
+      "app",
+      "dumprestore"
+     ],
+     "p": {
+      "batched": 0.99,
+      "single": 0.01,
+      "dumprestore": 0,
+      "app": 0
+     }
+    },
+    {
+     "order": [
+      "single",
+      "dumprestore",
+      "batched",
+      "app"
+     ],
+     "p": {
+      "dumprestore": 0.01,
+      "single": 0.02,
+      "app": 0,
+      "batched": 0.97
+     }
+    },
+    {
+     "order": [
+      "single",
+      "dumprestore",
+      "app",
+      "batched"
+     ],
+     "p": {
+      "app": 0,
+      "batched": 0.99,
+      "single": 0.01,
+      "dumprestore": 0
+     }
+    },
+    {
+     "order": [
+      "single",
+      "app",
+      "batched",
+      "dumprestore"
+     ],
+     "p": {
+      "single": 0.01,
+      "dumprestore": 0.01,
+      "batched": 0.98,
+      "app": 0
+     }
+    },
+    {
+     "order": [
+      "single",
+      "app",
+      "dumprestore",
+      "batched"
+     ],
+     "p": {
+      "app": 0,
+      "dumprestore": 0.01,
+      "single": 0.02,
+      "batched": 0.97
+     }
+    },
+    {
+     "order": [
+      "dumprestore",
+      "batched",
+      "single",
+      "app"
+     ],
+     "p": {
+      "batched": 0.98,
+      "dumprestore": 0.01,
+      "app": 0,
+      "single": 0.01
+     }
+    },
+    {
+     "order": [
+      "dumprestore",
+      "batched",
+      "app",
+      "single"
+     ],
+     "p": {
+      "single": 0.02,
+      "app": 0,
+      "dumprestore": 0.01,
+      "batched": 0.97
+     }
+    },
+    {
+     "order": [
+      "dumprestore",
+      "single",
+      "batched",
+      "app"
+     ],
+     "p": {
+      "batched": 0.98,
+      "dumprestore": 0.01,
+      "app": 0,
+      "single": 0.01
+     }
+    },
+    {
+     "order": [
+      "dumprestore",
+      "single",
+      "app",
+      "batched"
+     ],
+     "p": {
+      "dumprestore": 0.01,
+      "app": 0,
+      "batched": 0.98,
+      "single": 0.01
+     }
+    },
+    {
+     "order": [
+      "dumprestore",
+      "app",
+      "batched",
+      "single"
+     ],
+     "p": {
+      "single": 0.02,
+      "dumprestore": 0.01,
+      "app": 0,
+      "batched": 0.97
+     }
+    },
+    {
+     "order": [
+      "dumprestore",
+      "app",
+      "single",
+      "batched"
+     ],
+     "p": {
+      "app": 0,
+      "single": 0.01,
+      "dumprestore": 0.01,
+      "batched": 0.98
+     }
+    },
+    {
+     "order": [
+      "app",
+      "batched",
+      "single",
+      "dumprestore"
+     ],
+     "p": {
+      "batched": 0.98,
+      "app": 0,
+      "dumprestore": 0,
+      "single": 0.02
+     }
+    },
+    {
+     "order": [
+      "app",
+      "batched",
+      "dumprestore",
+      "single"
+     ],
+     "p": {
+      "batched": 0.96,
+      "dumprestore": 0.01,
+      "app": 0,
+      "single": 0.03
+     }
+    },
+    {
+     "order": [
+      "app",
+      "single",
+      "batched",
+      "dumprestore"
+     ],
+     "p": {
+      "single": 0.01,
+      "dumprestore": 0.01,
+      "batched": 0.98,
+      "app": 0
+     }
+    },
+    {
+     "order": [
+      "app",
+      "single",
+      "dumprestore",
+      "batched"
+     ],
+     "p": {
+      "app": 0,
+      "dumprestore": 0.01,
+      "single": 0.01,
+      "batched": 0.98
+     }
+    },
+    {
+     "order": [
+      "app",
+      "dumprestore",
+      "batched",
+      "single"
+     ],
+     "p": {
+      "dumprestore": 0.01,
+      "batched": 0.97,
+      "app": 0,
+      "single": 0.02
+     }
+    },
+    {
+     "order": [
+      "app",
+      "dumprestore",
+      "single",
+      "batched"
+     ],
+     "p": {
+      "batched": 0.98,
+      "dumprestore": 0.01,
+      "single": 0.01,
+      "app": 0
+     }
+    }
+   ],
+   "reask": {
+    "single": 0.02,
+    "app": 0,
+    "batched": 0.98,
+    "dumprestore": 0
+   },
+   "pair": {
+    "written": {
+     "batched": 0.98,
+     "single": 0.02,
+     "app": 0,
+     "dumprestore": 0
+    },
+    "reversed": {
+     "batched": 0.98,
+     "single": 0.01,
+     "app": 0,
+     "dumprestore": 0.01
+    }
+   }
+  },
+  {
+   "id": "alerting",
+   "orders": [
+    {
+     "order": [
+      "slo",
+      "cpu",
+      "everything",
+      "none"
+     ],
+     "p": {
+      "everything": 0,
+      "none": 0.01,
+      "cpu": 0.01,
+      "slo": 0.98
+     }
+    },
+    {
+     "order": [
+      "slo",
+      "cpu",
+      "none",
+      "everything"
+     ],
+     "p": {
+      "slo": 0.98,
+      "cpu": 0.01,
+      "none": 0.01,
+      "everything": 0
+     }
+    },
+    {
+     "order": [
+      "slo",
+      "everything",
+      "cpu",
+      "none"
+     ],
+     "p": {
+      "cpu": 0.01,
+      "none": 0.02,
+      "slo": 0.97,
+      "everything": 0
+     }
+    },
+    {
+     "order": [
+      "slo",
+      "everything",
+      "none",
+      "cpu"
+     ],
+     "p": {
+      "everything": 0,
+      "none": 0.01,
+      "slo": 0.98,
+      "cpu": 0.01
+     }
+    },
+    {
+     "order": [
+      "slo",
+      "none",
+      "cpu",
+      "everything"
+     ],
+     "p": {
+      "cpu": 0,
+      "everything": 0,
+      "none": 0.01,
+      "slo": 0.99
+     }
+    },
+    {
+     "order": [
+      "slo",
+      "none",
+      "everything",
+      "cpu"
+     ],
+     "p": {
+      "everything": 0,
+      "slo": 0.98,
+      "cpu": 0.01,
+      "none": 0.01
+     }
+    },
+    {
+     "order": [
+      "cpu",
+      "slo",
+      "everything",
+      "none"
+     ],
+     "p": {
+      "none": 0.01,
+      "cpu": 0.03,
+      "everything": 0,
+      "slo": 0.96
+     }
+    },
+    {
+     "order": [
+      "cpu",
+      "slo",
+      "none",
+      "everything"
+     ],
+     "p": {
+      "everything": 0,
+      "cpu": 0.01,
+      "none": 0.01,
+      "slo": 0.98
+     }
+    },
+    {
+     "order": [
+      "cpu",
+      "everything",
+      "slo",
+      "none"
+     ],
+     "p": {
+      "everything": 0,
+      "slo": 0.96,
+      "none": 0.01,
+      "cpu": 0.03
+     }
+    },
+    {
+     "order": [
+      "cpu",
+      "everything",
+      "none",
+      "slo"
+     ],
+     "p": {
+      "none": 0.01,
+      "everything": 0,
+      "slo": 0.97,
+      "cpu": 0.02
+     }
+    },
+    {
+     "order": [
+      "cpu",
+      "none",
+      "slo",
+      "everything"
+     ],
+     "p": {
+      "everything": 0,
+      "cpu": 0.02,
+      "none": 0.02,
+      "slo": 0.96
+     }
+    },
+    {
+     "order": [
+      "cpu",
+      "none",
+      "everything",
+      "slo"
+     ],
+     "p": {
+      "slo": 0.95,
+      "cpu": 0.03,
+      "none": 0.02,
+      "everything": 0
+     }
+    },
+    {
+     "order": [
+      "everything",
+      "slo",
+      "cpu",
+      "none"
+     ],
+     "p": {
+      "everything": 0,
+      "cpu": 0.01,
+      "slo": 0.97,
+      "none": 0.02
+     }
+    },
+    {
+     "order": [
+      "everything",
+      "slo",
+      "none",
+      "cpu"
+     ],
+     "p": {
+      "everything": 0,
+      "slo": 0.98,
+      "none": 0.01,
+      "cpu": 0.01
+     }
+    },
+    {
+     "order": [
+      "everything",
+      "cpu",
+      "slo",
+      "none"
+     ],
+     "p": {
+      "none": 0.02,
+      "cpu": 0.02,
+      "slo": 0.96,
+      "everything": 0
+     }
+    },
+    {
+     "order": [
+      "everything",
+      "cpu",
+      "none",
+      "slo"
+     ],
+     "p": {
+      "cpu": 0.02,
+      "slo": 0.95,
+      "everything": 0,
+      "none": 0.03
+     }
+    },
+    {
+     "order": [
+      "everything",
+      "none",
+      "slo",
+      "cpu"
+     ],
+     "p": {
+      "everything": 0,
+      "none": 0.02,
+      "cpu": 0.01,
+      "slo": 0.97
+     }
+    },
+    {
+     "order": [
+      "everything",
+      "none",
+      "cpu",
+      "slo"
+     ],
+     "p": {
+      "none": 0.01,
+      "slo": 0.98,
+      "everything": 0,
+      "cpu": 0.01
+     }
+    },
+    {
+     "order": [
+      "none",
+      "slo",
+      "cpu",
+      "everything"
+     ],
+     "p": {
+      "slo": 0.98,
+      "none": 0.02,
+      "cpu": 0,
+      "everything": 0
+     }
+    },
+    {
+     "order": [
+      "none",
+      "slo",
+      "everything",
+      "cpu"
+     ],
+     "p": {
+      "cpu": 0.01,
+      "none": 0.02,
+      "slo": 0.97,
+      "everything": 0
+     }
+    },
+    {
+     "order": [
+      "none",
+      "cpu",
+      "slo",
+      "everything"
+     ],
+     "p": {
+      "cpu": 0.02,
+      "everything": 0,
+      "none": 0.02,
+      "slo": 0.96
+     }
+    },
+    {
+     "order": [
+      "none",
+      "cpu",
+      "everything",
+      "slo"
+     ],
+     "p": {
+      "slo": 0.96,
+      "everything": 0,
+      "cpu": 0.01,
+      "none": 0.03
+     }
+    },
+    {
+     "order": [
+      "none",
+      "everything",
+      "slo",
+      "cpu"
+     ],
+     "p": {
+      "everything": 0,
+      "slo": 0.97,
+      "none": 0.02,
+      "cpu": 0.01
+     }
+    },
+    {
+     "order": [
+      "none",
+      "everything",
+      "cpu",
+      "slo"
+     ],
+     "p": {
+      "everything": 0,
+      "none": 0.02,
+      "cpu": 0.01,
+      "slo": 0.97
+     }
+    }
+   ],
+   "reask": {
+    "slo": 0.98,
+    "none": 0.01,
+    "cpu": 0.01,
+    "everything": 0
+   },
+   "pair": {
+    "written": {
+     "none": 0.02,
+     "slo": 0.97,
+     "everything": 0,
+     "cpu": 0.01
+    },
+    "reversed": {
+     "none": 0.02,
+     "slo": 0.97,
+     "everything": 0,
+     "cpu": 0.01
+    }
+   }
+  },
+  {
+   "id": "offline-sync",
+   "orders": [
+    {
+     "order": [
+      "queuelww",
+      "onlineonly",
+      "fullreplace",
+      "crdt"
+     ],
+     "p": {
+      "crdt": 0.05,
+      "queuelww": 0.95,
+      "fullreplace": 0,
+      "onlineonly": 0
+     }
+    },
+    {
+     "order": [
+      "queuelww",
+      "onlineonly",
+      "crdt",
+      "fullreplace"
+     ],
+     "p": {
+      "queuelww": 0.97,
+      "onlineonly": 0,
+      "fullreplace": 0,
+      "crdt": 0.03
+     }
+    },
+    {
+     "order": [
+      "queuelww",
+      "fullreplace",
+      "onlineonly",
+      "crdt"
+     ],
+     "p": {
+      "onlineonly": 0,
+      "fullreplace": 0,
+      "queuelww": 0.96,
+      "crdt": 0.04
+     }
+    },
+    {
+     "order": [
+      "queuelww",
+      "fullreplace",
+      "crdt",
+      "onlineonly"
+     ],
+     "p": {
+      "onlineonly": 0,
+      "fullreplace": 0,
+      "queuelww": 0.97,
+      "crdt": 0.03
+     }
+    },
+    {
+     "order": [
+      "queuelww",
+      "crdt",
+      "onlineonly",
+      "fullreplace"
+     ],
+     "p": {
+      "queuelww": 0.97,
+      "onlineonly": 0,
+      "fullreplace": 0,
+      "crdt": 0.03
+     }
+    },
+    {
+     "order": [
+      "queuelww",
+      "crdt",
+      "fullreplace",
+      "onlineonly"
+     ],
+     "p": {
+      "queuelww": 0.97,
+      "crdt": 0.03,
+      "onlineonly": 0,
+      "fullreplace": 0
+     }
+    },
+    {
+     "order": [
+      "onlineonly",
+      "queuelww",
+      "fullreplace",
+      "crdt"
+     ],
+     "p": {
+      "queuelww": 0.97,
+      "fullreplace": 0,
+      "crdt": 0.03,
+      "onlineonly": 0
+     }
+    },
+    {
+     "order": [
+      "onlineonly",
+      "queuelww",
+      "crdt",
+      "fullreplace"
+     ],
+     "p": {
+      "onlineonly": 0,
+      "fullreplace": 0,
+      "queuelww": 0.98,
+      "crdt": 0.02
+     }
+    },
+    {
+     "order": [
+      "onlineonly",
+      "fullreplace",
+      "queuelww",
+      "crdt"
+     ],
+     "p": {
+      "queuelww": 0.97,
+      "onlineonly": 0,
+      "fullreplace": 0,
+      "crdt": 0.03
+     }
+    },
+    {
+     "order": [
+      "onlineonly",
+      "fullreplace",
+      "crdt",
+      "queuelww"
+     ],
+     "p": {
+      "queuelww": 0.98,
+      "fullreplace": 0,
+      "onlineonly": 0,
+      "crdt": 0.02
+     }
+    },
+    {
+     "order": [
+      "onlineonly",
+      "crdt",
+      "queuelww",
+      "fullreplace"
+     ],
+     "p": {
+      "onlineonly": 0,
+      "fullreplace": 0,
+      "crdt": 0.04,
+      "queuelww": 0.96
+     }
+    },
+    {
+     "order": [
+      "onlineonly",
+      "crdt",
+      "fullreplace",
+      "queuelww"
+     ],
+     "p": {
+      "onlineonly": 0,
+      "fullreplace": 0,
+      "queuelww": 0.99,
+      "crdt": 0.01
+     }
+    },
+    {
+     "order": [
+      "fullreplace",
+      "queuelww",
+      "onlineonly",
+      "crdt"
+     ],
+     "p": {
+      "fullreplace": 0,
+      "queuelww": 0.99,
+      "crdt": 0.01,
+      "onlineonly": 0
+     }
+    },
+    {
+     "order": [
+      "fullreplace",
+      "queuelww",
+      "crdt",
+      "onlineonly"
+     ],
+     "p": {
+      "fullreplace": 0,
+      "queuelww": 0.99,
+      "crdt": 0.01,
+      "onlineonly": 0
+     }
+    },
+    {
+     "order": [
+      "fullreplace",
+      "onlineonly",
+      "queuelww",
+      "crdt"
+     ],
+     "p": {
+      "queuelww": 0.97,
+      "fullreplace": 0,
+      "onlineonly": 0,
+      "crdt": 0.03
+     }
+    },
+    {
+     "order": [
+      "fullreplace",
+      "onlineonly",
+      "crdt",
+      "queuelww"
+     ],
+     "p": {
+      "fullreplace": 0,
+      "queuelww": 0.99,
+      "onlineonly": 0,
+      "crdt": 0.01
+     }
+    },
+    {
+     "order": [
+      "fullreplace",
+      "crdt",
+      "queuelww",
+      "onlineonly"
+     ],
+     "p": {
+      "queuelww": 0.95,
+      "crdt": 0.05,
+      "fullreplace": 0,
+      "onlineonly": 0
+     }
+    },
+    {
+     "order": [
+      "fullreplace",
+      "crdt",
+      "onlineonly",
+      "queuelww"
+     ],
+     "p": {
+      "crdt": 0.02,
+      "fullreplace": 0,
+      "queuelww": 0.98,
+      "onlineonly": 0
+     }
+    },
+    {
+     "order": [
+      "crdt",
+      "queuelww",
+      "onlineonly",
+      "fullreplace"
+     ],
+     "p": {
+      "queuelww": 0.96,
+      "onlineonly": 0,
+      "crdt": 0.04,
+      "fullreplace": 0
+     }
+    },
+    {
+     "order": [
+      "crdt",
+      "queuelww",
+      "fullreplace",
+      "onlineonly"
+     ],
+     "p": {
+      "fullreplace": 0,
+      "queuelww": 0.97,
+      "onlineonly": 0,
+      "crdt": 0.03
+     }
+    },
+    {
+     "order": [
+      "crdt",
+      "onlineonly",
+      "queuelww",
+      "fullreplace"
+     ],
+     "p": {
+      "crdt": 0.03,
+      "queuelww": 0.97,
+      "fullreplace": 0,
+      "onlineonly": 0
+     }
+    },
+    {
+     "order": [
+      "crdt",
+      "onlineonly",
+      "fullreplace",
+      "queuelww"
+     ],
+     "p": {
+      "fullreplace": 0,
+      "queuelww": 0.98,
+      "crdt": 0.02,
+      "onlineonly": 0
+     }
+    },
+    {
+     "order": [
+      "crdt",
+      "fullreplace",
+      "queuelww",
+      "onlineonly"
+     ],
+     "p": {
+      "crdt": 0.05,
+      "onlineonly": 0,
+      "fullreplace": 0,
+      "queuelww": 0.95
+     }
+    },
+    {
+     "order": [
+      "crdt",
+      "fullreplace",
+      "onlineonly",
+      "queuelww"
+     ],
+     "p": {
+      "onlineonly": 0,
+      "crdt": 0.03,
+      "queuelww": 0.97,
+      "fullreplace": 0
+     }
+    }
+   ],
+   "reask": {
+    "queuelww": 0.96,
+    "fullreplace": 0,
+    "crdt": 0.04,
+    "onlineonly": 0
+   },
+   "pair": {
+    "written": {
+     "crdt": 0.05,
+     "fullreplace": 0,
+     "queuelww": 0.95,
+     "onlineonly": 0
+    },
+    "reversed": {
+     "crdt": 0.02,
+     "fullreplace": 0,
+     "queuelww": 0.98,
+     "onlineonly": 0
+    }
+   }
+  },
+  {
+   "id": "email",
+   "orders": [
+    {
+     "order": [
+      "provider",
+      "ownsmtp",
+      "gmail",
+      "sendbatch"
+     ],
+     "p": {
+      "provider": 1,
+      "gmail": 0,
+      "ownsmtp": 0,
+      "sendbatch": 0
+     }
+    },
+    {
+     "order": [
+      "provider",
+      "ownsmtp",
+      "sendbatch",
+      "gmail"
+     ],
+     "p": {
+      "gmail": 0,
+      "ownsmtp": 0,
+      "provider": 1,
+      "sendbatch": 0
+     }
+    },
+    {
+     "order": [
+      "provider",
+      "gmail",
+      "ownsmtp",
+      "sendbatch"
+     ],
+     "p": {
+      "ownsmtp": 0,
+      "gmail": 0,
+      "sendbatch": 0,
+      "provider": 1
+     }
+    },
+    {
+     "order": [
+      "provider",
+      "gmail",
+      "sendbatch",
+      "ownsmtp"
+     ],
+     "p": {
+      "ownsmtp": 0,
+      "sendbatch": 0,
+      "gmail": 0,
+      "provider": 1
+     }
+    },
+    {
+     "order": [
+      "provider",
+      "sendbatch",
+      "ownsmtp",
+      "gmail"
+     ],
+     "p": {
+      "sendbatch": 0,
+      "gmail": 0,
+      "provider": 1,
+      "ownsmtp": 0
+     }
+    },
+    {
+     "order": [
+      "provider",
+      "sendbatch",
+      "gmail",
+      "ownsmtp"
+     ],
+     "p": {
+      "gmail": 0,
+      "provider": 1,
+      "ownsmtp": 0,
+      "sendbatch": 0
+     }
+    },
+    {
+     "order": [
+      "ownsmtp",
+      "provider",
+      "gmail",
+      "sendbatch"
+     ],
+     "p": {
+      "provider": 1,
+      "sendbatch": 0,
+      "gmail": 0,
+      "ownsmtp": 0
+     }
+    },
+    {
+     "order": [
+      "ownsmtp",
+      "provider",
+      "sendbatch",
+      "gmail"
+     ],
+     "p": {
+      "gmail": 0,
+      "ownsmtp": 0,
+      "provider": 1,
+      "sendbatch": 0
+     }
+    },
+    {
+     "order": [
+      "ownsmtp",
+      "gmail",
+      "provider",
+      "sendbatch"
+     ],
+     "p": {
+      "sendbatch": 0,
+      "gmail": 0,
+      "provider": 1,
+      "ownsmtp": 0
+     }
+    },
+    {
+     "order": [
+      "ownsmtp",
+      "gmail",
+      "sendbatch",
+      "provider"
+     ],
+     "p": {
+      "ownsmtp": 0,
+      "gmail": 0,
+      "provider": 1,
+      "sendbatch": 0
+     }
+    },
+    {
+     "order": [
+      "ownsmtp",
+      "sendbatch",
+      "provider",
+      "gmail"
+     ],
+     "p": {
+      "sendbatch": 0,
+      "provider": 1,
+      "ownsmtp": 0,
+      "gmail": 0
+     }
+    },
+    {
+     "order": [
+      "ownsmtp",
+      "sendbatch",
+      "gmail",
+      "provider"
+     ],
+     "p": {
+      "ownsmtp": 0,
+      "gmail": 0,
+      "provider": 1,
+      "sendbatch": 0
+     }
+    },
+    {
+     "order": [
+      "gmail",
+      "provider",
+      "ownsmtp",
+      "sendbatch"
+     ],
+     "p": {
+      "gmail": 0,
+      "ownsmtp": 0,
+      "provider": 1,
+      "sendbatch": 0
+     }
+    },
+    {
+     "order": [
+      "gmail",
+      "provider",
+      "sendbatch",
+      "ownsmtp"
+     ],
+     "p": {
+      "sendbatch": 0,
+      "gmail": 0,
+      "provider": 1,
+      "ownsmtp": 0
+     }
+    },
+    {
+     "order": [
+      "gmail",
+      "ownsmtp",
+      "provider",
+      "sendbatch"
+     ],
+     "p": {
+      "sendbatch": 0,
+      "provider": 1,
+      "ownsmtp": 0,
+      "gmail": 0
+     }
+    },
+    {
+     "order": [
+      "gmail",
+      "ownsmtp",
+      "sendbatch",
+      "provider"
+     ],
+     "p": {
+      "gmail": 0,
+      "provider": 1,
+      "ownsmtp": 0,
+      "sendbatch": 0
+     }
+    },
+    {
+     "order": [
+      "gmail",
+      "sendbatch",
+      "provider",
+      "ownsmtp"
+     ],
+     "p": {
+      "gmail": 0,
+      "ownsmtp": 0,
+      "provider": 1,
+      "sendbatch": 0
+     }
+    },
+    {
+     "order": [
+      "gmail",
+      "sendbatch",
+      "ownsmtp",
+      "provider"
+     ],
+     "p": {
+      "gmail": 0,
+      "sendbatch": 0,
+      "ownsmtp": 0,
+      "provider": 1
+     }
+    },
+    {
+     "order": [
+      "sendbatch",
+      "provider",
+      "ownsmtp",
+      "gmail"
+     ],
+     "p": {
+      "provider": 1,
+      "sendbatch": 0,
+      "gmail": 0,
+      "ownsmtp": 0
+     }
+    },
+    {
+     "order": [
+      "sendbatch",
+      "provider",
+      "gmail",
+      "ownsmtp"
+     ],
+     "p": {
+      "ownsmtp": 0,
+      "sendbatch": 0,
+      "gmail": 0,
+      "provider": 1
+     }
+    },
+    {
+     "order": [
+      "sendbatch",
+      "ownsmtp",
+      "provider",
+      "gmail"
+     ],
+     "p": {
+      "gmail": 0,
+      "ownsmtp": 0,
+      "provider": 1,
+      "sendbatch": 0
+     }
+    },
+    {
+     "order": [
+      "sendbatch",
+      "ownsmtp",
+      "gmail",
+      "provider"
+     ],
+     "p": {
+      "sendbatch": 0,
+      "ownsmtp": 0,
+      "gmail": 0,
+      "provider": 1
+     }
+    },
+    {
+     "order": [
+      "sendbatch",
+      "gmail",
+      "provider",
+      "ownsmtp"
+     ],
+     "p": {
+      "provider": 1,
+      "sendbatch": 0,
+      "gmail": 0,
+      "ownsmtp": 0
+     }
+    },
+    {
+     "order": [
+      "sendbatch",
+      "gmail",
+      "ownsmtp",
+      "provider"
+     ],
+     "p": {
+      "ownsmtp": 0,
+      "gmail": 0,
+      "sendbatch": 0,
+      "provider": 1
+     }
+    }
+   ],
+   "reask": {
+    "gmail": 0,
+    "provider": 1,
+    "ownsmtp": 0,
+    "sendbatch": 0
+   },
+   "pair": {
+    "written": {
+     "ownsmtp": 0,
+     "sendbatch": 0,
+     "provider": 1,
+     "gmail": 0
+    },
+    "reversed": {
+     "ownsmtp": 0,
+     "sendbatch": 0,
+     "provider": 1,
+     "gmail": 0
+    }
+   }
+  },
+  {
+   "id": "repo-layout",
+   "orders": [
+    {
+     "order": [
+      "monorepo",
+      "polyrepo",
+      "copy",
+      "submodules"
+     ],
+     "p": {
+      "polyrepo": 0.13,
+      "submodules": 0,
+      "copy": 0,
+      "monorepo": 0.87
+     }
+    },
+    {
+     "order": [
+      "monorepo",
+      "polyrepo",
+      "submodules",
+      "copy"
+     ],
+     "p": {
+      "submodules": 0,
+      "polyrepo": 0.09,
+      "monorepo": 0.91,
+      "copy": 0
+     }
+    },
+    {
+     "order": [
+      "monorepo",
+      "copy",
+      "polyrepo",
+      "submodules"
+     ],
+     "p": {
+      "monorepo": 0.81,
+      "copy": 0,
+      "polyrepo": 0.19,
+      "submodules": 0
+     }
+    },
+    {
+     "order": [
+      "monorepo",
+      "copy",
+      "submodules",
+      "polyrepo"
+     ],
+     "p": {
+      "copy": 0,
+      "submodules": 0,
+      "monorepo": 0.83,
+      "polyrepo": 0.17
+     }
+    },
+    {
+     "order": [
+      "monorepo",
+      "submodules",
+      "polyrepo",
+      "copy"
+     ],
+     "p": {
+      "submodules": 0,
+      "polyrepo": 0.1,
+      "monorepo": 0.9,
+      "copy": 0
+     }
+    },
+    {
+     "order": [
+      "monorepo",
+      "submodules",
+      "copy",
+      "polyrepo"
+     ],
+     "p": {
+      "submodules": 0,
+      "polyrepo": 0.16,
+      "copy": 0,
+      "monorepo": 0.84
+     }
+    },
+    {
+     "order": [
+      "polyrepo",
+      "monorepo",
+      "copy",
+      "submodules"
+     ],
+     "p": {
+      "copy": 0,
+      "polyrepo": 0.09,
+      "monorepo": 0.91,
+      "submodules": 0
+     }
+    },
+    {
+     "order": [
+      "polyrepo",
+      "monorepo",
+      "submodules",
+      "copy"
+     ],
+     "p": {
+      "submodules": 0,
+      "monorepo": 0.93,
+      "polyrepo": 0.07,
+      "copy": 0
+     }
+    },
+    {
+     "order": [
+      "polyrepo",
+      "copy",
+      "monorepo",
+      "submodules"
+     ],
+     "p": {
+      "monorepo": 0.87,
+      "submodules": 0,
+      "polyrepo": 0.13,
+      "copy": 0
+     }
+    },
+    {
+     "order": [
+      "polyrepo",
+      "copy",
+      "submodules",
+      "monorepo"
+     ],
+     "p": {
+      "submodules": 0,
+      "polyrepo": 0.08,
+      "monorepo": 0.92,
+      "copy": 0
+     }
+    },
+    {
+     "order": [
+      "polyrepo",
+      "submodules",
+      "monorepo",
+      "copy"
+     ],
+     "p": {
+      "monorepo": 0.86,
+      "copy": 0,
+      "polyrepo": 0.14,
+      "submodules": 0
+     }
+    },
+    {
+     "order": [
+      "polyrepo",
+      "submodules",
+      "copy",
+      "monorepo"
+     ],
+     "p": {
+      "submodules": 0,
+      "copy": 0,
+      "polyrepo": 0.1,
+      "monorepo": 0.9
+     }
+    },
+    {
+     "order": [
+      "copy",
+      "monorepo",
+      "polyrepo",
+      "submodules"
+     ],
+     "p": {
+      "submodules": 0,
+      "monorepo": 0.93,
+      "polyrepo": 0.07,
+      "copy": 0
+     }
+    },
+    {
+     "order": [
+      "copy",
+      "monorepo",
+      "submodules",
+      "polyrepo"
+     ],
+     "p": {
+      "monorepo": 0.88,
+      "submodules": 0,
+      "polyrepo": 0.12,
+      "copy": 0
+     }
+    },
+    {
+     "order": [
+      "copy",
+      "polyrepo",
+      "monorepo",
+      "submodules"
+     ],
+     "p": {
+      "submodules": 0,
+      "polyrepo": 0.12,
+      "copy": 0,
+      "monorepo": 0.88
+     }
+    },
+    {
+     "order": [
+      "copy",
+      "polyrepo",
+      "submodules",
+      "monorepo"
+     ],
+     "p": {
+      "polyrepo": 0.12,
+      "submodules": 0,
+      "monorepo": 0.88,
+      "copy": 0
+     }
+    },
+    {
+     "order": [
+      "copy",
+      "submodules",
+      "monorepo",
+      "polyrepo"
+     ],
+     "p": {
+      "polyrepo": 0.1,
+      "submodules": 0,
+      "monorepo": 0.9,
+      "copy": 0
+     }
+    },
+    {
+     "order": [
+      "copy",
+      "submodules",
+      "polyrepo",
+      "monorepo"
+     ],
+     "p": {
+      "submodules": 0,
+      "copy": 0,
+      "monorepo": 0.89,
+      "polyrepo": 0.11
+     }
+    },
+    {
+     "order": [
+      "submodules",
+      "monorepo",
+      "polyrepo",
+      "copy"
+     ],
+     "p": {
+      "copy": 0,
+      "submodules": 0,
+      "monorepo": 0.94,
+      "polyrepo": 0.06
+     }
+    },
+    {
+     "order": [
+      "submodules",
+      "monorepo",
+      "copy",
+      "polyrepo"
+     ],
+     "p": {
+      "polyrepo": 0.11,
+      "copy": 0,
+      "submodules": 0,
+      "monorepo": 0.89
+     }
+    },
+    {
+     "order": [
+      "submodules",
+      "polyrepo",
+      "monorepo",
+      "copy"
+     ],
+     "p": {
+      "monorepo": 0.83,
+      "polyrepo": 0.17,
+      "copy": 0,
+      "submodules": 0
+     }
+    },
+    {
+     "order": [
+      "submodules",
+      "polyrepo",
+      "copy",
+      "monorepo"
+     ],
+     "p": {
+      "monorepo": 0.91,
+      "polyrepo": 0.09,
+      "submodules": 0,
+      "copy": 0
+     }
+    },
+    {
+     "order": [
+      "submodules",
+      "copy",
+      "monorepo",
+      "polyrepo"
+     ],
+     "p": {
+      "polyrepo": 0.1,
+      "copy": 0,
+      "monorepo": 0.9,
+      "submodules": 0
+     }
+    },
+    {
+     "order": [
+      "submodules",
+      "copy",
+      "polyrepo",
+      "monorepo"
+     ],
+     "p": {
+      "monorepo": 0.88,
+      "copy": 0,
+      "submodules": 0,
+      "polyrepo": 0.12
+     }
+    }
+   ],
+   "reask": {
+    "copy": 0,
+    "polyrepo": 0.09,
+    "monorepo": 0.91,
+    "submodules": 0
+   },
+   "pair": {
+    "written": {
+     "monorepo": 0.9,
+     "copy": 0,
+     "submodules": 0,
+     "polyrepo": 0.1
+    },
+    "reversed": {
+     "monorepo": 0.88,
+     "copy": 0,
+     "polyrepo": 0.12,
+     "submodules": 0
+    }
+   }
+  },
+  {
+   "id": "thumbnails",
+   "orders": [
+    {
+     "order": [
+      "cdntransform",
+      "worker",
+      "request",
+      "client"
+     ],
+     "p": {
+      "client": 0,
+      "cdntransform": 0.99,
+      "request": 0,
+      "worker": 0.01
+     }
+    },
+    {
+     "order": [
+      "cdntransform",
+      "worker",
+      "client",
+      "request"
+     ],
+     "p": {
+      "worker": 0.01,
+      "cdntransform": 0.99,
+      "request": 0,
+      "client": 0
+     }
+    },
+    {
+     "order": [
+      "cdntransform",
+      "request",
+      "worker",
+      "client"
+     ],
+     "p": {
+      "request": 0,
+      "client": 0,
+      "worker": 0.01,
+      "cdntransform": 0.99
+     }
+    },
+    {
+     "order": [
+      "cdntransform",
+      "request",
+      "client",
+      "worker"
+     ],
+     "p": {
+      "request": 0,
+      "worker": 0.01,
+      "client": 0,
+      "cdntransform": 0.99
+     }
+    },
+    {
+     "order": [
+      "cdntransform",
+      "client",
+      "worker",
+      "request"
+     ],
+     "p": {
+      "cdntransform": 0.99,
+      "client": 0,
+      "request": 0,
+      "worker": 0.01
+     }
+    },
+    {
+     "order": [
+      "cdntransform",
+      "client",
+      "request",
+      "worker"
+     ],
+     "p": {
+      "client": 0,
+      "cdntransform": 1,
+      "request": 0,
+      "worker": 0
+     }
+    },
+    {
+     "order": [
+      "worker",
+      "cdntransform",
+      "request",
+      "client"
+     ],
+     "p": {
+      "request": 0,
+      "client": 0,
+      "worker": 0.01,
+      "cdntransform": 0.99
+     }
+    },
+    {
+     "order": [
+      "worker",
+      "cdntransform",
+      "client",
+      "request"
+     ],
+     "p": {
+      "client": 0,
+      "request": 0,
+      "worker": 0,
+      "cdntransform": 1
+     }
+    },
+    {
+     "order": [
+      "worker",
+      "request",
+      "cdntransform",
+      "client"
+     ],
+     "p": {
+      "cdntransform": 0.99,
+      "client": 0,
+      "worker": 0.01,
+      "request": 0
+     }
+    },
+    {
+     "order": [
+      "worker",
+      "request",
+      "client",
+      "cdntransform"
+     ],
+     "p": {
+      "worker": 0.01,
+      "request": 0,
+      "cdntransform": 0.99,
+      "client": 0
+     }
+    },
+    {
+     "order": [
+      "worker",
+      "client",
+      "cdntransform",
+      "request"
+     ],
+     "p": {
+      "worker": 0.01,
+      "client": 0,
+      "cdntransform": 0.99,
+      "request": 0
+     }
+    },
+    {
+     "order": [
+      "worker",
+      "client",
+      "request",
+      "cdntransform"
+     ],
+     "p": {
+      "client": 0,
+      "worker": 0.01,
+      "request": 0,
+      "cdntransform": 0.99
+     }
+    },
+    {
+     "order": [
+      "request",
+      "cdntransform",
+      "worker",
+      "client"
+     ],
+     "p": {
+      "worker": 0.01,
+      "request": 0,
+      "client": 0,
+      "cdntransform": 0.99
+     }
+    },
+    {
+     "order": [
+      "request",
+      "cdntransform",
+      "client",
+      "worker"
+     ],
+     "p": {
+      "request": 0,
+      "client": 0,
+      "worker": 0.01,
+      "cdntransform": 0.99
+     }
+    },
+    {
+     "order": [
+      "request",
+      "worker",
+      "cdntransform",
+      "client"
+     ],
+     "p": {
+      "worker": 0.01,
+      "client": 0,
+      "request": 0,
+      "cdntransform": 0.99
+     }
+    },
+    {
+     "order": [
+      "request",
+      "worker",
+      "client",
+      "cdntransform"
+     ],
+     "p": {
+      "client": 0,
+      "request": 0,
+      "worker": 0.01,
+      "cdntransform": 0.99
+     }
+    },
+    {
+     "order": [
+      "request",
+      "client",
+      "cdntransform",
+      "worker"
+     ],
+     "p": {
+      "client": 0,
+      "request": 0,
+      "cdntransform": 0.99,
+      "worker": 0.01
+     }
+    },
+    {
+     "order": [
+      "request",
+      "client",
+      "worker",
+      "cdntransform"
+     ],
+     "p": {
+      "client": 0,
+      "worker": 0.01,
+      "cdntransform": 0.99,
+      "request": 0
+     }
+    },
+    {
+     "order": [
+      "client",
+      "cdntransform",
+      "worker",
+      "request"
+     ],
+     "p": {
+      "cdntransform": 0.99,
+      "client": 0,
+      "worker": 0.01,
+      "request": 0
+     }
+    },
+    {
+     "order": [
+      "client",
+      "cdntransform",
+      "request",
+      "worker"
+     ],
+     "p": {
+      "worker": 0.01,
+      "cdntransform": 0.99,
+      "request": 0,
+      "client": 0
+     }
+    },
+    {
+     "order": [
+      "client",
+      "worker",
+      "cdntransform",
+      "request"
+     ],
+     "p": {
+      "client": 0,
+      "worker": 0.01,
+      "cdntransform": 0.99,
+      "request": 0
+     }
+    },
+    {
+     "order": [
+      "client",
+      "worker",
+      "request",
+      "cdntransform"
+     ],
+     "p": {
+      "request": 0,
+      "worker": 0.01,
+      "cdntransform": 0.99,
+      "client": 0
+     }
+    },
+    {
+     "order": [
+      "client",
+      "request",
+      "cdntransform",
+      "worker"
+     ],
+     "p": {
+      "cdntransform": 0.99,
+      "request": 0,
+      "client": 0,
+      "worker": 0.01
+     }
+    },
+    {
+     "order": [
+      "client",
+      "request",
+      "worker",
+      "cdntransform"
+     ],
+     "p": {
+      "request": 0,
+      "worker": 0.01,
+      "client": 0,
+      "cdntransform": 0.99
+     }
+    }
+   ],
+   "reask": {
+    "request": 0,
+    "client": 0,
+    "worker": 0.01,
+    "cdntransform": 0.99
+   },
+   "pair": {
+    "written": {
+     "client": 0,
+     "worker": 0.01,
+     "request": 0,
+     "cdntransform": 0.99
+    },
+    "reversed": {
+     "client": 0,
+     "worker": 0.01,
+     "request": 0,
+     "cdntransform": 0.99
+    }
+   }
+  },
+  {
+   "id": "env-config",
+   "orders": [
+    {
+     "order": [
+      "envconfig",
+      "images",
+      "branch",
+      "hardcode"
+     ],
+     "p": {
+      "branch": 0,
+      "envconfig": 1,
+      "hardcode": 0,
+      "images": 0
+     }
+    },
+    {
+     "order": [
+      "envconfig",
+      "images",
+      "hardcode",
+      "branch"
+     ],
+     "p": {
+      "branch": 0,
+      "hardcode": 0,
+      "envconfig": 1,
+      "images": 0
+     }
+    },
+    {
+     "order": [
+      "envconfig",
+      "branch",
+      "images",
+      "hardcode"
+     ],
+     "p": {
+      "envconfig": 1,
+      "hardcode": 0,
+      "images": 0,
+      "branch": 0
+     }
+    },
+    {
+     "order": [
+      "envconfig",
+      "branch",
+      "hardcode",
+      "images"
+     ],
+     "p": {
+      "envconfig": 1,
+      "hardcode": 0,
+      "images": 0,
+      "branch": 0
+     }
+    },
+    {
+     "order": [
+      "envconfig",
+      "hardcode",
+      "images",
+      "branch"
+     ],
+     "p": {
+      "branch": 0,
+      "hardcode": 0,
+      "images": 0,
+      "envconfig": 1
+     }
+    },
+    {
+     "order": [
+      "envconfig",
+      "hardcode",
+      "branch",
+      "images"
+     ],
+     "p": {
+      "envconfig": 1,
+      "hardcode": 0,
+      "images": 0,
+      "branch": 0
+     }
+    },
+    {
+     "order": [
+      "images",
+      "envconfig",
+      "branch",
+      "hardcode"
+     ],
+     "p": {
+      "envconfig": 1,
+      "branch": 0,
+      "images": 0,
+      "hardcode": 0
+     }
+    },
+    {
+     "order": [
+      "images",
+      "envconfig",
+      "hardcode",
+      "branch"
+     ],
+     "p": {
+      "envconfig": 1,
+      "images": 0,
+      "hardcode": 0,
+      "branch": 0
+     }
+    },
+    {
+     "order": [
+      "images",
+      "branch",
+      "envconfig",
+      "hardcode"
+     ],
+     "p": {
+      "branch": 0,
+      "envconfig": 1,
+      "hardcode": 0,
+      "images": 0
+     }
+    },
+    {
+     "order": [
+      "images",
+      "branch",
+      "hardcode",
+      "envconfig"
+     ],
+     "p": {
+      "images": 0,
+      "branch": 0,
+      "hardcode": 0,
+      "envconfig": 1
+     }
+    },
+    {
+     "order": [
+      "images",
+      "hardcode",
+      "envconfig",
+      "branch"
+     ],
+     "p": {
+      "images": 0,
+      "envconfig": 1,
+      "branch": 0,
+      "hardcode": 0
+     }
+    },
+    {
+     "order": [
+      "images",
+      "hardcode",
+      "branch",
+      "envconfig"
+     ],
+     "p": {
+      "images": 0,
+      "hardcode": 0,
+      "branch": 0,
+      "envconfig": 1
+     }
+    },
+    {
+     "order": [
+      "branch",
+      "envconfig",
+      "images",
+      "hardcode"
+     ],
+     "p": {
+      "branch": 0,
+      "envconfig": 1,
+      "hardcode": 0,
+      "images": 0
+     }
+    },
+    {
+     "order": [
+      "branch",
+      "envconfig",
+      "hardcode",
+      "images"
+     ],
+     "p": {
+      "hardcode": 0,
+      "branch": 0,
+      "images": 0,
+      "envconfig": 1
+     }
+    },
+    {
+     "order": [
+      "branch",
+      "images",
+      "envconfig",
+      "hardcode"
+     ],
+     "p": {
+      "images": 0,
+      "hardcode": 0,
+      "branch": 0,
+      "envconfig": 1
+     }
+    },
+    {
+     "order": [
+      "branch",
+      "images",
+      "hardcode",
+      "envconfig"
+     ],
+     "p": {
+      "branch": 0,
+      "hardcode": 0,
+      "envconfig": 1,
+      "images": 0
+     }
+    },
+    {
+     "order": [
+      "branch",
+      "hardcode",
+      "envconfig",
+      "images"
+     ],
+     "p": {
+      "envconfig": 1,
+      "images": 0,
+      "hardcode": 0,
+      "branch": 0
+     }
+    },
+    {
+     "order": [
+      "branch",
+      "hardcode",
+      "images",
+      "envconfig"
+     ],
+     "p": {
+      "envconfig": 1,
+      "images": 0,
+      "hardcode": 0,
+      "branch": 0
+     }
+    },
+    {
+     "order": [
+      "hardcode",
+      "envconfig",
+      "images",
+      "branch"
+     ],
+     "p": {
+      "envconfig": 1,
+      "hardcode": 0,
+      "branch": 0,
+      "images": 0
+     }
+    },
+    {
+     "order": [
+      "hardcode",
+      "envconfig",
+      "branch",
+      "images"
+     ],
+     "p": {
+      "envconfig": 1,
+      "images": 0,
+      "branch": 0,
+      "hardcode": 0
+     }
+    },
+    {
+     "order": [
+      "hardcode",
+      "images",
+      "envconfig",
+      "branch"
+     ],
+     "p": {
+      "hardcode": 0,
+      "images": 0,
+      "envconfig": 1,
+      "branch": 0
+     }
+    },
+    {
+     "order": [
+      "hardcode",
+      "images",
+      "branch",
+      "envconfig"
+     ],
+     "p": {
+      "branch": 0,
+      "envconfig": 1,
+      "hardcode": 0,
+      "images": 0
+     }
+    },
+    {
+     "order": [
+      "hardcode",
+      "branch",
+      "envconfig",
+      "images"
+     ],
+     "p": {
+      "envconfig": 1,
+      "images": 0,
+      "branch": 0,
+      "hardcode": 0
+     }
+    },
+    {
+     "order": [
+      "hardcode",
+      "branch",
+      "images",
+      "envconfig"
+     ],
+     "p": {
+      "images": 0,
+      "branch": 0,
+      "hardcode": 0,
+      "envconfig": 1
+     }
+    }
+   ],
+   "reask": {
+    "branch": 0,
+    "images": 0,
+    "envconfig": 1,
+    "hardcode": 0
+   },
+   "pair": {
+    "written": {
+     "envconfig": 1,
+     "images": 0,
+     "branch": 0,
+     "hardcode": 0
+    },
+    "reversed": {
+     "envconfig": 1,
+     "images": 0,
+     "branch": 0,
+     "hardcode": 0
+    }
+   }
+  },
+  {
+   "id": "retries",
+   "orders": [
+    {
+     "order": [
+      "backoff",
+      "infinite",
+      "noretry",
+      "fixed"
+     ],
+     "p": {
+      "backoff": 0.98,
+      "infinite": 0,
+      "noretry": 0.01,
+      "fixed": 0.01
+     }
+    },
+    {
+     "order": [
+      "backoff",
+      "infinite",
+      "fixed",
+      "noretry"
+     ],
+     "p": {
+      "fixed": 0.01,
+      "noretry": 0.01,
+      "backoff": 0.98,
+      "infinite": 0
+     }
+    },
+    {
+     "order": [
+      "backoff",
+      "noretry",
+      "infinite",
+      "fixed"
+     ],
+     "p": {
+      "noretry": 0,
+      "fixed": 0.01,
+      "backoff": 0.99,
+      "infinite": 0
+     }
+    },
+    {
+     "order": [
+      "backoff",
+      "noretry",
+      "fixed",
+      "infinite"
+     ],
+     "p": {
+      "noretry": 0.01,
+      "backoff": 0.98,
+      "fixed": 0.01,
+      "infinite": 0
+     }
+    },
+    {
+     "order": [
+      "backoff",
+      "fixed",
+      "infinite",
+      "noretry"
+     ],
+     "p": {
+      "infinite": 0,
+      "backoff": 0.98,
+      "fixed": 0.01,
+      "noretry": 0.01
+     }
+    },
+    {
+     "order": [
+      "backoff",
+      "fixed",
+      "noretry",
+      "infinite"
+     ],
+     "p": {
+      "infinite": 0,
+      "fixed": 0,
+      "noretry": 0,
+      "backoff": 1
+     }
+    },
+    {
+     "order": [
+      "infinite",
+      "backoff",
+      "noretry",
+      "fixed"
+     ],
+     "p": {
+      "noretry": 0,
+      "fixed": 0,
+      "backoff": 1,
+      "infinite": 0
+     }
+    },
+    {
+     "order": [
+      "infinite",
+      "backoff",
+      "fixed",
+      "noretry"
+     ],
+     "p": {
+      "noretry": 0.01,
+      "infinite": 0,
+      "fixed": 0,
+      "backoff": 0.99
+     }
+    },
+    {
+     "order": [
+      "infinite",
+      "noretry",
+      "backoff",
+      "fixed"
+     ],
+     "p": {
+      "infinite": 0,
+      "backoff": 0.99,
+      "fixed": 0.01,
+      "noretry": 0
+     }
+    },
+    {
+     "order": [
+      "infinite",
+      "noretry",
+      "fixed",
+      "backoff"
+     ],
+     "p": {
+      "backoff": 1,
+      "fixed": 0,
+      "noretry": 0,
+      "infinite": 0
+     }
+    },
+    {
+     "order": [
+      "infinite",
+      "fixed",
+      "backoff",
+      "noretry"
+     ],
+     "p": {
+      "infinite": 0,
+      "backoff": 1,
+      "fixed": 0,
+      "noretry": 0
+     }
+    },
+    {
+     "order": [
+      "infinite",
+      "fixed",
+      "noretry",
+      "backoff"
+     ],
+     "p": {
+      "infinite": 0,
+      "noretry": 0,
+      "backoff": 1,
+      "fixed": 0
+     }
+    },
+    {
+     "order": [
+      "noretry",
+      "backoff",
+      "infinite",
+      "fixed"
+     ],
+     "p": {
+      "noretry": 0,
+      "backoff": 0.98,
+      "infinite": 0,
+      "fixed": 0.02
+     }
+    },
+    {
+     "order": [
+      "noretry",
+      "backoff",
+      "fixed",
+      "infinite"
+     ],
+     "p": {
+      "fixed": 0.01,
+      "backoff": 0.99,
+      "infinite": 0,
+      "noretry": 0
+     }
+    },
+    {
+     "order": [
+      "noretry",
+      "infinite",
+      "backoff",
+      "fixed"
+     ],
+     "p": {
+      "backoff": 0.99,
+      "fixed": 0.01,
+      "infinite": 0,
+      "noretry": 0
+     }
+    },
+    {
+     "order": [
+      "noretry",
+      "infinite",
+      "fixed",
+      "backoff"
+     ],
+     "p": {
+      "backoff": 1,
+      "fixed": 0,
+      "noretry": 0,
+      "infinite": 0
+     }
+    },
+    {
+     "order": [
+      "noretry",
+      "fixed",
+      "backoff",
+      "infinite"
+     ],
+     "p": {
+      "infinite": 0,
+      "backoff": 1,
+      "noretry": 0,
+      "fixed": 0
+     }
+    },
+    {
+     "order": [
+      "noretry",
+      "fixed",
+      "infinite",
+      "backoff"
+     ],
+     "p": {
+      "infinite": 0,
+      "noretry": 0,
+      "backoff": 1,
+      "fixed": 0
+     }
+    },
+    {
+     "order": [
+      "fixed",
+      "backoff",
+      "infinite",
+      "noretry"
+     ],
+     "p": {
+      "noretry": 0.01,
+      "fixed": 0,
+      "backoff": 0.99,
+      "infinite": 0
+     }
+    },
+    {
+     "order": [
+      "fixed",
+      "backoff",
+      "noretry",
+      "infinite"
+     ],
+     "p": {
+      "backoff": 1,
+      "noretry": 0,
+      "fixed": 0,
+      "infinite": 0
+     }
+    },
+    {
+     "order": [
+      "fixed",
+      "infinite",
+      "backoff",
+      "noretry"
+     ],
+     "p": {
+      "infinite": 0,
+      "fixed": 0,
+      "backoff": 1,
+      "noretry": 0
+     }
+    },
+    {
+     "order": [
+      "fixed",
+      "infinite",
+      "noretry",
+      "backoff"
+     ],
+     "p": {
+      "fixed": 0,
+      "backoff": 1,
+      "infinite": 0,
+      "noretry": 0
+     }
+    },
+    {
+     "order": [
+      "fixed",
+      "noretry",
+      "backoff",
+      "infinite"
+     ],
+     "p": {
+      "infinite": 0,
+      "fixed": 0,
+      "noretry": 0,
+      "backoff": 1
+     }
+    },
+    {
+     "order": [
+      "fixed",
+      "noretry",
+      "infinite",
+      "backoff"
+     ],
+     "p": {
+      "noretry": 0,
+      "infinite": 0,
+      "fixed": 0,
+      "backoff": 1
+     }
+    }
+   ],
+   "reask": {
+    "infinite": 0,
+    "noretry": 0,
+    "fixed": 0.01,
+    "backoff": 0.99
+   },
+   "pair": {
+    "written": {
+     "noretry": 0,
+     "fixed": 0.01,
+     "infinite": 0,
+     "backoff": 0.99
+    },
+    "reversed": {
+     "noretry": 0,
+     "backoff": 1,
+     "infinite": 0,
+     "fixed": 0
+    }
+   }
+  }
+ ]
+}
