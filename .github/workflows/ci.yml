@@ -24,8 +24,8 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
-      - name: Committed bundle matches the source
-        run: git diff --exit-code plugins/claude-referee/dist
+      - name: Committed bundle and npm copy match the source
+        run: git diff --exit-code plugins/claude-referee/dist npm
 
   bundle:
     runs-on: ubuntu-latest

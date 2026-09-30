@@ -1,0 +1,24 @@
+{
+  "line.risky": {
+    "type": "noul",
+    "instructions": {
+      "question": "Does this changed line need a closer look from a reviewer?",
+      "note": "`item` is one line of a diff. `context` may name the file or the change."
+    },
+    "criteria": {
+      "true": "The line can change behaviour in a way that is easy to get wrong: security, data loss, concurrency, money or error handling.",
+      "false": "The line is routine: formatting, naming, comments, logging, imports or a plain rename."
+    }
+  },
+  "failure.env": {
+    "type": "noul",
+    "instructions": {
+      "question": "Is this test failure caused by the environment rather than by the code under test?",
+      "note": "`item` is the output of one failing test."
+    },
+    "criteria": {
+      "true": "The output points to the environment: network, a missing tool or file, permissions, a port in use, a timeout or a resource limit.",
+      "false": "The output points to the code: a failed assertion, a type error, an exception from the code or wrong behaviour."
+    }
+  }
+}

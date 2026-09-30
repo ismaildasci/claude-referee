@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 
@@ -78,7 +79,7 @@ var RefereeError = class extends Error {
 var NAME = /^[a-z0-9][a-z0-9-]{0,63}$/;
 function bundledPackDirs() {
   const here = dirname(fileURLToPath(import.meta.url));
-  return [join2(here, "..", "packs"), join2(here, "packs"), join2(here, "..", "..", "plugins", "claude-referee", "packs")];
+  return [join2(here, "packs"), join2(here, "..", "packs"), join2(here, "..", "..", "plugins", "claude-referee", "packs")];
 }
 __name(bundledPackDirs, "bundledPackDirs");
 function packDirs(env, bundled = bundledPackDirs()) {

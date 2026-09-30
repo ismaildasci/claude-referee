@@ -1,8 +1,9 @@
 // Bundles the CLI and hook entry points into plugins/claude-referee/dist with the SDK inlined.
 // dist is committed, so installs never need node_modules; CI fails if a rebuild changes it.
+// npm/ gets copies of the CLI bundle, notices and packs, so `npx claude-referee` works without the plugin.
 
 import { build } from "esbuild";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -18,6 +19,7 @@ await build({
   platform: "node",
   target: "node20",
   keepNames: true,
+  banner: { js: "#!/usr/bin/env node" },
   legalComments: "none",
   charset: "utf8",
   logLevel: "warning",
@@ -29,3 +31,10 @@ writeFileSync(
   join(outdir, "THIRD_PARTY_NOTICES"),
   `claude-referee bundles the following third-party software.\n\n@typesafe-ai/sdk 0.6.0\n\n${sdkLicense.trim()}\n`,
 );
+
+const npmDir = join(root, "npm");
+copyFileSync(join(outdir, "cli.mjs"), join(npmDir, "cli.mjs"));
+copyFileSync(join(outdir, "THIRD_PARTY_NOTICES"), join(npmDir, "THIRD_PARTY_NOTICES"));
+copyFileSync(join(root, "LICENSE"), join(npmDir, "LICENSE"));
+rmSync(join(npmDir, "packs"), { recursive: true, force: true });
+cpSync(join(root, "plugins/claude-referee/packs"), join(npmDir, "packs"), { recursive: true });

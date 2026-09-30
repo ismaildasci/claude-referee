@@ -1,0 +1,8 @@
+{
+  "done.met": { "met": 0.7, "missing": 0.5 },
+  "verify.supported": { "supported": 0.9, "unsupported": 0.1 },
+  "decide.best": { "clear": 0.85, "margin": 0.1 },
+  "decide.fit": { "clear": 0.85, "margin": 0.1 },
+  "line.risky": { "auto": 0.9 },
+  "failure.env": { "auto": 0.9 }
+}
