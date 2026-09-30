@@ -1,0 +1,236 @@
+// eval: "record" asks Jev once per case of a suite and appends hashed answers; "score" re-scores them offline.
+// Suites live in jev-evals/<suite>/ as suite.json, cases.jsonl and recorded.jsonl; a changed question text makes scoring fail.
+
+import { appendFileSync, existsSync, readdirSync, readFileSync } from "node:fs";
+import { join, resolve } from "node:path";
+import { resolveModel } from "../../engine/config.ts";
+import { RefereeError } from "../../engine/errors.ts";
+import { findRecording, metrics, parseCases, parseRecordings, parseSweep, sweep, type EvalCase, type Recording } from "../../engine/evals.ts";
+import type { Result } from "../../engine/output.ts";
+import type { Pack } from "../../engine/pack.ts";
+import { Session, questionHash, redactRequest, stateHash, type Outcome, type Planned } from "../../engine/session.ts";
+import type { Command, Context } from "../types.ts";
+import { JEV_ERRORS, fitLine, openPack, reorder, str } from "../shared.ts";
+import { doneEvidence, doneRequest } from "./done.ts";
+
+interface SuiteConfig {
+  readonly command: string;
+  readonly criteria?: string | readonly string[];
+  readonly positive: string;
+  readonly max_wrong_positive: number;
+}
+
+interface Suite {
+  readonly name: string;
+  readonly dir: string;
+  readonly config: SuiteConfig;
+  readonly cases: EvalCase[];
+  readonly recordings: Recording[];
+}
+
+interface CaseRequest {
+  readonly suite: Suite;
+  readonly item: EvalCase;
+  readonly planned: Planned;
+  readonly finish: (outcomes: Outcome[]) => Result;
+  readonly qhash: string;
+  readonly shash: string;
+}
+
+const LIST_LIMIT = 20;
+
+function readSuite(root: string, name: string): Suite {
+  const dir = join(root, name);
+  if (!existsSync(join(dir, "suite.json")) || !existsSync(join(dir, "cases.jsonl"))) {
+    throw new RefereeError("bad_input", `No eval suite ${name}: it needs suite.json and cases.jsonl.`, { next_step: `Look in ${root}.` });
+  }
+  let raw: Record<string, unknown>;
+  try {
+    raw = JSON.parse(readFileSync(join(dir, "suite.json"), "utf8")) as Record<string, unknown>;
+  } catch {
+    throw new RefereeError("bad_input", `Suite ${name}: suite.json is not valid JSON.`);
+  }
+  if (typeof raw["command"] !== "string") throw new RefereeError("bad_input", `Suite ${name}: suite.json needs a command.`);
+  const config: SuiteConfig = {
+    command: raw["command"],
+    ...(typeof raw["criteria"] === "string" || Array.isArray(raw["criteria"]) ? { criteria: raw["criteria"] as string | string[] } : {}),
+    positive: typeof raw["positive"] === "string" ? raw["positive"] : "met",
+    max_wrong_positive: typeof raw["max_wrong_positive"] === "number" ? raw["max_wrong_positive"] : 0,
+  };
+  const recorded = join(dir, "recorded.jsonl");
+  return {
+    name,
+    dir,
+    config,
+    cases: parseCases(readFileSync(join(dir, "cases.jsonl"), "utf8")),
+    recordings: existsSync(recorded) ? parseRecordings(readFileSync(recorded, "utf8")) : [],
+  };
+}
+
+function suites(root: string, name: string): Suite[] {
+  if (name !== "all") return [readSuite(root, name)];
+  if (!existsSync(root)) return [];
+  return readdirSync(root, { withFileTypes: true })
+    .filter((d) => d.isDirectory() && existsSync(join(root, d.name, "suite.json")))
+    .map((d) => readSuite(root, d.name))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function criteriaFor(suite: Suite, item: EvalCase): string[] {
+  const own = item["criteria"] ?? item["criterion"] ?? suite.config.criteria;
+  const list = (Array.isArray(own) ? own : [own]).filter((c): c is string => typeof c === "string" && c.trim() !== "");
+  if (list.length === 0) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: no criterion.`);
+  return list;
+}
+
+function request(context: Context, pack: Pack, suite: Suite, item: EvalCase): CaseRequest {
+  if (suite.config.command !== "done") throw new RefereeError("bad_input", `Suite ${suite.name} uses ${suite.config.command}; eval handles done suites for now.`);
+  const evidence = doneEvidence(typeof item["evidence"] === "string" ? item["evidence"] : "");
+  if (!evidence.trim()) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: the evidence is empty.`);
+  const { planned, finish } = doneRequest(pack, undefined, criteriaFor(suite, item), evidence);
+  const first = planned[0];
+  if (!first) throw new RefereeError("internal", "done planned no request.");
+  const redacted = redactRequest(first, context.io.home, pack.redact);
+  return { suite, item, planned: { ...first, id: `${suite.name}/${item.id}` }, finish, qhash: questionHash(first.questions), shash: stateHash(redacted.body.state) };
+}
+
+async function record(context: Context, pack: Pack, list: readonly Suite[]): Promise<Result> {
+  const { io, flags } = context;
+  const session = new Session({
+    command: "eval",
+    env: io.env,
+    cwd: io.cwd,
+    home: io.home,
+    platform: io.platform,
+    now: io.now,
+    pack: { name: pack.name, version: `${pack.version}+${pack.hash}`, redact: pack.redact },
+    dataDir: flags.dataDir,
+    fresh: true,
+  });
+  const todo: CaseRequest[] = [];
+  let skipped = 0;
+  for (const suite of list) {
+    for (const item of suite.cases) {
+      const req = request(context, pack, suite, item);
+      if (!flags.fresh && findRecording(suite.recordings, { case: item.id, qhash: req.qhash, shash: req.shash, model: session.model }).status === "ok") skipped += 1;
+      else todo.push(req);
+    }
+  }
+  if (flags.dryRun) return fitLine({ ...session.dryRun(todo.map((t) => t.planned)), skipped });
+  const outcomes = todo.length ? await session.run(todo.map((t) => t.planned), { partial: true }) : [];
+  const failed: string[] = [];
+  let recorded = 0;
+  todo.forEach((req, i) => {
+    const outcome = outcomes[i];
+    if (!outcome?.answers) {
+      failed.push(req.planned.id);
+      return;
+    }
+    const line = {
+      suite: req.suite.name,
+      case: req.item.id,
+      split: req.item.split,
+      model: session.model,
+      pack: `${pack.name}@${pack.version}`,
+      qhash: req.qhash,
+      shash: req.shash,
+      answers: outcome.answers,
+      recorded_at: new Date(io.now()).toISOString(),
+    };
+    appendFileSync(join(req.suite.dir, "recorded.jsonl"), JSON.stringify(line) + "\n");
+    recorded += 1;
+  });
+  const receipt = session.record({ verdict: failed.length ? "partial" : "recorded" });
+  return reorder({
+    ok: true,
+    verdict: failed.length ? "partial" : "recorded",
+    suites: list.map((s) => s.name),
+    recorded,
+    skipped,
+    ...(failed.length ? { failed: failed.slice(0, LIST_LIMIT) } : {}),
+    ...session.stats(),
+    next_step: failed.length ? "Run the same command again; recorded cases are skipped." : undefined,
+    receipt: receipt.id,
+  });
+}
+
+function scoreSuite(context: Context, pack: Pack, suite: Suite, model: string, split: string | undefined, sweepSpec: string | undefined): Result {
+  const items = suite.cases
+    .filter((c) => !split || c.split === split)
+    .map((item) => {
+      const req = request(context, pack, suite, item);
+      const found = findRecording(suite.recordings, { case: item.id, qhash: req.qhash, shash: req.shash, model });
+      if (found.status !== "ok") {
+        const why = found.status === "missing" ? `no recording for ${model}` : "the question text or input changed since it was recorded";
+        throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: ${why}.`, { next_step: `Run eval record --suite ${suite.name} with a key.` });
+      }
+      const result = req.finish([{ id: "done", answers: found.line.answers as Outcome["answers"], stopped: [], cached: true }]);
+      return { id: item.id, split: item.split, expected: item.expected, verdict: String(result["verdict"]), p: Number(result["p"]) };
+    });
+  const m = metrics(items, suite.config.positive);
+  const swept = sweepSpec ? sweep(items, suite.config.positive, parseSweep(sweepSpec)) : null;
+  return {
+    suite: suite.name,
+    verdict: m.wrong_positive > suite.config.max_wrong_positive ? "violated" : "pass",
+    ...m,
+    max_wrong_positive: suite.config.max_wrong_positive,
+    ...(swept ? { sweep: swept.rows.map((r) => [r.t, r.precision, r.recall, r.wrong_positive]), suggested: swept.suggested, ...(swept.reason ? { sweep_note: swept.reason } : {}) } : {}),
+  };
+}
+
+function score(context: Context, pack: Pack, list: readonly Suite[], all: boolean): Result {
+  const model = resolveModel(context.io.env);
+  const split = str(context, "split");
+  if (split !== undefined && split !== "dev" && split !== "holdout") throw new RefereeError("bad_input", '--split takes "dev" or "holdout".');
+  const scored = (all ? list.filter((s) => s.recordings.length > 0) : list).map((s) => scoreSuite(context, pack, s, model, split, str(context, "sweep")));
+  const verdict = scored.some((s) => s["verdict"] === "violated") ? "violated" : "pass";
+  if (!all && scored[0]) {
+    const { suite, verdict: v, ...rest } = scored[0];
+    return { ok: true, verdict: v, suite, model, ...(split ? { split } : {}), ...rest };
+  }
+  return {
+    ok: true,
+    verdict,
+    model,
+    suites: scored.map((s) => ({ suite: s["suite"], verdict: s["verdict"], cases: s["cases"], wrong_positive: s["wrong_positive"], max_wrong_positive: s["max_wrong_positive"] })),
+  };
+}
+
+export const evalCommand: Command = {
+  name: "eval",
+  describe: {
+    summary: "Record Jev's answers for an eval suite once, then score them offline.",
+    inputs: {
+      "record | score": "Positional action.",
+      "--suite <name|all>": "A directory under the evals dir with suite.json, cases.jsonl and, once recorded, recorded.jsonl. 'all' takes every suite; score then skips suites without recordings.",
+      "--evals-dir <dir>": "Where the suites live; default jev-evals in the current directory.",
+      "--split <dev|holdout>": "score: only cases from this split.",
+      "--sweep <from:to:step>": "score: precision, recall and wrong positives per threshold; suggests one only with at least 10 cases per class.",
+      "--fresh": "record: record every case again, even ones already recorded for this question text, input and model.",
+    },
+    outputs: {
+      verdict: "record: recorded or partial; score: pass, or violated when wrong positives exceed the suite's max_wrong_positive",
+      recorded: "record: cases recorded now",
+      skipped: "record: cases already recorded",
+      verdicts: "score: count per verdict",
+      precision: "score: share of positive verdicts that were right",
+      recall: "score: share of expected positives found",
+      automation: "score: share of cases with a definite verdict",
+      wrong_positive: "score: positive verdicts that should not be; the kill criterion",
+    },
+    errors: [...JEV_ERRORS],
+    effects: "record sends each unrecorded case to the TypeSafe API and appends to recorded.jsonl; score reads files only.",
+    cost: "record: one Jev request per case not yet recorded. score: free and offline.",
+  },
+  options: { suite: { type: "string" }, split: { type: "string" }, sweep: { type: "string" }, "evals-dir": { type: "string" } },
+  async run(context) {
+    const action = context.positionals[0];
+    if (action !== "record" && action !== "score") throw new RefereeError("bad_input", "eval needs an action: record or score.", { next_step: "Example: eval score --suite injection" });
+    const name = str(context, "suite");
+    if (!name) throw new RefereeError("bad_input", "Give --suite <name|all>.");
+    const root = resolve(context.io.cwd, str(context, "evals-dir") ?? "jev-evals");
+    const list = suites(root, name);
+    const { pack } = openPack(context);
+    return action === "record" ? record(context, pack, list) : score(context, pack, list, name === "all");
+  },
+};

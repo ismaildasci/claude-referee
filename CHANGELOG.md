@@ -9,6 +9,9 @@ All notable changes to this project are documented here. The format follows [Kee
 - `receipts --usage`, the same as `--tokens`.
 - `doctor` shows `base_url` when `TYPESAFE_BASE_URL` points somewhere other than the default, without credentials or query.
 - `jev-evals/injection`: 33 test logs, with and without a note addressed to the judge, and Jev's answers from 2026-10-01. The measurements page and SECURITY.md describe the result.
+- `eval record --suite <name|all>` asks Jev once per case of a suite under `jev-evals/` and appends the answers to `recorded.jsonl`, keyed by hashes of the question text and the redacted input. Cases already recorded are skipped unless `--fresh`.
+- `eval score` re-scores recorded answers offline, without a key: verdict counts, precision, recall, automation and wrong positives, plus `--sweep`, which won't suggest a threshold while a class has fewer than 10 cases. It fails when a case has no recording or its question text changed.
+- CI scores every recorded suite and fails when a suite's wrong positives exceed its `max_wrong_positive`. The injection suite allows one: the known wrong `met`, kept visible until `done` v2 fixes it.
 
 ### Changed
 

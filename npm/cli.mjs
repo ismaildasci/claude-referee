@@ -51,7 +51,7 @@ var init_dist = __esm({
       #parseResponse;
       #parsed;
       constructor(responsePromise, parseResponse) {
-        super((resolve5) => resolve5(void 0));
+        super((resolve6) => resolve6(void 0));
         this.#responsePromise = responsePromise;
         this.#parseResponse = parseResponse;
       }
@@ -143,7 +143,7 @@ var init_dist = __esm({
       const exponential = Math.min(policy.backoffInitialMs * 2 ** attempt, policy.backoffMaxMs);
       return Math.round(exponential * (1 - random() * policy.backoffJitter));
     }, "retryDelayMs");
-    sleep = /* @__PURE__ */ __name((ms, signal) => new Promise((resolve5, reject) => {
+    sleep = /* @__PURE__ */ __name((ms, signal) => new Promise((resolve6, reject) => {
       if (signal?.aborted) return reject(signal.reason);
       const onAbort = /* @__PURE__ */ __name(() => {
         clearTimeout(timer);
@@ -151,7 +151,7 @@ var init_dist = __esm({
       }, "onAbort");
       const timer = setTimeout(() => {
         signal?.removeEventListener("abort", onAbort);
-        resolve5();
+        resolve6();
       }, ms);
       signal?.addEventListener("abort", onAbort, { once: true });
     }), "sleep");
@@ -556,11 +556,11 @@ var init_dist = __esm({
       * console.log(answers.billing.noul);
       * ```
       */
-      systemOne(request, options = {}) {
-        validateQuestions(request.questions);
+      systemOne(request2, options = {}) {
+        validateQuestions(request2.questions);
         const body = {
-          ...request,
-          model: request.model ?? this.defaultModel
+          ...request2,
+          model: request2.model ?? this.defaultModel
         };
         return this.#request("POST", "/v1/systemone", {
           ...options,
@@ -1228,12 +1228,12 @@ __name(tildify, "tildify");
 
 // src/engine/key.ts
 import { execFile } from "node:child_process";
-var runCommand = /* @__PURE__ */ __name((file, args, timeoutMs) => new Promise((resolve5) => {
+var runCommand = /* @__PURE__ */ __name((file, args, timeoutMs) => new Promise((resolve6) => {
   execFile(
     file,
     [...args],
     { timeout: timeoutMs, encoding: "utf8", windowsHide: true, maxBuffer: 64 * 1024 },
-    (error, stdout) => resolve5(error ? null : stdout)
+    (error, stdout) => resolve6(error ? null : stdout)
   );
 }), "runCommand");
 var processMemo = /* @__PURE__ */ new Map();
@@ -1486,6 +1486,26 @@ function stopError(stopped) {
 __name(stopError, "stopError");
 
 // src/engine/session.ts
+function questionHash(questions) {
+  return sha256(JSON.stringify(questions)).slice(0, 12);
+}
+__name(questionHash, "questionHash");
+function stateHash(state) {
+  return sha256(JSON.stringify(state)).slice(0, 12);
+}
+__name(stateHash, "stateHash");
+function redactRequest(p, home, extra) {
+  const options = { home, extra };
+  const count = /* @__PURE__ */ __name((replaced) => Object.values(replaced).reduce((a, b) => a + b, 0), "count");
+  const state = redact2({ state: p.state }, options);
+  const questions = redact2({ questions: p.questions }, { ...options, keepKeys: true });
+  return {
+    body: { state: state.value.state, questions: questions.value.questions },
+    stops: [...state.stopped, ...questions.stopped],
+    replaced: count(state.replaced) + count(questions.replaced)
+  };
+}
+__name(redactRequest, "redactRequest");
 var Session = class {
   static {
     __name(this, "Session");
@@ -1515,14 +1535,11 @@ var Session = class {
     this.receiptId = newReceiptId(this.started);
   }
   prepare(planned) {
-    const options = { home: this.options.home, extra: this.options.pack.redact };
-    const count = /* @__PURE__ */ __name((replaced) => Object.values(replaced).reduce((a, b) => a + b, 0), "count");
     return planned.map((p) => {
-      const state = redact2({ state: p.state }, options);
-      const questions = redact2({ questions: p.questions }, { ...options, keepKeys: true });
-      this.replacedCount += count(state.replaced) + count(questions.replaced);
-      this.questionHashes.add(sha256(JSON.stringify(p.questions)).slice(0, 12));
-      return { planned: p, body: { state: state.value.state, questions: questions.value.questions }, stops: [...state.stopped, ...questions.stopped] };
+      const { body, stops, replaced } = redactRequest(p, this.options.home, this.options.pack.redact);
+      this.replacedCount += replaced;
+      this.questionHashes.add(questionHash(p.questions));
+      return { planned: p, body, stops };
     });
   }
   dryRun(planned) {
@@ -2044,6 +2061,34 @@ var NEXT = {
   missing: "The evidence doesn't show the criterion. Run the check that proves it and pipe its output in; the same evidence gives the same answer.",
   unsure: "The evidence is ambiguous. Pipe the full output of the check that proves the criterion, or narrow the criterion."
 };
+function doneEvidence(text) {
+  return clip(stripAnsi(text), 2e3, 12e3);
+}
+__name(doneEvidence, "doneEvidence");
+function doneRequest(pack, thresholds, criteria, evidence) {
+  const base = question(pack, "done.met");
+  const questions = Object.fromEntries(criteria.map((criterion, i) => [`c${i + 1}`, { ...base, instructions: withData(base.instructions, { criterion }) }]));
+  const met = threshold(pack, thresholds, "done.met", "met", 0.7);
+  const missing = threshold(pack, thresholds, "done.met", "missing", 0.5);
+  const finish = /* @__PURE__ */ __name(([outcome]) => {
+    const per = criteria.map((_, i) => {
+      const answer = outcome?.answers?.[`c${i + 1}`];
+      const p = answer?.type === "noul" ? answer.noul : 0;
+      const verdict2 = p >= met ? "met" : p < missing ? "missing" : "unsure";
+      return { i: i + 1, verdict: verdict2, p };
+    });
+    const verdict = per.some((c) => c.verdict === "missing") ? "missing" : per.some((c) => c.verdict === "unsure") ? "unsure" : "met";
+    return {
+      ok: true,
+      verdict,
+      p: Math.min(...per.map((c) => c.p)),
+      ...per.length > 1 ? { criteria: per } : {},
+      next_step: verdict === "met" ? void 0 : NEXT[verdict]
+    };
+  }, "finish");
+  return { planned: [{ id: "done", state: { evidence }, questions }], finish };
+}
+__name(doneRequest, "doneRequest");
 var done = {
   name: "done",
   describe: {
@@ -2067,35 +2112,298 @@ var done = {
     const criteria = list(context, "criteria").map((c) => c.trim()).filter(Boolean);
     if (criteria.length === 0) throw new RefereeError("bad_input", "Give at least one --criteria.", { next_step: 'Example: --criteria "all tests pass"' });
     if (criteria.length > 10) throw new RefereeError("bad_input", "At most 10 criteria per call.");
-    const evidence = clip(stripAnsi(await readSource(context, str(context, "evidence"), "evidence")), 2e3, 12e3);
+    const evidence = doneEvidence(await readSource(context, str(context, "evidence"), "evidence"));
     if (!evidence.trim()) throw new RefereeError("bad_input", "The evidence is empty.");
     const { pack, project } = openPack(context);
-    const base = question(pack, "done.met");
-    const questions = Object.fromEntries(criteria.map((criterion, i) => [`c${i + 1}`, { ...base, instructions: withData(base.instructions, { criterion }) }]));
-    const met = threshold(pack, project?.thresholds, "done.met", "met", 0.7);
-    const missing = threshold(pack, project?.thresholds, "done.met", "missing", 0.5);
-    return jevCommand(context, "done", pack, [{ id: "done", state: { evidence }, questions }], ([outcome]) => {
-      const per = criteria.map((_, i) => {
-        const answer = outcome?.answers?.[`c${i + 1}`];
-        const p = answer?.type === "noul" ? answer.noul : 0;
-        const verdict2 = p >= met ? "met" : p < missing ? "missing" : "unsure";
-        return { i: i + 1, verdict: verdict2, p };
-      });
-      const verdict = per.some((c) => c.verdict === "missing") ? "missing" : per.some((c) => c.verdict === "unsure") ? "unsure" : "met";
-      return {
-        ok: true,
-        verdict,
-        p: Math.min(...per.map((c) => c.p)),
-        ...per.length > 1 ? { criteria: per } : {},
-        next_step: verdict === "met" ? void 0 : NEXT[verdict]
-      };
-    });
+    const { planned, finish } = doneRequest(pack, project?.thresholds, criteria, evidence);
+    return jevCommand(context, "done", pack, planned, finish);
+  }
+};
+
+// src/cli/commands/eval.ts
+import { appendFileSync as appendFileSync2, existsSync as existsSync4, readdirSync as readdirSync4, readFileSync as readFileSync7 } from "node:fs";
+import { join as join7, resolve as resolve4 } from "node:path";
+
+// src/engine/evals.ts
+var MIN_PER_CLASS = 10;
+function parseCases(text) {
+  const seen = /* @__PURE__ */ new Set();
+  return text.split(/\r?\n/).filter((line) => line.trim()).map((line, i) => {
+    let raw;
+    try {
+      raw = JSON.parse(line);
+    } catch {
+      throw new RefereeError("bad_input", `Eval case line ${i + 1} is not valid JSON.`);
+    }
+    const { id, split, expected } = raw;
+    if (typeof id !== "string" || !id) throw new RefereeError("bad_input", `Eval case line ${i + 1} needs an id.`);
+    if (seen.has(id)) throw new RefereeError("bad_input", `Eval case id ${id} appears twice.`);
+    if (split !== "dev" && split !== "holdout") throw new RefereeError("bad_input", `Eval case ${id} needs split "dev" or "holdout".`);
+    if (typeof expected !== "string" || !expected) throw new RefereeError("bad_input", `Eval case ${id} needs an expected label.`);
+    seen.add(id);
+    return { ...raw, id, split, expected };
+  });
+}
+__name(parseCases, "parseCases");
+function parseRecordings(text) {
+  return text.split(/\r?\n/).filter((line) => line.trim()).flatMap((line) => {
+    try {
+      return [JSON.parse(line)];
+    } catch {
+      return [];
+    }
+  });
+}
+__name(parseRecordings, "parseRecordings");
+function findRecording(lines, key) {
+  const forCase = lines.filter((l) => l.case === key.case && l.model === key.model);
+  const match = [...forCase].reverse().find((l) => l.qhash === key.qhash && l.shash === key.shash);
+  if (match) return { status: "ok", line: match };
+  return { status: forCase.length > 0 ? "stale" : "missing" };
+}
+__name(findRecording, "findRecording");
+var ratio = /* @__PURE__ */ __name((a, b) => b === 0 ? null : a / b, "ratio");
+function metrics(items, positive) {
+  const verdicts = { met: 0, unsure: 0, missing: 0 };
+  for (const item of items) verdicts[item.verdict] = (verdicts[item.verdict] ?? 0) + 1;
+  const predicted = items.filter((i) => i.verdict === positive);
+  const actual = items.filter((i) => i.expected === positive);
+  const truePositive = predicted.filter((i) => i.expected === positive).length;
+  const decided = items.filter((i) => i.verdict !== "unsure").length;
+  return {
+    cases: items.length,
+    verdicts,
+    precision: ratio(truePositive, predicted.length),
+    recall: ratio(truePositive, actual.length),
+    automation: ratio(decided, items.length) ?? 0,
+    wrong_positive: predicted.length - truePositive,
+    wrong_negative: items.filter((i) => i.expected === positive && i.verdict !== positive && i.verdict !== "unsure").length
+  };
+}
+__name(metrics, "metrics");
+function parseSweep(spec) {
+  const parts = spec.split(":").map(Number);
+  const [from, to, step] = parts;
+  if (parts.length !== 3 || from === void 0 || to === void 0 || step === void 0 || parts.some((n) => !Number.isFinite(n)) || step <= 0 || from > to) {
+    throw new RefereeError("bad_input", "--sweep takes from:to:step, e.g. 0.50:0.95:0.05.");
+  }
+  const out = [];
+  for (let t = from; t <= to + 1e-9; t += step) out.push(Number(t.toFixed(4)));
+  return out;
+}
+__name(parseSweep, "parseSweep");
+function sweep(items, positive, thresholds) {
+  const rows = thresholds.map((t) => {
+    const predicted = items.filter((i) => i.p >= t);
+    const truePositive = predicted.filter((i) => i.expected === positive).length;
+    return { t, precision: ratio(truePositive, predicted.length), recall: ratio(truePositive, items.filter((i) => i.expected === positive).length), wrong_positive: predicted.length - truePositive };
+  });
+  const positives = items.filter((i) => i.expected === positive).length;
+  const negatives = items.length - positives;
+  if (positives < MIN_PER_CLASS || negatives < MIN_PER_CLASS) {
+    return { rows, suggested: null, reason: `No suggestion: fewer than ${MIN_PER_CLASS} cases in a class (${positives} positive, ${negatives} other).` };
+  }
+  const safe = rows.find((r) => r.wrong_positive === 0);
+  return safe ? { rows, suggested: safe.t } : { rows, suggested: null, reason: "No threshold in the range avoids a wrong positive." };
+}
+__name(sweep, "sweep");
+
+// src/cli/commands/eval.ts
+var LIST_LIMIT = 20;
+function readSuite(root, name) {
+  const dir = join7(root, name);
+  if (!existsSync4(join7(dir, "suite.json")) || !existsSync4(join7(dir, "cases.jsonl"))) {
+    throw new RefereeError("bad_input", `No eval suite ${name}: it needs suite.json and cases.jsonl.`, { next_step: `Look in ${root}.` });
+  }
+  let raw;
+  try {
+    raw = JSON.parse(readFileSync7(join7(dir, "suite.json"), "utf8"));
+  } catch {
+    throw new RefereeError("bad_input", `Suite ${name}: suite.json is not valid JSON.`);
+  }
+  if (typeof raw["command"] !== "string") throw new RefereeError("bad_input", `Suite ${name}: suite.json needs a command.`);
+  const config = {
+    command: raw["command"],
+    ...typeof raw["criteria"] === "string" || Array.isArray(raw["criteria"]) ? { criteria: raw["criteria"] } : {},
+    positive: typeof raw["positive"] === "string" ? raw["positive"] : "met",
+    max_wrong_positive: typeof raw["max_wrong_positive"] === "number" ? raw["max_wrong_positive"] : 0
+  };
+  const recorded = join7(dir, "recorded.jsonl");
+  return {
+    name,
+    dir,
+    config,
+    cases: parseCases(readFileSync7(join7(dir, "cases.jsonl"), "utf8")),
+    recordings: existsSync4(recorded) ? parseRecordings(readFileSync7(recorded, "utf8")) : []
+  };
+}
+__name(readSuite, "readSuite");
+function suites(root, name) {
+  if (name !== "all") return [readSuite(root, name)];
+  if (!existsSync4(root)) return [];
+  return readdirSync4(root, { withFileTypes: true }).filter((d) => d.isDirectory() && existsSync4(join7(root, d.name, "suite.json"))).map((d) => readSuite(root, d.name)).sort((a, b) => a.name.localeCompare(b.name));
+}
+__name(suites, "suites");
+function criteriaFor(suite, item) {
+  const own = item["criteria"] ?? item["criterion"] ?? suite.config.criteria;
+  const list2 = (Array.isArray(own) ? own : [own]).filter((c) => typeof c === "string" && c.trim() !== "");
+  if (list2.length === 0) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: no criterion.`);
+  return list2;
+}
+__name(criteriaFor, "criteriaFor");
+function request(context, pack, suite, item) {
+  if (suite.config.command !== "done") throw new RefereeError("bad_input", `Suite ${suite.name} uses ${suite.config.command}; eval handles done suites for now.`);
+  const evidence = doneEvidence(typeof item["evidence"] === "string" ? item["evidence"] : "");
+  if (!evidence.trim()) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: the evidence is empty.`);
+  const { planned, finish } = doneRequest(pack, void 0, criteriaFor(suite, item), evidence);
+  const first = planned[0];
+  if (!first) throw new RefereeError("internal", "done planned no request.");
+  const redacted = redactRequest(first, context.io.home, pack.redact);
+  return { suite, item, planned: { ...first, id: `${suite.name}/${item.id}` }, finish, qhash: questionHash(first.questions), shash: stateHash(redacted.body.state) };
+}
+__name(request, "request");
+async function record(context, pack, list2) {
+  const { io, flags } = context;
+  const session = new Session({
+    command: "eval",
+    env: io.env,
+    cwd: io.cwd,
+    home: io.home,
+    platform: io.platform,
+    now: io.now,
+    pack: { name: pack.name, version: `${pack.version}+${pack.hash}`, redact: pack.redact },
+    dataDir: flags.dataDir,
+    fresh: true
+  });
+  const todo = [];
+  let skipped = 0;
+  for (const suite of list2) {
+    for (const item of suite.cases) {
+      const req = request(context, pack, suite, item);
+      if (!flags.fresh && findRecording(suite.recordings, { case: item.id, qhash: req.qhash, shash: req.shash, model: session.model }).status === "ok") skipped += 1;
+      else todo.push(req);
+    }
+  }
+  if (flags.dryRun) return fitLine({ ...session.dryRun(todo.map((t) => t.planned)), skipped });
+  const outcomes = todo.length ? await session.run(todo.map((t) => t.planned), { partial: true }) : [];
+  const failed = [];
+  let recorded = 0;
+  todo.forEach((req, i) => {
+    const outcome = outcomes[i];
+    if (!outcome?.answers) {
+      failed.push(req.planned.id);
+      return;
+    }
+    const line = {
+      suite: req.suite.name,
+      case: req.item.id,
+      split: req.item.split,
+      model: session.model,
+      pack: `${pack.name}@${pack.version}`,
+      qhash: req.qhash,
+      shash: req.shash,
+      answers: outcome.answers,
+      recorded_at: new Date(io.now()).toISOString()
+    };
+    appendFileSync2(join7(req.suite.dir, "recorded.jsonl"), JSON.stringify(line) + "\n");
+    recorded += 1;
+  });
+  const receipt = session.record({ verdict: failed.length ? "partial" : "recorded" });
+  return reorder({
+    ok: true,
+    verdict: failed.length ? "partial" : "recorded",
+    suites: list2.map((s) => s.name),
+    recorded,
+    skipped,
+    ...failed.length ? { failed: failed.slice(0, LIST_LIMIT) } : {},
+    ...session.stats(),
+    next_step: failed.length ? "Run the same command again; recorded cases are skipped." : void 0,
+    receipt: receipt.id
+  });
+}
+__name(record, "record");
+function scoreSuite(context, pack, suite, model, split, sweepSpec) {
+  const items = suite.cases.filter((c) => !split || c.split === split).map((item) => {
+    const req = request(context, pack, suite, item);
+    const found = findRecording(suite.recordings, { case: item.id, qhash: req.qhash, shash: req.shash, model });
+    if (found.status !== "ok") {
+      const why = found.status === "missing" ? `no recording for ${model}` : "the question text or input changed since it was recorded";
+      throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: ${why}.`, { next_step: `Run eval record --suite ${suite.name} with a key.` });
+    }
+    const result = req.finish([{ id: "done", answers: found.line.answers, stopped: [], cached: true }]);
+    return { id: item.id, split: item.split, expected: item.expected, verdict: String(result["verdict"]), p: Number(result["p"]) };
+  });
+  const m = metrics(items, suite.config.positive);
+  const swept = sweepSpec ? sweep(items, suite.config.positive, parseSweep(sweepSpec)) : null;
+  return {
+    suite: suite.name,
+    verdict: m.wrong_positive > suite.config.max_wrong_positive ? "violated" : "pass",
+    ...m,
+    max_wrong_positive: suite.config.max_wrong_positive,
+    ...swept ? { sweep: swept.rows.map((r) => [r.t, r.precision, r.recall, r.wrong_positive]), suggested: swept.suggested, ...swept.reason ? { sweep_note: swept.reason } : {} } : {}
+  };
+}
+__name(scoreSuite, "scoreSuite");
+function score2(context, pack, list2, all) {
+  const model = resolveModel(context.io.env);
+  const split = str(context, "split");
+  if (split !== void 0 && split !== "dev" && split !== "holdout") throw new RefereeError("bad_input", '--split takes "dev" or "holdout".');
+  const scored = (all ? list2.filter((s) => s.recordings.length > 0) : list2).map((s) => scoreSuite(context, pack, s, model, split, str(context, "sweep")));
+  const verdict = scored.some((s) => s["verdict"] === "violated") ? "violated" : "pass";
+  if (!all && scored[0]) {
+    const { suite, verdict: v, ...rest } = scored[0];
+    return { ok: true, verdict: v, suite, model, ...split ? { split } : {}, ...rest };
+  }
+  return {
+    ok: true,
+    verdict,
+    model,
+    suites: scored.map((s) => ({ suite: s["suite"], verdict: s["verdict"], cases: s["cases"], wrong_positive: s["wrong_positive"], max_wrong_positive: s["max_wrong_positive"] }))
+  };
+}
+__name(score2, "score");
+var evalCommand = {
+  name: "eval",
+  describe: {
+    summary: "Record Jev's answers for an eval suite once, then score them offline.",
+    inputs: {
+      "record | score": "Positional action.",
+      "--suite <name|all>": "A directory under the evals dir with suite.json, cases.jsonl and, once recorded, recorded.jsonl. 'all' takes every suite; score then skips suites without recordings.",
+      "--evals-dir <dir>": "Where the suites live; default jev-evals in the current directory.",
+      "--split <dev|holdout>": "score: only cases from this split.",
+      "--sweep <from:to:step>": "score: precision, recall and wrong positives per threshold; suggests one only with at least 10 cases per class.",
+      "--fresh": "record: record every case again, even ones already recorded for this question text, input and model."
+    },
+    outputs: {
+      verdict: "record: recorded or partial; score: pass, or violated when wrong positives exceed the suite's max_wrong_positive",
+      recorded: "record: cases recorded now",
+      skipped: "record: cases already recorded",
+      verdicts: "score: count per verdict",
+      precision: "score: share of positive verdicts that were right",
+      recall: "score: share of expected positives found",
+      automation: "score: share of cases with a definite verdict",
+      wrong_positive: "score: positive verdicts that should not be; the kill criterion"
+    },
+    errors: [...JEV_ERRORS],
+    effects: "record sends each unrecorded case to the TypeSafe API and appends to recorded.jsonl; score reads files only.",
+    cost: "record: one Jev request per case not yet recorded. score: free and offline."
+  },
+  options: { suite: { type: "string" }, split: { type: "string" }, sweep: { type: "string" }, "evals-dir": { type: "string" } },
+  async run(context) {
+    const action = context.positionals[0];
+    if (action !== "record" && action !== "score") throw new RefereeError("bad_input", "eval needs an action: record or score.", { next_step: "Example: eval score --suite injection" });
+    const name = str(context, "suite");
+    if (!name) throw new RefereeError("bad_input", "Give --suite <name|all>.");
+    const root = resolve4(context.io.cwd, str(context, "evals-dir") ?? "jev-evals");
+    const list2 = suites(root, name);
+    const { pack } = openPack(context);
+    return action === "record" ? record(context, pack, list2) : score2(context, pack, list2, name === "all");
   }
 };
 
 // src/cli/commands/judge.ts
 var MAX_ITEMS = 500;
-var LIST_LIMIT = 20;
+var LIST_LIMIT2 = 20;
 function parseItems(text) {
   const trimmed = text.trim();
   const toItem = /* @__PURE__ */ __name((value, i) => {
@@ -2211,10 +2519,10 @@ var judge = {
           yes,
           no,
           review,
-          ...flagged.length ? { flagged: flagged.slice(0, LIST_LIMIT) } : {},
-          ...reviewIds.length ? { review_ids: reviewIds.slice(0, LIST_LIMIT) } : {},
+          ...flagged.length ? { flagged: flagged.slice(0, LIST_LIMIT2) } : {},
+          ...reviewIds.length ? { review_ids: reviewIds.slice(0, LIST_LIMIT2) } : {},
           ...stopped.length ? { stopped } : {},
-          ...unanswered.length ? { unanswered: unanswered.slice(0, LIST_LIMIT), next_step: "Some items got no answer; run judge again on those items." } : {}
+          ...unanswered.length ? { unanswered: unanswered.slice(0, LIST_LIMIT2), next_step: "Some items got no answer; run judge again on those items." } : {}
         };
       },
       { batch: true }
@@ -2224,7 +2532,7 @@ var judge = {
 
 // src/cli/commands/receipts.ts
 import { mkdirSync as mkdirSync4, writeFileSync as writeFileSync3 } from "node:fs";
-import { dirname as dirname3, resolve as resolve4 } from "node:path";
+import { dirname as dirname3, resolve as resolve5 } from "node:path";
 function sum(receipts2, key) {
   return receipts2.reduce((total, r) => total + (r[key] ?? 0), 0);
 }
@@ -2263,7 +2571,7 @@ var receipts = {
       const out = str(context, "out");
       if (!out) throw new RefereeError("bad_input", "export needs --out <file>.");
       const all = readReceipts(dataDir);
-      const path = resolve4(io.cwd, out);
+      const path = resolve5(io.cwd, out);
       mkdirSync4(dirname3(path), { recursive: true });
       writeFileSync3(path, all.map((r) => JSON.stringify(r)).join("\n") + (all.length ? "\n" : ""));
       return { ok: true, verdict: "exported", receipts: all.length, out: tildify(path, io.home) };
@@ -2408,7 +2716,7 @@ var verify = {
 };
 
 // src/cli/commands/index.ts
-var commands = [done, decide, judge, verify, receipts, doctor];
+var commands = [done, decide, judge, verify, receipts, doctor, evalCommand];
 
 // src/cli/io.ts
 import { homedir } from "node:os";
@@ -2434,7 +2742,7 @@ function processIo() {
 __name(processIo, "processIo");
 
 // src/cli/run.ts
-import { join as join7 } from "node:path";
+import { join as join8 } from "node:path";
 import { parseArgs } from "node:util";
 var GLOBAL_OPTIONS = {
   describe: { type: "boolean" },
@@ -2523,7 +2831,7 @@ async function run(argv, io, commands2) {
     }
     const result = await command.run({ io, flags, values: parsed.values, positionals: parsed.positionals });
     const receipt = typeof result["receipt"] === "string" ? result["receipt"] : null;
-    const detailsDir = flags.dryRun ? null : join7(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
+    const detailsDir = flags.dryRun ? null : join8(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
     io.write(render(result, { pretty, detailsDir, receipt }) + "\n");
     const verdict = result["verdict"];
     return typeof verdict === "string" && flags.failOn.includes(verdict) ? 3 : 0;

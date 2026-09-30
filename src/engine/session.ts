@@ -53,6 +53,26 @@ interface Prepared {
   readonly stops: readonly Stop[];
 }
 
+export function questionHash(questions: Questions): string {
+  return sha256(JSON.stringify(questions)).slice(0, 12);
+}
+
+export function stateHash(state: EntryType): string {
+  return sha256(JSON.stringify(state)).slice(0, 12);
+}
+
+export function redactRequest(p: Planned, home: string, extra: PackPatterns | undefined): { body: Prepared["body"]; stops: Stop[]; replaced: number } {
+  const options = { home, extra };
+  const count = (replaced: Readonly<Record<string, number>>) => Object.values(replaced).reduce((a, b) => a + b, 0);
+  const state = redact({ state: p.state }, options);
+  const questions = redact({ questions: p.questions }, { ...options, keepKeys: true });
+  return {
+    body: { state: state.value.state, questions: questions.value.questions },
+    stops: [...state.stopped, ...questions.stopped],
+    replaced: count(state.replaced) + count(questions.replaced),
+  };
+}
+
 export class Session {
   readonly model: string;
   readonly dataDir: string;
@@ -81,14 +101,11 @@ export class Session {
   }
 
   prepare(planned: readonly Planned[]): Prepared[] {
-    const options = { home: this.options.home, extra: this.options.pack.redact };
-    const count = (replaced: Readonly<Record<string, number>>) => Object.values(replaced).reduce((a, b) => a + b, 0);
     return planned.map((p) => {
-      const state = redact({ state: p.state }, options);
-      const questions = redact({ questions: p.questions }, { ...options, keepKeys: true });
-      this.replacedCount += count(state.replaced) + count(questions.replaced);
-      this.questionHashes.add(sha256(JSON.stringify(p.questions)).slice(0, 12));
-      return { planned: p, body: { state: state.value.state, questions: questions.value.questions }, stops: [...state.stopped, ...questions.stopped] };
+      const { body, stops, replaced } = redactRequest(p, this.options.home, this.options.pack.redact);
+      this.replacedCount += replaced;
+      this.questionHashes.add(questionHash(p.questions));
+      return { planned: p, body, stops };
     });
   }
 

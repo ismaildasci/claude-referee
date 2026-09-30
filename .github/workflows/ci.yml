@@ -40,13 +40,15 @@ jobs:
           tmp="$(mktemp -d)"
           cp -R plugins/claude-referee "$tmp/"
           cli="$tmp/claude-referee/dist/cli.mjs"
-          for c in done decide judge verify receipts doctor; do
+          for c in done decide judge verify receipts doctor eval; do
             node "$cli" "$c" --describe | node -e 'JSON.parse(require("fs").readFileSync(0, "utf8"))' || { echo "describe failed: $c"; exit 1; }
           done
           echo 'not json' | node "$tmp/claude-referee/dist/hook.mjs" session-start
           size=$(cat "$tmp"/claude-referee/dist/*.mjs | wc -c)
           echo "bundle bytes: $size"
           test "$size" -lt 200000
+      - name: Recorded evals score within each suite's allowance (offline, no key)
+        run: node plugins/claude-referee/dist/cli.mjs eval score --suite all --fail-on violated
 
   plugin:
     runs-on: ubuntu-latest
