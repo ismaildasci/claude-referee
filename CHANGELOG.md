@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- `receipts --usage`, the same as `--tokens`.
+
+### Changed
+
+- The README uses the final design: new images, the yellow-card mark and plainer wording, checked section by section with Jev.
+- Measurements now include the cache re-run and label the briefing numbers by version.
+
 ## [0.1.0] - 2026-09-30
 
 First public release.
