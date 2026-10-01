@@ -296,3 +296,33 @@ test("a summary that merely prints a zero skipped count is not capped", async ()
     await server.close();
   }
 });
+
+test("done never says met when the log itself says no tests ran, even with an exit code of 0", async () => {
+  const cases = [
+    "[info] No tests to run for Test / testOnly *.StreamMergerSpec\n[success] Total time: 7 s\nsbt exit code: 0\n",
+    "Tests run: 0, Failures: 0, Errors: 0, Skipped: 0\nBUILD SUCCESS\nmvn exit code: 0\n",
+    "0 tests executed\nexit code: 0\n",
+  ];
+  for (const evidence of cases) {
+    const server = await fakeJev(nouls(0.97));
+    try {
+      const out = io(server, evidence);
+      await run(["done", "--criteria", "all tests pass", "--evidence", "-"], out, commands);
+      assert.equal(out.json()["verdict"], "unsure", evidence);
+      assert.equal(out.json()["reason"], "no_tests_run", evidence);
+    } finally {
+      await server.close();
+    }
+  }
+});
+
+test("a log that says '0 tests failed' or runs 10 tests is not read as no tests", async () => {
+  const server = await fakeJev(nouls(0.97));
+  try {
+    const out = io(server, "100% tests passed, 0 tests failed out of 10\nTests run: 10, Failures: 0\nctest exit code: 0\n");
+    await run(["done", "--criteria", "all tests pass", "--evidence", "-"], out, commands);
+    assert.equal(out.json()["verdict"], "met");
+  } finally {
+    await server.close();
+  }
+});

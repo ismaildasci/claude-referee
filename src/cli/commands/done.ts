@@ -23,6 +23,8 @@ export function doneEvidence(text: string): string {
 }
 
 const SKIPPED_NEXT = "Some tests were skipped, risky or incomplete, so done won't say met. Look at them: if they are expected (a platform-only test), say so yourself; otherwise run the skipped ones.";
+const NO_TESTS = /\b(?:no tests? (?:to run|found|were found|executed|ran|collected|matched)|0 tests? (?:run|ran|executed|collected|found|completed)|tests? run: 0(?!\d)|nothing to run)/i;
+const NO_TESTS_NEXT = "The log itself says no tests ran, so done won't say met. Run the tests that were meant to run and pipe their output in.";
 const SKIP_WORDS = /^OK, but .*\b(?:incomplete|skipped|risky)\b/i;
 
 function hasSkips(parsed: ParsedEvidence): boolean {
@@ -62,10 +64,13 @@ export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, crit
       const p = answer?.type === "noul" ? answer.noul : 0;
       const raw: Verdict = p >= met ? "met" : p < missing ? "missing" : "unsure";
       const skipCap = raw === "met" && hasSkips(parsed);
-      const verdict: Verdict = raw === "met" && (parsed.trust === "unparsed" || parsed.conflict || skipCap) ? "unsure" : raw;
-      return { i: i + 1, verdict, p, skipCap };
+      const noTestsCap = raw === "met" && NO_TESTS.test(evidence);
+      const verdict: Verdict = raw === "met" && (parsed.trust === "unparsed" || parsed.conflict || skipCap || noTestsCap) ? "unsure" : raw;
+      return { i: i + 1, verdict, p, skipCap, noTestsCap };
     });
-    const skipCapped = per.some((c) => c.skipCap) && per.every((c) => c.verdict !== "missing") && parsed.trust !== "unparsed" && !parsed.conflict;
+    const settled = per.every((c) => c.verdict !== "missing") && parsed.trust !== "unparsed" && !parsed.conflict;
+    const noTestsCapped = settled && per.some((c) => c.noTestsCap);
+    const skipCapped = settled && !noTestsCapped && per.some((c) => c.skipCap);
     const verdict: Verdict = per.some((c) => c.verdict === "missing") ? "missing" : per.some((c) => c.verdict === "unsure") ? "unsure" : "met";
     return {
       ok: true,
@@ -74,9 +79,9 @@ export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, crit
       trust: parsed.trust,
       ...(parsed.exit_code !== null ? { exit_code: parsed.exit_code } : {}),
       ...(parsed.runners.length > 0 ? { runners: parsed.runners.map((r) => ({ runner: r.runner, passed: r.passed, failed: r.failed, errors: r.errors, skipped: r.skipped })) } : {}),
-      ...(skipCapped && verdict === "unsure" ? { reason: "skipped_tests" } : {}),
+      ...(noTestsCapped && verdict === "unsure" ? { reason: "no_tests_run" } : skipCapped && verdict === "unsure" ? { reason: "skipped_tests" } : {}),
       ...(per.length > 1 ? { criteria: per.map(({ i, verdict: v, p: pp }) => ({ i, verdict: v, p: pp })) } : {}),
-      next_step: verdict === "met" ? undefined : skipCapped && verdict === "unsure" ? SKIPPED_NEXT : parsed.trust === "unparsed" && per.every((c) => c.verdict !== "missing") ? UNPARSED_NEXT : NEXT[verdict],
+      next_step: verdict === "met" ? undefined : noTestsCapped && verdict === "unsure" ? NO_TESTS_NEXT : skipCapped && verdict === "unsure" ? SKIPPED_NEXT : parsed.trust === "unparsed" && per.every((c) => c.verdict !== "missing") ? UNPARSED_NEXT : NEXT[verdict],
     };
   };
   const state = (parsed.trust === "unparsed" ? { evidence } : { evidence: factsOf(parsed) }) as EntryType;
@@ -95,7 +100,7 @@ export const done: Command = {
       verdict: "met, unsure or missing; the lowest across criteria",
       trust: "parsed (a runner summary was recognised), exit_code (only an exit code line) or unparsed (met is not possible)",
       runners: "Parsed counts per recognised runner",
-      reason: "exit_code_nonzero when the evidence has a non-zero exit code (missing, Jev not asked); skipped_tests when met was capped at unsure because tests were skipped, risky or incomplete",
+      reason: "exit_code_nonzero when the evidence has a non-zero exit code (missing, Jev not asked); skipped_tests or no_tests_run when met was capped at unsure because tests were skipped, risky or incomplete, or the log says no tests ran",
       p: "Lowest probability that a criterion holds",
       criteria: "Per criterion, by position, when more than one",
       next_step: "Only when not met",
