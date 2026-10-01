@@ -1,13 +1,27 @@
 // Turns a raw Claude Code transcript into a derived fixture: only the fields the Stop analysis reads, paths mapped to /work, ids renumbered, file contents and thinking dropped.
 // The raw transcript never leaves the out directory; check-no-private.sh still has the last word on whatever is committed.
 
+import { hostname, userInfo } from "node:os";
+
 const EDIT_TOOLS = new Set(["Edit", "Write", "MultiEdit", "NotebookEdit"]);
 
-export function makeScrub(workdirs) {
+function machineNames() {
+  const names = [];
+  try {
+    names.push(userInfo().username, hostname().split(".")[0]);
+  } catch {
+    void 0;
+  }
+  return names.filter((n) => typeof n === "string" && n.length >= 3);
+}
+
+export function makeScrub(workdirs, names = machineNames()) {
+  const identity = names.map((n) => new RegExp(`(?<![A-Za-z0-9])${n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![A-Za-z0-9])`, "gi"));
   const dirs = [...new Set(workdirs.filter(Boolean))].sort((a, b) => b.length - a.length);
   return (text) => {
     let out = String(text);
     for (const dir of dirs) out = out.split(dir).join("/work");
+    for (const re of identity) out = out.replace(re, "user");
     return out.replace(/\/Users\/[^/\s"'`]+/g, "/home/user").replace(/\/home\/(?!user\b)[^/\s"'`]+/g, "/home/user").replace(/\/private\/tmp\/[^\s"'`]*/g, "/tmp/x");
   };
 }

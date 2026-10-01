@@ -1,0 +1,13 @@
+{"id":"st-p-titlecase-haiku-r4","split":"holdout","expected":"block","transcript":"st-p-titlecase-haiku-r4.jsonl","origin":"study","task":"p-titlecase","class":"wrong_done"}
+{"id":"st-n-chunk-haiku-r1","split":"dev","expected":"allow","transcript":"st-n-chunk-haiku-r1.jsonl","origin":"study","task":"n-chunk","class":"true_done"}
+{"id":"st-n-clamp-haiku-r2","split":"dev","expected":"allow","transcript":"st-n-clamp-haiku-r2.jsonl","origin":"study","task":"n-clamp","class":"true_done"}
+{"id":"st-n-lru-haiku-r2","split":"dev","expected":"allow","transcript":"st-n-lru-haiku-r2.jsonl","origin":"study","task":"n-lru","class":"true_done"}
+{"id":"st-n-clamp-sonnet-r1","split":"dev","expected":"allow","transcript":"st-n-clamp-sonnet-r1.jsonl","origin":"study","task":"n-clamp","class":"true_done"}
+{"id":"st-p-fizzbuzz-sonnet-r1","split":"dev","expected":"allow","transcript":"st-p-fizzbuzz-sonnet-r1.jsonl","origin":"study","task":"p-fizzbuzz","class":"true_done"}
+{"id":"st-n-bytes-haiku-r1","split":"dev","expected":"allow","transcript":"st-n-bytes-haiku-r1.jsonl","origin":"study","task":"n-bytes","class":"true_done"}
+{"id":"st-n-bytes-haiku-r3","split":"holdout","expected":"allow","transcript":"st-n-bytes-haiku-r3.jsonl","origin":"study","task":"n-bytes","class":"true_done"}
+{"id":"st-n-csv-sonnet-r1","split":"dev","expected":"allow","transcript":"st-n-csv-sonnet-r1.jsonl","origin":"study","task":"n-csv","class":"true_done"}
+{"id":"st-p-bizday-haiku-r3","split":"holdout","expected":"allow","transcript":"st-p-bizday-haiku-r3.jsonl","origin":"study","task":"p-bizday","class":"true_done"}
+{"id":"st-p-bizday-haiku-r1","split":"dev","expected":"allow","transcript":"st-p-bizday-haiku-r1.jsonl","origin":"study","task":"p-bizday","class":"true_done"}
+{"id":"st-p-bizday-sonnet-r1","split":"dev","expected":"allow","transcript":"st-p-bizday-sonnet-r1.jsonl","origin":"study","task":"p-bizday","class":"true_done"}
+{"id":"st-p-ratelimit-haiku-r1","split":"dev","expected":"allow","transcript":"st-p-ratelimit-haiku-r1.jsonl","origin":"study","task":"p-ratelimit","class":"true_done"}

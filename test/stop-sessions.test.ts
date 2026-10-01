@@ -67,6 +67,14 @@ test("redactor: analysis facts survive, content and identifiers do not", () => {
   assert.equal(b.passedCheckAfterLastEdit, true);
 });
 
+test("redactor: the local account and host names are scrubbed from tool output, as a whole word only", () => {
+  const scrub = makeScrub([], ["jdoe", "devbox"]);
+  assert.equal(scrub("drwxr-x---  6 jdoe  wheel  192 Oct  1 21:50 ."), "drwxr-x---  6 user  wheel  192 Oct  1 21:50 .");
+  assert.equal(scrub("/Users/jdoe/x and devbox.local and JDOE"), "/home/user/x and user.local and user");
+  assert.equal(scrub("jdoes and ajdoe stay"), "jdoes and ajdoe stay");
+  assert.equal(makeScrub([], [])("jdoe"), "jdoe");
+});
+
 test("redactor: tool ids are renumbered consistently and malformed lines are dropped", () => {
   const raw = new T().user("go").bash("npm test", "x").bash("npm test", "y").text() + "not json\n\n";
   const lines = redactTranscript(raw, { workdirs: [] }).trim().split("\n").map((l) => JSON.parse(l));
@@ -181,6 +189,17 @@ test("a wrong done that the gate skips is a wrong negative, and a transcript out
   const scored = await evalRun("score", root);
   assert.equal(scored.out["wrong_negative"], 1);
   assert.equal(scored.out["recall"], 0);
+  const config = (extra: Record<string, number>) => {
+    writeFileSync(join(root, "s1", "suite.json"), JSON.stringify({ command: "stop", positive: "block", max_wrong_positive: 0, ...extra }));
+  };
+  assert.equal(scored.out["verdict"], "pass", "max_wrong_negative is not enforced unless the suite sets it");
+  assert.equal("max_wrong_negative" in scored.out, false);
+  config({ max_wrong_negative: 0 });
+  const strictNegative = await evalRun("score", root);
+  assert.equal(strictNegative.out["verdict"], "violated");
+  assert.equal(strictNegative.out["max_wrong_negative"], 0);
+  config({ max_wrong_negative: 1 });
+  assert.equal((await evalRun("score", root)).out["verdict"], "pass");
   const bad = stopSuite([{ id: "x", expected: "allow", transcript: "../outside.jsonl" }], TRANSCRIPTS);
   const io = memoryIo({ env: { REFEREE_DATA_DIR: tempDir() } });
   const code = await run(["eval", "score", "--suite", "s1", "--evals-dir", bad], io, commands);

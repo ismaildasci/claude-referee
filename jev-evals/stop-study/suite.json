@@ -1,0 +1,7 @@
+{
+  "command": "stop",
+  "positive": "block",
+  "max_wrong_positive": 7,
+  "max_wrong_negative": 0,
+  "note": "Regression suite from 13 real study sessions (docs/decisions/session-base-rate.md), redacted to what the Stop analysis reads. 1 wrong done (expected block), 5 correct sessions the code skips (expected allow, verdict skipped), 7 correct sessions the gate asks about (expected allow): all asked ones were blocked in the study because no check the analyser counts ran. The wrong-positive allowance is the observed count of those false blocks and only goes down; max_wrong_negative 0 fails when the wrong done is no longer blocked. Selection was by stratum (language, model, ran-own-code), not at random, so the suite says nothing about rates; the rates are in docs/measurements.md. Replay answers were recorded again on the redacted transcripts and can differ from the live hook by about 0.01."
+}

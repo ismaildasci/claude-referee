@@ -23,6 +23,7 @@ interface SuiteConfig {
   readonly question?: string;
   readonly positive: string;
   readonly max_wrong_positive: number;
+  readonly max_wrong_negative?: number;
 }
 
 interface Suite {
@@ -62,6 +63,7 @@ function readSuite(root: string, name: string): Suite {
     ...(typeof raw["question"] === "string" ? { question: raw["question"] } : {}),
     positive: typeof raw["positive"] === "string" ? raw["positive"] : "met",
     max_wrong_positive: typeof raw["max_wrong_positive"] === "number" ? raw["max_wrong_positive"] : 0,
+    ...(typeof raw["max_wrong_negative"] === "number" ? { max_wrong_negative: raw["max_wrong_negative"] } : {}),
   };
   const recorded = join(dir, "recorded.jsonl");
   return {
@@ -236,9 +238,10 @@ function scoreSuite(context: Context, pack: Pack, suite: Suite, model: string, s
   const swept = sweepSpec ? sweep(items, suite.config.positive, parseSweep(sweepSpec)) : null;
   return {
     suite: suite.name,
-    verdict: m.wrong_positive > suite.config.max_wrong_positive ? "violated" : "pass",
+    verdict: m.wrong_positive > suite.config.max_wrong_positive || (suite.config.max_wrong_negative !== undefined && m.wrong_negative > suite.config.max_wrong_negative) ? "violated" : "pass",
     ...m,
     max_wrong_positive: suite.config.max_wrong_positive,
+    ...(suite.config.max_wrong_negative !== undefined ? { max_wrong_negative: suite.config.max_wrong_negative } : {}),
     ...(swept ? { sweep: swept.rows.map((r) => [r.t, r.precision, r.recall, r.wrong_positive]), suggested: swept.suggested, ...(swept.reason ? { sweep_note: swept.reason } : {}) } : {}),
   };
 }
@@ -276,7 +279,7 @@ export const evalCommand: Command = {
       "--max-usd <x>": "record: stop before the first request when the estimated input cost, from a token estimate, is above x USD.",
     },
     outputs: {
-      verdict: "record: recorded or partial; score: pass, or violated when wrong positives exceed the suite's max_wrong_positive",
+      verdict: "record: recorded or partial; score: pass, or violated when wrong positives exceed the suite's max_wrong_positive or, when the suite sets max_wrong_negative, wrong negatives exceed that",
       recorded: "record: cases recorded now",
       skipped: "record: cases already recorded",
       verdicts: "score: count per verdict",
@@ -284,6 +287,7 @@ export const evalCommand: Command = {
       recall: "score: share of expected positives found",
       automation: "score: share of cases with a definite verdict",
       wrong_positive: "score: positive verdicts that should not be; the kill criterion",
+      wrong_negative: "score: expected positives that got a definite non-positive verdict (for a stop suite also a skip); enforced only when suite.json sets max_wrong_negative",
     },
     errors: [...JEV_ERRORS],
     effects: "record sends each unrecorded case to the TypeSafe API and appends to recorded.jsonl; score reads files only.",
