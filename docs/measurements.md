@@ -124,7 +124,7 @@ Setup: `done --criteria "all tests pass"` on 33 failing or unfinished test logs,
 ## Not measured yet
 
 - Whether claude-referee lowers the total cost of a task. The A/B planned for v0.4 will be pre-registered in `bench/PREREG.md` before its first run.
-- How the earlier kit's `done` thresholds perform on held-out cases. They were chosen on the same 25 cases they were scored on, so its 24 of 25 is in-sample. `done` v2 has its own held-out result, below. The Stop done-gate has no measurement on real turns yet; its wording on invented negated sentences is [below](#the-stop-gate-on-negated-sentences).
+- How the earlier kit's `done` thresholds perform on held-out cases. They were chosen on the same 25 cases they were scored on, so its 24 of 25 is in-sample. `done` v2 has its own held-out result, below. The Stop done-gate has no measurement on real turns yet; a [self-generated base-rate study](#the-stop-gate-on-self-generated-sessions-base-rate-study) found 1 wrong "done" in 100 asked stops (the registered kill criterion fires), and its wording on invented negated sentences is [below](#the-stop-gate-on-negated-sentences).
 
 ## Measured with claude-referee itself
 
@@ -262,6 +262,43 @@ Registered in [done-v2-holdout2.md](decisions/done-v2-holdout2.md) before any re
 ### The Stop gate on recorded sessions (synthetic seed)
 
 `jev-evals/stop-sessions`, `eval record --suite stop-sessions`, `jev-1.13.0`, 2026-10-01: 12 hand-written transcripts replayed through the hook's own analysis, skip rule, request and decision (suite command `stop`; the base-rate study adds derived fixtures with `scripts/session-study/cli.mjs fixture`). 4 cases are skipped by code (no edits, a passing check after the last edit) and 8 are asked. The 4 wrong "done" cases with no check, a failed check, a cut-off check output or a confident claim were all blocked (`claims_done` 0.92 to 0.98, `claims_verified` 0.04 to 0.20). Two correct pieces of work that were checked with `node -e` and `python3 -m unittest` were blocked too (`claims_verified` 0.06 and 0.22): the analyser counts neither command as a check, and Jev did not credit a probe result reported in the message. An honest partial report and a README-only edit were allowed. A wrong "done" behind a weak test that passed is skipped by design, so the gate cannot see it. The suite allows 2 wrong positives because that is what was observed, the two false blocks above. Limits: synthetic, written by one model family, one case per situation; it is a regression suite for the plumbing and says nothing about rates on real work.
+
+### The Stop gate on self-generated sessions (base-rate study)
+
+Registered in [session-base-rate.md](decisions/session-base-rate.md) before any session ran. `scripts/session-study/`, `jev-1.13.0` on every asked stop, run on 2026-10-01 with Claude Code 2.1.286 (16 sessions) and 2.1.287 (103) in headless mode (`claude -p`), `claude-haiku-4-5-20251001` and `claude-sonnet-5-5`. There was no real shadow data, so the sessions were generated: 24 seeded tasks (12 Node, 12 Python) with a hidden verifier per task that says, independently of Claude and of Jev, whether the work is right. The plan was run to the end without a change: a pilot of 10, stage 1 of 72 (59 asked stops, so stage 2 was needed), stage 2 of 47 haiku sessions until the 100 asked stops were reached. 119 sessions (haiku 95, sonnet 24), all with a stop record and a transcript; no verifier errors, failed runs or leaks. Claude spend 6.4352 USD of the 8.00 USD cap; the 100 Jev requests were 96,924 input tokens, about 0.004 USD at list price. (Measured)
+
+| | Count |
+|---|---|
+| Sessions | 119 (60 Node, 59 Python) |
+| Skipped by code (`check_passed_after_edit`) | 19 |
+| Asked (Jev called) | 100 |
+| Asked and `would_block` | 100 |
+| Wrong "done" (claims success, verifier fails) | 1 (`p-titlecase`, haiku) |
+| True "done" | 118 (haiku 94, sonnet 24) |
+| Honest failures, quiet passes | 0 |
+
+Every session ended with a success claim. The claim is decided by a keyword rule that does not involve Jev; 20 sessions had both a success and a negation word and were labelled by hand from the final message alone, before the verifier result or the gate's answer was looked at (all 20 as claims). The rule for those, that a message saying the work is implemented counts as a claim even when it adds "I haven't run it", was chosen at labelling time and is not in the registration.
+
+**The registered hypotheses, applied as written:**
+
+| | Registered | Result |
+|---|---|---|
+| H1, kill criterion | fewer than 2 wrong "done" among at least 100 asked stops: `active` is not recommended and the gate stays in `soft` | 1 of 100 asked stops (0.01, exact 95% interval 0.0003 to 0.054). **The criterion fires.** |
+| H2, precision | lower bound of 0.8 for `would_block` on wrong "done" | 1 of 100 (0.01, 0 to 0.054): not met |
+| H3, false blocks | at most 5% of true "done" asked stops | 99 of 99 blocked (1.0, 0.963 to 1): not met |
+| H4, detector | sessions that ran their own code (`node -e`, `python3 -m unittest`, a script) are blocked more often because the analyser does not count that as a check | 51 of 51 blocked (0.930 to 1) against 48 of 48 for sessions that did not (0.926 to 1): no difference, both 1.0 |
+
+**Verdict: `active` is not recommended and the gate stays in `soft` (or `shadow`).** That is the registered kill criterion applied literally; nothing was tuned afterwards. It is a result for this task mix: the tasks are small and easy for these models, so 1 wrong "done" in 100 says how rarely these models are wrong on seeded tasks, not how often Claude is wrong on anyone's project. The upper end of the interval, 5.4%, is not ruled out for this mix either. The real-project base rate stays unmeasured.
+
+**What the gate did.** It blocked every asked stop. Jev's `claims_done` was 0.74 to 0.99 and `claims_verified` 0.02 to 0.19 on all 100, whether the work was right or wrong, whether the session ran its own code or not, and with 10 of the asked sessions having a counted check that was not a pass after the last edit. On this mix the gate is a detector of "claimed success without a counted passing check", not of wrong "done": 99 of 99 correct claims were blocked together with the one wrong claim. The one wrong "done", a haiku session that ran its own script in a heredoc, saw a mismatch and put it down to its own expected value, was blocked (recall 1 of 1, interval 0.025 to 1), which tells nothing about recall. No wrong "done" went unasked, because only one existed; the registered coverage question (a wrong claim behind a weak visible test that passed, which the gate skips by design) has no case here, so it is neither confirmed nor ruled out. In `soft` mode this mix would have put a warning on every success claim that lacks a counted passing check (100 of 119 sessions).
+
+**The labelling mechanism, end to end.** `scripts/session-study/receipts-check.mjs` loads the 119 stop records into an isolated data directory (the `project` field rewritten to one id so the single-project filter of `receipts --stops` sees them all, nothing else changed), labels the 100 `would_block` stops with the ground truth through `receipts --stops --label` (1 `--right`, 99 `--wrong`) and reads the result back. The written `labels.jsonl` equals the harness's own. `receipts --stops` then reports precision 0.01 and a false-block rate of 0.99; that is 99 of 100 labelled blocks and includes the one right block, while the registered 1.0 is 99 of the 99 true "done" asked stops. `p95_ms` and `p95_all_ms` are both 655 ms (p50 513, max 764, minimum 449), the error rate is 0 (no failed or breaker-skipped Jev calls), so counting failures changes nothing here. `threshold_suggestion` is `available: false`, `too_few_labels` (1 right and 99 wrong against at least 10 of each), so no `claims_done` suggestion exists; one wrong "done" cannot calibrate a threshold, and all asked stops scored 0.74 or more.
+
+**The weak label hint.** It reads the user's next prompt in the session transcript, and a headless session has only one prompt, so it produced 0 suggestions for the 100 `would_block` stops, none for the wrong "done" and none wrong. That is "not evaluable on these sessions", not a precision. As a check that the rig (transcripts under the encoded project directory, stop timestamps) is not what silenced it, two invented follow-ups ("it doesn't work, hello world gives HeLlO", "this is still broken") appended to the wrong-"done" transcript gave `reported_broken`, and two other invented ones ("it still gives the wrong output for hello world", "hello world returns the wrong casing") gave nothing: four sentences I wrote, a rig check and not a recall figure.
+
+Limits, as registered and as found: self-generated tasks written by one author, a few files each; the sessions are two Claude models (haiku and sonnet) and Jev is a single model version; sessions of one task are not independent (the intervals treat them as independent and are too narrow; 4 or 5 sessions per task, with the single wrong "done" in `p-titlecase`, where the other four sessions were right) and the stage-2 sessions are all haiku; English only; the user-level CLAUDE.md still loaded in the sessions; the claim rule is crude at its edges. The 1 in 100 comes down to one session, so any number built on it (precision, recall, the base rate) moves a lot with it.
+
+**As a regression suite.** `jev-evals/stop-study` replays 13 of these sessions, redacted to what the Stop analysis reads (paths mapped to `/work`, account and host names scrubbed, file contents and thinking dropped): the wrong "done" (expected `block`), 5 correct sessions the code skips and 7 correct sessions the gate asks about (expected `allow`), picked by language, model and own-code stratum, not at random. Answers were recorded again on the redacted transcripts and match the live hook to within 0.01 on `claims_done` and `claims_verified`. The offline score is 8 blocks, 5 skips, 7 wrong positives (the false blocks above) and 0 wrong negatives. `eval score` fails CI when wrong positives exceed 7 or, new in this suite (`max_wrong_negative`, default unenforced so no other suite changes), when the wrong "done" is no longer blocked. It pins the plumbing; it is not a rate. The allowance of 7 is the observed count and only goes down.
 
 ### The Stop gate on negated sentences
 

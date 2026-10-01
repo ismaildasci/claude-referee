@@ -63,6 +63,8 @@ The done-gate looks at a stop only when Claude edited files and no check passed 
 
 `active` isn't recommended until shadow mode has at least 50 labelled stops with a precision of at least 0.8 and no more than 5% false blocks. It must also let through no more false "done" claims than Claude Code's built-in `/goal`, at a lower total cost. Both modes send the data listed in [privacy](privacy.md).
 
+The one measurement so far is a [self-generated study](measurements.md#the-stop-gate-on-self-generated-sessions-base-rate-study) of 119 sessions on seeded tasks: 1 wrong "done" in 100 asked stops, so the registered kill criterion fires and `active` is not recommended, and the gate would have blocked all 100 asked stops, 99 of them on correct work (Claude had not run a check the analyser counts). On that mix `soft` would have warned on every success claim without a counted passing check. Real projects are unmeasured; label your own stops before you rely on either mode.
+
 ## The API key
 
 claude-referee looks for the key in this order:
