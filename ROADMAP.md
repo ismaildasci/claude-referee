@@ -17,7 +17,7 @@ Items marked **help wanted** are good places to start, and most need no TypeSafe
 ## v0.1.x: live numbers
 
 - **Live API checks.** Done on 2026-09-30: the API's edge cases, latency at 1, 6 and 8 requests in parallel, and option-order sensitivity on a public set of 20 decisions. Results: [Measured with claude-referee itself](docs/measurements.md#measured-with-claude-referee-itself).
-- **A close-call decision set.** Planned: decisions whose options are close, to measure option-order sensitivity again and whether reversing the order inside one request can replace the second request. On the public set, every policy, even the written order alone, found the all-orders leader, so it couldn't tell them apart.
+- **A close-call decision set.** Done on 2026-10-01 with a pre-registered design: [Option order on a close-call set](docs/measurements.md#option-order-on-a-close-call-set). Next, as a separate decision record: whether `decide` can send both orders in one request.
 
 ## v0.2: evidence in code, and thresholds in the open
 

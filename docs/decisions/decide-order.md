@@ -1,6 +1,6 @@
 # Option order on close calls: pre-registration
 
-Status: Pre-registered; results pending.
+Status: Pre-registered; results in.
 
 Date: 2026-10-01. Written before any full-run data for this measurement exists. The screening answers that selected the cases do exist; they are described under Deviations.
 
@@ -177,4 +177,13 @@ Anything that changes after this record is committed is listed here with its dat
 
 ## Results
 
-Pending.
+Run on 2026-10-01 with the registered command, after the registration commit `eea5c77`: 1,014 requests, 551,379 input tokens, about $0.023, no retries. Raw: [order-2026-10-01.json](../../jev-evals/decide-close/order-2026-10-01.json). The `registered` flag in the summary is true. Nothing in the design changed between the commit and the run.
+
+- **Order matters on close calls.** One option's probability moved by 0.26 on average between orders and by up to 0.42. In 27 of the 39 decisions the spread was 0.24 or more, and in the same 27 the leader changed in at least one of the 24 orders. 8 decisions were tied (24-order margin below 0.08); 31 were not.
+- **Leader agreement with the 24-order leader, 31 non-tied decisions:** written 26, written plus re-ask 26, written plus reversed 31, four rotations 30, same-request pair 30. This is descriptive: the reference contains each policy's own draws.
+- **Mean leave-out distance (primary):** written 0.061, written plus re-ask 0.061, written plus reversed 0.033, four rotations 0.031, same-request pair 0.037.
+- **Comparison gate:** written plus reversed beat written plus re-ask by 0.029 on average and was closer in 32 of 39 decisions (82%). Both margins of the gate were met, so the wording "the second order helped on close calls" is allowed. Averaging two answers alone (written plus re-ask) did not help.
+- **Re-ask noise:** mean 0.042, 95th percentile 0.09 (the noise limit is 0.10).
+- **K3: PASS** on the breach count and the leader condition. 4 of 39 decisions breached the threshold of 0.09, against 11 allowed. Of 18 decisive decisions, none had a different leader between the same-request pair and the separate written plus reversed. Read with the limits: the re-ask 95th percentile of 0.09 is close to the 0.10 limit, where the calibrated power to detect a 0.05 shift is about two thirds; a PASS means no breach beyond what noise explains, not identity.
+- **Subsets:** S1 (27 cases) and S2 (31 cases) give the same conclusions: the second order helped, and K3 passes. Mean leave-out distance written 0.060 and 0.062, written plus reversed 0.031 and 0.032.
+- **Consequence, as registered:** K3 passed, so a follow-up decision record may propose sending both orders in one request. This record changes no code; `decide` still asks in two requests.

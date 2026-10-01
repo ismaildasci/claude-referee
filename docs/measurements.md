@@ -125,7 +125,6 @@ Setup: `done --criteria "all tests pass"` on 33 failing or unfinished test logs,
 
 - Whether claude-referee lowers the total cost of a task. The v0.2 A/B will be pre-registered in `bench/PREREG.md` before its first run.
 - How the done-gate performs on held-out cases. The `done` threshold was chosen on the same 25 cases it was scored on, so its 24 of 25 is in-sample. At least 40 new labelled cases are needed.
-- Whether flipping the order inside a single request can replace the second request. On the public set below, every policy, even the written order alone, found the all-orders leader, so it couldn't tell them apart.
 
 ## Measured with claude-referee itself
 
@@ -177,6 +176,16 @@ Run on 2026-09-30 (UTC) and 2026-10-01 against `jev-1.13.0`, from one machine, w
 - Asking the same request again moved an option's probability by up to 0.04. The earlier kit measured 0.01 at most.
 - **How to read it:** 19 of the 20 decisions had a leader at 0.9 or more over all orders. The lowest leader, 0.89, had the largest spread, 0.13; wherever the leader was at 1, the spread was 0.
 - **Reversing inside one request:** the reversed question asked in the same request as the written one matched the separate reversed request within 0.01; the written question matched its separate request within 0.03. Both are within the 0.04 that asking again moved it. Because every policy, even the written order alone, matched the all-orders leader in 20 of 20 decisions, this set can't tell the policies apart by leader agreement. `decide` still asks in two orders.
+
+### Option order on a close-call set
+
+`node scripts/order-sensitivity.mjs`, 1,014 requests on 2026-10-01, no retries, about $0.023. 39 invented public decisions with 4 options each, screened to be close (leader below 0.70 in two fixed orders; [cases](../jev-evals/decide-close/cases.jsonl)), each asked in all 24 option orders, once more in the written order, and once as a single request holding the written and the reversed question. The design, metrics and rules were committed before the run: [decide-order.md](decisions/decide-order.md). Raw: [order-2026-10-01.json](../jev-evals/decide-close/order-2026-10-01.json).
+
+- One option's probability moved by 0.26 on average between orders, and by up to 0.42. In 27 of the 39 decisions the spread was 0.24 or more and the leader changed in at least one order. On the public set above it moved by 0.026 on average.
+- Of 31 non-tied decisions, the written order alone matched the all-orders leader in 26, written plus reversed in 31, four rotations in 30, and the single two-question request in 30.
+- Mean distance from the all-orders answer, leaving out the policy's own orders: written 0.061, written plus re-ask 0.061, written plus reversed 0.033. Asking the written order twice did not help; the reversed order did, in 32 of 39 decisions.
+- Reversing inside one request: the same-request pair matched the separate written plus reversed leader on all 18 decisive decisions, and 4 of 39 decisions moved by more than 0.09 against separate requests (11 allowed). This passes the registered rule. Asking again moved an option by up to 0.09 at the 95th percentile on this set, near the limit where the rule has about two thirds of the power to see a 0.05 shift, so read it as "no difference beyond noise", not as identical.
+- Limits: invented cases written by a model, one model version, one question, 4 options; 13 of 39 cases come from 5 source decisions (the 31-case subset with one per source gives the same result); the all-24 mean is a reference, not a known right answer.
 
 ### Checking claims with `decide`
 
