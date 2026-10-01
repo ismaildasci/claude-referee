@@ -27,10 +27,10 @@ In `main`, not released:
 - `done` answers `missing` without asking Jev when the evidence has a non-zero exit code.
 - The PHPUnit `Tests:` line is no longer read as a jest summary; `judge` and `decide` no longer let float arithmetic move a value that sits exactly on a band.
 - CI scans the whole git history with a pinned gitleaks.
+- A weekly job compares TypeSafe's `models.md`, `api.md` and `llms.txt` with recorded hashes (the rate limits changed once without an announcement we could find).
 
 Still open:
 
-- A weekly CI job that compares the TypeSafe docs pages for limits and models (`models.md`, `api.md`, `llms.txt`) with recorded hashes, because the rate limits changed once without an announcement we could find.
 - Publishing to npm (after 2026-10-03 14:22 UTC, with a one-time code from the maintainer's authenticator), then trusted publishing with a manually triggered workflow behind a protected environment. No workflow publishes on a tag by itself.
 - Whether `decide` should send both orders in one request. A pilot on the 39 close-call decisions on 2026-10-01 passed its registered rules (leaders within re-ask noise, 33% fewer input tokens) but showed no latency gain, and the saving is about $0.000015 per decision, so no code change is planned until a fresh hold-out says otherwise. The pilot's raw data isn't in the repository yet.
 
