@@ -10,11 +10,23 @@ No. It answers narrow questions with probabilities and stays out of the way belo
 
 ## Will it break my prompt cache?
 
-It shouldn't. Claude Code caches the conversation by prefix, and the hooks only append short notes; nothing rewrites earlier turns. We haven't measured cache misses with the plugin on yet. The cache guard exists because switching models mid-session re-reads everything uncached.
+It shouldn't. Claude Code caches the conversation by prefix, and the hooks only append short notes; nothing rewrites earlier turns. We haven't measured cache misses with the plugin on yet. Switching models mid-session does re-read everything uncached, but Claude Code already asks before a `/model` switch while the cache is warm, so claude-referee doesn't add its own prompt.
 
 ## What if TypeSafe is slow or down?
 
-The v0.1 hook doesn't call Jev, so sessions never wait on it. A CLI call gives up after 30 seconds and reports `timeout`, which is an unknown, not a "no". From v0.2, hooks that call Jev get a short time budget of a few seconds and fail open: you lose the check, not the session.
+The session note never calls Jev, so sessions don't wait on it. A CLI call gives up after 30 seconds and reports `timeout`, which is an unknown, not a "no". The done-gate, when you turn it on, calls Jev with a budget of 2 seconds and fails open: you lose the check, not the session, and after three failures in a row it skips Jev until the session ends. TypeSafe documents limits of 100K tokens and 40 requests per second that "can change without notice" ([models](https://docs.typesafe.ai/models.md)); its [status page](https://status.typesafe.ai) lists past incidents. We found no SLA in its customer terms.
+
+## How is `claude-referee verify` different from Claude Code's `/verify`?
+
+They answer different questions. Claude Code's bundled `/verify` builds and runs your app to see that a change works. `claude-referee verify` checks whether claims in a text are supported by a source text you give it. The command is planned to be renamed `claims`, with `verify` kept as an alias until 1.0.
+
+## How is the done-gate different from `/goal`?
+
+`/goal` is a Stop hook that asks a small model whether a condition holds; per [Claude Code's docs](https://code.claude.com/docs/en/goal) it calls no tools and judges only what is already in the conversation. The done-gate looks at facts first (which files were edited, whether a check passed afterwards) and asks Jev only about what is left, and it writes every decision to a local receipt. They can run together. A measured comparison is planned for v0.4; until then neither is claimed to be better.
+
+## Isn't there already a `receipts` plugin?
+
+Anthropic's official marketplace has `receipts` and `session-report` plugins that read your Claude Code transcripts to report usage. claude-referee's receipts are different: one line per decision it made (command, verdict, request ids, token counts, cost, hash of the questions). `receipts --usage` is a narrow counter of what claude-referee itself cost; for general usage, use Claude Code's `/usage`.
 
 ## What does it cost to keep installed?
 
@@ -26,7 +38,7 @@ Yes. The CLI is a single bundled file with the TypeSafe SDK inside, so it needs 
 
 ## Why is the model pinned?
 
-Thresholds are tuned per model version, so claude-referee defaults to `jev-1.13.0`. You can override it with `TYPESAFE_MODEL` or the `model` setting, but the pack's thresholds were tuned on the default. Moving to a new Jev model means re-checking the thresholds on labelled cases; the eval harness that makes this cheap is on the [roadmap](../ROADMAP.md).
+Thresholds are tuned per model version, so claude-referee defaults to `jev-1.13.0`. You can override it with `TYPESAFE_MODEL` or the `model` setting, but the pack's thresholds were tuned on the default. Moving to a new Jev model means re-checking the thresholds on labelled cases; `eval record` and `eval score` make this cheap for the `done` and `verify` suites; the other commands are on the [roadmap](../ROADMAP.md).
 
 ## How do I update or uninstall?
 

@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/hero-dark.gif">
-    <img alt="claude-referee: evidence over eloquence. Claude says all tests pass; the referee's done-gate (v0.2) replies that no check has passed since the last edit and asks Claude to run cargo nextest, which shows 2 failures." src="assets/hero-light.gif" width="100%">
+    <img alt="claude-referee: evidence over eloquence. Claude says all tests pass; the referee's done-gate (active mode, planned) replies that no check has passed since the last edit and asks Claude to run cargo nextest, which shows 2 failures." src="assets/hero-light.gif" width="100%">
   </picture>
 </p>
 
@@ -37,12 +37,11 @@ claude-referee is an unofficial plugin for Claude Code that checks lines like th
 |---|---|---|
 | **You or Claude run a command** | `done`, `decide`, `judge` or `verify` asks Jev and prints a one-line answer | v0.1 |
 | **A session starts** | Claude gets a short note, at most 800 characters, on how to use the commands | v0.1 |
-| **Claude stops** | Off by default. In `active` mode, when Jev says Claude's "done" is unverified, the stop is blocked and Claude gets a note naming the check to run, at most three times a session. If Jev is slow or down, the hook fails open | v0.2 |
-| **You switch models** | A warning before a switch that would make Claude re-read the whole conversation at full price | v0.2 |
+| **Claude stops** | Off by default. In `shadow` mode it only records what it would have done (`receipts --stops`). The planned `active` mode blocks a stop when Jev says Claude's "done" is unverified, with a note naming the check to run, at most three times a session. If Jev is slow or down, the hook fails open | `shadow` in v0.1.3; `active` planned |
 
 If a check finds nothing, Claude sees nothing. If it finds something, Claude sees a note of 300 characters at most.
 
-Why not just a command? In the kit that came before claude-referee, Claude could run the `done` check whenever it liked, and it ran once in 14 days. A check that doesn't run by itself barely exists. That's why v0.2 adds one that runs every time Claude stops.
+Why not just a command? In the kit that came before claude-referee, Claude could run the `done` check whenever it liked, and it ran once in 14 days. A check that doesn't run by itself barely exists. That's why there is a check that runs every time Claude stops; today it only records what it would do.
 
 ## How it works
 
@@ -56,7 +55,7 @@ Why not just a command? In the kit that came before claude-referee, Claude could
 3. Jev answers with probabilities.
 4. claude-referee compares them with fixed thresholds. It stays silent, adds a short note, or prints a one-line JSON result.
 
-If plain code can answer a question, no model is asked. The diagram shows the full design: in v0.1 the session note and the four commands work, while the stop check, the model-switch warning and reading test output in code come in v0.2 ([roadmap](ROADMAP.md)).
+If plain code can answer a question, no model is asked. The diagram shows the full design: the session note, the four commands, reading test output in code and the stop check in `shadow` mode work today, and blocking a stop (`active`) is planned ([roadmap](ROADMAP.md)); the model-switch warning was dropped because Claude Code already asks.
 
 ## What's measured so far
 

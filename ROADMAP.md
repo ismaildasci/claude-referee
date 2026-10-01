@@ -1,8 +1,10 @@
 # Roadmap
 
-claude-referee grows one measured step at a time. A feature moves into a release only with tests, and a check that changes Claude's behaviour only with a measurement. Each item below says what "done" means for it. Dates aren't promised; the order is.
+claude-referee compares what Claude Code says with the evidence, keeps a receipt of every decision and publishes its own error rate. It grows one measured step at a time: a feature moves into a release only with tests, and a check that changes Claude's behaviour only with a measurement. Each item below says what "done" means for it. Dates aren't promised; the order is. Until 1.0 every minor version is a theme and every patch is a fix.
 
 Items marked **help wanted** are good places to start, and most need no TypeSafe key. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+What it is not: a model router, a context compactor or a general code reviewer. It doesn't replace Claude Code's `/verify` (which runs your app) or `/goal` (a Stop hook that reads only the conversation); it reads the evidence itself and records the decision. What was dropped or postponed, and why, is in [docs/decisions/dropped.md](docs/decisions/dropped.md).
 
 ## v0.1: the commands and the session note (released)
 
@@ -14,47 +16,66 @@ Items marked **help wanted** are good places to start, and most need no TypeSafe
 - The session note, only in projects with `.claude/referee.json`
 - The `generic` pack and the `jev` skill
 
-## v0.1.x: live numbers
+## v0.1.x: hardening and live numbers
 
-- **Live API checks.** Done on 2026-09-30: the API's edge cases, latency at 1, 6 and 8 requests in parallel, and option-order sensitivity on a public set of 20 decisions. Results: [Measured with claude-referee itself](docs/measurements.md#measured-with-claude-referee-itself).
-- **A close-call decision set.** Done on 2026-10-01 with a pre-registered design: [Option order on a close-call set](docs/measurements.md#option-order-on-a-close-call-set). Next, as a separate decision record: whether `decide` can send both orders in one request.
+Released by 0.1.3: `done` v2 (runner output parsed in code), `verify` v2, the done-gate in `shadow` mode, the pack linter, `eval record` and `eval score`, `npm run ci:local`, and the live API checks and close-call option-order measurement ([results](docs/measurements.md)).
+
+In `main`, not released:
+
+- A request aborted after the API's headers arrived no longer kills the process with an uncaught error (SDK 0.6.0 bug; checked on Node 22 only).
+- The TypeSafe key goes only to `https://api.typesafe.ai`; another `TYPESAFE_BASE_URL` needs `REFEREE_BASE_URL_KEY`.
+- `done` answers `missing` without asking Jev when the evidence has a non-zero exit code.
+- The PHPUnit `Tests:` line is no longer read as a jest summary; `judge` and `decide` no longer let float arithmetic move a value that sits exactly on a band.
+- CI scans the whole git history with a pinned gitleaks.
+
+Still open:
+
+- A weekly CI job that compares the TypeSafe docs pages for limits and models (`models.md`, `api.md`, `llms.txt`) with recorded hashes, because the rate limits changed once without an announcement we could find.
+- Publishing to npm (after 2026-10-03 14:22 UTC, with a one-time code from the maintainer's authenticator), then trusted publishing with a manually triggered workflow behind a protected environment. No workflow publishes on a tag by itself.
+- Whether `decide` should send both orders in one request. A pilot on the 39 close-call decisions on 2026-10-01 passed its registered rules (leaders within re-ask noise, 33% fewer input tokens) but showed no latency gain, and the saving is about $0.000015 per decision, so no code change is planned until a fresh hold-out says otherwise. The pilot's raw data isn't in the repository yet.
 
 ## v0.2: evidence in code, and thresholds in the open
 
-- **Recorded-answer evals.** Cases live in `jev-evals/<suite>/cases.jsonl` with separate dev and hold-out splits. `eval record` saves Jev's answers once; `eval score --sweep` chooses thresholds offline and gives the same result every time. CI fails when a question changes without new recordings. **help wanted:** labelled cases, invented or public, for `done`, `verify` and `judge`.
-- **`done` v2.** In `main`, not released. Test, lint and type-check output is parsed in code into counts, an exit code and the failing test names, and only that reaches Jev; unrecognised output can never return `met`. Measured on 48 held-out cases: no wrong `met`, `missing` found in 27 of 30, smaller than v1's input ([result](docs/measurements.md#done-v2-on-held-out-cases)). Still open: checking the parsers against real runs of each tool, and more cases. **help wanted:** real output samples from pytest, `go test`, PHPUnit, RSpec, `dotnet test`, Mocha, ESLint, Ruff, Vitest, Jest, Cargo and tsc, in the formats your CI prints.
-- **`verify` v2.** In `main`, not released. Quotes and numbers in a claim are matched against the source in code first: a double-quoted text that isn't there is reported unsupported, and a backticked name or number that isn't there is reported unsure, both without asking Jev. What's left gets two three-way questions per claim (supports, contradicts or says nothing, in both option orders) and one check for an instruction aimed at the judge in the source. Measured on 60 held-out claims: no wrong `supported`, 19 of 24 true claims confirmed, but more `unsure` than v1 and no more true claims confirmed than v1 (22 of 24); one request per source, as in v1, with more questions in it ([result](docs/measurements.md#verify-v2-on-held-out-claims)). The registered "fewer requests than v1" criterion is not met. The bands were checked against the recorded answers and left alone: bands can't recover the 5 lost true claims, which stop at the code-side checks or the injection gate ([result](docs/measurements.md#verify-v2-on-held-out-claims)). Still open: whether the number and backtick checks or the injection gate can be loosened without a wrong `supported`; each needs a registered design first.
-- **The done-gate.** A Stop hook, off by default, that looks at a stop only when Claude edited files and no check passed afterwards, and asks Jev whether Claude claimed success it didn't verify. `shadow` mode is in `main`, not released: it records the decision and never blocks; `receipts --stops` lists decisions, and `--label <id> --right|--wrong` marks them. Still open: `active` mode (a block of at most 300 characters naming the check, at most three per session, 60 seconds apart), test-integrity notes, evidence files from `areas[].evidence`, and the comparison with Claude Code's built-in `/goal`. `active` is recommended only after at least 50 labelled stops with precision of 0.8 or better, no more than 5% false blocks and a p95 of 3 seconds or less.
-- **A pre-registered A/B.** 12 to 20 cases plus 3 to 5 controls, a pilot to choose the number of runs, and results with confidence intervals in `bench/RESULTS.md`. The plan goes into `bench/PREREG.md` before the first run, and the result is published whichever way it goes.
-- **The cache guard.** Before a `/model` switch that would re-cache a warm conversation for $0.25 or more, it asks. It never blocks on its own, only warns in `-p` mode, and needs Claude Code 2.1.251 or later. Project files can only lower the threshold.
-- **The pack linter.** `lint-pack <dir>` is in `main`, not released: it flags a missing model pin, questions without instructions, an and/or inside a Noul, true and false criteria that don't differ, a Choice without an other or none option or with an undefined category, more than 255 options, a Score with fewer than 2 or more than 10 levels or numbers only, and counting or date questions. `--recorded <evals dir>` flags a Noul whose 10th percentile is 0.5 or more over at least 10 recorded answers. Not built: the check that backticked state paths exist, since packs have no state schema. The generic pack lints clean.
-- **An MCP server, as an experiment.** It ships only if it passes a gate set in advance: at most 150 tokens of fixed cost per session, a lower median total cost than the CLI on structured cases, and no drop in task success.
+- **Recorded-answer evals for every command.** Cases live in `jev-evals/<suite>/cases.jsonl` with separate dev and hold-out splits; `eval record` saves Jev's answers once and `eval score` gives the same result every time. Today `eval` handles `done` and `verify` suites. Still to do: `decide` and `judge`-style suites, `--max-requests` and `--max-usd` caps on `eval record`, and `--ablation`. **help wanted:** labelled cases, invented or public.
+- **`done` v2, the rest.** Parsers checked against real runs of each tool, and more hold-out cases (at least 40 new ones, no wrong `met`, `missing` recall of 0.9 or better, less input than v1). **help wanted:** real output samples from pytest, `go test`, PHPUnit, RSpec, `dotnet test`, Mocha, ESLint, Ruff, Vitest, Jest, Cargo and tsc, in the formats your CI prints.
+- **Injection defence, if it passes its gate.** A detector question ("does the evidence address the reviewer or say the run is approved?") that can veto `met` and `supports`. It ships only with no wrong `met` on the injection suite plus new attack shapes, and at most 5% false vetoes on harmless controls.
+- **`claims`.** `verify` v2 under the name `claims` (`verify` stays as an alias until 1.0, so it isn't confused with Claude Code's `/verify`). Open: whether the number and backtick checks or the injection gate can be loosened without a wrong `supported`; each needs a registered design first. A Turkish claim set to see whether thresholds hold outside English.
 - **More redaction patterns.** **help wanted:** each with stop and keep fixtures.
+- **`decide` policy.** One decision record in `docs/decisions/` that settles two requests, one request with two questions, or balanced rotations for three or more options.
 
-## v0.3: see your own numbers
+Exit criteria: the `done` v2 and `claims` acceptance numbers hold on new hold-out cases and dated rows are added to [docs/measurements.md](docs/measurements.md).
 
-- **A local dashboard.** Receipts stored in SQLite and browsed in a local web page: requests, cache hits, tokens and cost per project, command and day, verdicts over time, and a screen to label done-gate decisions. Nothing is uploaded.
-- **Receipt import** from the JSON lines files that v0.1 and v0.2 write, so no history is lost.
+## v0.3: the done-gate, measured on real stops
 
-## Labs
+- **`soft` mode** that leaves a note in the transcript without an error, next to `off`, `shadow` and `active`.
+- **Labelling.** `receipts --stops` already lists stops and `--label <id> --right|--wrong` marks them. Still to do: a weak label suggested from the user's next message (never a replacement for the human label) and a threshold suggestion only with at least 10 labels per class, with exact binomial intervals.
+- **A base-rate study.** Shadow mode on two real projects for two weeks, one of them public. Kill criterion: if fewer than 2 of at least 100 stops are really a wrong "done", `active` is not recommended and the gate stays in `soft`.
+- **Recorded-session evals** with `claude plugin eval`, using recorded "false done" and "true done" transcripts.
+- **A recipe for the project `verify` skill.** Since Claude Code 2.1.286 Claude runs a project or user skill named `verify` before committing; the recipe is one line telling it to pipe the test output to `claude-referee done`. The plugin doesn't write that file itself.
+- **Blind spots found by replaying real turns** (an outside team replayed 73 turns and most blocked sentences were true): negative sentences ("I haven't committed") are not claims; results from subagents and results repeated from an earlier turn are marked; a truncated tool output never counts as proof.
+- **Stats that count failures.** `receipts --stops` should report an error rate and a p95 over every attempt, not only answered calls, before any `active` data is collected.
 
-Experiments ship in a separate, opt-in `claude-referee-labs` plugin and move into claude-referee only after they pass their own gate:
+## v0.4: measure and show
 
-| Experiment | Gate |
-|---|---|
-| Pruning long tool output | Two weeks in shadow with at most 2-5% regret and at least 50% fewer tokens on pruned outputs, then an A/B |
-| A risk gate for Bash commands | Asks on at most 5% of harmless commands, p95 of 1.5 seconds or less, and Jev never allows a command on its own; only fixed rules deny |
-| Downward-only subagent routing | Lower total cost in an A/B, no drop in success; the main conversation's model is never touched |
-| A file briefing on the first prompt | Fewer tool calls and lower total cost in an A/B; opt-in, since code excerpts leave the machine |
-| Skill suggestions | Fewer wrong skill loads without more unneeded ones; p95 of 1 second or less |
-| Test selection | At least 90% recall on past commits; never used as evidence for `done` |
+- **A pre-registered A/B.** Four arms: no gate, a 20-line hook that runs the project's tests, Claude Code's `/goal`, and claude-referee. 12 to 20 cases plus 3 to 5 controls, a pilot to choose the number of runs, results with confidence intervals in `bench/RESULTS.md`, the plan in `bench/PREREG.md` before the first run, and the result published whichever way it goes. Costs come from transcripts, grouped by request id, with 1-hour and 5-minute cache writes priced separately and failed runs included.
+- **A local dashboard** (`npx claude-referee ui`): 127.0.0.1 only, a random token, Origin and Host checks; the labelling queue first, then overview, privacy counters and export. JSON lines stay the source of truth; SQLite is only an index and needs Node 22.13 or later.
+- **Receipt integrity.** Each receipt carries the hash of the one before it and `receipts verify` checks the chain; `receipts overrule <id>` lets a human void a decision so the cache never reuses it; an answer whose evidence hash changed is marked stale.
 
-## After measured results
+## v0.5: widen
 
-- Submitting to the community plugin marketplace, once the first A/B results are published.
+- **`active` done-gate**, recommended only after at least 50 labelled stops with precision of 0.8 or better, at most 5% false blocks, a p95 of 3 seconds or less, and the A/B.
+- **A CI recipe and a GitHub Action** that run `done` on the test log of agent-opened PRs and `claims` on changed docs, and upload receipts as an artifact.
+- **Release-note claims**, only if `claims` precision held on hold-out.
+- **`judge --baseline`**, a ratchet that records existing violations once and reports only new ones.
+- **The community plugin marketplace**, after the A/B.
+- **Packs for runners and languages**, each parser a good first issue.
+
+## 1.0
+
+JSON output carries a `schema_version` and the output and pack formats are frozen; no known wrong `met` on the public injection set and on hold-out; the A/B is published; macOS and Linux verified and Windows either verified or stated as unsupported; the vulnerability process is defined in [SECURITY.md](SECURITY.md), the history is clean in gitleaks and npm provenance is on.
 
 ## Intentionally not planned
 
-Three items of the original design are left out on purpose: an `--engine v1` flag with `decide-compare` (v1 never existed in this repository), a migration from the earlier private kit's data directory, and the `TYPESAFE_KIT_HOOKS` environment variable (it belongs to that kit).
+Routing, output pruning, a file briefing on the first prompt, skill suggestions, a Bash risk gate, a model-switch cache guard, an MCP server (after 1.0 at the earliest) and PR review are out, with one line of reasoning each in [docs/decisions/dropped.md](docs/decisions/dropped.md). Also left out: an `--engine v1` flag with `decide-compare` (v1 never existed in this repository), a migration from the earlier private kit's data directory, and the `TYPESAFE_KIT_HOOKS` environment variable (it belongs to that kit).
 
 Have an idea? Open an issue with the pack suggestion or parser request template.

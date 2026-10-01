@@ -9,14 +9,14 @@ Requests go to `api.typesafe.ai`. TypeSafe's [privacy policy](https://typesafe.a
 | When | What is sent |
 |---|---|
 | Every call | The pack's question text and the input it asks about |
-| `done` | Your criterion and the output you pipe in. In v0.1 that's the head and tail of the raw output. From v0.2 it's the parsed failures, when claude-referee has a parser for your runner |
+| `done` | Your criterion and the output you pipe in. Output from a runner claude-referee has a parser for is parsed in code and only the counts, exit code and failing test names are sent; any other output is sent as text, its first 2,000 and last 12,000 characters |
 | `decide` | The decision, any inline `context`, the option texts and the contents of your `context_files`. The choice is asked twice, in two option orders |
 | `judge` and `verify` | The items, claims and source text you pass in |
-| Done-gate (v0.2), shadow mode included | Each time Claude stops after editing without a passing check: the first 1,500 characters of your prompt, the last 2,000 characters of Claude's final message, the check commands with their pass/fail status, and the paths of the files Claude edited, without their contents |
+| Done-gate in shadow mode | Each time Claude stops after editing without a passing check: the first 1,500 characters of your prompt, the last 2,000 characters of Claude's final message, the check commands with their pass/fail status, and the paths of the files Claude edited, without their contents |
 
 The prompt and Claude's final message are free text. Patterns can't reliably clean free text, so keep the done-gate off where session text may not leave your machine.
 
-The session briefing and the cache guard never call the network.
+The session briefing never calls the network.
 
 ## Check before sending
 
@@ -58,7 +58,7 @@ Redaction is pattern-based. It can miss a secret in an unusual format, and it ca
 ## Stays on your machine
 
 claude-referee's data directory holds:
-- **Receipts:** one line per command run: the command, pack, model, verdict, request IDs, request and cache-hit counts, input tokens, estimated cost, latency, redaction counts and a hash of the questions. Hook receipts add the Claude Code session ID. From v0.2, done-gate receipts also note assertions removed from test files and new skip markers, as counts and file paths only. Receipts hold no request text.
+- **Receipts:** one line per command run: the command, pack, model, verdict, request IDs, request and cache-hit counts, input tokens, estimated cost, latency, redaction counts and a hash of the questions. Hook receipts add the Claude Code session ID. Planned: done-gate receipts will also note assertions removed from test files and new skip markers, as counts and file paths only. Receipts hold no request text.
 - **The answer cache:** Jev's answers, keyed by the pack version, the model and hashes of the question and the redacted input. Entries expire after 30 days by default. `--fresh` skips the cache.
 - **Results files:** the details of verdicts longer than 1,500 characters, such as per-item scores from `judge`.
 

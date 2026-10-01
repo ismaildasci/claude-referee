@@ -103,7 +103,7 @@ claude-referee v0.1's own briefing from the `generic` pack came to 657 character
 - Before the session briefing pointed to it, the `done` command ran once in 14 days. (Measured)
 - The briefing's own wording mattered: one sentence claimed a tool was blocked when it wasn't, and a one-line heredoc example failed when copied. Both were fixed. (Observed)
 
-**What changed:** the done-gate (v0.2) runs when Claude stops, instead of waiting to be called. Every command example in the briefing runs in the tests.
+**What changed:** the done-gate (shadow mode today) runs when Claude stops, instead of waiting to be called. Every command example in the briefing runs in the tests.
 
 ## Instructions inside the evidence
 
@@ -123,7 +123,7 @@ Setup: `done --criteria "all tests pass"` on 33 failing or unfinished test logs,
 
 ## Not measured yet
 
-- Whether claude-referee lowers the total cost of a task. The v0.2 A/B will be pre-registered in `bench/PREREG.md` before its first run.
+- Whether claude-referee lowers the total cost of a task. The A/B planned for v0.4 will be pre-registered in `bench/PREREG.md` before its first run.
 - How the earlier kit's `done` thresholds perform on held-out cases. They were chosen on the same 25 cases they were scored on, so its 24 of 25 is in-sample. `done` v2 has its own held-out result, below. The Stop done-gate has none yet.
 
 ## Measured with claude-referee itself

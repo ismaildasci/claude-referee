@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/hero-dark.gif">
-    <img alt="claude-referee: güzel söz değil, kanıt. Claude tüm testlerin geçtiğini söylüyor; hakemin done-gate'i (v0.2) son düzenlemeden beri hiçbir kontrolün geçmediğini söyleyip Claude'dan cargo nextest çalıştırmasını istiyor ve 2 hata çıkıyor." src="assets/hero-light.gif" width="100%">
+    <img alt="claude-referee: güzel söz değil, kanıt. Claude tüm testlerin geçtiğini söylüyor; hakemin done-gate'i (active mod, planlandı) son düzenlemeden beri hiçbir kontrolün geçmediğini söyleyip Claude'dan cargo nextest çalıştırmasını istiyor ve 2 hata çıkıyor." src="assets/hero-light.gif" width="100%">
   </picture>
 </p>
 
@@ -31,12 +31,11 @@ claude-referee, bu tür cümleleri denetleyen, resmî olmayan bir Claude Code ek
 |---|---|---|
 | **Sen ya da Claude bir komut çalıştırınca** | `done`, `decide`, `judge` ya da `verify` Jev'e sorar ve tek satırlık bir cevap basar | v0.1 |
 | **Oturum başlayınca** | Claude'a komutları nasıl kullanacağını anlatan, en fazla 800 karakterlik kısa bir not gider | v0.1 |
-| **Claude durunca** | Varsayılan olarak kapalı. `active` modda Jev, Claude'un "bitti" iddiasını doğrulanmamış bulursa durma engellenir ve Claude koşması gereken kontrolü söyleyen bir not alır; oturum başına en fazla üç kez. Jev yavaşsa ya da çalışmıyorsa hook yolu açık bırakır | v0.2 |
-| **Model değiştirince** | Claude'un tüm konuşmayı tam fiyatla yeniden okumasına yol açacak bir geçişten önce uyarı | v0.2 |
+| **Claude durunca** | Varsayılan olarak kapalı. `shadow` modda yalnızca ne yapacağını kaydeder (`receipts --stops`). Planlanan `active` mod, Jev Claude'un "bitti" iddiasını doğrulanmamış bulursa durmayı engeller ve Claude koşması gereken kontrolü söyleyen bir not alır; oturum başına en fazla üç kez. Jev yavaşsa ya da çalışmıyorsa hook yolu açık bırakır | `shadow` v0.1.3'te; `active` planlandı |
 
 Bir kontrol hiçbir şey bulmazsa Claude hiçbir şey görmez. Bir şey bulursa Claude en fazla 300 karakterlik bir not görür.
 
-Neden yalnızca bir komut değil? claude-referee'den önceki kitte Claude `done` kontrolünü istediği zaman çalıştırabiliyordu ve 14 günde bir kez çalıştırdı. Kendiliğinden çalışmayan bir kontrol neredeyse yok hükmündedir. Bu yüzden v0.2, Claude her durduğunda çalışan bir kontrol ekliyor.
+Neden yalnızca bir komut değil? claude-referee'den önceki kitte Claude `done` kontrolünü istediği zaman çalıştırabiliyordu ve 14 günde bir kez çalıştırdı. Kendiliğinden çalışmayan bir kontrol neredeyse yok hükmündedir. Bu yüzden Claude her durduğunda çalışan bir kontrol var; bugün yalnızca ne yapacağını kaydediyor.
 
 ## Nasıl çalışır
 
@@ -50,7 +49,7 @@ Neden yalnızca bir komut değil? claude-referee'den önceki kitte Claude `done`
 3. Jev olasılıklarla cevap verir.
 4. claude-referee bunları sabit eşiklerle karşılaştırır. Ya sessiz kalır, ya kısa bir not ekler ya da tek satırlık bir JSON sonuç basar.
 
-Düz kod bir soruyu cevaplayabiliyorsa hiçbir modele sorulmaz. Diyagram tasarımın tamamını gösteriyor: v0.1'de oturum notu ve dört komut çalışıyor; durunca yapılan kontrol, model değişimi uyarısı ve test çıktısının kodda okunması v0.2'de geliyor ([yol haritası](ROADMAP.md)).
+Düz kod bir soruyu cevaplayabiliyorsa hiçbir modele sorulmaz. Diyagram tasarımın tamamını gösteriyor: bugün oturum notu, dört komut, test çıktısının kodda okunması ve `shadow` modda durunca yapılan kontrol çalışıyor; durmayı engelleyen `active` mod planlandı ([yol haritası](ROADMAP.md)); model değişimi uyarısı, Claude Code zaten sorduğu için bırakıldı.
 
 ## Şimdiye kadar ne ölçüldü
 

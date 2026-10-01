@@ -35,7 +35,7 @@ Hooks stay off in any project without a project file. `hooks_enabled: false` in 
     },
     { "prefix": "web/", "checks": ["npx tsc --noEmit", "npx vitest run"] }
   ],
-  "hooks": { "sessionStart": true, "stopGate": "shadow", "preModelSwitch": true }
+  "hooks": { "sessionStart": true, "stopGate": "shadow" }
 }
 ```
 
@@ -44,13 +44,13 @@ Hooks stay off in any project without a project file. `hooks_enabled: false` in 
 | Key | Values | Default |
 |---|---|---|
 | `pack` | A pack name from the plugin or from `packs_dir` | required |
-| `areas` | Per path prefix: the check commands, evidence files (v0.2) and an optional pack | none |
-| `thresholds` | Per-question overrides in the same shape as the pack's `thresholds.json`, and `cacheGuardUsd` (v0.2), the re-cache cost at which the cache guard asks. They can only make a check stricter, so `cacheGuardUsd` can only go down | the pack's; `cacheGuardUsd` 0.25 |
+| `areas` | Per path prefix: the check commands, evidence files (planned) and an optional pack | none |
+| `thresholds` | Per-question overrides in the same shape as the pack's `thresholds.json`, . They can only make a check stricter | the pack's |
 | `hooks.sessionStart` | `true` or `false` | `true` |
-| `hooks.stopGate` | `off` or `shadow` (in `main`, not released); `active` is not built yet | `off` |
-| `hooks.preModelSwitch` | `true` or `false` (v0.2) | `false` |
+| `hooks.stopGate` | `off` or `shadow`; `active` is not built yet | `off` |
+| `hooks.preModelSwitch` | Read but not used: the cache guard was dropped, see [decisions](decisions/dropped.md) | `false` |
 
-`areas` tells claude-referee which checks count as proof for which part of the repository. The session briefing shows only the area where the session started. A pack can ship default areas in `areas.json`; they apply only when the project file has no `areas`. From v0.2, an evidence file counts only if it changed after Claude's last edit, so a stale report is treated as no evidence.
+`areas` tells claude-referee which checks count as proof for which part of the repository. The session briefing shows only the area where the session started. A pack can ship default areas in `areas.json`; they apply only when the project file has no `areas`. Planned: an evidence file will count only if it changed after Claude's last edit, so a stale report is treated as no evidence.
 
 ### Done-gate modes
 
@@ -164,7 +164,7 @@ The `generic` pack ships with the plugin. Your team's packs can live in a privat
 1. Point `packs_dir` at that repository.
 2. Name the pack in `.claude/referee.json`.
 
-`npx claude-referee lint-pack <path>` (v0.2) checks a pack against TypeSafe's question-writing rules.
+`npx claude-referee lint-pack <path>` checks a pack against TypeSafe's question-writing rules.
 
 ## Always-on cost
 
@@ -180,5 +180,4 @@ While claude-referee is enabled, its skill listing adds at most 250 tokens to ev
 
 - **Hooks stay silent but `doctor` works in your terminal.** Claude Code probably can't find Node 20.3 or later on its own `PATH`. That happens most often when Claude Code is launched from a desktop app instead of a shell.
 - **`doctor` finds no key, but hooks work.** The key is stored only as a plugin setting, which reaches hooks but not the shell. Add the Keychain item or `TYPESAFE_API_KEY_CMD`.
-- **The cache guard never asks.** It asks only when re-caching would cost at least `cacheGuardUsd` ($0.25 by default). It also needs Claude Code 2.1.251 or later, a warm cache, an interactive `/model` switch, and `hooks.preModelSwitch` in the project file.
 - **`npx claude-referee` and Claude disagree.** `npx claude-referee` runs the copy published to npm, while Claude runs the copy bundled with the plugin. Run `npx claude-referee@<version>` with the plugin's version, which `/plugin` shows, to match them.

@@ -2,7 +2,7 @@
 
 Claude's turns decide the cost, not the Jev bill. A batched Jev judgement costs about $0.0001–0.0003. Every Claude Code request re-reads the whole cached conversation, so one extra Claude turn at 80K tokens of context costs about $0.016 on Opus 5.5 before any output. claude-referee is designed around that gap.
 
-The tables on this page are **modelled** from list prices and the formulas below; they aren't measurements. The last section summarises measurements: our own from before this project, and third parties'. Measure your own numbers with `/usage` in Claude Code and `npx claude-referee receipts --tokens`. From v0.2, the A/B harness in `bench/` runs paired comparisons.
+The tables on this page are **modelled** from list prices and the formulas below; they aren't measurements. The last section summarises measurements: our own from before this project, and third parties'. Measure your own numbers with `/usage` in Claude Code and `npx claude-referee receipts --tokens`. The A/B harness planned for v0.4 will run paired comparisons in `bench/`.
 
 ## Prices
 
@@ -117,4 +117,4 @@ Output is short and never echoes its input. There is no main-model routing, and 
 - Pruning tool output saves little at safe thresholds. The best-calibrated public study hid about 5% of large-output text ([winnow](https://github.com/GhalebDweikat/winnow/blob/51d80b945c74c8384bc47fa817179f668289afd8/docs/DESIGN.md)).
 - TypeSafe's skill-suggestion cookbook cut wrong skill loads from 16.8% to 7.3%, with a Haiku 4.5 agent on jev-1.12 ([cookbook](https://docs.typesafe.ai/cookbooks/skill_suggestion.md)).
 
-No one has yet published a repeated Claude Code A/B that counts task success, cache effects and Jev cost together. claude-referee's A/B harness (v0.2) will set out how it does that in `bench/PREREG.md` before its first run, and the results will be published either way.
+No one has yet published a repeated Claude Code A/B that counts task success, cache effects and Jev cost together. claude-referee's A/B harness (planned for v0.4) will set out how it does that in `bench/PREREG.md` before its first run, and the results will be published either way.
