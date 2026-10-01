@@ -1453,9 +1453,9 @@ function isVersionContext(text, start, end) {
   return /(?:\bv|version|ver|@|=|[\d.])\s*$/i.test(before) || /^(?:\.\d|[-+][0-9A-Za-z])/.test(after);
 }
 __name(isVersionContext, "isVersionContext");
-function replaceIn(text, home, extra, counts) {
+function replaceIn(text, home, extra, counts3) {
   const bump = /* @__PURE__ */ __name((kind) => {
-    counts[kind] = (counts[kind] ?? 0) + 1;
+    counts3[kind] = (counts3[kind] ?? 0) + 1;
   }, "bump");
   let out = text;
   if (home && home.length > 1 && out.includes(home)) {
@@ -2100,6 +2100,812 @@ var doctor = {
   }
 };
 
+// src/engine/runners/compiled.ts
+var ANSI = /\u001b(?:\[[0-?]*[ -/]*[@-~]|\][^\u0007\u001b]*(?:\u0007|\u001b\\)?)/g;
+var MAX_FAILING = 10;
+var MAX_NAME = 120;
+var MAX_SUMMARY = 200;
+function prepare(text) {
+  return text.replace(ANSI, "").split(/\r?\n/);
+}
+__name(prepare, "prepare");
+function facts(runner, passed, failed, errors, skipped, ids, summary) {
+  return {
+    runner,
+    passed,
+    failed,
+    errors,
+    skipped,
+    failing: [...ids].slice(0, MAX_FAILING).map((n) => n.slice(0, MAX_NAME)),
+    summary_line: summary === null ? null : summary.trim().slice(0, MAX_SUMMARY)
+  };
+}
+__name(facts, "facts");
+function topLevel(ids) {
+  const top = [...ids].filter((n) => !n.includes("/")).length;
+  return top > 0 ? top : ids.size;
+}
+__name(topLevel, "topLevel");
+var GO_PKG_OK = /^ok\s+\S+\s+(?:[\d.]+s\b|\(cached\))(.*)$/;
+var GO_PKG_FAIL = /^FAIL\s+\S+\s+(?:[\d.]+s\b|\[(?:build|setup) failed\])/;
+var GO_NO_FILES = /^\?\s+\S+\s+\[no test files\]/;
+var GO_TEST = /^\s*--- (FAIL|PASS|SKIP): (\S+)/;
+var GO_RUN = /^\s*=== (?:RUN|PAUSE|CONT)\s/;
+var GO_RUN_ID = /^\s*=== RUN\s+(\S+)/;
+var go = {
+  name: "go test",
+  parse(text) {
+    const lines3 = prepare(text);
+    const summaries = [];
+    const failedIds = /* @__PURE__ */ new Set();
+    const passedIds = /* @__PURE__ */ new Set();
+    const skippedIds = /* @__PURE__ */ new Set();
+    const startedIds = /* @__PURE__ */ new Set();
+    let okPackages = 0;
+    let failedPackages = 0;
+    let buildFailed = 0;
+    let other = false;
+    let panic = false;
+    let goroutine = false;
+    let bareFail = false;
+    let failFirst = null;
+    let okLast = null;
+    for (const line of lines3) {
+      const ok = GO_PKG_OK.exec(line);
+      if (ok) {
+        summaries.push(line);
+        okLast = line;
+        if (!/\[no tests to run\]/.test(ok[1] ?? "")) okPackages++;
+        continue;
+      }
+      if (GO_PKG_FAIL.test(line)) {
+        summaries.push(line);
+        failFirst ??= line;
+        if (/\[(?:build|setup) failed\]/.test(line)) buildFailed++;
+        else failedPackages++;
+        continue;
+      }
+      if (GO_NO_FILES.test(line)) {
+        summaries.push(line);
+        continue;
+      }
+      const t = GO_TEST.exec(line);
+      if (t) {
+        other = true;
+        const id = t[2];
+        if (t[1] === "FAIL") failedIds.add(id);
+        else if (t[1] === "PASS") passedIds.add(id);
+        else skippedIds.add(id);
+        continue;
+      }
+      const started = GO_RUN_ID.exec(line);
+      if (started) startedIds.add(started[1]);
+      if (GO_RUN.test(line)) other = true;
+      else if (/^panic: /.test(line)) panic = true;
+      else if (/^goroutine \d+ \[/.test(line)) goroutine = true;
+      else if (/^FAIL\s*$/.test(line)) bareFail = true;
+    }
+    const recognised = summaries.length > 0 || other || panic && goroutine;
+    if (!recognised) return null;
+    const unfinished = [...startedIds].some((id) => !failedIds.has(id) && !passedIds.has(id) && !skippedIds.has(id)) ? 1 : 0;
+    const errors = buildFailed + unfinished + (panic && (goroutine || other || summaries.length > 0) ? 1 : 0);
+    const failed = Math.max(failedPackages, topLevel(failedIds), bareFail && errors === 0 ? 1 : 0);
+    if (summaries.length === 0 && failed === 0 && errors === 0) return null;
+    const passed = Math.max(okPackages, topLevel(passedIds));
+    const summary = summaries.length === 0 ? null : failFirst ?? okLast ?? summaries[summaries.length - 1];
+    return facts("go test", passed, failed, errors, topLevel(skippedIds), failedIds, summary);
+  }
+};
+var CARGO_RESULT = /^test result: (ok|FAILED)\. (\d+) passed; (\d+) failed; (\d+) ignored;/;
+var CARGO_TEST = /^test (.+?) \.\.\. (ok|FAILED|ignored)\b/;
+var CARGO_STDOUT = /^---- (.+?) stdout ----$/;
+var CARGO_COMPILE = /^error\[E\d+\]/;
+var CARGO_LIST_ITEM = /^ {4}([\w:]+|\S+ - .+ \(line \d+\))$/;
+var cargo = {
+  name: "cargo test",
+  parse(text) {
+    const lines3 = prepare(text);
+    const results = [];
+    const failedIds = /* @__PURE__ */ new Set();
+    const compile2 = /* @__PURE__ */ new Set();
+    let passed = 0;
+    let failedSum = 0;
+    let ignored = 0;
+    let okLines = 0;
+    let failedStatus = false;
+    let failedFirst = null;
+    let couldNotCompile = false;
+    let testFailedLine = false;
+    for (let i = 0; i < lines3.length; i++) {
+      const line = lines3[i];
+      const r = CARGO_RESULT.exec(line);
+      if (r) {
+        results.push(line);
+        passed += Number(r[2]);
+        failedSum += Number(r[3]);
+        ignored += Number(r[4]);
+        if (r[1] === "FAILED") {
+          failedStatus = true;
+          failedFirst ??= line;
+        }
+        continue;
+      }
+      const t = CARGO_TEST.exec(line);
+      if (t) {
+        if (t[2] === "FAILED") failedIds.add(t[1]);
+        else if (t[2] === "ok") okLines++;
+        continue;
+      }
+      const s = CARGO_STDOUT.exec(line);
+      if (s) {
+        failedIds.add(s[1]);
+        continue;
+      }
+      if (/^failures:\s*$/.test(line)) {
+        for (let j = i + 1; j < lines3.length; j++) {
+          const item = CARGO_LIST_ITEM.exec(lines3[j]);
+          if (!item) break;
+          failedIds.add(item[1]);
+        }
+        continue;
+      }
+      if (CARGO_COMPILE.test(line)) compile2.add(line);
+      else if (/^error: could not compile /.test(line)) couldNotCompile = true;
+      else if (/^error: test failed, to rerun pass/.test(line)) testFailedLine = true;
+    }
+    const errors = compile2.size > 0 ? compile2.size : couldNotCompile ? 1 : 0;
+    const failed = Math.max(failedSum, failedIds.size, failedStatus || testFailedLine ? 1 : 0);
+    if (results.length === 0 && failed === 0 && errors === 0) return null;
+    const summary = results.length === 0 ? null : failedFirst ?? results[results.length - 1];
+    return facts("cargo test", results.length > 0 ? passed : okLines, failed, errors, ignored, failedIds, summary);
+  }
+};
+var DOTNET_SUMMARY = /^\s*(Passed|Failed)!\s+-\s+Failed:\s*(\d+),\s*Passed:\s*(\d+),\s*Skipped:\s*(\d+),\s*Total:\s*(\d+)/;
+var DOTNET_FAILED = /^\s+Failed (.+?) \[[^\]]*\]\s*$/;
+var DOTNET_PASSED = /^\s+Passed (.+?) \[[^\]]*\]\s*$/;
+var DOTNET_ERROR = /^(.*?)\s*(?:\[[^\]]*\.\w*proj\])?\s*$/;
+var dotnet = {
+  name: "dotnet test",
+  parse(text) {
+    const lines3 = prepare(text);
+    const summaries = [];
+    const failedIds = /* @__PURE__ */ new Set();
+    const buildErrors = /* @__PURE__ */ new Set();
+    let passed = 0;
+    let failedSum = 0;
+    let skipped = 0;
+    let passedLines = 0;
+    let failedStatus = false;
+    let failedFirst = null;
+    let noTests = null;
+    let runFailed = false;
+    let buildFailed = false;
+    for (const line of lines3) {
+      const s = DOTNET_SUMMARY.exec(line);
+      if (s) {
+        summaries.push(line);
+        failedSum += Number(s[2]);
+        passed += Number(s[3]);
+        skipped += Number(s[4]);
+        if (s[1] === "Failed") {
+          failedStatus = true;
+          failedFirst ??= line;
+        }
+        continue;
+      }
+      const f = DOTNET_FAILED.exec(line);
+      if (f) {
+        failedIds.add(f[1]);
+        continue;
+      }
+      if (DOTNET_PASSED.test(line)) {
+        passedLines++;
+        continue;
+      }
+      if (/\berror [A-Z]{2,4}\d{3,5}:/.test(line)) {
+        buildErrors.add((DOTNET_ERROR.exec(line)?.[1] ?? line).trim());
+        continue;
+      }
+      if (/^\s*No test is available\b/.test(line)) noTests ??= line;
+      else if (/^\s*Test Run Failed\.?\s*$/.test(line)) runFailed = true;
+      else if (/^\s*Build FAILED\.?\s*$/.test(line)) buildFailed = true;
+    }
+    const errors = buildErrors.size > 0 ? buildErrors.size : buildFailed ? 1 : 0;
+    const failed = Math.max(failedSum, failedIds.size, failedStatus || runFailed ? 1 : 0);
+    const hasSummary = summaries.length > 0 || noTests !== null;
+    if (!hasSummary && failed === 0 && errors === 0) return null;
+    const summary = summaries.length > 0 ? failedFirst ?? summaries[summaries.length - 1] : noTests;
+    return facts("dotnet test", summaries.length > 0 ? passed : passedLines, failed, errors, skipped, failedIds, summary);
+  }
+};
+var parsers = [go, cargo, dotnet];
+
+// src/engine/runners/js.ts
+var ANSI2 = /\u001b\[[0-9;?]*[ -/]*[@-~]/g;
+var MAX_FAILING2 = 10;
+var MAX_NAME2 = 120;
+var MAX_SUMMARY2 = 200;
+function toLines(text) {
+  return text.replace(ANSI2, "").split(/\r\n|\r|\n/);
+}
+__name(toLines, "toLines");
+function clip2(line) {
+  return line === null ? null : line.trim().slice(0, MAX_SUMMARY2);
+}
+__name(clip2, "clip");
+function listFailing(ids) {
+  const out = [];
+  for (const raw of ids) {
+    const id = raw.trim().slice(0, MAX_NAME2);
+    if (id !== "" && !out.includes(id)) out.push(id);
+    if (out.length === MAX_FAILING2) break;
+  }
+  return out;
+}
+__name(listFailing, "listFailing");
+function countsOf(body) {
+  const c = { passed: 0, failed: 0, skipped: 0 };
+  for (const m of body.matchAll(/(\d+)\s+(failed|passed|skipped|todo|pending|total)\b/g)) {
+    const n = Number(m[1]);
+    if (m[2] === "failed") c.failed += n;
+    else if (m[2] === "passed") c.passed += n;
+    else if (m[2] !== "total") c.skipped += n;
+  }
+  return c;
+}
+__name(countsOf, "countsOf");
+function tally(lines3, re) {
+  const t = { line: null, last: { passed: 0, failed: 0, skipped: 0 }, failedMax: 0 };
+  for (const l of lines3) {
+    const m = re.exec(l);
+    if (m === null) continue;
+    t.line = l;
+    t.last = countsOf(m[1] ?? "");
+    t.failedMax = Math.max(t.failedMax, t.last.failed);
+  }
+  return t;
+}
+__name(tally, "tally");
+function facts2(runner, f) {
+  return { runner, passed: f.passed, failed: f.failed, errors: f.errors, skipped: f.skipped, failing: listFailing(f.failing), summary_line: clip2(f.summary) };
+}
+__name(facts2, "facts");
+function parseJest(text) {
+  const lines3 = toLines(text);
+  const tests = tally(lines3, /^\s*Tests:\s+(\d.*)$/);
+  const suites2 = tally(lines3, /^\s*Test Suites:\s+(\d.*)$/);
+  const noTests = lines3.find((l) => /^\s*No tests found\b/.test(l)) ?? null;
+  const ids = /* @__PURE__ */ new Set();
+  const files = /* @__PURE__ */ new Set();
+  let runErrors = 0;
+  for (const l of lines3) {
+    const h = /^\s*● (.+?)\s*$/.exec(l);
+    if (h !== null) {
+      const name = h[1] ?? "";
+      if (/^Test suite failed to run\b/.test(name)) runErrors += 1;
+      else if (!/^(?:Console|Validation Warning|Deprecation Warning)\b/.test(name)) ids.add(name);
+      continue;
+    }
+    const f = /^\s*FAIL\s+(\S*[./]\S*)(?:\s+\(.*\))?\s*$/.exec(l);
+    if (f !== null) files.add(f[1] ?? "");
+  }
+  if (tests.line === null && suites2.line === null && noTests === null && ids.size === 0 && files.size === 0 && runErrors === 0) return null;
+  const failed = Math.max(tests.failedMax, ids.size, ids.size === 0 && runErrors === 0 ? files.size : 0);
+  const errors = Math.max(runErrors, failed === 0 ? suites2.failedMax : 0);
+  return facts2("jest", {
+    passed: tests.last.passed,
+    failed,
+    errors,
+    skipped: tests.last.skipped,
+    failing: ids.size > 0 ? ids : files,
+    summary: tests.line ?? suites2.line ?? noTests
+  });
+}
+__name(parseJest, "parseJest");
+function parseVitest(text) {
+  const lines3 = toLines(text);
+  const tests = tally(lines3, /^\s*Tests\s+(\d.*)$/);
+  const files = tally(lines3, /^\s*Test Files\s+(\d.*)$/);
+  const noFiles = lines3.find((l) => /^\s*No test files found\b/.test(l)) ?? null;
+  const ids = /* @__PURE__ */ new Set();
+  const loadFails = /* @__PURE__ */ new Set();
+  const markedFiles = /* @__PURE__ */ new Set();
+  let unhandled = 0;
+  for (const l of lines3) {
+    const f = /^\s*FAIL\s+(\S.*?)\s*$/.exec(l);
+    if (f !== null) {
+      const id = f[1] ?? "";
+      if (id.includes(" > ")) ids.add(id);
+      else if (/\[.*\]$/.test(id)) loadFails.add(id);
+      continue;
+    }
+    const m = /^\s*❯ (\S+) \(\d+ tests?(?: \| (\d+) failed)?/.exec(l);
+    if (m !== null && Number(m[2] ?? 0) > 0) {
+      markedFiles.add(m[1] ?? "");
+      continue;
+    }
+    const e = /^\s*Errors\s+(\d+) errors?\b/.exec(l);
+    if (e !== null) unhandled = Math.max(unhandled, Number(e[1]));
+  }
+  const marked = ids.size + loadFails.size + markedFiles.size;
+  if (tests.line === null && files.line === null && noFiles === null && marked === 0 && unhandled === 0) return null;
+  const failed = Math.max(tests.failedMax, ids.size, ids.size === 0 && markedFiles.size > 0 ? markedFiles.size : 0);
+  const errors = Math.max(loadFails.size, unhandled, failed === 0 ? files.failedMax : 0);
+  return facts2("vitest", {
+    passed: tests.last.passed,
+    failed,
+    errors,
+    skipped: tests.last.skipped,
+    failing: ids.size + loadFails.size > 0 ? [...ids, ...loadFails] : markedFiles,
+    summary: tests.line ?? files.line ?? noFiles
+  });
+}
+__name(parseVitest, "parseVitest");
+function parseMocha(text) {
+  const lines3 = toLines(text);
+  let passLine = null;
+  let failLine = null;
+  let pendLine = null;
+  let passIdx = -1;
+  let pendIdx = -1;
+  let failIdx = -1;
+  let passed = 0;
+  let skipped = 0;
+  let failedMax = 0;
+  let evidence = false;
+  lines3.forEach((l, i) => {
+    const m = /^\s*(\d+) (passing|failing|pending)\b/.exec(l);
+    if (m !== null) {
+      const n = Number(m[1]);
+      if (m[2] === "passing") [passLine, passIdx, passed] = [l, i, n];
+      else if (m[2] === "pending") [pendLine, pendIdx, skipped] = [l, i, n];
+      else [failLine, failIdx, failedMax] = [l, i, Math.max(failedMax, n)];
+    } else if (/^\s*[✔✓]\s/.test(l)) evidence = true;
+  });
+  if (pendIdx < passIdx) skipped = 0;
+  const hasSummary = passLine !== null || failLine !== null || pendLine !== null;
+  const ids = /* @__PURE__ */ new Map();
+  if (hasSummary || evidence) {
+    lines3.forEach((l, i) => {
+      const m = /^\s{2,}(\d+)\) (\S.*?)\s*$/.exec(l);
+      if (m === null) return;
+      let name = m[2] ?? "";
+      const next = i > failIdx && failIdx >= 0 ? /^\s{5,}(\S.*):\s*$/.exec(lines3[i + 1] ?? "") : null;
+      if (next !== null) name = `${name} > ${next[1] ?? ""}`;
+      ids.set(Number(m[1]), name);
+    });
+  }
+  if (!hasSummary && ids.size === 0) return null;
+  return facts2("mocha", {
+    passed,
+    failed: Math.max(failedMax, ids.size),
+    errors: 0,
+    skipped,
+    failing: ids.values(),
+    summary: passLine ?? failLine ?? pendLine
+  });
+}
+__name(parseMocha, "parseMocha");
+function parseEslint(text) {
+  const lines3 = toLines(text);
+  let summary = null;
+  let errorsMax = 0;
+  let file = "";
+  const entries = /* @__PURE__ */ new Set();
+  let sawLine = false;
+  for (const l of lines3) {
+    const s = /^\s*✖\s+(\d+) problems?\s+\((\d+) errors?,\s*(\d+) warnings?\)/.exec(l);
+    if (s !== null) {
+      summary = l;
+      errorsMax = Math.max(errorsMax, Number(s[2]));
+      continue;
+    }
+    const d = /^\s+(\d+):(\d+)\s+(error|warning)\s+(.*?)(?:\s{2,}([@\w/.-]+))?\s*$/.exec(l);
+    if (d !== null) {
+      sawLine = true;
+      if (d[3] === "error") entries.add(`${file === "" ? "" : `${file}:`}${d[1]}:${d[2]} ${d[5] ?? "error"}`);
+      continue;
+    }
+    if (/^\S*[./\\]\S*$/.test(l)) file = l;
+  }
+  if (summary === null && !sawLine) return null;
+  return facts2("eslint", { passed: 0, failed: 0, errors: Math.max(errorsMax, entries.size), skipped: 0, failing: entries, summary });
+}
+__name(parseEslint, "parseEslint");
+function parseTsc(text) {
+  const lines3 = toLines(text);
+  let summary = null;
+  let errorsMax = 0;
+  const entries = /* @__PURE__ */ new Set();
+  for (const l of lines3) {
+    const s = /^\s*(?:\[[^\]]*\]\s*)?Found (\d+) errors?\b/.exec(l);
+    if (s !== null) {
+      summary = l;
+      errorsMax = Math.max(errorsMax, Number(s[1]));
+      continue;
+    }
+    const a = /^\s*(\S+?)\((\d+),(\d+)\):\s+error\s+(TS\d+):/.exec(l) ?? /^\s*(\S+?):(\d+):(\d+)\s+-\s+error\s+(TS\d+):/.exec(l);
+    if (a !== null) {
+      entries.add(`${a[1]}:${a[2]}:${a[3]} ${a[4]}`);
+      continue;
+    }
+    const g2 = /^\s*error\s+(TS\d+):/.exec(l);
+    if (g2 !== null) entries.add(g2[1] ?? "");
+  }
+  if (summary === null && entries.size === 0) return null;
+  const errors = Math.max(errorsMax, entries.size);
+  return facts2("tsc", { passed: summary !== null && errors === 0 ? 1 : 0, failed: 0, errors, skipped: 0, failing: entries, summary });
+}
+__name(parseTsc, "parseTsc");
+function parseNodeTest(text) {
+  const lines3 = toLines(text);
+  const num = /* @__PURE__ */ __name((key) => {
+    const hit = [...lines3].reverse().map((l) => new RegExp(`^ℹ ${key} (\\d+)\\s*$`).exec(l)).find((m) => m !== null);
+    return hit ? Number(hit[1]) : null;
+  }, "num");
+  const tests = num("tests");
+  const pass = num("pass");
+  const fail = num("fail");
+  const ids = /* @__PURE__ */ new Set();
+  let inFailing = false;
+  for (const l of lines3) {
+    if (/^✖ failing tests:\s*$/.test(l)) inFailing = true;
+    const m = /^✖ (.+?) \(\d+(?:\.\d+)?ms\)\s*$/.exec(l);
+    if (m !== null && !inFailing) ids.add(m[1]);
+  }
+  const summary = tests !== null && pass !== null && fail !== null ? lines3.filter((l) => /^ℹ (?:tests|pass|fail) \d+\s*$/.test(l)).slice(-3).join(" ") : null;
+  const failed = Math.max(fail ?? 0, ids.size);
+  if (summary === null && failed === 0) return null;
+  return facts2("node:test", { passed: pass ?? 0, failed, errors: 0, skipped: num("skipped") ?? 0, failing: ids, summary });
+}
+__name(parseNodeTest, "parseNodeTest");
+var parsers2 = [
+  { name: "jest", parse: parseJest },
+  { name: "vitest", parse: parseVitest },
+  { name: "mocha", parse: parseMocha },
+  { name: "eslint", parse: parseEslint },
+  { name: "tsc", parse: parseTsc },
+  { name: "node:test", parse: parseNodeTest }
+];
+
+// src/engine/runners/php-ruby.ts
+var MAX_FAILING3 = 10;
+var MAX_NAME3 = 120;
+var MAX_SUMMARY3 = 200;
+function lines(text) {
+  return text.replace(/\x1b\[[0-9;?]*[ -/]*[@-~]/g, "").split(/\r\n|\r|\n/).map((l) => l.replace(/\s+$/, ""));
+}
+__name(lines, "lines");
+function cap(s, n) {
+  const t = s.trim();
+  return t.length > n ? t.slice(0, n) : t;
+}
+__name(cap, "cap");
+function dedupeNames(names) {
+  const out = [];
+  for (const n of names) {
+    const c = cap(n, MAX_NAME3);
+    if (!out.includes(c)) out.push(c);
+  }
+  return out.slice(0, MAX_FAILING3);
+}
+__name(dedupeNames, "dedupeNames");
+function counts(rest) {
+  const out = {};
+  for (const m of rest.matchAll(/([A-Za-z][A-Za-z ]*?):\s*(\d+)/g)) {
+    const key = m[1].toLowerCase();
+    out[key] = Math.max(out[key] ?? 0, Number(m[2]));
+  }
+  return out;
+}
+__name(counts, "counts");
+var phpunit = {
+  name: "phpunit",
+  parse(text) {
+    const all = lines(text);
+    const candidates = [];
+    const failureIds = /* @__PURE__ */ new Map();
+    const errorIds = /* @__PURE__ */ new Map();
+    let section = null;
+    let summaryFailures = 0;
+    let summaryErrors = 0;
+    let headerFailures = 0;
+    let headerErrors = 0;
+    let failFloor = 0;
+    let errFloor = 0;
+    let progressFail = false;
+    all.forEach((line, index) => {
+      let m;
+      if (m = line.match(/^OK \((\d+) tests?, (\d+) assertions?\)/)) {
+        candidates.push({ index, line, passed: Number(m[1]), skipped: 0 });
+        section = null;
+      } else if (/^OK, but .*!$/.test(line)) {
+        candidates.push({ index, line, passed: 0, skipped: 0 });
+        section = null;
+      } else if (m = line.match(/^Tests:\s*(\d+)\s*(?:,(.*?))?\.?$/)) {
+        const c = counts(m[2] ?? "");
+        const failures = c["failures"] ?? 0;
+        const errors2 = c["errors"] ?? 0;
+        const skipped = c["skipped"] ?? 0;
+        summaryFailures = Math.max(summaryFailures, failures);
+        summaryErrors = Math.max(summaryErrors, errors2);
+        candidates.push({ index, line, passed: Math.max(0, Number(m[1]) - failures - errors2 - skipped), skipped });
+        section = null;
+      } else if (/^No tests executed!/.test(line)) {
+        candidates.push({ index, line, passed: 0, skipped: 0 });
+        section = null;
+      } else if (/^FAILURES!$/.test(line)) {
+        failFloor = 1;
+        section = null;
+      } else if (/^ERRORS!$/.test(line)) {
+        errFloor = 1;
+        section = null;
+      } else if (m = line.match(/^There (?:was|were) (\d+) ([a-z ]+?)s?:$/i)) {
+        const n = Number(m[1]);
+        const kind = m[2].toLowerCase();
+        if (kind === "failure") {
+          section = "failure";
+          headerFailures = Math.max(headerFailures, n);
+        } else if (kind === "error") {
+          section = "error";
+          headerErrors = Math.max(headerErrors, n);
+        } else section = "other";
+      } else if (section === "failure" || section === "error") {
+        if (m = line.match(/^(\d+)\) ([\w\\]+::\S.*)$/)) {
+          (section === "failure" ? failureIds : errorIds).set(`${m[1]}) ${m[2]}`, m[2]);
+        }
+      } else if (/^[.FEWSIRDN]+\s+\d+ \/ \d+ \(\s*\d+%\)$/.test(line.trim())) {
+        if (/[FE]/.test(line.trim().split(/\s+/)[0])) progressFail = true;
+      }
+    });
+    const last = candidates[candidates.length - 1];
+    let failed = Math.max(summaryFailures, failureIds.size, headerFailures, failFloor);
+    const errors = Math.max(summaryErrors, errorIds.size, headerErrors, errFloor);
+    if (failed === 0 && errors === 0 && progressFail) failed = 1;
+    if (!last && failed === 0 && errors > 0) failed = errors;
+    if (!last && failed === 0 && errors === 0) return null;
+    return {
+      runner: "phpunit",
+      passed: last?.passed ?? 0,
+      failed,
+      errors,
+      skipped: last?.skipped ?? 0,
+      failing: dedupeNames([...failureIds.values(), ...errorIds.values()]),
+      summary_line: last ? cap(last.line, MAX_SUMMARY3) : null
+    };
+  }
+};
+var rspec = {
+  name: "rspec",
+  parse(text) {
+    const all = lines(text);
+    const summaries = [];
+    const numbered = /* @__PURE__ */ new Map();
+    const located = /* @__PURE__ */ new Map();
+    const loadErrors = /* @__PURE__ */ new Set();
+    let section = null;
+    let summaryFailures = 0;
+    let summaryErrors = 0;
+    let failuresHeader = false;
+    all.forEach((line, index) => {
+      let m;
+      if (m = line.match(
+        /^\s*(\d+) examples?, (\d+) failures?(?:, (\d+) pending)?(?:, (\d+) errors? occurred outside of examples)?\s*$/
+      )) {
+        const failures = Number(m[2]);
+        const pending = Number(m[3] ?? 0);
+        summaryFailures = Math.max(summaryFailures, failures);
+        summaryErrors = Math.max(summaryErrors, Number(m[4] ?? 0));
+        summaries.push({ index, line, passed: Math.max(0, Number(m[1]) - failures - pending), skipped: pending });
+        section = null;
+      } else if (/^Failures:$/.test(line)) {
+        section = "failures";
+        failuresHeader = true;
+      } else if (/^Failed examples:$/.test(line)) {
+        section = "failed";
+      } else if (/^Pending:$/.test(line)) {
+        section = "pending";
+      } else if (/^Finished in /.test(line)) {
+        section = null;
+      } else if (m = line.match(/^rspec (\.?\/?\S+?:\d+(?:\[[\d:]+\])?|\.?\/\S+)\s*(?:#\s*(.*))?$/)) {
+        located.set(m[1], `${m[1]}${m[2] ? ` # ${m[2]}` : ""}`);
+      } else if (m = line.match(/^An error occurred while loading (\S+?)\.?$/)) {
+        loadErrors.add(m[1]);
+      } else if (section === "failures" && (m = line.match(/^\s*(\d+)\) (.+)$/))) {
+        const lm = m[2].match(/^An error occurred while loading (\S+?)\.?$/);
+        if (lm) loadErrors.add(lm[1]);
+        numbered.set(`${m[1]}) ${m[2]}`, m[2]);
+      }
+    });
+    const last = summaries[summaries.length - 1];
+    const failureIds = [...numbered.values()].filter((n) => !/^An error occurred while loading /.test(n));
+    const failed = Math.max(summaryFailures, failureIds.length, located.size, failuresHeader && loadErrors.size === 0 ? 1 : 0);
+    const errors = Math.max(summaryErrors, loadErrors.size);
+    if (!last && failed === 0 && errors === 0) return null;
+    return {
+      runner: "rspec",
+      passed: last?.passed ?? 0,
+      failed,
+      errors,
+      skipped: last?.skipped ?? 0,
+      failing: dedupeNames(located.size > 0 ? [...located.values()] : [...numbered.values()]),
+      summary_line: last ? cap(last.line, MAX_SUMMARY3) : null
+    };
+  }
+};
+var parsers3 = [phpunit, rspec];
+
+// src/engine/runners/python.ts
+var MAX_FAILING4 = 10;
+var MAX_ENTRY = 120;
+var MAX_SUMMARY4 = 200;
+var ANSI3 = /\u001b\[[0-9;?]*[ -/]*[@-~]|\u001b\][^\u0007\u001b]*(?:\u0007|\u001b\\)/g;
+var TIME = String.raw`in \d+(?:\.\d+)?s(?: \(\d+:\d{2}:\d{2}\))?`;
+var PYTEST_SUMMARY = new RegExp(String.raw`^(?:\d+ (?:failed|passed|skipped|deselected|xfailed|xpassed|warnings?|errors?|rerun)(?:, )?)+ ${TIME}$`);
+var PYTEST_NO_TESTS = new RegExp(String.raw`^no tests ran ${TIME}$`);
+var PYTEST_EMPTY = /^(?:=+\s*|collecting \.\.\. )?collected 0 items\b.*$/;
+var PYTEST_COUNT = /(\d+) (failed|passed|skipped|errors?)\b/g;
+var SHORT_LINE = /^(?:\[gw\d+\]\s+)?(?:\[\s*\d+%\]\s+)?(FAILED|ERROR)\s+(.+)$/;
+var VERBOSE_LINE = /^([\w./\\-]+\.py::\S.*?)\s+(FAILED|ERROR)\b/;
+var COLLECT_ERROR = /^_+ ERROR collecting (\S+\.py) _+$/;
+var TEST_ID = /^[\w./\\-]+\.py(?:::\S.*)?$/;
+var FAILURES_BLOCK = /^=+ FAILURES =+$/;
+var ERRORS_BLOCK = /^=+ ERRORS =+$/;
+var RUFF_FOUND = /^Found (\d+) errors?\.$/;
+var RUFF_CLEAN = /^All checks passed!$/;
+var RUFF_FIXABLE = /^\[\*\] (\d+) fixable with the .{0,4}--fix.{0,4} option/;
+var RUFF_CONCISE = /^(\S+?):(\d+):(\d+): ([A-Z]{1,4}\d{2,4})(?: |$)/;
+var RUFF_HEADER = /^([A-Z]{1,4}\d{2,4}) (?:\[\*\] )?\S/;
+var RUFF_ARROW = /^\s*--> (\S+?):(\d+):(\d+)$/;
+function lines2(text) {
+  return text.replace(ANSI3, "").split(/\r\n|\r|\n/);
+}
+__name(lines2, "lines");
+function cap2(value, max) {
+  return value.length > max ? value.slice(0, max) : value;
+}
+__name(cap2, "cap");
+function counts2(line) {
+  const out = { failed: 0, passed: 0, skipped: 0, errors: 0 };
+  for (const m of line.matchAll(PYTEST_COUNT)) {
+    const key = (m[2] ?? "").startsWith("error") ? "errors" : m[2] ?? "";
+    out[key] = Math.max(out[key] ?? 0, Number(m[1]));
+  }
+  return out;
+}
+__name(counts2, "counts");
+var pytest = {
+  name: "pytest",
+  parse(text) {
+    const failedIds = /* @__PURE__ */ new Set();
+    const errorIds = /* @__PURE__ */ new Set();
+    const summaries = [];
+    let empty = null;
+    let failuresBlock = false;
+    let errorsBlock = false;
+    for (const raw of lines2(text)) {
+      const line = raw.trim();
+      const bare = line.replace(/^=+\s*|\s*=+$/g, "");
+      if (PYTEST_SUMMARY.test(bare) || PYTEST_NO_TESTS.test(bare)) {
+        summaries.push(line);
+        continue;
+      }
+      if (PYTEST_EMPTY.test(line)) {
+        empty = line;
+        continue;
+      }
+      if (FAILURES_BLOCK.test(line)) failuresBlock = true;
+      else if (ERRORS_BLOCK.test(line)) errorsBlock = true;
+      const collect = COLLECT_ERROR.exec(line);
+      if (collect) {
+        errorIds.add(collect[1] ?? "");
+        continue;
+      }
+      const short = SHORT_LINE.exec(line);
+      if (short) {
+        const id = (short[2] ?? "").split(" - ")[0]?.trim() ?? "";
+        if (TEST_ID.test(id)) (short[1] === "FAILED" ? failedIds : errorIds).add(id);
+        continue;
+      }
+      const verbose = VERBOSE_LINE.exec(line);
+      if (verbose) (verbose[2] === "FAILED" ? failedIds : errorIds).add(verbose[1] ?? "");
+    }
+    const markers = failedIds.size + errorIds.size > 0 || failuresBlock || errorsBlock;
+    if (summaries.length === 0 && empty === null && !markers) return null;
+    let failed = Math.max(failedIds.size, failuresBlock ? 1 : 0);
+    let errors = Math.max(errorIds.size, errorsBlock ? 1 : 0);
+    for (const s of summaries) {
+      const c = counts2(s);
+      failed = Math.max(failed, c.failed ?? 0);
+      errors = Math.max(errors, c.errors ?? 0);
+    }
+    const last = summaries.length > 0 ? summaries[summaries.length - 1] : null;
+    const tail = counts2(last ?? "");
+    const failing = [...failedIds, ...errorIds].slice(0, MAX_FAILING4).map((id) => cap2(id, MAX_ENTRY));
+    const summary = last ?? empty;
+    return {
+      runner: "pytest",
+      passed: tail.passed ?? 0,
+      failed,
+      errors,
+      skipped: tail.skipped ?? 0,
+      failing,
+      summary_line: summary === null ? null : cap2(summary, MAX_SUMMARY4)
+    };
+  }
+};
+var ruff = {
+  name: "ruff",
+  parse(text) {
+    const violations = /* @__PURE__ */ new Set();
+    let found = 0;
+    let fixable = 0;
+    let clean = false;
+    let summary = null;
+    let header = null;
+    for (const raw of lines2(text)) {
+      const line = raw.trim();
+      const f = RUFF_FOUND.exec(line);
+      if (f) {
+        found = Math.max(found, Number(f[1]));
+        summary = line;
+        continue;
+      }
+      if (RUFF_CLEAN.test(line)) {
+        clean = true;
+        summary = line;
+        continue;
+      }
+      const fix = RUFF_FIXABLE.exec(line);
+      if (fix) {
+        fixable = Math.max(fixable, Number(fix[1]));
+        continue;
+      }
+      const concise = RUFF_CONCISE.exec(raw.trimStart());
+      if (concise) {
+        violations.add(`${concise[1]}:${concise[2]}:${concise[3]} ${concise[4]}`);
+        continue;
+      }
+      const head = RUFF_HEADER.exec(line);
+      if (head) {
+        header = head[1] ?? null;
+        continue;
+      }
+      const arrow = RUFF_ARROW.exec(raw);
+      if (arrow && header !== null) {
+        violations.add(`${arrow[1]}:${arrow[2]}:${arrow[3]} ${header}`);
+        header = null;
+      }
+    }
+    if (!clean && found === 0 && fixable === 0 && violations.size === 0) return null;
+    const errors = Math.max(found, violations.size, fixable);
+    return {
+      runner: "ruff",
+      passed: clean && errors === 0 ? 1 : 0,
+      failed: 0,
+      errors,
+      skipped: 0,
+      failing: [...violations].slice(0, MAX_FAILING4).map((v) => cap2(v, MAX_ENTRY)),
+      summary_line: summary === null ? null : cap2(summary, MAX_SUMMARY4)
+    };
+  }
+};
+var parsers4 = [pytest, ruff];
+
+// src/engine/runners/index.ts
+var PARSERS = [...parsers4, ...parsers2, ...parsers, ...parsers3];
+function parseEvidence(text) {
+  const runners = PARSERS.map((p) => p.parse(text)).filter((r) => r !== null);
+  const exitMatches = [...text.matchAll(/^.{0,60}?\bexit (?:code|status)\s*[:=]?\s*(-?\d+)/gim)];
+  const exit = exitMatches.map((m) => Number(m[1]));
+  const exit_lines = exitMatches.slice(0, 3).map((m) => m[0].trim().slice(0, 80));
+  const exit_code = exit.length === 0 ? null : exit.some((c) => c !== 0) ? exit.find((c) => c !== 0) : 0;
+  const conflict = runners.some((r) => r.failed + r.errors > 0) && (runners.some((r) => r.failed + r.errors === 0 && r.passed > 0) || exit_code === 0);
+  const trust = runners.length > 0 ? "parsed" : exit_code !== null ? "exit_code" : "unparsed";
+  return { trust, exit_code, exit_lines, runners, conflict, lines: text.split("\n").length };
+}
+__name(parseEvidence, "parseEvidence");
+
 // src/cli/commands/done.ts
 var NEXT = {
   missing: "The evidence doesn't show the criterion. Run the check that proves it and pipe its output in; the same evidence gives the same answer.",
@@ -2109,7 +2915,13 @@ function doneEvidence(text) {
   return clip(stripAnsi(text), 2e3, 12e3);
 }
 __name(doneEvidence, "doneEvidence");
+var UNPARSED_NEXT = `No recognised runner summary or exit code in the evidence, so it cannot count as met. Pipe the runner's full output, or add an exit code line: { your-command; echo "exit code: $?"; } 2>&1 | claude-referee done --criteria "..."`;
+function factsOf(parsed) {
+  return { trust: parsed.trust, exit_code: parsed.exit_code, exit_lines: parsed.exit_lines, runners: parsed.runners, conflict: parsed.conflict, lines: parsed.lines };
+}
+__name(factsOf, "factsOf");
 function doneRequest(pack, thresholds, criteria, evidence) {
+  const parsed = parseEvidence(evidence);
   const base = question(pack, "done.met");
   const questions = Object.fromEntries(criteria.map((criterion, i) => [`c${i + 1}`, { ...base, instructions: withData(base.instructions, { criterion }) }]));
   const met = threshold(pack, thresholds, "done.met", "met", 0.7);
@@ -2118,7 +2930,8 @@ function doneRequest(pack, thresholds, criteria, evidence) {
     const per = criteria.map((_, i) => {
       const answer = outcome?.answers?.[`c${i + 1}`];
       const p = answer?.type === "noul" ? answer.noul : 0;
-      const verdict2 = p >= met ? "met" : p < missing ? "missing" : "unsure";
+      const raw = p >= met ? "met" : p < missing ? "missing" : "unsure";
+      const verdict2 = raw === "met" && (parsed.trust === "unparsed" || parsed.conflict) ? "unsure" : raw;
       return { i: i + 1, verdict: verdict2, p };
     });
     const verdict = per.some((c) => c.verdict === "missing") ? "missing" : per.some((c) => c.verdict === "unsure") ? "unsure" : "met";
@@ -2126,11 +2939,15 @@ function doneRequest(pack, thresholds, criteria, evidence) {
       ok: true,
       verdict,
       p: Math.min(...per.map((c) => c.p)),
+      trust: parsed.trust,
+      ...parsed.exit_code !== null ? { exit_code: parsed.exit_code } : {},
+      ...parsed.runners.length > 0 ? { runners: parsed.runners.map((r) => ({ runner: r.runner, passed: r.passed, failed: r.failed, errors: r.errors, skipped: r.skipped })) } : {},
       ...per.length > 1 ? { criteria: per } : {},
-      next_step: verdict === "met" ? void 0 : NEXT[verdict]
+      next_step: verdict === "met" ? void 0 : parsed.trust === "unparsed" && per.every((c) => c.verdict !== "missing") ? UNPARSED_NEXT : NEXT[verdict]
     };
   }, "finish");
-  return { planned: [{ id: "done", state: { evidence }, questions }], finish };
+  const state = parsed.trust === "unparsed" ? { evidence } : { evidence: factsOf(parsed) };
+  return { planned: [{ id: "done", state, questions }], finish };
 }
 __name(doneRequest, "doneRequest");
 var done = {
@@ -2139,10 +2956,12 @@ var done = {
     summary: "Check whether piped test or lint output shows that each criterion holds.",
     inputs: {
       "--criteria <text>": 'What must hold, e.g. "all tests pass". Repeat for several; max 10.',
-      "--evidence <file|->": "The check output. '-' or omitted reads stdin. ANSI colours are stripped; long output keeps its first 2,000 and last 12,000 characters."
+      "--evidence <file|->": "The check output. '-' or omitted reads stdin. ANSI colours are stripped; long output keeps its first 2,000 and last 12,000 characters. Output from a recognised test runner, linter or type checker, or with an exit code line, is parsed in code and only those facts are sent; anything else is sent as text and can never count as met."
     },
     outputs: {
       verdict: "met, unsure or missing; the lowest across criteria",
+      trust: "parsed (a runner summary was recognised), exit_code (only an exit code line) or unparsed (met is not possible)",
+      runners: "Parsed counts per recognised runner",
       p: "Lowest probability that a criterion holds",
       criteria: "Per criterion, by position, when more than one",
       next_step: "Only when not met"
@@ -2199,8 +3018,8 @@ function parseRecordings(text) {
   });
 }
 __name(parseRecordings, "parseRecordings");
-function findRecording(lines, key) {
-  const forCase = lines.filter((l) => l.case === key.case && l.model === key.model);
+function findRecording(lines3, key) {
+  const forCase = lines3.filter((l) => l.case === key.case && l.model === key.model);
   const match = [...forCase].reverse().find((l) => l.qhash === key.qhash && l.shash === key.shash);
   if (match) return { status: "ok", line: match };
   return { status: forCase.length > 0 ? "stale" : "missing" };
@@ -2463,9 +3282,9 @@ function parseItems(text) {
       throw new RefereeError("bad_input", "Items look like a JSON array but don't parse.");
     }
   }
-  const lines = text.split(/\r?\n/);
-  const jsonl = lines.filter((l) => l.trim()).every((l) => l.trim().startsWith("{"));
-  return lines.map((line, i) => {
+  const lines3 = text.split(/\r?\n/);
+  const jsonl = lines3.filter((l) => l.trim()).every((l) => l.trim().startsWith("{"));
+  return lines3.map((line, i) => {
     if (!line.trim()) return null;
     if (!jsonl) return { id: String(i + 1), text: line };
     try {
@@ -2992,14 +3811,14 @@ var SHARED_CONTRACT = {
 };
 function usage(commands2) {
   const width = Math.max(...commands2.map((c) => c.name.length), 4);
-  const lines = commands2.map((c) => `  ${c.name.padEnd(width)}  ${c.describe.summary}`);
+  const lines3 = commands2.map((c) => `  ${c.name.padEnd(width)}  ${c.describe.summary}`);
   return [
     `${KIT} ${VERSION}`,
     "",
     `Usage: ${KIT} <command> [options]`,
     "",
     "Commands:",
-    ...lines,
+    ...lines3,
     "",
     "Every command accepts --describe (JSON contract), --pretty and --data-dir.",
     "Commands that ask Jev also accept --dry-run, --fresh and --fail-on <verdict,...>."

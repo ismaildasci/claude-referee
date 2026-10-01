@@ -1,0 +1,1 @@
+{"command":"done","criteria":"all tests pass","positive":"met","max_wrong_positive":0,"note":"Held-out cases for done v2, written without access to the parsers. Dev cases (d-) are for tuning, hold-out cases (h-) only for the claim."}

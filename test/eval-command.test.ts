@@ -10,7 +10,7 @@ import { fakeJev, type FakeRequest } from "./fake-jev.ts";
 import { memoryIo, tempDir } from "./helpers.ts";
 
 const byEvidence = (request: FakeRequest) => {
-  const p = String((request.state as { evidence: string }).evidence).includes("12 passed") ? 0.95 : 0.1;
+  const p = JSON.stringify((request.state as { evidence: unknown }).evidence).includes("12 passed") ? 0.95 : 0.1;
   return Object.fromEntries(Object.keys(request.questions).map((id) => [id, { type: "noul", noul: p }]));
 };
 

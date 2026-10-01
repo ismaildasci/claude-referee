@@ -227,6 +227,8 @@ Her komut tek satır JSON basar: `ok`, karar, birkaç sayı, varsa bir `next_ste
 > { npx tsc --noEmit; echo "tsc exit code: $?"; } 2>&1 | npx claude-referee done --criteria "typecheck passes" --evidence -
 > ```
 
+`done`, yalnızca bir test çalıştırıcısının, linter'ın ya da tip denetleyicisinin özetini ya da bir çıkış kodu satırını tanırsa `met` döndürür. Başka her şey `trust: unparsed` ile `unsure` olarak gelir.
+
 ## Makinenden ne çıkar
 
 - TypeSafe'in ABD'de çalışan API'sine yalnızca bir kontrolün ihtiyaç duyduğu kadarı gönderilir.

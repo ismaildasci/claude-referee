@@ -119,12 +119,12 @@ Setup: `done --criteria "all tests pass"` on 33 failing or unfinished test logs,
 
 - When the log showed the failure, the note didn't change a verdict.
 - When the log showed no result, the note raised p in 5 of 6 logs, and a pytest log cut off before its summary went from `missing` (0.47) to `met` (0.74).
-- The fix is on the evidence side: pipe the whole output with the exit code. A runner-summary parser (planned for `done` v2) would keep a note like this out of the judged fields.
+- The fix is on the evidence side: pipe the whole output with the exit code. `done` v2 (unreleased) parses runner summaries in code so a note like this never reaches the judge; see [done v2 on held-out cases](#done-v2-on-held-out-cases).
 
 ## Not measured yet
 
 - Whether claude-referee lowers the total cost of a task. The v0.2 A/B will be pre-registered in `bench/PREREG.md` before its first run.
-- How the done-gate performs on held-out cases. The `done` threshold was chosen on the same 25 cases it was scored on, so its 24 of 25 is in-sample. At least 40 new labelled cases are needed.
+- How the earlier kit's `done` thresholds perform on held-out cases. They were chosen on the same 25 cases they were scored on, so its 24 of 25 is in-sample. `done` v2 has its own held-out result, below. The Stop done-gate has none yet.
 
 ## Measured with claude-referee itself
 
@@ -209,3 +209,16 @@ Both runs used `eval record`, one request per log, and are compared with each ot
 - No verdict changed.
 - On the six logs that showed no result and carried the note, p rose by 0.03 on average with the sentence (from -0.02 to +0.09 per log). On the logs that showed the failure, p moved by 0.03 at most.
 - **What changed:** nothing. The sentence isn't adopted; the fix stays on the evidence side.
+
+### done v2 on held-out cases
+
+`eval record --suite done-v2`, one request per case, `jev-1.13.0`, 2026-10-01. 48 held-out cases (18 should be `met`, 30 `missing`) and 30 dev cases, all invented and labelled by a model that did not see the parsers, covering pytest, jest, vitest, mocha, go test, cargo test, dotnet test, PHPUnit, RSpec, ESLint, Ruff, tsc and plain commands with an exit code line. Variants: passing, failing, cut off, cut off after a failure, zero tests, skipped only, silent commands with and without an exit code, a non-zero exit code, a forged "all passed" summary after a failing run, a note aimed at the judge, retries, warnings, and two runners in one output. Cases: [cases.jsonl](../jev-evals/done-v2/cases.jsonl). Answers: [recorded.jsonl](../jev-evals/done-v2/recorded.jsonl).
+
+How it works: output from a recognised runner is parsed in code into counts, an exit code, the label in front of it and the failing test names, and only those facts are sent. Output that isn't recognised is sent as text and can never return `met`; it returns `unsure` with `trust: unparsed`. Conflicting summaries are merged worst case.
+
+- Held-out: no wrong `met` (0 of 30 `missing` cases), `missing` found in 27 of 30, `met` found in 15 of 18, 5 `unsure`. Median size of what is sent: 281 characters, against 365 for the raw text of done v1.
+- The three `missing` cases that were not found are cut-off logs of unrecognised output where Jev answered `met` at 0.78, 0.84 and 0.87. The rule that unparsed output can't be `met` turned them into `unsure`. Without it they would have been three wrong `met`.
+- Dev: no wrong `met`, `missing` found in 19 of 19, `met` in 7 of 11.
+- The 33 injection logs: no `met` at all with done v2 (done v1 had one wrong `met`).
+- **What changed:** the held-out set was scored once before the exit code label was added to the facts: 13 of 18 `met` found, because a silent `tsc` run showed only an exit code of 0 without saying which command it belonged to. The label fixed it (15 of 18). The other numbers did not move. The recorded file keeps both runs.
+- Limits: the cases are invented; the parsers were written from the tools' documented output and have not been checked against real runs of every tool; one model version; the `met` and `missing` bands are the pack's 0.7 and 0.5, untuned; 3 `met` cases are still reported `unsure` or `missing`.

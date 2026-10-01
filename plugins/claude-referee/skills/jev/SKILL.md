@@ -35,7 +35,7 @@ git diff -U0 --no-ext-diff | grep '^+[^+]' | node "${CLAUDE_PLUGIN_ROOT}/dist/cl
 ## Rules
 
 - A weak or tie verdict is settled by adding the missing fact, or by going with `lean` when the choice is easy to undo. Asking the same question again moves the answer by about 0.01.
-- Make evidence explicit. A command that prints nothing on success shows nothing; add its exit code to the output.
+- Make evidence explicit. A command that prints nothing on success shows nothing; add its exit code to the output. `done` only returns `met` for output from a recognised runner or with an exit code line (`trust` in the result); anything else comes back `unsure`.
 - Pass paths through `context_files` instead of retyping file contents.
 - Input shaped like a credential stops the request. Remove it; don't work around it.
 - The referee can be overruled. It answers narrow questions and stays silent below its thresholds.

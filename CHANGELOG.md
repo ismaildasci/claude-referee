@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- `jev-evals/done-v2`: 48 held-out and 30 dev labelled cases for `done` with their recorded answers; the injection suite now allows no wrong `met`.
 - `scripts/probe-api.mjs`, `scripts/latency.mjs` and `scripts/order-sensitivity.mjs`: live checks of the API's edge cases, of latency at 1, 6 and 8 requests in parallel, and of option-order sensitivity. Their results from 2026-09-30 are in `jev-evals/api/` and `jev-evals/decide/`.
 - `jev-evals/decide`: a public set of 20 decisions with 4 options each.
 - `jev-evals/claims`: 31 labelled claims about this repository's docs, `decide`'s three-way answers to them, and the scripts that build and score them.
@@ -15,6 +16,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
+- `done` parses recognised runner output in code (pytest, Ruff, Jest, Vitest, Mocha, ESLint, tsc, node:test, go test, cargo test, dotnet test, PHPUnit, RSpec) and sends only counts, the exit code, its label and the failing test names to Jev. Output that isn't recognised is sent as text and can never return `met`; it returns `unsure` with `trust: unparsed`. The result now has `trust`, `exit_code` and `runners`. The `done.met` note changed, so recorded answers were re-recorded.
 - Probabilities in the JSON output are now rounded down to two decimals instead of to nearest, so 0.895 shows as 0.89 and a printed 0.90 means at least 0.90. `_usd` fields keep six decimals.
 
 ## [0.1.1] - 2026-10-01
