@@ -13,10 +13,12 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
+- `done` never says `met` when the log itself says no tests ran (`no tests to run`, `no tests found`, `0 tests executed`, `Tests run: 0`, `nothing to run`), even with an exit code of 0: `unsure` with `reason: "no_tests_run"`.
 - `done` never says `met` when tests were skipped, risky or incomplete (a skipped or ignored count above 0, or PHPUnit's "OK, but incomplete, skipped, or risky tests!"): the verdict is `unsure` with `reason: "skipped_tests"`, whatever Jev answers. The skipped count stays in the facts.
 
 ### Added
 
+- `jev-evals/done-v2-h4`: a fourth hold-out for `done` v2 (46 cases, registered in `docs/decisions/done-v2-holdout4.md`); it failed its registered check, and the suite's allowance is the 1 remaining observed wrong `met`.
 - Parsers for `node --test` TAP output, the `eslint` summary line (warnings are a separate fact), `tsc -b`, `golangci-lint`, `vite build` and `cargo build`/`check` (warnings are a separate fact). Fewer runs depend on an exit code alone. PHPUnit's `Risky:` and `Incomplete:` counts now count as not fully passed (in `skipped`). The 10 cases of `done-v2-h3` and one of `done-v2-h2` that these changed moved to `done-v2` as dev.
 - `jev-evals/done-v2-h3`: a third hold-out for `done` v2 (46 cases, registered in `docs/decisions/done-v2-holdout3.md`). It failed its registered check (2 wrong `met`); the suite's allowance is those 2 observed cases.
 - Parsers for Python `unittest` and `cargo clippy`. Clippy output reports its warnings as a separate `warnings` fact, so a criterion like "lint is clean" no longer rests on an exit code alone.
