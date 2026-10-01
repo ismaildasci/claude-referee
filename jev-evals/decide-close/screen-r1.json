@@ -1,0 +1,1535 @@
+{
+ "date": "2026-10-01T05:26:36.390Z",
+ "model": "jev-1.13.0",
+ "input": "cands-r1.jsonl",
+ "keep_file": "jev-evals/decide-close/cases.jsonl",
+ "rule": "keep when the leader probability is below 0.70 in both fixed orders badc and cadb (options indexed a,b,c,d in written order)",
+ "summary": {
+  "tested": 56,
+  "kept": 25,
+  "total_in_cases": 25,
+  "requests": 112,
+  "input_tokens": 59010,
+  "cost_usd": 0.002478,
+  "rejected": 31,
+  "capped": 0,
+  "refused": 0,
+  "duplicates": 0,
+  "retries_429": 0,
+  "max": 40
+ },
+ "candidates": [
+  {
+   "id": "va1-ratelimit-noredis",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "edge",
+    "p_leader": 0.67,
+    "probabilities": {
+     "edge": 0.67,
+     "memory": 0.01,
+     "redis": 0.32,
+     "postgres": 0
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "edge",
+    "p_leader": 0.72,
+    "probabilities": {
+     "redis": 0.27,
+     "memory": 0.01,
+     "edge": 0.72,
+     "postgres": 0
+    }
+   }
+  },
+  {
+   "id": "va1-jobs-kafka",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "kafka",
+    "p_leader": 0.78,
+    "probabilities": {
+     "cron": 0,
+     "kafka": 0.78,
+     "inprocess": 0,
+     "pgqueue": 0.22
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "kafka",
+    "p_leader": 0.76,
+    "probabilities": {
+     "pgqueue": 0.23,
+     "inprocess": 0,
+     "kafka": 0.76,
+     "cron": 0.01
+    }
+   }
+  },
+  {
+   "id": "va1-spa-logoutlag",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "jwtcookie",
+    "p_leader": 0.91,
+    "probabilities": {
+     "jwtcookie": 0.91,
+     "jwtlocal": 0.08,
+     "basic": 0,
+     "cookie": 0.01
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "jwtcookie",
+    "p_leader": 0.97,
+    "probabilities": {
+     "jwtlocal": 0.03,
+     "basic": 0,
+     "cookie": 0,
+     "jwtcookie": 0.97
+    }
+   }
+  },
+  {
+   "id": "va1-uploads-singlevm",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "localdisk",
+    "p_leader": 0.65,
+    "probabilities": {
+     "database": 0,
+     "objectstore": 0.34,
+     "localdisk": 0.65,
+     "nfs": 0.01
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "localdisk",
+    "p_leader": 0.73,
+    "probabilities": {
+     "objectstore": 0.26,
+     "database": 0,
+     "nfs": 0.01,
+     "localdisk": 0.73
+    }
+   }
+  },
+  {
+   "id": "va1-deploy-offhours",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "recreate",
+    "p_leader": 0.66,
+    "probabilities": {
+     "manual": 0.01,
+     "bluegreen": 0.03,
+     "rolling": 0.3,
+     "recreate": 0.66
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "recreate",
+    "p_leader": 0.7,
+    "probabilities": {
+     "rolling": 0.23,
+     "bluegreen": 0.06,
+     "manual": 0.01,
+     "recreate": 0.7
+    }
+   }
+  },
+  {
+   "id": "va1-payment-sandbox",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "mocks",
+    "p_leader": 0.83,
+    "probabilities": {
+     "none": 0,
+     "sandboxci": 0.17,
+     "prodtests": 0,
+     "mocks": 0.83
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "mocks",
+    "p_leader": 0.73,
+    "probabilities": {
+     "prodtests": 0,
+     "none": 0.01,
+     "sandboxci": 0.26,
+     "mocks": 0.73
+    }
+   }
+  },
+  {
+   "id": "va1-logs-rawtext",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "text",
+    "p_leader": 0.8200000000000001,
+    "probabilities": {
+     "debugall": 0,
+     "json": 0.18,
+     "csv": 0,
+     "text": 0.8200000000000001
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "text",
+    "p_leader": 0.86,
+    "probabilities": {
+     "debugall": 0,
+     "json": 0.13,
+     "csv": 0.01,
+     "text": 0.86
+    }
+   }
+  },
+  {
+   "id": "va1-flags-nobudget",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "dbtable",
+    "p_leader": 0.5,
+    "probabilities": {
+     "vendor": 0.48,
+     "dbtable": 0.5,
+     "configfile": 0.01,
+     "envvars": 0.01
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "dbtable",
+    "p_leader": 0.55,
+    "probabilities": {
+     "configfile": 0.06,
+     "dbtable": 0.55,
+     "envvars": 0.01,
+     "vendor": 0.38
+    }
+   }
+  },
+  {
+   "id": "va1-search-hases",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "elastic",
+    "p_leader": 0.79,
+    "probabilities": {
+     "like": 0,
+     "elastic": 0.79,
+     "pgtrgm": 0.21,
+     "client": 0
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "elastic",
+    "p_leader": 0.84,
+    "probabilities": {
+     "like": 0,
+     "client": 0,
+     "elastic": 0.84,
+     "pgtrgm": 0.16
+    }
+   }
+  },
+  {
+   "id": "va1-pagecache-nocdn",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "redis",
+    "p_leader": 0.99,
+    "probabilities": {
+     "nocache": 0,
+     "redis": 0.99,
+     "browser": 0,
+     "cdn": 0.01
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "redis",
+    "p_leader": 1,
+    "probabilities": {
+     "browser": 0,
+     "cdn": 0,
+     "nocache": 0,
+     "redis": 1
+    }
+   }
+  },
+  {
+   "id": "va1-ratelimit-approx",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "redis",
+    "p_leader": 0.9,
+    "probabilities": {
+     "redis": 0.9,
+     "edge": 0.01,
+     "memory": 0.09,
+     "postgres": 0
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "redis",
+    "p_leader": 0.94,
+    "probabilities": {
+     "postgres": 0,
+     "edge": 0.02,
+     "memory": 0.04,
+     "redis": 0.94
+    }
+   }
+  },
+  {
+   "id": "va1-jobs-lossok",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "pgqueue",
+    "p_leader": 0.95,
+    "probabilities": {
+     "inprocess": 0.02,
+     "pgqueue": 0.95,
+     "kafka": 0,
+     "cron": 0.03
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "pgqueue",
+    "p_leader": 0.96,
+    "probabilities": {
+     "cron": 0.02,
+     "pgqueue": 0.96,
+     "inprocess": 0.02,
+     "kafka": 0
+    }
+   }
+  },
+  {
+   "id": "va1-deploy-tworeplicas",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "rolling",
+    "p_leader": 0.88,
+    "probabilities": {
+     "rolling": 0.88,
+     "recreate": 0,
+     "bluegreen": 0.12,
+     "manual": 0
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "rolling",
+    "p_leader": 0.85,
+    "probabilities": {
+     "bluegreen": 0.15,
+     "recreate": 0,
+     "manual": 0,
+     "rolling": 0.85
+    }
+   }
+  },
+  {
+   "id": "va1-search-exact",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "pgtrgm",
+    "p_leader": 0.75,
+    "probabilities": {
+     "elastic": 0.02,
+     "pgtrgm": 0.75,
+     "client": 0,
+     "like": 0.23
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "pgtrgm",
+    "p_leader": 0.65,
+    "probabilities": {
+     "pgtrgm": 0.65,
+     "client": 0,
+     "elastic": 0.01,
+     "like": 0.34
+    }
+   }
+  },
+  {
+   "id": "vb1-secrets-norot",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "kubesecrets",
+    "p_leader": 0.59,
+    "probabilities": {
+     "wiki": 0.01,
+     "envfile": 0.02,
+     "kubesecrets": 0.59,
+     "cloudsm": 0.38
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "kubesecrets",
+    "p_leader": 0.52,
+    "probabilities": {
+     "kubesecrets": 0.52,
+     "cloudsm": 0.46,
+     "wiki": 0.01,
+     "envfile": 0.01
+    }
+   }
+  },
+  {
+   "id": "vb1-apiver-nonotice",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "header",
+    "p_leader": 0.52,
+    "probabilities": {
+     "newapi": 0,
+     "urlversion": 0.47,
+     "inplace": 0.01,
+     "header": 0.52
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "header",
+    "p_leader": 0.57,
+    "probabilities": {
+     "inplace": 0,
+     "urlversion": 0.43,
+     "newapi": 0,
+     "header": 0.57
+    }
+   }
+  },
+  {
+   "id": "vb1-migration-window",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "single",
+    "p_leader": 0.51,
+    "probabilities": {
+     "batched": 0.43,
+     "dumprestore": 0.05,
+     "app": 0.01,
+     "single": 0.51
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "batched",
+    "p_leader": 0.5599999999999999,
+    "probabilities": {
+     "batched": 0.5599999999999999,
+     "single": 0.38,
+     "app": 0.01,
+     "dumprestore": 0.05
+    }
+   }
+  },
+  {
+   "id": "vb1-alerting-cpuhit",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "cpu",
+    "p_leader": 0.65,
+    "probabilities": {
+     "none": 0.01,
+     "cpu": 0.65,
+     "slo": 0.34,
+     "everything": 0
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "cpu",
+    "p_leader": 0.69,
+    "probabilities": {
+     "cpu": 0.69,
+     "slo": 0.3,
+     "none": 0.01,
+     "everything": 0
+    }
+   }
+  },
+  {
+   "id": "vb1-offline-coedit",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "queuelww",
+    "p_leader": 0.7,
+    "probabilities": {
+     "crdt": 0.3,
+     "fullreplace": 0,
+     "queuelww": 0.7,
+     "onlineonly": 0
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "queuelww",
+    "p_leader": 0.56,
+    "probabilities": {
+     "fullreplace": 0,
+     "crdt": 0.44,
+     "queuelww": 0.56,
+     "onlineonly": 0
+    }
+   }
+  },
+  {
+   "id": "vb1-email-ownrelay",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "ownsmtp",
+    "p_leader": 0.84,
+    "probabilities": {
+     "sendbatch": 0,
+     "provider": 0.16,
+     "ownsmtp": 0.84,
+     "gmail": 0
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "ownsmtp",
+    "p_leader": 0.89,
+    "probabilities": {
+     "provider": 0.11,
+     "gmail": 0,
+     "ownsmtp": 0.89,
+     "sendbatch": 0
+    }
+   }
+  },
+  {
+   "id": "vb1-repo-rareshared",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "monorepo",
+    "p_leader": 0.55,
+    "probabilities": {
+     "monorepo": 0.55,
+     "copy": 0,
+     "polyrepo": 0.45,
+     "submodules": 0
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "monorepo",
+    "p_leader": 0.54,
+    "probabilities": {
+     "polyrepo": 0.45,
+     "submodules": 0.01,
+     "monorepo": 0.54,
+     "copy": 0
+    }
+   }
+  },
+  {
+   "id": "vb1-thumbs-cdnaddon",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "worker",
+    "p_leader": 0.99,
+    "probabilities": {
+     "request": 0,
+     "client": 0,
+     "worker": 0.99,
+     "cdntransform": 0.01
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "worker",
+    "p_leader": 0.99,
+    "probabilities": {
+     "worker": 0.99,
+     "request": 0,
+     "client": 0,
+     "cdntransform": 0.01
+    }
+   }
+  },
+  {
+   "id": "vb1-envcfg-audit",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "envconfig",
+    "p_leader": 0.9400000000000001,
+    "probabilities": {
+     "branch": 0.06,
+     "envconfig": 0.9400000000000001,
+     "images": 0,
+     "hardcode": 0
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "envconfig",
+    "p_leader": 0.96,
+    "probabilities": {
+     "branch": 0.04,
+     "hardcode": 0,
+     "images": 0,
+     "envconfig": 0.96
+    }
+   }
+  },
+  {
+   "id": "vb1-retries-batch",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "backoff",
+    "p_leader": 0.87,
+    "probabilities": {
+     "fixed": 0.01,
+     "infinite": 0,
+     "noretry": 0.12,
+     "backoff": 0.87
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "backoff",
+    "p_leader": 0.89,
+    "probabilities": {
+     "backoff": 0.89,
+     "noretry": 0.09,
+     "fixed": 0.02,
+     "infinite": 0
+    }
+   }
+  },
+  {
+   "id": "vb1-apiver-fewint",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "urlversion",
+    "p_leader": 0.93,
+    "probabilities": {
+     "inplace": 0.07,
+     "header": 0,
+     "newapi": 0,
+     "urlversion": 0.93
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "urlversion",
+    "p_leader": 0.94,
+    "probabilities": {
+     "inplace": 0.05,
+     "newapi": 0,
+     "urlversion": 0.94,
+     "header": 0.01
+    }
+   }
+  },
+  {
+   "id": "vb1-repo-squads",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "monorepo",
+    "p_leader": 0.83,
+    "probabilities": {
+     "monorepo": 0.83,
+     "copy": 0,
+     "submodules": 0,
+     "polyrepo": 0.17
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "monorepo",
+    "p_leader": 0.72,
+    "probabilities": {
+     "submodules": 0.01,
+     "monorepo": 0.72,
+     "copy": 0,
+     "polyrepo": 0.27
+    }
+   }
+  },
+  {
+   "id": "vb1-alerting-nodefslo",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "slo",
+    "p_leader": 0.68,
+    "probabilities": {
+     "none": 0.19,
+     "slo": 0.68,
+     "cpu": 0.13,
+     "everything": 0
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "slo",
+    "p_leader": 0.58,
+    "probabilities": {
+     "cpu": 0.02,
+     "none": 0.4,
+     "everything": 0,
+     "slo": 0.58
+    }
+   }
+  },
+  {
+   "id": "vb1-retries-bursts",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "backoff",
+    "p_leader": 0.94,
+    "probabilities": {
+     "infinite": 0,
+     "noretry": 0.05,
+     "backoff": 0.94,
+     "fixed": 0.01
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "backoff",
+    "p_leader": 0.97,
+    "probabilities": {
+     "infinite": 0,
+     "noretry": 0.02,
+     "backoff": 0.97,
+     "fixed": 0.01
+    }
+   }
+  },
+  {
+   "id": "ba1-metrics-retention",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "thanos",
+    "p_leader": 0.48,
+    "probabilities": {
+     "thanos": 0.48,
+     "bigdisk": 0.01,
+     "hosted": 0.22,
+     "rollup": 0.29
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "thanos",
+    "p_leader": 0.42,
+    "probabilities": {
+     "thanos": 0.42,
+     "rollup": 0.36,
+     "hosted": 0.21,
+     "bigdisk": 0.01
+    }
+   }
+  },
+  {
+   "id": "ba1-read-scaling",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "replicas",
+    "p_leader": 0.93,
+    "probabilities": {
+     "scaleup": 0.02,
+     "rediscache": 0.02,
+     "replicas": 0.93,
+     "tune": 0.03
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "replicas",
+    "p_leader": 0.91,
+    "probabilities": {
+     "scaleup": 0.03,
+     "replicas": 0.91,
+     "tune": 0.05,
+     "rediscache": 0.01
+    }
+   }
+  },
+  {
+   "id": "ba1-poison-message",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "deadletter",
+    "p_leader": 0.51,
+    "probabilities": {
+     "skiplog": 0.05,
+     "parkaccount": 0.26,
+     "deadletter": 0.51,
+     "haltpage": 0.18
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "deadletter",
+    "p_leader": 0.56,
+    "probabilities": {
+     "skiplog": 0.07,
+     "parkaccount": 0.2,
+     "haltpage": 0.16,
+     "deadletter": 0.56
+    }
+   }
+  },
+  {
+   "id": "ba1-connection-pooling",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "managedproxy",
+    "p_leader": 0.88,
+    "probabilities": {
+     "managedproxy": 0.88,
+     "smallpools": 0.1,
+     "rawlimit": 0,
+     "pgbouncer": 0.02
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "managedproxy",
+    "p_leader": 0.83,
+    "probabilities": {
+     "pgbouncer": 0.06,
+     "smallpools": 0.11,
+     "managedproxy": 0.83,
+     "rawlimit": 0
+    }
+   }
+  },
+  {
+   "id": "ba1-backup-recovery",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "walpitr",
+    "p_leader": 0.8,
+    "probabilities": {
+     "walpitr": 0.8,
+     "standbydump": 0.08,
+     "delayed": 0.03,
+     "snapshots": 0.09
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "walpitr",
+    "p_leader": 0.66,
+    "probabilities": {
+     "delayed": 0.03,
+     "standbydump": 0.08,
+     "walpitr": 0.66,
+     "snapshots": 0.23
+    }
+   }
+  },
+  {
+   "id": "ba1-cache-stampede",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "earlyrefresh",
+    "p_leader": 0.39,
+    "probabilities": {
+     "singleflight": 0.2,
+     "precompute": 0.12,
+     "earlyrefresh": 0.39,
+     "redislock": 0.29
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "earlyrefresh",
+    "p_leader": 0.38,
+    "probabilities": {
+     "singleflight": 0.17,
+     "precompute": 0.11,
+     "redislock": 0.34,
+     "earlyrefresh": 0.38
+    }
+   }
+  },
+  {
+   "id": "ba1-tenant-isolation",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "dbperbig",
+    "p_leader": 0.37,
+    "probabilities": {
+     "schemaper": 0.36,
+     "dbpertenant": 0.01,
+     "dbperbig": 0.37,
+     "sharedrls": 0.26
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "schemaper",
+    "p_leader": 0.37,
+    "probabilities": {
+     "schemaper": 0.37,
+     "dbpertenant": 0.01,
+     "dbperbig": 0.3,
+     "sharedrls": 0.32
+    }
+   }
+  },
+  {
+   "id": "ba1-mysql-postgres",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "cdccutover",
+    "p_leader": 0.45,
+    "probabilities": {
+     "dualwrite": 0.02,
+     "cdccutover": 0.45,
+     "bysvc": 0.14,
+     "staymysql": 0.39
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "cdccutover",
+    "p_leader": 0.43,
+    "probabilities": {
+     "dualwrite": 0.04,
+     "staymysql": 0.42,
+     "bysvc": 0.11,
+     "cdccutover": 0.43
+    }
+   }
+  },
+  {
+   "id": "ba1-trace-sampling",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "tailbased",
+    "p_leader": 0.86,
+    "probabilities": {
+     "tailbased": 0.86,
+     "headfixed": 0.05,
+     "pathsonly": 0.02,
+     "shortfull": 0.07
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "tailbased",
+    "p_leader": 0.86,
+    "probabilities": {
+     "tailbased": 0.86,
+     "headfixed": 0.03,
+     "shortfull": 0.1,
+     "pathsonly": 0.01
+    }
+   }
+  },
+  {
+   "id": "ba1-autoscale-signal",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "concurrency",
+    "p_leader": 0.73,
+    "probabilities": {
+     "concurrency": 0.73,
+     "cpu": 0.03,
+     "fixedfleet": 0.11,
+     "schedule": 0.13
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "concurrency",
+    "p_leader": 0.61,
+    "probabilities": {
+     "schedule": 0.21,
+     "fixedfleet": 0.09,
+     "cpu": 0.09,
+     "concurrency": 0.61
+    }
+   }
+  },
+  {
+   "id": "ba1-analytics-feed",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "batchload",
+    "p_leader": 0.61,
+    "probabilities": {
+     "dedicated": 0.28,
+     "matviews": 0.01,
+     "cdcstream": 0.1,
+     "batchload": 0.61
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "batchload",
+    "p_leader": 0.73,
+    "probabilities": {
+     "cdcstream": 0.04,
+     "batchload": 0.73,
+     "matviews": 0.01,
+     "dedicated": 0.22
+    }
+   }
+  },
+  {
+   "id": "ba1-events-retention",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "partdrop",
+    "p_leader": 0.47,
+    "probabilities": {
+     "coldstore": 0.37,
+     "partdrop": 0.47,
+     "keepall": 0.07,
+     "batchdelete": 0.09
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "partdrop",
+    "p_leader": 0.55,
+    "probabilities": {
+     "coldstore": 0.35,
+     "keepall": 0.04,
+     "partdrop": 0.55,
+     "batchdelete": 0.06
+    }
+   }
+  },
+  {
+   "id": "ba1-service-hosting",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "managedkube",
+    "p_leader": 0.47000000000000003,
+    "probabilities": {
+     "containersvc": 0.28,
+     "hostedpaas": 0.18,
+     "vmsystemd": 0.07,
+     "managedkube": 0.47000000000000003
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "managedkube",
+    "p_leader": 0.42,
+    "probabilities": {
+     "vmsystemd": 0.06,
+     "hostedpaas": 0.33,
+     "containersvc": 0.19,
+     "managedkube": 0.42
+    }
+   }
+  },
+  {
+   "id": "ba1-iac-apply",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "ciapply",
+    "p_leader": 0.66,
+    "probabilities": {
+     "manualapply": 0.03,
+     "nightly": 0.03,
+     "ciapply": 0.66,
+     "reconciler": 0.28
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "ciapply",
+    "p_leader": 0.68,
+    "probabilities": {
+     "manualapply": 0.03,
+     "reconciler": 0.27,
+     "nightly": 0.01,
+     "ciapply": 0.68
+    }
+   }
+  },
+  {
+   "id": "bb1-flaky-tests",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "fakebroker",
+    "p_leader": 0.48,
+    "probabilities": {
+     "quarantine": 0.25,
+     "fakebroker": 0.48,
+     "autoretry": 0.27,
+     "stopline": 0
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "autoretry",
+    "p_leader": 0.4,
+    "probabilities": {
+     "quarantine": 0.22,
+     "autoretry": 0.4,
+     "fakebroker": 0.37,
+     "stopline": 0.01
+    }
+   }
+  },
+  {
+   "id": "bb1-browser-pipeline",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "smokepr",
+    "p_leader": 0.91,
+    "probabilities": {
+     "smokepr": 0.91,
+     "aftermerge": 0.03,
+     "riskbased": 0.01,
+     "everypr": 0.05
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "smokepr",
+    "p_leader": 0.76,
+    "probabilities": {
+     "riskbased": 0.03,
+     "smokepr": 0.76,
+     "aftermerge": 0.04,
+     "everypr": 0.17
+    }
+   }
+  },
+  {
+   "id": "bb1-release-cadence",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "train",
+    "p_leader": 0.56,
+    "probabilities": {
+     "ondemand": 0,
+     "continuous": 0,
+     "splitlane": 0.44,
+     "train": 0.56
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "train",
+    "p_leader": 0.58,
+    "probabilities": {
+     "ondemand": 0,
+     "splitlane": 0.42,
+     "continuous": 0,
+     "train": 0.58
+    }
+   }
+  },
+  {
+   "id": "bb1-recovery-policy",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "flagoff",
+    "p_leader": 0.43,
+    "probabilities": {
+     "splitmigrate": 0.29,
+     "revert": 0.27,
+     "flagoff": 0.43,
+     "forward": 0.01
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "splitmigrate",
+    "p_leader": 0.41,
+    "probabilities": {
+     "revert": 0.2,
+     "flagoff": 0.37,
+     "splitmigrate": 0.41,
+     "forward": 0.02
+    }
+   }
+  },
+  {
+   "id": "bb1-approval-policy",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "tworeview",
+    "p_leader": 0.8200000000000001,
+    "probabilities": {
+     "tiered": 0.18,
+     "onereview": 0,
+     "tworeview": 0.8200000000000001,
+     "postmerge": 0
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "tworeview",
+    "p_leader": 0.83,
+    "probabilities": {
+     "tworeview": 0.83,
+     "onereview": 0,
+     "postmerge": 0,
+     "tiered": 0.17
+    }
+   }
+  },
+  {
+   "id": "bb1-big-refactor-review",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "codemod",
+    "p_leader": 0.64,
+    "probabilities": {
+     "walkthrough": 0.09,
+     "codemod": 0.64,
+     "stacked": 0.13,
+     "integration": 0.14
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "codemod",
+    "p_leader": 0.48,
+    "probabilities": {
+     "walkthrough": 0.06,
+     "codemod": 0.48,
+     "integration": 0.36,
+     "stacked": 0.1
+    }
+   }
+  },
+  {
+   "id": "bb1-dashboard-data",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "tanstack",
+    "p_leader": 0.71,
+    "probabilities": {
+     "keepthunks": 0.01,
+     "tanstack": 0.71,
+     "rtkquery": 0.28,
+     "contexthooks": 0
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "rtkquery",
+    "p_leader": 0.51,
+    "probabilities": {
+     "tanstack": 0.48,
+     "keepthunks": 0.01,
+     "rtkquery": 0.51,
+     "contexthooks": 0
+    }
+   }
+  },
+  {
+   "id": "bb1-product-rendering",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "isr",
+    "p_leader": 0.37,
+    "probabilities": {
+     "ssr": 0.27,
+     "islands": 0.21,
+     "isr": 0.37,
+     "staticshell": 0.15
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "isr",
+    "p_leader": 0.5,
+    "probabilities": {
+     "staticshell": 0.1,
+     "isr": 0.5,
+     "ssr": 0.18,
+     "islands": 0.22
+    }
+   }
+  },
+  {
+   "id": "bb1-list-pagination",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "dualmode",
+    "p_leader": 0.7,
+    "probabilities": {
+     "opaque": 0.08,
+     "dualmode": 0.7,
+     "keyset": 0.21,
+     "offsetcap": 0.01
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "dualmode",
+    "p_leader": 0.83,
+    "probabilities": {
+     "keyset": 0.08,
+     "dualmode": 0.83,
+     "opaque": 0.08,
+     "offsetcap": 0.01
+    }
+   }
+  },
+  {
+   "id": "bb1-mobile-api-style",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "composite",
+    "p_leader": 0.58,
+    "probabilities": {
+     "composite": 0.58,
+     "sparse": 0.01,
+     "graphql": 0,
+     "bff": 0.41
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "composite",
+    "p_leader": 0.65,
+    "probabilities": {
+     "sparse": 0.07,
+     "bff": 0.27,
+     "composite": 0.65,
+     "graphql": 0.01
+    }
+   }
+  },
+  {
+   "id": "bb1-advisory-handling",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "reachable",
+    "p_leader": 0.42,
+    "probabilities": {
+     "reachable": 0.42,
+     "deadlines": 0.31,
+     "gate": 0.22,
+     "autopatch": 0.05
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "reachable",
+    "p_leader": 0.56,
+    "probabilities": {
+     "gate": 0.19,
+     "reachable": 0.56,
+     "deadlines": 0.23,
+     "autopatch": 0.02
+    }
+   }
+  },
+  {
+   "id": "bb1-secret-scanning",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "nightly",
+    "p_leader": 0.46,
+    "probabilities": {
+     "cijob": 0.45,
+     "pushprotect": 0.09,
+     "precommit": 0,
+     "nightly": 0.46
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "cijob",
+    "p_leader": 0.59,
+    "probabilities": {
+     "cijob": 0.59,
+     "precommit": 0,
+     "nightly": 0.27,
+     "pushprotect": 0.14
+    }
+   }
+  },
+  {
+   "id": "bb1-oncall-model",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "pairing",
+    "p_leader": 0.68,
+    "probabilities": {
+     "outsourced": 0.01,
+     "pairing": 0.68,
+     "ownership": 0.29,
+     "weekly": 0.02
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "pairing",
+    "p_leader": 0.58,
+    "probabilities": {
+     "weekly": 0.04,
+     "ownership": 0.37,
+     "outsourced": 0.01,
+     "pairing": 0.58
+    }
+   }
+  },
+  {
+   "id": "bb1-debt-allocation",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "fixedshare",
+    "p_leader": 0.67,
+    "probabilities": {
+     "rotation": 0.04,
+     "fixedshare": 0.67,
+     "boyscout": 0.28,
+     "hardening": 0.01
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "fixedshare",
+    "p_leader": 0.68,
+    "probabilities": {
+     "rotation": 0.05,
+     "boyscout": 0.25,
+     "fixedshare": 0.68,
+     "hardening": 0.01
+    }
+   }
+  }
+ ]
+}

@@ -1,0 +1,1454 @@
+{
+ "date": "2026-10-01T05:39:37.596Z",
+ "model": "jev-1.13.0",
+ "input": "cands-r2.jsonl",
+ "keep_file": "jev-evals/decide-close/cases.jsonl",
+ "rule": "keep when the leader probability is below 0.70 in both fixed orders badc and cadb (options indexed a,b,c,d in written order)",
+ "summary": {
+  "tested": 53,
+  "kept": 15,
+  "total_in_cases": 40,
+  "requests": 106,
+  "input_tokens": 57324,
+  "cost_usd": 0.002408,
+  "rejected": 27,
+  "capped": 11,
+  "refused": 0,
+  "duplicates": 0,
+  "retries_429": 0,
+  "max": 40
+ },
+ "candidates": [
+  {
+   "id": "va2-ratelimit-slowreview",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "postgres",
+    "p_leader": 0.33,
+    "probabilities": {
+     "redis": 0.27,
+     "edge": 0.23,
+     "postgres": 0.33,
+     "memory": 0.17
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "postgres",
+    "p_leader": 0.45,
+    "probabilities": {
+     "postgres": 0.45,
+     "edge": 0.27,
+     "redis": 0.11,
+     "memory": 0.17
+    }
+   }
+  },
+  {
+   "id": "va2-jobs-auditevents",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "kafka",
+    "p_leader": 0.51,
+    "probabilities": {
+     "cron": 0.02,
+     "kafka": 0.51,
+     "inprocess": 0,
+     "pgqueue": 0.47
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "pgqueue",
+    "p_leader": 0.53,
+    "probabilities": {
+     "inprocess": 0,
+     "pgqueue": 0.53,
+     "kafka": 0.44,
+     "cron": 0.03
+    }
+   }
+  },
+  {
+   "id": "va2-spa-crossregion",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "jwtcookie",
+    "p_leader": 0.66,
+    "probabilities": {
+     "jwtcookie": 0.66,
+     "jwtlocal": 0.08,
+     "cookie": 0.26,
+     "basic": 0
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "jwtcookie",
+    "p_leader": 0.79,
+    "probabilities": {
+     "jwtlocal": 0.02,
+     "basic": 0,
+     "cookie": 0.19,
+     "jwtcookie": 0.79
+    }
+   }
+  },
+  {
+   "id": "va2-uploads-onprem",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "nfs",
+    "p_leader": 0.79,
+    "probabilities": {
+     "nfs": 0.79,
+     "objectstore": 0.18,
+     "database": 0,
+     "localdisk": 0.03
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "nfs",
+    "p_leader": 0.75,
+    "probabilities": {
+     "objectstore": 0.24,
+     "localdisk": 0.01,
+     "database": 0,
+     "nfs": 0.75
+    }
+   }
+  },
+  {
+   "id": "va2-deploy-schemabreak",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "bluegreen",
+    "p_leader": 0.71,
+    "probabilities": {
+     "bluegreen": 0.71,
+     "manual": 0,
+     "recreate": 0,
+     "rolling": 0.29
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "bluegreen",
+    "p_leader": 0.67,
+    "probabilities": {
+     "bluegreen": 0.67,
+     "rolling": 0.33,
+     "recreate": 0,
+     "manual": 0
+    }
+   }
+  },
+  {
+   "id": "va2-payments-flakysandbox",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "mocks",
+    "p_leader": 0.99,
+    "probabilities": {
+     "none": 0,
+     "mocks": 0.99,
+     "prodtests": 0,
+     "sandboxci": 0.01
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "mocks",
+    "p_leader": 0.99,
+    "probabilities": {
+     "sandboxci": 0.01,
+     "prodtests": 0,
+     "none": 0,
+     "mocks": 0.99
+    }
+   }
+  },
+  {
+   "id": "va2-logs-perbill",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "csv",
+    "p_leader": 0.7,
+    "probabilities": {
+     "debugall": 0,
+     "json": 0.19,
+     "text": 0.11,
+     "csv": 0.7
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "csv",
+    "p_leader": 0.73,
+    "probabilities": {
+     "json": 0.24,
+     "text": 0.03,
+     "debugall": 0,
+     "csv": 0.73
+    }
+   }
+  },
+  {
+   "id": "va2-flags-budgetpending",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "dbtable",
+    "p_leader": 0.43,
+    "probabilities": {
+     "envvars": 0.29,
+     "vendor": 0.28,
+     "configfile": 0,
+     "dbtable": 0.43
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "dbtable",
+    "p_leader": 0.58,
+    "probabilities": {
+     "vendor": 0.18,
+     "dbtable": 0.58,
+     "envvars": 0.24,
+     "configfile": 0
+    }
+   }
+  },
+  {
+   "id": "va2-search-sharedcluster",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "pgtrgm",
+    "p_leader": 0.83,
+    "probabilities": {
+     "like": 0,
+     "client": 0,
+     "elastic": 0.17,
+     "pgtrgm": 0.83
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "pgtrgm",
+    "p_leader": 0.92,
+    "probabilities": {
+     "elastic": 0.08,
+     "like": 0,
+     "client": 0,
+     "pgtrgm": 0.92
+    }
+   }
+  },
+  {
+   "id": "va2-pagecache-livestock",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "cdn",
+    "p_leader": 0.72,
+    "probabilities": {
+     "browser": 0,
+     "redis": 0.23,
+     "nocache": 0.05,
+     "cdn": 0.72
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "cdn",
+    "p_leader": 0.54,
+    "probabilities": {
+     "redis": 0.4,
+     "nocache": 0.05,
+     "cdn": 0.54,
+     "browser": 0
+    }
+   }
+  },
+  {
+   "id": "va2-flags-percentrollout",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "vendor",
+    "p_leader": 0.67,
+    "probabilities": {
+     "configfile": 0.03,
+     "dbtable": 0.25,
+     "envvars": 0.05,
+     "vendor": 0.67
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "vendor",
+    "p_leader": 0.64,
+    "probabilities": {
+     "vendor": 0.64,
+     "configfile": 0.04,
+     "envvars": 0.02,
+     "dbtable": 0.3
+    }
+   }
+  },
+  {
+   "id": "va2-uploads-longvms",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "nfs",
+    "p_leader": 0.97,
+    "probabilities": {
+     "database": 0,
+     "localdisk": 0.03,
+     "objectstore": 0,
+     "nfs": 0.97
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "nfs",
+    "p_leader": 0.9400000000000001,
+    "probabilities": {
+     "nfs": 0.9400000000000001,
+     "objectstore": 0,
+     "database": 0,
+     "localdisk": 0.06
+    }
+   }
+  },
+  {
+   "id": "vb2-secrets-vmmix",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "kubesecrets",
+    "p_leader": 0.53,
+    "probabilities": {
+     "cloudsm": 0.4,
+     "kubesecrets": 0.53,
+     "wiki": 0,
+     "envfile": 0.07
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "kubesecrets",
+    "p_leader": 0.59,
+    "probabilities": {
+     "envfile": 0.09,
+     "wiki": 0,
+     "cloudsm": 0.32,
+     "kubesecrets": 0.59
+    }
+   }
+  },
+  {
+   "id": "vb2-apiver-thirtyday",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "header",
+    "p_leader": 0.77,
+    "probabilities": {
+     "header": 0.77,
+     "newapi": 0,
+     "urlversion": 0.22,
+     "inplace": 0.01
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "header",
+    "p_leader": 0.75,
+    "probabilities": {
+     "header": 0.75,
+     "newapi": 0,
+     "urlversion": 0.25,
+     "inplace": 0
+    }
+   }
+  },
+  {
+   "id": "vb2-migration-slot",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "batched",
+    "p_leader": 0.62,
+    "probabilities": {
+     "app": 0.06,
+     "dumprestore": 0.13,
+     "single": 0.19,
+     "batched": 0.62
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "batched",
+    "p_leader": 0.61,
+    "probabilities": {
+     "app": 0.11,
+     "dumprestore": 0.14,
+     "batched": 0.61,
+     "single": 0.14
+    }
+   }
+  },
+  {
+   "id": "vb2-alerting-earlywarn",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "slo",
+    "p_leader": 0.58,
+    "probabilities": {
+     "slo": 0.58,
+     "none": 0,
+     "cpu": 0.42,
+     "everything": 0
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "slo",
+    "p_leader": 0.71,
+    "probabilities": {
+     "everything": 0,
+     "none": 0,
+     "slo": 0.71,
+     "cpu": 0.29
+    }
+   }
+  },
+  {
+   "id": "vb2-offline-partslist",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "queuelww",
+    "p_leader": 0.76,
+    "probabilities": {
+     "crdt": 0.24,
+     "fullreplace": 0,
+     "onlineonly": 0,
+     "queuelww": 0.76
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "queuelww",
+    "p_leader": 0.78,
+    "probabilities": {
+     "fullreplace": 0,
+     "onlineonly": 0,
+     "crdt": 0.22,
+     "queuelww": 0.78
+    }
+   }
+  },
+  {
+   "id": "vb2-email-internal",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "gmail",
+    "p_leader": 0.6799999999999999,
+    "probabilities": {
+     "sendbatch": 0.01,
+     "provider": 0.06,
+     "ownsmtp": 0.25,
+     "gmail": 0.6799999999999999
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "gmail",
+    "p_leader": 0.57,
+    "probabilities": {
+     "provider": 0.06,
+     "gmail": 0.57,
+     "ownsmtp": 0.36,
+     "sendbatch": 0.01
+    }
+   }
+  },
+  {
+   "id": "vb2-repo-cadence",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "monorepo",
+    "p_leader": 0.62,
+    "probabilities": {
+     "monorepo": 0.62,
+     "submodules": 0.01,
+     "polyrepo": 0.36,
+     "copy": 0.01
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "monorepo",
+    "p_leader": 0.56,
+    "probabilities": {
+     "monorepo": 0.56,
+     "copy": 0,
+     "polyrepo": 0.43,
+     "submodules": 0.01
+    }
+   }
+  },
+  {
+   "id": "vb2-thumbs-paidcdn",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "cdntransform",
+    "p_leader": 0.67,
+    "probabilities": {
+     "client": 0,
+     "request": 0.01,
+     "cdntransform": 0.67,
+     "worker": 0.32
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "cdntransform",
+    "p_leader": 0.6,
+    "probabilities": {
+     "client": 0,
+     "request": 0.01,
+     "worker": 0.39,
+     "cdntransform": 0.6
+    }
+   }
+  },
+  {
+   "id": "vb2-envcfg-inlined",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "branch",
+    "p_leader": 0.9,
+    "probabilities": {
+     "hardcode": 0,
+     "images": 0.05,
+     "branch": 0.9,
+     "envconfig": 0.05
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "branch",
+    "p_leader": 0.94,
+    "probabilities": {
+     "hardcode": 0,
+     "branch": 0.94,
+     "images": 0.03,
+     "envconfig": 0.03
+    }
+   }
+  },
+  {
+   "id": "vb2-migration-midtable",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "single",
+    "p_leader": 0.48,
+    "probabilities": {
+     "single": 0.48,
+     "app": 0.01,
+     "batched": 0.44,
+     "dumprestore": 0.07
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "batched",
+    "p_leader": 0.52,
+    "probabilities": {
+     "app": 0.01,
+     "dumprestore": 0.07,
+     "single": 0.4,
+     "batched": 0.52
+    }
+   }
+  },
+  {
+   "id": "vb2-offline-dropouts",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "queuelww",
+    "p_leader": 1,
+    "probabilities": {
+     "queuelww": 1,
+     "onlineonly": 0,
+     "crdt": 0,
+     "fullreplace": 0
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "queuelww",
+    "p_leader": 1,
+    "probabilities": {
+     "fullreplace": 0,
+     "onlineonly": 0,
+     "crdt": 0,
+     "queuelww": 1
+    }
+   }
+  },
+  {
+   "id": "vb2-retries-reserve",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "backoff",
+    "p_leader": 0.75,
+    "probabilities": {
+     "fixed": 0.02,
+     "infinite": 0,
+     "backoff": 0.75,
+     "noretry": 0.23
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "backoff",
+    "p_leader": 0.85,
+    "probabilities": {
+     "fixed": 0.02,
+     "noretry": 0.13,
+     "backoff": 0.85,
+     "infinite": 0
+    }
+   }
+  },
+  {
+   "id": "vb2-secrets-handrotate",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "kubesecrets",
+    "p_leader": 0.64,
+    "probabilities": {
+     "envfile": 0.05,
+     "wiki": 0.01,
+     "cloudsm": 0.3,
+     "kubesecrets": 0.64
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "kubesecrets",
+    "p_leader": 0.63,
+    "probabilities": {
+     "kubesecrets": 0.63,
+     "cloudsm": 0.31,
+     "wiki": 0.02,
+     "envfile": 0.04
+    }
+   }
+  },
+  {
+   "id": "ba2-region-failover",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "warm",
+    "p_leader": 0.49,
+    "probabilities": {
+     "active": 0,
+     "pilot": 0.38,
+     "rebuild": 0.13,
+     "warm": 0.49
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "pilot",
+    "p_leader": 0.47,
+    "probabilities": {
+     "pilot": 0.47,
+     "warm": 0.4,
+     "rebuild": 0.13,
+     "active": 0
+    }
+   }
+  },
+  {
+   "id": "ba2-staging-envs",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "ephemeral",
+    "p_leader": 0.43,
+    "probabilities": {
+     "squadns": 0.32,
+     "ephemeral": 0.43,
+     "inprod": 0,
+     "shared": 0.25
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "ephemeral",
+    "p_leader": 0.39,
+    "probabilities": {
+     "ephemeral": 0.39,
+     "squadns": 0.35,
+     "shared": 0.24,
+     "inprod": 0.02
+    }
+   }
+  },
+  {
+   "id": "ba2-timeseries-store",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "pgpart",
+    "p_leader": 0.5,
+    "probabilities": {
+     "pgpart": 0.5,
+     "managed": 0.07,
+     "parquet": 0.29,
+     "clickhouse": 0.14
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "pgpart",
+    "p_leader": 0.57,
+    "probabilities": {
+     "managed": 0.07,
+     "parquet": 0.26,
+     "clickhouse": 0.1,
+     "pgpart": 0.57
+    }
+   }
+  },
+  {
+   "id": "ba2-scheduled-jobs",
+   "outcome": "kept",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "cronjob",
+    "p_leader": 0.5,
+    "probabilities": {
+     "lease": 0.35,
+     "cronjob": 0.5,
+     "singleton": 0.11,
+     "advisory": 0.04
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "cronjob",
+    "p_leader": 0.5599999999999999,
+    "probabilities": {
+     "lease": 0.35,
+     "cronjob": 0.5599999999999999,
+     "advisory": 0.03,
+     "singleton": 0.06
+    }
+   }
+  },
+  {
+   "id": "ba2-pipeline-orchestrator",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "airflow",
+    "p_leader": 0.93,
+    "probabilities": {
+     "managed": 0.07,
+     "airflow": 0.93,
+     "makefile": 0,
+     "dbt": 0
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "airflow",
+    "p_leader": 0.96,
+    "probabilities": {
+     "managed": 0.04,
+     "makefile": 0,
+     "airflow": 0.96,
+     "dbt": 0
+    }
+   }
+  },
+  {
+   "id": "ba2-pricing-rollout",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "shadow",
+    "p_leader": 0.78,
+    "probabilities": {
+     "cutover": 0.01,
+     "shadow": 0.78,
+     "canary": 0.18,
+     "cohort": 0.03
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "shadow",
+    "p_leader": 0.77,
+    "probabilities": {
+     "shadow": 0.77,
+     "canary": 0.18,
+     "cohort": 0.03,
+     "cutover": 0.02
+    }
+   }
+  },
+  {
+   "id": "ba2-log-spend",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "tier",
+    "p_leader": 0.95,
+    "probabilities": {
+     "contract": 0,
+     "trim": 0.05,
+     "selfhost": 0,
+     "tier": 0.95
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "tier",
+    "p_leader": 0.97,
+    "probabilities": {
+     "trim": 0.03,
+     "selfhost": 0,
+     "tier": 0.97,
+     "contract": 0
+    }
+   }
+  },
+  {
+   "id": "ba2-refdata-cache",
+   "outcome": "capped",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "local",
+    "p_leader": 0.5,
+    "probabilities": {
+     "twolevel": 0.19,
+     "snapshot": 0.01,
+     "local": 0.5,
+     "redis": 0.3
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "local",
+    "p_leader": 0.52,
+    "probabilities": {
+     "twolevel": 0.19,
+     "redis": 0.26,
+     "local": 0.52,
+     "snapshot": 0.03
+    }
+   }
+  },
+  {
+   "id": "ba2-audit-log",
+   "outcome": "capped",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "objectlock",
+    "p_leader": 0.55,
+    "probabilities": {
+     "objectlock": 0.55,
+     "partitioned": 0.04,
+     "hosted": 0.2,
+     "separate": 0.21
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "objectlock",
+    "p_leader": 0.53,
+    "probabilities": {
+     "partitioned": 0.03,
+     "separate": 0.26,
+     "hosted": 0.18,
+     "objectlock": 0.53
+    }
+   }
+  },
+  {
+   "id": "ba2-identity-migration",
+   "outcome": "capped",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "lazy",
+    "p_leader": 0.63,
+    "probabilities": {
+     "lazy": 0.63,
+     "bulk": 0.02,
+     "wrap": 0.19,
+     "sync": 0.16
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "lazy",
+    "p_leader": 0.66,
+    "probabilities": {
+     "bulk": 0.03,
+     "lazy": 0.66,
+     "wrap": 0.19,
+     "sync": 0.12
+    }
+   }
+  },
+  {
+   "id": "ba2-write-scaling",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "archive",
+    "p_leader": 0.88,
+    "probabilities": {
+     "queue": 0.07,
+     "distsql": 0.05,
+     "shard": 0,
+     "archive": 0.88
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "archive",
+    "p_leader": 0.81,
+    "probabilities": {
+     "shard": 0.01,
+     "queue": 0.12,
+     "archive": 0.81,
+     "distsql": 0.06
+    }
+   }
+  },
+  {
+   "id": "ba2-document-store",
+   "outcome": "capped",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "docdb",
+    "p_leader": 0.39,
+    "probabilities": {
+     "objects": 0.15,
+     "jsonb": 0.13,
+     "dedicated": 0.33,
+     "docdb": 0.39
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "docdb",
+    "p_leader": 0.44,
+    "probabilities": {
+     "objects": 0.12,
+     "docdb": 0.44,
+     "jsonb": 0.09,
+     "dedicated": 0.35
+    }
+   }
+  },
+  {
+   "id": "ba2-webhooks",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "queue",
+    "p_leader": 0.94,
+    "probabilities": {
+     "pull": 0,
+     "queue": 0.94,
+     "hosted": 0,
+     "pubsub": 0.06
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "queue",
+    "p_leader": 0.97,
+    "probabilities": {
+     "hosted": 0,
+     "pubsub": 0.03,
+     "pull": 0,
+     "queue": 0.97
+    }
+   }
+  },
+  {
+   "id": "ba2-metric-cardinality",
+   "outcome": "capped",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "droplabel",
+    "p_leader": 0.46,
+    "probabilities": {
+     "hostedvendor": 0.11,
+     "recording": 0.26,
+     "scaleout": 0.17,
+     "droplabel": 0.46
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "droplabel",
+    "p_leader": 0.5,
+    "probabilities": {
+     "recording": 0.12,
+     "droplabel": 0.5,
+     "scaleout": 0.2,
+     "hostedvendor": 0.18
+    }
+   }
+  },
+  {
+   "id": "bb2-flaky-tests",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "quarantine",
+    "p_leader": 0.76,
+    "probabilities": {
+     "freeze": 0,
+     "replace": 0,
+     "autoretry": 0.24,
+     "quarantine": 0.76
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "quarantine",
+    "p_leader": 0.77,
+    "probabilities": {
+     "autoretry": 0.23,
+     "replace": 0,
+     "freeze": 0,
+     "quarantine": 0.77
+    }
+   }
+  },
+  {
+   "id": "bb2-integration-checks",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "contracts",
+    "p_leader": 1,
+    "probabilities": {
+     "smoke": 0,
+     "contracts": 1,
+     "canary": 0,
+     "sharedsuite": 0
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "contracts",
+    "p_leader": 1,
+    "probabilities": {
+     "smoke": 0,
+     "contracts": 1,
+     "canary": 0,
+     "sharedsuite": 0
+    }
+   }
+  },
+  {
+   "id": "bb2-release-cadence",
+   "outcome": "capped",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "darklaunch",
+    "p_leader": 0.53,
+    "probabilities": {
+     "monthly": 0.01,
+     "weeklytrain": 0.44,
+     "darklaunch": 0.53,
+     "continuous": 0.02
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "darklaunch",
+    "p_leader": 0.64,
+    "probabilities": {
+     "continuous": 0.01,
+     "darklaunch": 0.64,
+     "monthly": 0.01,
+     "weeklytrain": 0.34
+    }
+   }
+  },
+  {
+   "id": "bb2-review-flow",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "owners",
+    "p_leader": 0.92,
+    "probabilities": {
+     "smallprs": 0.01,
+     "selfmerge": 0,
+     "owners": 0.92,
+     "pairing": 0.07
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "owners",
+    "p_leader": 0.81,
+    "probabilities": {
+     "pairing": 0.18,
+     "smallprs": 0.01,
+     "selfmerge": 0,
+     "owners": 0.81
+    }
+   }
+  },
+  {
+   "id": "bb2-frontend-structure",
+   "outcome": "capped",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "microfe",
+    "p_leader": 0.28,
+    "probabilities": {
+     "microfe": 0.28,
+     "packages": 0.28,
+     "routeapps": 0.19,
+     "modular": 0.25
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "packages",
+    "p_leader": 0.36,
+    "probabilities": {
+     "routeapps": 0.2,
+     "packages": 0.36,
+     "modular": 0.16,
+     "microfe": 0.28
+    }
+   }
+  },
+  {
+   "id": "bb2-server-state",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "querylib",
+    "p_leader": 0.91,
+    "probabilities": {
+     "querylib": 0.91,
+     "serverload": 0.01,
+     "store": 0.02,
+     "ownhook": 0.06
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "querylib",
+    "p_leader": 0.93,
+    "probabilities": {
+     "querylib": 0.93,
+     "store": 0.01,
+     "ownhook": 0.05,
+     "serverload": 0.01
+    }
+   }
+  },
+  {
+   "id": "bb2-client-api",
+   "outcome": "capped",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "bff",
+    "p_leader": 0.59,
+    "probabilities": {
+     "batch": 0.23,
+     "graphql": 0.08,
+     "restexpand": 0.1,
+     "bff": 0.59
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "bff",
+    "p_leader": 0.47,
+    "probabilities": {
+     "bff": 0.47,
+     "restexpand": 0.13,
+     "batch": 0.26,
+     "graphql": 0.14
+    }
+   }
+  },
+  {
+   "id": "bb2-partner-events",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "webhooks",
+    "p_leader": 0.76,
+    "probabilities": {
+     "polling": 0.02,
+     "queue": 0.18,
+     "streaming": 0.04,
+     "webhooks": 0.76
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "webhooks",
+    "p_leader": 0.68,
+    "probabilities": {
+     "streaming": 0.06,
+     "polling": 0.01,
+     "webhooks": 0.68,
+     "queue": 0.25
+    }
+   }
+  },
+  {
+   "id": "bb2-dependency-updates",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "triage",
+    "p_leader": 0.7,
+    "probabilities": {
+     "cigate": 0.02,
+     "triage": 0.7,
+     "quarterly": 0.03,
+     "updatebot": 0.25
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "triage",
+    "p_leader": 0.69,
+    "probabilities": {
+     "quarterly": 0.02,
+     "updatebot": 0.25,
+     "triage": 0.69,
+     "cigate": 0.04
+    }
+   }
+  },
+  {
+   "id": "bb2-prod-data-access",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "jit",
+    "p_leader": 0.72,
+    "probabilities": {
+     "jit": 0.72,
+     "standing": 0.11,
+     "replica": 0.02,
+     "admintools": 0.15
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "jit",
+    "p_leader": 0.73,
+    "probabilities": {
+     "replica": 0.02,
+     "standing": 0.09,
+     "jit": 0.73,
+     "admintools": 0.16
+    }
+   }
+  },
+  {
+   "id": "bb2-planning-cadence",
+   "outcome": "capped",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "sprints",
+    "p_leader": 0.45999999999999996,
+    "probabilities": {
+     "kanban": 0.38,
+     "cycles": 0.15,
+     "sprints": 0.45999999999999996,
+     "rotation": 0.01
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "sprints",
+    "p_leader": 0.49,
+    "probabilities": {
+     "sprints": 0.49,
+     "kanban": 0.36,
+     "rotation": 0,
+     "cycles": 0.15
+    }
+   }
+  },
+  {
+   "id": "bb2-tech-debt",
+   "outcome": "capped",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "pipeline",
+    "p_leader": 0.44,
+    "probabilities": {
+     "tax": 0.38,
+     "scout": 0.05,
+     "burst": 0.13,
+     "pipeline": 0.44
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "pipeline",
+    "p_leader": 0.53,
+    "probabilities": {
+     "burst": 0.18,
+     "pipeline": 0.53,
+     "scout": 0.12,
+     "tax": 0.17
+    }
+   }
+  },
+  {
+   "id": "bb2-ui-regressions",
+   "outcome": "rejected",
+   "keep": false,
+   "p1": {
+    "order": "badc",
+    "leader": "visual",
+    "p_leader": 0.56,
+    "probabilities": {
+     "staged": 0.03,
+     "visual": 0.56,
+     "appflows": 0.05,
+     "behavior": 0.36
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "visual",
+    "p_leader": 0.75,
+    "probabilities": {
+     "visual": 0.75,
+     "staged": 0.05,
+     "appflows": 0.07,
+     "behavior": 0.13
+    }
+   }
+  },
+  {
+   "id": "bb2-bad-deploys",
+   "outcome": "capped",
+   "keep": true,
+   "p1": {
+    "order": "badc",
+    "leader": "rollback",
+    "p_leader": 0.59,
+    "probabilities": {
+     "soak": 0.02,
+     "progressive": 0.34,
+     "rollback": 0.59,
+     "rollforward": 0.05
+    }
+   },
+   "p2": {
+    "order": "cadb",
+    "leader": "rollback",
+    "p_leader": 0.62,
+    "probabilities": {
+     "rollforward": 0.03,
+     "soak": 0.02,
+     "rollback": 0.62,
+     "progressive": 0.33
+    }
+   }
+  }
+ ]
+}
