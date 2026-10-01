@@ -27,6 +27,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - `jev-evals/claims-tr`: 44 invented Turkish claim and source pairs (registered in `docs/decisions/claims-tr.md`); no wrong `supported`, 13 of 17 true claims confirmed.
 - `claims` is the new name of `verify`, so it isn't confused with Claude Code's own `/verify`; `verify` stays an alias until 1.0 and behaves the same. Receipts still record the command as `verify`.
 - `jev-evals/done-v2-h4`: a fourth hold-out for `done` v2 (46 cases, registered in `docs/decisions/done-v2-holdout4.md`); it failed its registered check, and the suite's allowance is the 1 remaining observed wrong `met`.
+- `jev-evals/done-v2-h5`: a fifth hold-out for `done` v2 (47 cases in new tools, registered in `docs/decisions/done-v2-holdout5.md`, one labeller); 0 wrong `met`, `missing` found in 23 of 25, `met` found in 11 of 22 (0.50), so the registered check failed on that count. Nothing was tuned on it; the suite allows 0 wrong `met`.
 
 ## [0.1.5] - 2026-10-01
 

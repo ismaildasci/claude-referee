@@ -266,6 +266,16 @@ Registered in [claims-tr.md](decisions/claims-tr.md) before any request. `eval r
 - **The registered check passed:** no wrong `supported` among 27 unsupported cases; 13 of 17 true claims confirmed (0.76; the English hold-out confirmed 19 of 24, 0.79). 12 cases were decided in code (a quote or number not in the source).
 - Limits: invented text, one model family writes and labels, one model version, Turkish only; it shows no collapse, not equality with English.
 
+### done v2 on a fifth hold-out
+
+Registered in [done-v2-holdout5.md](decisions/done-v2-holdout5.md) before any request, same method and bars as the fourth. `eval record --suite done-v2-h5`, `jev-1.13.0`, 2026-10-01: 47 invented outputs (22 `met`, 25 `missing`) in tools and formats absent from the earlier sets (`cargo nextest`, `mix`, `prove`, `busted`, `dart`, `flutter`, `dune`, `testthat`, Julia, Haskell, `xcodebuild`, `shellcheck`, `hadolint`, `biome`, `next build`, `nix build`, `tox`, and others) plus adversarial cases. One author wrote and labelled them (no second labeller; 2 of 49 dropped on a re-read). Cases: [cases.jsonl](../jev-evals/done-v2-h5/cases.jsonl). Answers: [recorded.jsonl](../jev-evals/done-v2-h5/recorded.jsonl).
+
+- **The registered check failed on one of three counts:** 0 wrong `met` (met), `missing` found in 23 of 25 (0.92, met), `met` found in 11 of 22 (0.50, not met; bar 0.6). 11 `met`, 5 `unsure`, 31 `missing`.
+- Every miss on an expected `met` is an exit-code-0 run with no matching parser (`nextest` was read by the `cargo build` parser, with no tests counted; `prove`, `dart`, `flutter`, Julia, `behave`, `kaocha`, `tox`, `biome`, `next build`, `nix build`): Jev sees the exit code and answers 0.23 to 0.67. The adversarial cases (a note aimed at the judge, a forged summary or exit line, a bot comment, a swallowed exit code, a crash after the summary, JUnit XML errors) were all `missing`.
+- No wrong `met`, unlike the second to fourth sets. The `hadolint --no-fail` case (warnings, exit code 0, "lint is clean") was answered at p 0.93 and held at `unsure` by the lint-warning cap from the fourth set.
+- Nothing was changed after the look; the suite allows 0 wrong `met`. `done` v2 stays not measured: five invented hold-outs, none passed.
+- Limits: a single labeller, so labels are unchecked by a second agent; invented outputs; one model version.
+
 ### done v2 on a fourth hold-out
 
 Registered in [done-v2-holdout4.md](decisions/done-v2-holdout4.md) before any request, with the labelling convention fixed in advance. `eval record --suite done-v2-h4`, `jev-1.13.0`, 2026-10-01: 47 invented outputs (21 `met`, 26 `missing`) from agents that did not read the repository, kept when a second agent labelled them the same. Cases: [cases.jsonl](../jev-evals/done-v2-h4/cases.jsonl) (one case later moved to `done-v2`).

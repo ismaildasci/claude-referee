@@ -15,3 +15,15 @@ Registered 2026-10-01 before any new case is sent to Jev; the git commit that fi
 **Pass.** Unchanged: no wrong `met`, `missing` recall of 0.9 or better, `met` found in at least 60% of expected `met` cases. If a case is later used to change a parser or rule, it moves to `dev` and the rest are reported as a regression check only. If the check fails, the suite's allowance is set to the observed wrong `met` count (as in the earlier sets) and the result is reported as a failure.
 
 **Limits.** The same model family writes and labels; one labeller; invented outputs; one Jev model version.
+
+## Result (2026-10-01)
+
+Of 49 cases written, 47 were kept (22 `met`, 25 `missing`); two were dropped on the single re-read before anything was sent, both for an arguable label: `h5-b-07` (`cucumber-js` with undefined steps and exit code 0) and `h5-c-08` (a `pyright` summary whose warning count did not match the lines shown). Recorded once, scored once (`jev-evals/done-v2-h5`, `jev-1.13.0`); 19 of 47 were decided in code (a non-zero exit code or a failure visible in the parsed log), 28 were sent to Jev.
+
+**The registered check failed on one of three counts.** Wrong `met`: 0 (bar met). `missing` found in 23 of 25 (0.92, bar met); the other two (`hadolint --no-fail` with warnings, `yamllint` warnings only) came back `unsure`. `met` found in 11 of 22 (0.50, below 0.6): 8 expected `met` came back `missing` and 3 `unsure`.
+
+**What it shows.** All 11 misses on expected `met` carry an exit code of 0 and no parser match (`nextest` matched the `cargo build` parser, which counted no tests): `cargo nextest` (read as a `cargo build` runner with no tests), Perl `prove`, `dart test`, `flutter test`, Julia `Pkg.test`, `behave`, `kaocha`, `tox`, `biome`, `next build`, `nix build` (p 0.23 to 0.67). It is the same tail as in the fourth set: parser coverage, not unsafe answers. No wrong `met`, unlike the second to fourth sets: `hadolint --no-fail` with two warnings under "lint is clean" was answered at p 0.93 and held at `unsure` by the lint-warning cap added after the fourth set (the cap was fitted on a `rubocop` case, so this is a different tool).
+
+**Decision.** None applied. Nothing was tuned on these cases, no case moved to dev, and the suite's allowance stays 0. `done` v2 is not called measured: five hold-outs, none passed; the safety side (no wrong `met`) held this time, the coverage side did not.
+
+**Limits.** One author wrote and labelled every case (no second labeller), so the labels were not independently checked; invented outputs; one model version.
