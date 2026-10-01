@@ -2217,10 +2217,122 @@ var parsers2 = [
   { name: "node:test", parse: parseNodeTest }
 ];
 
-// src/engine/runners/php-ruby.ts
+// src/engine/runners/more.ts
+var ANSI3 = /\u001b(?:\[[0-?]*[ -/]*[@-~]|\][^\u0007\u001b]*(?:\u0007|\u001b\\)?)/g;
 var MAX_FAILING3 = 10;
 var MAX_NAME3 = 120;
 var MAX_SUMMARY3 = 200;
+var prepare2 = /* @__PURE__ */ __name((text) => text.replace(ANSI3, "").split(/\r?\n/), "prepare");
+var clip2 = /* @__PURE__ */ __name((value, max) => value.trim().slice(0, max), "clip");
+var UT_RAN = /^Ran (\d+) tests? in [\d.]+s\s*$/;
+var UT_RESULT = /^(OK|FAILED|NO TESTS RAN)(?: \(([^)]*)\))?\s*$/;
+var UT_NAMED = /^(FAIL|ERROR): (.+?)\s*$/;
+var UT_VERBOSE = /^\S.*\([\w.]+\) \.\.\. (ok|FAIL|ERROR|skipped\b.*|expected failure|unexpected success)\s*$/;
+function utCount(detail, key) {
+  const m = new RegExp(`(?:^|, )${key}=(\\d+)`).exec(detail ?? "");
+  return m ? Number(m[1]) : 0;
+}
+__name(utCount, "utCount");
+var unittest = {
+  name: "unittest",
+  parse(text) {
+    const lines3 = prepare2(text);
+    const names = /* @__PURE__ */ new Set();
+    let best = null;
+    let ok = 0;
+    let verboseFail = 0;
+    let verboseError = 0;
+    let verboseSkip = 0;
+    let verbose = 0;
+    for (let i = 0; i < lines3.length; i++) {
+      const line = lines3[i];
+      const named = UT_NAMED.exec(line);
+      if (named) {
+        names.add(clip2(named[2], MAX_NAME3));
+        continue;
+      }
+      const v = UT_VERBOSE.exec(line);
+      if (v) {
+        verbose++;
+        if (v[1] === "ok") ok++;
+        else if (v[1] === "FAIL") verboseFail++;
+        else if (v[1] === "ERROR") verboseError++;
+        else if (v[1]?.startsWith("skipped")) verboseSkip++;
+        continue;
+      }
+      const ran = UT_RAN.exec(line);
+      if (!ran) continue;
+      for (let j = i + 1; j < Math.min(lines3.length, i + 4); j++) {
+        const r = UT_RESULT.exec(lines3[j]);
+        if (!r) continue;
+        const detail = r[2];
+        const summary = {
+          ran: Number(ran[1]),
+          failed: utCount(detail, "failures"),
+          errors: utCount(detail, "errors"),
+          skipped: utCount(detail, "skipped"),
+          line: clip2(lines3[j], MAX_SUMMARY3)
+        };
+        if (r[1] === "FAILED" && summary.failed + summary.errors === 0) summary.failed = 1;
+        if (best === null || summary.failed + summary.errors > best.failed + best.errors) best = summary;
+        break;
+      }
+    }
+    if (best === null && verbose === 0) return null;
+    if (best === null) {
+      return { runner: "unittest", passed: ok, failed: Math.max(verboseFail, 0), errors: verboseError, skipped: verboseSkip, failing: [...names].slice(0, MAX_FAILING3), summary_line: null };
+    }
+    const passed = Math.max(best.ran - best.failed - best.errors - best.skipped, 0);
+    return { runner: "unittest", passed, failed: best.failed, errors: best.errors, skipped: best.skipped, failing: [...names].slice(0, MAX_FAILING3), summary_line: best.line };
+  }
+};
+var CLIPPY_MARK = /\bcargo clippy\b|clippy::/;
+var CLIPPY_GENERATED = /^warning: `[^`]+`(?: \([^)]*\))? generated (\d+) warnings?/;
+var CLIPPY_WARNING = /^warning: (?!`[^`]+`(?: \([^)]*\))? generated )/;
+var CLIPPY_ERROR = /^error(?:\[E\d+\])?: (?!could not compile|aborting due to)/;
+var CLIPPY_COMPILE = /^error: could not compile `[^`]+`(?: \([^)]*\))?(?: due to (\d+) previous errors?)?/;
+var clippy = {
+  name: "clippy",
+  parse(text) {
+    const lines3 = prepare2(text);
+    if (!lines3.some((l) => CLIPPY_MARK.test(l))) return null;
+    let generated = 0;
+    let headers = 0;
+    let errorHeaders = 0;
+    let dueTo = 0;
+    let couldNot = false;
+    let summary = null;
+    for (const line of lines3) {
+      const g2 = CLIPPY_GENERATED.exec(line);
+      if (g2) {
+        generated += Number(g2[1]);
+        summary = clip2(line, MAX_SUMMARY3);
+        continue;
+      }
+      if (CLIPPY_WARNING.test(line)) {
+        headers++;
+        continue;
+      }
+      const c = CLIPPY_COMPILE.exec(line);
+      if (c) {
+        couldNot = true;
+        dueTo += Number(c[1] ?? 0);
+        summary = clip2(line, MAX_SUMMARY3);
+        continue;
+      }
+      if (CLIPPY_ERROR.test(line)) errorHeaders++;
+    }
+    const errors = Math.max(errorHeaders, dueTo, couldNot ? 1 : 0);
+    const facts3 = { runner: "clippy", passed: 0, failed: 0, errors, skipped: 0, warnings: Math.max(generated, headers), failing: [], summary_line: summary };
+    return facts3;
+  }
+};
+var parsers3 = [unittest, clippy];
+
+// src/engine/runners/php-ruby.ts
+var MAX_FAILING4 = 10;
+var MAX_NAME4 = 120;
+var MAX_SUMMARY4 = 200;
 function lines(text) {
   return text.replace(/\x1b\[[0-9;?]*[ -/]*[@-~]/g, "").split(/\r\n|\r|\n/).map((l) => l.replace(/\s+$/, ""));
 }
@@ -2233,10 +2345,10 @@ __name(cap, "cap");
 function dedupeNames(names) {
   const out = [];
   for (const n of names) {
-    const c = cap(n, MAX_NAME3);
+    const c = cap(n, MAX_NAME4);
     if (!out.includes(c)) out.push(c);
   }
-  return out.slice(0, MAX_FAILING3);
+  return out.slice(0, MAX_FAILING4);
 }
 __name(dedupeNames, "dedupeNames");
 function counts(rest) {
@@ -2320,7 +2432,7 @@ var phpunit = {
       errors,
       skipped: last?.skipped ?? 0,
       failing: dedupeNames([...failureIds.values(), ...errorIds.values()]),
-      summary_line: last ? cap(last.line, MAX_SUMMARY3) : null
+      summary_line: last ? cap(last.line, MAX_SUMMARY4) : null
     };
   }
 };
@@ -2378,17 +2490,17 @@ var rspec = {
       errors,
       skipped: last?.skipped ?? 0,
       failing: dedupeNames(located.size > 0 ? [...located.values()] : [...numbered.values()]),
-      summary_line: last ? cap(last.line, MAX_SUMMARY3) : null
+      summary_line: last ? cap(last.line, MAX_SUMMARY4) : null
     };
   }
 };
-var parsers3 = [phpunit, rspec];
+var parsers4 = [phpunit, rspec];
 
 // src/engine/runners/python.ts
-var MAX_FAILING4 = 10;
+var MAX_FAILING5 = 10;
 var MAX_ENTRY = 120;
-var MAX_SUMMARY4 = 200;
-var ANSI3 = /\u001b\[[0-9;?]*[ -/]*[@-~]|\u001b\][^\u0007\u001b]*(?:\u0007|\u001b\\)/g;
+var MAX_SUMMARY5 = 200;
+var ANSI4 = /\u001b\[[0-9;?]*[ -/]*[@-~]|\u001b\][^\u0007\u001b]*(?:\u0007|\u001b\\)/g;
 var TIME = String.raw`in \d+(?:\.\d+)?s(?: \(\d+:\d{2}:\d{2}\))?`;
 var PYTEST_SUMMARY = new RegExp(String.raw`^(?:\d+ (?:failed|passed|skipped|deselected|xfailed|xpassed|warnings?|errors?|rerun)(?:, )?)+ ${TIME}$`);
 var PYTEST_NO_TESTS = new RegExp(String.raw`^no tests ran ${TIME}$`);
@@ -2407,7 +2519,7 @@ var RUFF_CONCISE = /^(\S+?):(\d+):(\d+): ([A-Z]{1,4}\d{2,4})(?: |$)/;
 var RUFF_HEADER = /^([A-Z]{1,4}\d{2,4}) (?:\[\*\] )?\S/;
 var RUFF_ARROW = /^\s*--> (\S+?):(\d+):(\d+)$/;
 function lines2(text) {
-  return text.replace(ANSI3, "").split(/\r\n|\r|\n/);
+  return text.replace(ANSI4, "").split(/\r\n|\r|\n/);
 }
 __name(lines2, "lines");
 function cap2(value, max) {
@@ -2470,7 +2582,7 @@ var pytest = {
     }
     const last = summaries.length > 0 ? summaries[summaries.length - 1] : null;
     const tail = counts2(last ?? "");
-    const failing = [...failedIds, ...errorIds].slice(0, MAX_FAILING4).map((id) => cap2(id, MAX_ENTRY));
+    const failing = [...failedIds, ...errorIds].slice(0, MAX_FAILING5).map((id) => cap2(id, MAX_ENTRY));
     const summary = last ?? empty;
     return {
       runner: "pytest",
@@ -2479,7 +2591,7 @@ var pytest = {
       errors,
       skipped: tail.skipped ?? 0,
       failing,
-      summary_line: summary === null ? null : cap2(summary, MAX_SUMMARY4)
+      summary_line: summary === null ? null : cap2(summary, MAX_SUMMARY5)
     };
   }
 };
@@ -2534,15 +2646,15 @@ var ruff = {
       failed: 0,
       errors,
       skipped: 0,
-      failing: [...violations].slice(0, MAX_FAILING4).map((v) => cap2(v, MAX_ENTRY)),
-      summary_line: summary === null ? null : cap2(summary, MAX_SUMMARY4)
+      failing: [...violations].slice(0, MAX_FAILING5).map((v) => cap2(v, MAX_ENTRY)),
+      summary_line: summary === null ? null : cap2(summary, MAX_SUMMARY5)
     };
   }
 };
-var parsers4 = [pytest, ruff];
+var parsers5 = [pytest, ruff];
 
 // src/engine/runners/index.ts
-var PARSERS = [...parsers4, ...parsers2, ...parsers, ...parsers3];
+var PARSERS = [...parsers5, ...parsers2, ...parsers, ...parsers4, ...parsers3];
 function parseEvidence(text) {
   const runners = PARSERS.map((p) => p.parse(text)).filter((r) => r !== null);
   const exitMatches = [...text.matchAll(/^.{0,60}?\bexit (?:code|status)\s*[:=]?\s*(-?\d+)/gim)];

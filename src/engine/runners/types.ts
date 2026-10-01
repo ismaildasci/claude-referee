@@ -7,6 +7,7 @@ export interface RunnerFacts {
   readonly failed: number;
   readonly errors: number;
   readonly skipped: number;
+  readonly warnings?: number;
   readonly failing: readonly string[];
   readonly summary_line: string | null;
 }

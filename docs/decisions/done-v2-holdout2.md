@@ -14,7 +14,7 @@ Registered 2026-10-01 before any new case is sent to Jev. The git commit that fi
 
 **Limits.** Same model family wrote and labelled the cases; invented outputs may not match every real tool version; one Jev model version.
 
-## Result (2026-10-01)
+## Result (2026-10-01, first look)
 
 Of 48 cases written, 45 survived the second labeller (17 `met`, 28 `missing`). Rejected: `h2-d-04` (author `missing`, labeller `met`: eslint with no diagnostics), `h2-e-01` and `h2-c-08` (author `missing`, labeller "ambiguous": a green summary followed by a non-zero exit code). Recorded once, scored once, as the suite `jev-evals/done-v2-h2`.
 
@@ -23,3 +23,9 @@ Of 48 cases written, 45 survived the second labeller (17 `met`, 28 `missing`). R
 Verdicts over the 45 cases: 12 `met`, 4 `unsure`, 29 `missing`. `missing` found in 26 of 28 expected-`missing` cases (0.93, passes), `met` found in 11 of 17 (0.65, passes the 60% bar), precision of `met` 11 of 12. The other differences: a cut-off pytest-like log came back `unsure` (0.51, safe), two cases with a note aimed at the judge or a test named "all tests passed" came back `unsure` (0.63 and 0.56, safe), a unittest `OK (skipped=3)` run, an interleaved parallel run and a Gradle run killed by SIGTERM after its tests finished (`exit code: 143`) came back `missing`. The last is decided in code now (non-zero exit code) and the label `met` is disputed.
 
 **Consequence.** `done` v2 is not called measured. The suite's allowance is set to the one observed wrong `met`, so a second one fails CI; that is bookkeeping, not a pass. No rule was changed because of these cases, so they stay hold-out. The next step is its own registered design: how a linter or compiler warning count reaches Jev for criteria like "lint is clean" (parsed warning counts as a fact), then a fresh hold-out.
+
+## After the first look: two parsers, four cases moved to dev
+
+The failing and the missed cases showed two gaps in what is parsed: Python's `unittest` output (`Ran N tests ... OK (skipped=3)`) and `cargo clippy` warnings had no parser, so Jev saw only an exit code of 0 (the clippy warning case got p = 0.90 and the `unittest` run with skips got 0.26). Two parsers were added (`src/engine/runners/more.ts`; clippy reports warnings as a separate `warnings` fact). As this record says, the four cases whose evidence changed (`h2-d-03`, `h2-d-08`, `h2-a-04`, `h2-a-08`) moved to `done-v2` as `dev` and were recorded again: `h2-d-03` went from 0.90 to 0.15 and `h2-a-08` from 0.26 to 0.74; `h2-d-08` (0.11 to 0.09) and `h2-a-04` (0.01) were `missing` before and after. The 41 cases left in `done-v2-h2` have no wrong `met` (11 `met`, 4 `unsure`, 26 `missing`), but that is a regression check after the fact, not a pass of the registered check. The suite's allowance went back to 0.
+
+A fresh hold-out is still needed before `done` v2 is called measured.
