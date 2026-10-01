@@ -13,4 +13,5 @@ export function readGrounds(out: string): (Ground & Record<string, any>)[];
 export function writeLabels(out: string): { labelled: number; merged: string };
 export function ambiguousPending(out: string): (Ground & Record<string, any>)[];
 export function setManual(out: string, id: string, value: "claim" | "no_claim"): void;
-export function findProjectDir(projectsDir: string, workDir: string, id: string): string | null;
+export function findProjectDir(projectsDir: string, workDir: string, id: string, sessionId?: string): string | null;
+export function askedCount(out: string): number;

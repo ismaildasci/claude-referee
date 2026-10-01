@@ -6,7 +6,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { addFixture } from "./fixture.mjs";
 import { ASKED_TARGET, CAP_USD, MAX_SESSIONS, PER_SESSION_USD, analyze, planSessions } from "./lib.mjs";
-import { ambiguousPending, prepare, readGrounds, readLedger, runAll, setManual, writeLabels } from "./runner.mjs";
+import { ambiguousPending, askedCount, prepare, readGrounds, readLedger, runAll, setManual, writeLabels } from "./runner.mjs";
 import { TASKS } from "./tasks.mjs";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -37,7 +37,7 @@ if (command === "prepare") {
   const capUsd = Number(flag("--cap-usd", String(CAP_USD)));
   if (!(capUsd > 0 && capUsd <= CAP_USD)) throw new Error(`--cap-usd must be above 0 and at most the registered ${CAP_USD}`);
   const opts = { claude: flag("--claude", "claude"), projectsDir: resolve(flag("--projects-dir", join(homedir(), ".claude", "projects"))) };
-  const shouldStop = stage === 2 ? () => readGrounds(outDir).filter((g) => g.stop && !g.stop.skipped && g.stop.would_block !== undefined).length >= ASKED_TARGET : () => false;
+  const shouldStop = stage === 2 ? () => askedCount(outDir) >= ASKED_TARGET : () => false;
   const summary = await runAll({ out: outDir, plans: plans(), capUsd, opts, shouldStop, log: (line) => console.error(line) });
   console.log(JSON.stringify(summary));
   process.exit(summary.stopped === "budget" ? 3 : 0);

@@ -7,7 +7,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { ambiguousPending, paths, prepare, readGrounds, readLedger, runAll, runSession, setManual, writeLabels } from "../scripts/session-study/runner.mjs";
+import { ambiguousPending, askedCount, findProjectDir, paths, prepare, readGrounds, readLedger, runAll, runSession, setManual, writeLabels } from "../scripts/session-study/runner.mjs";
 import { taskById } from "../scripts/session-study/tasks.mjs";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -156,4 +156,32 @@ test("labels follow the receipts format: a would_block stop is right only for a 
   assert.equal(JSON.parse(readFileSync(join(ok.merged, "labels.jsonl"), "utf8").trim()).label, "wrong");
   assert.equal(JSON.parse(readFileSync(join(wrong.merged, "labels.jsonl"), "utf8").trim()).label, "right");
   assert.ok(readFileSync(join(wrong.merged, "stops.jsonl"), "utf8").includes('"would_block":true'));
+});
+
+test("the project directory is found even when Claude Code's naming differs from ours, and by session file as a last resort", () => {
+  const projects = join(root, "projects-naming");
+  const work = join(root, "work-naming", "n-clamp__haiku__r1");
+  mkdirSync(work, { recursive: true });
+  mkdirSync(join(projects, "-some-prefix-work-n_clamp__haiku__r1"), { recursive: true });
+  assert.equal(findProjectDir(projects, work, "n-clamp__haiku__r1"), join(projects, "-some-prefix-work-n_clamp__haiku__r1"));
+  const other = join(root, "projects-holder");
+  mkdirSync(join(other, "-completely-different"), { recursive: true });
+  writeFileSync(join(other, "-completely-different", "sess-1.jsonl"), "{}\n");
+  assert.equal(findProjectDir(other, work, "n-clamp__haiku__r1", "sess-1"), join(other, "-completely-different"));
+  assert.equal(findProjectDir(other, work, "n-clamp__haiku__r1", "sess-2"), null);
+});
+
+test("a session whose transcript cannot be found is warned about and stage 2 counts only usable asked stops", async () => {
+  const s = setup("warn", { files: taskById("n-clamp").solution, final: "Done.", cost: 0.02, stop: { decision: { would_block: false } } });
+  const lines: string[] = [];
+  const r = await runAll({ out: s.out, plans: [plan("n-clamp")], opts: { ...s.opts, projectsDir: join(s.out, "elsewhere") }, log: (l) => lines.push(l) });
+  assert.equal(r.ran, 1);
+  assert.match(lines.join("\n"), /WARNING no_transcript_found_in_projects_dir/);
+  assert.equal(readGrounds(s.out)[0]?.has_transcript, false);
+  assert.equal(askedCount(s.out), 1);
+  const leakedRun = setup("warn2", { files: taskById("n-clamp").solution, final: "Done.", cost: 0.02, stop: { decision: { would_block: false } }, leak: "x" });
+  const cfg = JSON.parse(readFileSync(process.env["STUB_CONFIG"]!, "utf8"));
+  writeFileSync(process.env["STUB_CONFIG"]!, JSON.stringify({ ...cfg, leak: join(leakedRun.out, "verifiers", "n-clamp.mjs") }));
+  await runSession({ out: leakedRun.out, plan: plan("n-clamp"), opts: leakedRun.opts });
+  assert.equal(askedCount(leakedRun.out), 0);
 });

@@ -133,18 +133,23 @@ function runClaude({ claude, prompt, cwd, model, plugin, dataDir, perSessionUsd,
   });
 }
 
-// Finds the directory Claude Code made for the working directory; removes nothing outside projectsDir.
-export function findProjectDir(projectsDir, workDir, id) {
+// Finds the directory Claude Code made for the working directory without trusting its naming rule: the exact encoding first, then the same
+// name with punctuation ignored, then any directory that holds this session's transcript. Removes nothing outside projectsDir.
+const alnum = (text) => text.replace(/[^A-Za-z0-9]/g, "");
+export function findProjectDir(projectsDir, workDir, id, sessionId = "") {
   if (!existsSync(projectsDir)) return null;
   const exact = join(projectsDir, encodeProjectDir(realpathSync(workDir)));
   if (existsSync(exact)) return exact;
-  const tail = encodeProjectDir(`${sep}work${sep}${id}`);
-  const found = readdirSync(projectsDir).find((name) => name.endsWith(tail));
-  return found ? join(projectsDir, found) : null;
+  const names = readdirSync(projectsDir);
+  const tail = alnum(`work${id}`);
+  const loose = names.find((name) => alnum(name).endsWith(tail));
+  if (loose) return join(projectsDir, loose);
+  const holder = sessionId ? names.find((name) => existsSync(join(projectsDir, name, `${sessionId}.jsonl`))) : undefined;
+  return holder ? join(projectsDir, holder) : null;
 }
 
 export function harvestTranscript({ projectsDir, workDir, id, sessionId, dest }) {
-  const dir = findProjectDir(projectsDir, workDir, id);
+  const dir = findProjectDir(projectsDir, workDir, id, sessionId);
   if (!dir) return false;
   const files = readdirSync(dir).filter((f) => f.endsWith(".jsonl"));
   const wanted = sessionId && files.includes(`${sessionId}.jsonl`) ? `${sessionId}.jsonl` : files[0];
@@ -198,6 +203,8 @@ export async function runSession({ out, plan, opts = {} }) {
   const transcriptFile = join(p.session, "transcript.jsonl");
   if (!existsSync(transcriptFile) && projectsDir) harvestTranscript({ projectsDir, workDir: p.work, id: plan.id, sessionId: sessionUuid, dest: transcriptFile });
   const transcript = existsSync(transcriptFile) ? readFileSync(transcriptFile, "utf8") : "";
+  const warnings = [];
+  if (!transcript) warnings.push(projectsDir ? "no_transcript_found_in_projects_dir" : "no_projects_dir");
   const stopsFile = join(p.data, "stops.jsonl");
   if (existsSync(stopsFile)) writeFileSync(join(p.session, "stops.jsonl"), readFileSync(stopsFile));
   const verifier = runVerifier({ out, task, workDir: p.work });
@@ -222,6 +229,7 @@ export async function runSession({ out, plan, opts = {} }) {
     leaked: isLeaked,
     run_failed: runFailed,
     has_transcript: transcript !== "",
+    warnings,
     ran_own_code: ranOwnCode(transcript),
     bash_commands: bashCommands(transcript).length,
     stop,
@@ -254,7 +262,7 @@ export async function runAll({ out, plans, capUsd = CAP_USD, perSessionUsd = PER
     }
     const r = await runSession({ out, plan, opts: { ...opts, perSessionUsd } });
     summary.ran++;
-    log(`${plan.id}: ${r.ground?.class} (${r.ground?.cost_usd ?? "?"} USD)`);
+    log(`${plan.id}: ${r.ground?.class} (${r.ground?.cost_usd ?? "?"} USD)${r.ground?.warnings?.length ? ` WARNING ${r.ground.warnings.join(",")}` : ""}`);
   }
   summary.spent_usd = Math.round(spentUsd(readLedger(out)) * 10000) / 10000;
   return summary;
@@ -292,6 +300,11 @@ export function writeLabels(out) {
     if (!["leaked", "run_failed", "error", "unresolved"].includes(g.class) && existsSync(file)) appendFileSync(join(merged, "stops.jsonl"), readFileSync(file));
   }
   return { labelled, merged };
+}
+
+// Asked stops of sessions that count, the same filter the analysis uses; stage 2 stops at the registered target.
+export function askedCount(out) {
+  return readGrounds(out).filter((g) => !["leaked", "run_failed", "error", "unresolved"].includes(g.class) && g.stop && !g.stop.skipped && g.stop.would_block !== undefined).length;
 }
 
 export function ambiguousPending(out) {
