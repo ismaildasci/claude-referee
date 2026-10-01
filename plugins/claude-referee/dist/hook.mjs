@@ -1707,6 +1707,51 @@ var Session = class {
   }
 };
 
+// src/engine/stopgate/decide.ts
+function question(pack, id) {
+  const q = pack.questions[id];
+  if (!q) throw new Error(`pack has no question ${id}`);
+  return q;
+}
+__name(question, "question");
+function decideStop(answers, pack, thresholds) {
+  if (!answers) return null;
+  const noul2 = /* @__PURE__ */ __name((id) => {
+    const a = answers[id];
+    return a?.type === "noul" && typeof a.noul === "number" ? a.noul : null;
+  }, "noul");
+  const claimsDone = noul2("claims_done");
+  const claimsVerified = noul2("claims_verified");
+  const applies = noul2("verification_applies");
+  const outcome = answers["outcome"];
+  if (claimsDone === null || claimsVerified === null || applies === null || outcome?.type !== "choice" || !outcome.probabilities) return null;
+  const doneAt = threshold(pack, thresholds, "stop.gate", "claims_done", 0.7);
+  const verifiedAt = thresholdBelow(pack, thresholds, "stop.gate", "claims_verified", 0.5);
+  const appliesAt = threshold(pack, thresholds, "stop.gate", "verification_applies", 0.5);
+  const blockedAt = thresholdBelow(pack, thresholds, "stop.gate", "blocked", 0.4);
+  const would_block = claimsDone >= doneAt && claimsVerified < verifiedAt && applies >= appliesAt && (outcome.probabilities["blocked"] ?? 0) < blockedAt;
+  return { claims_done: claimsDone, claims_verified: claimsVerified, verification_applies: applies, outcome: outcome.probabilities, would_block };
+}
+__name(decideStop, "decideStop");
+function stopSkipReason(facts3) {
+  if (facts3.edits.length === 0) return "no_edits";
+  return facts3.passedCheckAfterLastEdit ? "check_passed_after_edit" : null;
+}
+__name(stopSkipReason, "stopSkipReason");
+function stopQuestions(pack) {
+  return {
+    claims_done: question(pack, "stop.claims_done"),
+    claims_verified: question(pack, "stop.claims_verified"),
+    verification_applies: question(pack, "stop.verification_applies"),
+    outcome: question(pack, "stop.outcome")
+  };
+}
+__name(stopQuestions, "stopQuestions");
+function stopState(facts3, finalMessage) {
+  return { task: facts3.task, final_message: finalMessage, checks: facts3.checks.map((c) => ({ cmd: c.cmd, status: c.status })), edits: [...facts3.edits] };
+}
+__name(stopState, "stopState");
+
 // src/engine/stopgate/stops.ts
 import { appendFileSync as appendFileSync3, chmodSync, existsSync as existsSync4, mkdirSync as mkdirSync4, readFileSync as readFileSync6, renameSync, statSync as statSync2, writeFileSync as writeFileSync3 } from "node:fs";
 import { join as join8 } from "node:path";
@@ -3626,31 +3671,6 @@ __name(analyzeTranscript, "analyzeTranscript");
 
 // src/hooks/stop.ts
 var EXCERPT = 200;
-function question(pack, id) {
-  const q = pack.questions[id];
-  if (!q) throw new Error(`pack has no question ${id}`);
-  return q;
-}
-__name(question, "question");
-function decideStop(answers, pack, thresholds) {
-  if (!answers) return null;
-  const noul2 = /* @__PURE__ */ __name((id) => {
-    const a = answers[id];
-    return a?.type === "noul" && typeof a.noul === "number" ? a.noul : null;
-  }, "noul");
-  const claimsDone = noul2("claims_done");
-  const claimsVerified = noul2("claims_verified");
-  const applies = noul2("verification_applies");
-  const outcome = answers["outcome"];
-  if (claimsDone === null || claimsVerified === null || applies === null || outcome?.type !== "choice" || !outcome.probabilities) return null;
-  const doneAt = threshold(pack, thresholds, "stop.gate", "claims_done", 0.7);
-  const verifiedAt = thresholdBelow(pack, thresholds, "stop.gate", "claims_verified", 0.5);
-  const appliesAt = threshold(pack, thresholds, "stop.gate", "verification_applies", 0.5);
-  const blockedAt = thresholdBelow(pack, thresholds, "stop.gate", "blocked", 0.4);
-  const would_block = claimsDone >= doneAt && claimsVerified < verifiedAt && applies >= appliesAt && (outcome.probabilities["blocked"] ?? 0) < blockedAt;
-  return { claims_done: claimsDone, claims_verified: claimsVerified, verification_applies: applies, outcome: outcome.probabilities, would_block };
-}
-__name(decideStop, "decideStop");
 var SOFT_NOTE = "claude-referee: this turn edited files and claimed it was done, but no passing check ran after the last edit. Run the project's tests or build before trusting it.";
 async function stopGate(io2, _pluginRoot) {
   const started = io2.now();
@@ -3692,8 +3712,8 @@ async function stopGate(io2, _pluginRoot) {
     ...marks.subagentReports > 0 ? { subagent_reports: marks.subagentReports } : {},
     ...marks.stalePass ? { stale_pass: true } : {}
   };
-  if (facts3.edits.length === 0) return finish("no_edits", counts3);
-  if (facts3.passedCheckAfterLastEdit) return finish("check_passed_after_edit", counts3);
+  const skip = stopSkipReason(facts3);
+  if (skip) return finish(skip, counts3);
   const finalMessage = typeof input.last_assistant_message === "string" && input.last_assistant_message.trim() ? input.last_assistant_message.slice(-2e3) : facts3.finalMessage;
   try {
     const pack = loadPack(project.pack, packDirs(env));
@@ -3708,14 +3728,7 @@ async function stopGate(io2, _pluginRoot) {
       profile: "hook",
       sessionId
     });
-    const questions = {
-      claims_done: question(pack, "stop.claims_done"),
-      claims_verified: question(pack, "stop.claims_verified"),
-      verification_applies: question(pack, "stop.verification_applies"),
-      outcome: question(pack, "stop.outcome")
-    };
-    const state = { task: facts3.task, final_message: finalMessage, checks: facts3.checks.map((c) => ({ cmd: c.cmd, status: c.status })), edits: [...facts3.edits] };
-    const [outcome] = await session.run([{ id: "stop", state, questions }]);
+    const [outcome] = await session.run([{ id: "stop", state: stopState(facts3, finalMessage), questions: stopQuestions(pack) }]);
     session.record({ verdict: base2.mode });
     const decision = decideStop(outcome?.answers ?? null, pack, project.thresholds);
     if (!decision) return finish("jev_error", counts3);

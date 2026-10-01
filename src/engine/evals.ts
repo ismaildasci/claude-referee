@@ -93,7 +93,7 @@ export function findRecording(lines: readonly Recording[], key: RecordingKey): {
 const ratio = (a: number, b: number): number | null => (b === 0 ? null : a / b);
 
 export function metrics(items: readonly Scored[], positive: string): Metrics {
-  const verdicts: Record<string, number> = positive === "yes" ? { yes: 0, review: 0, no: 0 } : { met: 0, unsure: 0, missing: 0 };
+  const verdicts: Record<string, number> = positive === "yes" ? { yes: 0, review: 0, no: 0 } : positive === "block" ? { block: 0, allow: 0, skipped: 0, unsure: 0 } : { met: 0, unsure: 0, missing: 0 };
   const undecidedVerdict = positive === "yes" ? "review" : "unsure";
   for (const item of items) verdicts[item.verdict] = (verdicts[item.verdict] ?? 0) + 1;
   const predicted = items.filter((i) => i.verdict === positive);

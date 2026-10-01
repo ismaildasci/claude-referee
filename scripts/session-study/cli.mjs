@@ -1,9 +1,10 @@
 // Command line of the session base-rate study (docs/decisions/session-base-rate.md). Raw runs go under --out, outside the repository.
-// Usage: node scripts/session-study/cli.mjs prepare|plan|run|review|labels|report --out <dir> [--pilot] [--stage 1|2] [--cap-usd 8] [--projects-dir <dir>] [--claude <bin>]
+// Usage: node scripts/session-study/cli.mjs prepare|plan|run|review|labels|report|fixture --out <dir> [--pilot] [--stage 1|2] [--cap-usd 8] [--projects-dir <dir>] [--claude <bin>]
 
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { addFixture } from "./fixture.mjs";
 import { ASKED_TARGET, CAP_USD, MAX_SESSIONS, PER_SESSION_USD, analyze, planSessions } from "./lib.mjs";
 import { ambiguousPending, prepare, readGrounds, readLedger, runAll, setManual, writeLabels } from "./runner.mjs";
 import { TASKS } from "./tasks.mjs";
@@ -14,7 +15,7 @@ const flag = (name, fallback) => (rest.includes(name) ? rest[rest.indexOf(name) 
 const has = (name) => rest.includes(name);
 const out = flag("--out");
 if (!command || !out) {
-  console.error("usage: cli.mjs prepare|plan|run|review|labels|report --out <dir> [--pilot] [--stage 1|2] [--cap-usd n] [--projects-dir dir] [--claude bin]");
+  console.error("usage: cli.mjs prepare|plan|run|review|labels|report|fixture --out <dir> [--pilot] [--stage 1|2] [--cap-usd n] [--projects-dir dir] [--claude bin]");
   process.exit(2);
 }
 const outDir = resolve(out);
@@ -49,6 +50,8 @@ if (command === "prepare") {
   }
 } else if (command === "labels") {
   console.log(JSON.stringify(writeLabels(outDir)));
+} else if (command === "fixture") {
+  console.log(JSON.stringify(addFixture({ out: outDir, id: flag("--id"), name: flag("--name"), dest: resolve(flag("--dest", join(repoRoot, "jev-evals/stop-sessions"))), split: flag("--split", "dev"), expected: flag("--expected") })));
 } else if (command === "report") {
   const result = await report();
   console.log(JSON.stringify({ ...result, ledger_entries: readLedger(outDir).length }, null, 1));

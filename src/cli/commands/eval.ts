@@ -2,8 +2,10 @@
 // Suites live in jev-evals/<suite>/ as suite.json, cases.jsonl and recorded.jsonl; a changed question text makes scoring fail.
 
 import { appendFileSync, existsSync, readdirSync, readFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { join, resolve, sep } from "node:path";
 import { costUsd, estimateTokens, resolveModel } from "../../engine/config.ts";
+import { decideStop, stopQuestions, stopSkipReason, stopState } from "../../engine/stopgate/decide.ts";
+import { analyzeTranscript } from "../../engine/stopgate/transcript.ts";
 import { RefereeError } from "../../engine/errors.ts";
 import { findRecording, metrics, parseCases, parseRecordings, parseSweep, sweep, type EvalCase, type Recording } from "../../engine/evals.ts";
 import type { Result } from "../../engine/output.ts";
@@ -87,12 +89,32 @@ function criteriaFor(suite: Suite, item: EvalCase): string[] {
   return list;
 }
 
+// A stop case replays a redacted transcript through the same analysis, skip rule, request and decision the Stop hook uses.
+function stopRequest(pack: Pack, suite: Suite, item: EvalCase): { planned: Planned[]; finish: (outcomes: Outcome[]) => Result } {
+  const name = typeof item["transcript"] === "string" ? item["transcript"] : "";
+  const file = resolve(suite.dir, name);
+  if (!name || !file.startsWith(resolve(suite.dir) + sep) || !existsSync(file)) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: the transcript file is missing or outside the suite.`);
+  const facts = analyzeTranscript(readFileSync(file, "utf8"));
+  const skip = stopSkipReason(facts);
+  if (skip) return { planned: [], finish: () => ({ verdict: "skipped", reason: skip }) };
+  const planned: Planned[] = [{ id: "stop", state: stopState(facts, facts.finalMessage), questions: stopQuestions(pack) }];
+  return {
+    planned,
+    finish: (outcomes) => {
+      const decision = decideStop(outcomes[0]?.answers ?? null, pack, undefined);
+      return decision ? { verdict: decision.would_block ? "block" : "allow", p: decision.claims_done } : { verdict: "unsure", p: Number.NaN };
+    },
+  };
+}
+
 function request(context: Context, pack: Pack, suite: Suite, item: EvalCase): CaseRequest {
   const command = suite.config.command;
-  if (command !== "done" && command !== "verify" && command !== "judge") throw new RefereeError("bad_input", `Suite ${suite.name} uses ${command}; eval handles done, verify and judge suites for now.`);
+  if (command !== "done" && command !== "verify" && command !== "judge" && command !== "stop") throw new RefereeError("bad_input", `Suite ${suite.name} uses ${command}; eval handles done, verify, judge and stop suites for now.`);
   let planned: Planned[];
   let finish: (outcomes: Outcome[]) => Result;
-  if (command === "done") {
+  if (command === "stop") {
+    ({ planned, finish } = stopRequest(pack, suite, item));
+  } else if (command === "done") {
     const evidence = doneEvidence(typeof item["evidence"] === "string" ? item["evidence"] : "");
     if (!evidence.trim()) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: the evidence is empty.`);
     ({ planned, finish } = doneRequest(pack, undefined, criteriaFor(suite, item), evidence));

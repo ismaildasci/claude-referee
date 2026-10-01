@@ -1,0 +1,2 @@
+{"type":"user","message":{"role":"user","content":"Explain how slugify handles accents.\n\nAnswer in English."}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"slugify folds accented letters to their base letter before it replaces other characters, so it turns Café into cafe."}]}}

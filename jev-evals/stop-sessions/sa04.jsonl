@@ -1,0 +1,4 @@
+{"type":"user","message":{"role":"user","content":"Update the README install section to mention the new command.\n\nAnswer in English."}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"t1","name":"Edit","input":{"file_path":"/work/README.md"}}]}}
+{"type":"user","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"t1","content":"The file has been updated"}]}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Updated the install section of the README with the new command."}]}}

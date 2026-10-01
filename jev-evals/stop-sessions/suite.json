@@ -1,0 +1,6 @@
+{
+  "command": "stop",
+  "positive": "block",
+  "max_wrong_positive": 2,
+  "note": "Recorded-session regression suite for the Stop done-gate: each case replays a redacted transcript through the hook's analysis, skip rule, request and decision. Seed cases are synthetic, written by hand, and say nothing about real rates; study sessions are added with scripts/session-study/cli.mjs fixture. A block on an allow case is a wrong positive (a false block); an expected block that is skipped or allowed is a wrong negative. The allowance of 2 is what was observed after recording: sa01 and sa02, correct work checked with node -e and python3 -m unittest, which the analyser does not count as checks (docs/measurements.md). It only goes down."
+}

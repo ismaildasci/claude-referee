@@ -366,10 +366,10 @@ var init_dist = __esm({
     }, "choice");
     validateQuestions = /* @__PURE__ */ __name((questions) => {
       if (Object.keys(questions).length === 0) throw new TypeSafeError("At least one question is required.");
-      for (const [name, question2] of Object.entries(questions)) {
-        if (question2.type !== "score") continue;
-        if (!Array.isArray(question2.criteria)) throw new TypeSafeError(`Score question "${name}" has criteria that are not a list; score criteria must be a list of descriptions indexed by score from zero.`);
-        if (question2.criteria.length < 2) throw new TypeSafeError(`Score question "${name}" has ${question2.criteria.length} criteria; at least two scores are required.`);
+      for (const [name, question3] of Object.entries(questions)) {
+        if (question3.type !== "score") continue;
+        if (!Array.isArray(question3.criteria)) throw new TypeSafeError(`Score question "${name}" has criteria that are not a list; score criteria must be a list of descriptions indexed by score from zero.`);
+        if (question3.criteria.length < 2) throw new TypeSafeError(`Score question "${name}" has ${question3.criteria.length} criteria; at least two scores are required.`);
       }
     }, "validateQuestions");
     Models = class {
@@ -432,18 +432,18 @@ var init_dist = __esm({
       for (const status of statuses) if (!Number.isInteger(status) || status < 100 || status > 999) throw new TypeSafeError(`\`${name}\` must contain HTTP status codes, got ${String(status)}.`);
       return statuses;
     }, "assertStatusSet");
-    resolveRetryPolicy = /* @__PURE__ */ __name((base, overrides) => {
+    resolveRetryPolicy = /* @__PURE__ */ __name((base2, overrides) => {
       const o = overrides ?? {};
       return {
-        maxRetries: o.maxRetries === void 0 ? base.maxRetries : assertNonNegativeInteger("retry.maxRetries", o.maxRetries),
-        backoffInitialMs: o.backoffInitialMs === void 0 ? base.backoffInitialMs : assertNonNegativeMs("retry.backoffInitialMs", o.backoffInitialMs),
-        backoffMaxMs: o.backoffMaxMs === void 0 ? base.backoffMaxMs : assertNonNegativeMs("retry.backoffMaxMs", o.backoffMaxMs),
-        backoffJitter: o.backoffJitter === void 0 ? base.backoffJitter : assertFraction("retry.backoffJitter", o.backoffJitter),
-        httpStatuses: new Set(o.httpStatuses === void 0 ? base.httpStatuses : assertStatusSet("retry.httpStatuses", o.httpStatuses)),
-        respectRetryAfter: o.respectRetryAfter ?? base.respectRetryAfter,
-        maxRetryAfterMs: o.maxRetryAfterMs === void 0 ? base.maxRetryAfterMs : assertNonNegativeMs("retry.maxRetryAfterMs", o.maxRetryAfterMs),
-        apiConnectionError: o.apiConnectionError ?? base.apiConnectionError,
-        apiTimeoutError: o.apiTimeoutError ?? base.apiTimeoutError
+        maxRetries: o.maxRetries === void 0 ? base2.maxRetries : assertNonNegativeInteger("retry.maxRetries", o.maxRetries),
+        backoffInitialMs: o.backoffInitialMs === void 0 ? base2.backoffInitialMs : assertNonNegativeMs("retry.backoffInitialMs", o.backoffInitialMs),
+        backoffMaxMs: o.backoffMaxMs === void 0 ? base2.backoffMaxMs : assertNonNegativeMs("retry.backoffMaxMs", o.backoffMaxMs),
+        backoffJitter: o.backoffJitter === void 0 ? base2.backoffJitter : assertFraction("retry.backoffJitter", o.backoffJitter),
+        httpStatuses: new Set(o.httpStatuses === void 0 ? base2.httpStatuses : assertStatusSet("retry.httpStatuses", o.httpStatuses)),
+        respectRetryAfter: o.respectRetryAfter ?? base2.respectRetryAfter,
+        maxRetryAfterMs: o.maxRetryAfterMs === void 0 ? base2.maxRetryAfterMs : assertNonNegativeMs("retry.maxRetryAfterMs", o.maxRetryAfterMs),
+        apiConnectionError: o.apiConnectionError ?? base2.apiConnectionError,
+        apiTimeoutError: o.apiTimeoutError ?? base2.apiTimeoutError
       };
     }, "resolveRetryPolicy");
     isRetryableError = /* @__PURE__ */ __name((err, policy) => {
@@ -897,12 +897,18 @@ function listPacks(dirs) {
   return out.sort((a, b) => a.name.localeCompare(b.name));
 }
 __name(listPacks, "listPacks");
-function threshold(pack, project, question2, key, fallback) {
-  const base = pack.thresholds[question2]?.[key] ?? fallback;
-  const override = project?.[question2]?.[key];
-  return typeof override === "number" && override > base ? Math.min(override, 1) : base;
+function threshold(pack, project, question3, key, fallback) {
+  const base2 = pack.thresholds[question3]?.[key] ?? fallback;
+  const override = project?.[question3]?.[key];
+  return typeof override === "number" && override > base2 ? Math.min(override, 1) : base2;
 }
 __name(threshold, "threshold");
+function thresholdBelow(pack, project, question3, key, fallback) {
+  const base2 = pack.thresholds[question3]?.[key] ?? fallback;
+  const override = project?.[question3]?.[key];
+  return typeof override === "number" && override < base2 ? Math.max(override, 0) : base2;
+}
+__name(thresholdBelow, "thresholdBelow");
 
 // src/cli/shared.ts
 import { readFileSync as readFileSync6, statSync as statSync2 } from "node:fs";
@@ -1013,10 +1019,10 @@ __name(findProjectFile, "findProjectFile");
 function loadProject(cwd) {
   const file = findProjectFile(cwd);
   if (!file) return null;
-  const base = readProjectFile(file);
+  const base2 = readProjectFile(file);
   const localFile = join3(dirname2(file), "referee.local.json");
   const local = existsSync2(localFile) ? readProjectFile(localFile) : {};
-  const merged = { ...base, ...local, hooks: { ...base.hooks, ...local.hooks } };
+  const merged = { ...base2, ...local, hooks: { ...base2.hooks, ...local.hooks } };
   if (typeof merged.pack !== "string" || !merged.pack) throw new RefereeError("bad_project", 'The project file needs a pack name, for example {"pack": "generic"}.');
   const gate = merged.hooks?.stopGate;
   return {
@@ -1599,9 +1605,9 @@ function redact2(value, options = {}) {
       const out = {};
       for (const [key, child] of Object.entries(node)) {
         for (const kind of stopsIn(key, extraStop)) stopped.push({ kind, field: `${field}.<key>` });
-        const base = options.keepKeys ? key : replaceIn(key, options.home, extraReplace, replaced);
-        let safeKey = base;
-        for (let n = 2; Object.hasOwn(out, safeKey); n++) safeKey = `${base}#${n}`;
+        const base2 = options.keepKeys ? key : replaceIn(key, options.home, extraReplace, replaced);
+        let safeKey = base2;
+        for (let n = 2; Object.hasOwn(out, safeKey); n++) safeKey = `${base2}#${n}`;
         out[safeKey] = walk(child, field ? `${field}.${safeKey}` : safeKey);
       }
       return out;
@@ -1879,8 +1885,8 @@ function question(pack, id) {
 }
 __name(question, "question");
 function withData(instructions, data) {
-  const base = typeof instructions === "object" && instructions !== null && !Array.isArray(instructions) ? instructions : { question: instructions };
-  return { ...base, ...data };
+  const base2 = typeof instructions === "object" && instructions !== null && !Array.isArray(instructions) ? instructions : { question: instructions };
+  return { ...base2, ...data };
 }
 __name(withData, "withData");
 async function jevCommand(context, command, pack, planned, finish, options = {}) {
@@ -3804,8 +3810,8 @@ function doneRequest(pack, thresholds, criteria, evidence) {
       }), "finish")
     };
   }
-  const base = question(pack, "done.met");
-  const questions = Object.fromEntries(criteria.map((criterion, i) => [`c${i + 1}`, { ...base, instructions: withData(base.instructions, { criterion }) }]));
+  const base2 = question(pack, "done.met");
+  const questions = Object.fromEntries(criteria.map((criterion, i) => [`c${i + 1}`, { ...base2, instructions: withData(base2.instructions, { criterion }) }]));
   const met = threshold(pack, thresholds, "done.met", "met", 0.7);
   const missing = threshold(pack, thresholds, "done.met", "missing", 0.5);
   const finish = /* @__PURE__ */ __name(([outcome]) => {
@@ -3880,7 +3886,391 @@ var done = {
 
 // src/cli/commands/eval.ts
 import { appendFileSync as appendFileSync2, existsSync as existsSync4, readdirSync as readdirSync4, readFileSync as readFileSync8 } from "node:fs";
-import { join as join8, resolve as resolve4 } from "node:path";
+import { join as join8, resolve as resolve4, sep as sep2 } from "node:path";
+
+// src/engine/stopgate/decide.ts
+function question2(pack, id) {
+  const q = pack.questions[id];
+  if (!q) throw new Error(`pack has no question ${id}`);
+  return q;
+}
+__name(question2, "question");
+function decideStop(answers, pack, thresholds) {
+  if (!answers) return null;
+  const noul2 = /* @__PURE__ */ __name((id) => {
+    const a = answers[id];
+    return a?.type === "noul" && typeof a.noul === "number" ? a.noul : null;
+  }, "noul");
+  const claimsDone = noul2("claims_done");
+  const claimsVerified = noul2("claims_verified");
+  const applies = noul2("verification_applies");
+  const outcome = answers["outcome"];
+  if (claimsDone === null || claimsVerified === null || applies === null || outcome?.type !== "choice" || !outcome.probabilities) return null;
+  const doneAt = threshold(pack, thresholds, "stop.gate", "claims_done", 0.7);
+  const verifiedAt = thresholdBelow(pack, thresholds, "stop.gate", "claims_verified", 0.5);
+  const appliesAt = threshold(pack, thresholds, "stop.gate", "verification_applies", 0.5);
+  const blockedAt = thresholdBelow(pack, thresholds, "stop.gate", "blocked", 0.4);
+  const would_block = claimsDone >= doneAt && claimsVerified < verifiedAt && applies >= appliesAt && (outcome.probabilities["blocked"] ?? 0) < blockedAt;
+  return { claims_done: claimsDone, claims_verified: claimsVerified, verification_applies: applies, outcome: outcome.probabilities, would_block };
+}
+__name(decideStop, "decideStop");
+function stopSkipReason(facts3) {
+  if (facts3.edits.length === 0) return "no_edits";
+  return facts3.passedCheckAfterLastEdit ? "check_passed_after_edit" : null;
+}
+__name(stopSkipReason, "stopSkipReason");
+function stopQuestions(pack) {
+  return {
+    claims_done: question2(pack, "stop.claims_done"),
+    claims_verified: question2(pack, "stop.claims_verified"),
+    verification_applies: question2(pack, "stop.verification_applies"),
+    outcome: question2(pack, "stop.outcome")
+  };
+}
+__name(stopQuestions, "stopQuestions");
+function stopState(facts3, finalMessage) {
+  return { task: facts3.task, final_message: finalMessage, checks: facts3.checks.map((c) => ({ cmd: c.cmd, status: c.status })), edits: [...facts3.edits] };
+}
+__name(stopState, "stopState");
+
+// src/engine/stopgate/transcript.ts
+var TASK_MAX = 1500;
+var FINAL_MAX = 2e3;
+var CMD_MAX = 200;
+var RESULT_TAIL = 2e5;
+var EDIT_TOOLS = /* @__PURE__ */ new Set(["Edit", "Write", "MultiEdit", "NotebookEdit"]);
+var SEPARATORS = /* @__PURE__ */ new Set(["&&", "||", "|", "|&", ";", "&", "\n", "(", ")"]);
+var ASSIGNMENT2 = /^[A-Za-z_][A-Za-z0-9_]*=/;
+var WRAPPERS = /* @__PURE__ */ new Set(["{", "time", "exec", "command", "env"]);
+var SCRIPT = /^(test|lint|typecheck|check|build)(:.+)?$/;
+var DIRECT_TOOLS = /* @__PURE__ */ new Set(["vitest", "jest", "tsc", "eslint", "playwright", "pytest", "ruff", "mypy", "phpunit", "pest", "rspec"]);
+var FAILURE_MARKER = /\berror\b|\bfail(?:ed|ure|ures|ing)?\b|npm ERR!|✖|✗/i;
+var USER_LINE = /"type"\s*:\s*"user"/;
+var TOOL_RESULT_LINE = /"type"\s*:\s*"tool_result"/;
+var TOOL_USE_ID = /"tool_use_id"\s*:\s*"([^"]*)"/g;
+var SUBAGENT_TOOLS = /* @__PURE__ */ new Set(["Agent", "Task"]);
+var TRUNCATED = [/^\s*<persisted-output>/, /\.\.\. \[\d+ (?:lines|characters) truncated\] \.\.\./, /^\s*Command did not complete within its \d+s timeout and was moved to the background/];
+function withoutHeredocs(command) {
+  const out = [];
+  let delimiter = null;
+  for (const line of command.split("\n")) {
+    if (delimiter) {
+      if ((delimiter.strip ? line.replace(/^\t+/, "") : line) === delimiter.word) delimiter = null;
+      continue;
+    }
+    out.push(line);
+    const match = /<<(-?)\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\2/.exec(line);
+    if (match) delimiter = { word: match[3] ?? "", strip: match[1] === "-" };
+  }
+  return out.join("\n");
+}
+__name(withoutHeredocs, "withoutHeredocs");
+function tokenize(command) {
+  const tokens2 = [];
+  let current = "";
+  let quote = null;
+  const flush = /* @__PURE__ */ __name(() => {
+    if (current) tokens2.push(current);
+    current = "";
+  }, "flush");
+  for (let i = 0; i < command.length; i++) {
+    const ch = command[i] ?? "";
+    if (quote) {
+      if (ch === quote) quote = null;
+      else if (ch === "\\" && quote === '"' && i + 1 < command.length) current += command[++i];
+      else current += ch;
+      continue;
+    }
+    if (ch === "'" || ch === '"') {
+      quote = ch;
+      continue;
+    }
+    const two = command.slice(i, i + 2);
+    if (two === "&&" || two === "||" || two === "|&") {
+      flush();
+      tokens2.push(two);
+      i++;
+    } else if (ch === "|" || ch === ";" || ch === "&" || ch === "\n" || ch === "(" || ch === ")") {
+      flush();
+      tokens2.push(ch);
+    } else if (ch === " " || ch === "	") {
+      flush();
+    } else {
+      current += ch;
+    }
+  }
+  flush();
+  return tokens2;
+}
+__name(tokenize, "tokenize");
+var base = /* @__PURE__ */ __name((token) => token.slice(token.lastIndexOf("/") + 1), "base");
+var skipFlags = /* @__PURE__ */ __name((args) => {
+  let i = 0;
+  while ((args[i] ?? "").startsWith("-")) i++;
+  return args.slice(i);
+}, "skipFlags");
+function checkKind(segment) {
+  let i = 0;
+  while (i < segment.length && (ASSIGNMENT2.test(segment[i] ?? "") || WRAPPERS.has(segment[i] ?? ""))) i++;
+  const first = segment[i];
+  if (!first) return null;
+  const name = base(first);
+  const args = segment.slice(i + 1);
+  const direct = /* @__PURE__ */ __name((tool, rest) => {
+    if (tool === "tsc" || tool === "eslint") return { silent: true };
+    if (tool === "ruff") return ["format", "version", "server", "config", "clean"].includes(rest[0] ?? "") ? null : { silent: true };
+    return DIRECT_TOOLS.has(tool) ? { silent: false } : null;
+  }, "direct");
+  if (name === "npm" || name === "pnpm" || name === "yarn" || name === "bun") {
+    const rest = skipFlags(args);
+    const sub = rest[0] ?? "";
+    if (sub === "exec" || sub === "dlx") {
+      const tool = skipFlags(rest.slice(1))[0];
+      return tool ? direct(base(tool), skipFlags(rest.slice(1)).slice(1)) : null;
+    }
+    if (sub === "run" || sub === "run-script") {
+      const script = rest[1] ?? "";
+      return SCRIPT.test(script) ? { silent: /^build(:.+)?$/.test(script) && name === "npm" } : null;
+    }
+    if (sub === "test") return { silent: false };
+    if (name !== "npm" && SCRIPT.test(sub)) return { silent: false };
+    return null;
+  }
+  if (name === "npx" || name === "bunx") {
+    const rest = skipFlags(args);
+    return rest[0] ? direct(base(rest[0]), rest.slice(1)) : null;
+  }
+  if (name === "python" || name === "python3") {
+    if (args[0] === "-m" && ["pytest", "mypy", "ruff"].includes(args[1] ?? "")) return direct(args[1] ?? "", args.slice(2));
+    return null;
+  }
+  if (name === "cargo") {
+    const rest = args.filter((a) => !a.startsWith("+"));
+    const sub = rest[0] ?? "";
+    if (["test", "clippy", "build", "nextest"].includes(sub)) return { silent: false };
+    return sub === "check" ? { silent: true } : null;
+  }
+  if (name === "go") {
+    const sub = args[0] ?? "";
+    if (sub === "test") return { silent: false };
+    return sub === "vet" || sub === "build" ? { silent: true } : null;
+  }
+  if (name === "dotnet") return ["test", "build"].includes(args[0] ?? "") ? { silent: false } : null;
+  if (name === "rake") return args[0] === "test" ? { silent: false } : null;
+  if (name === "make") return args.some((a) => ["test", "check", "lint", "build"].includes(a)) ? { silent: false } : null;
+  if (name === "mvn") return args.includes("test") ? { silent: false } : null;
+  if (name === "gradle" || name === "gradlew") return args.some((a) => a === "test" || a === "check") ? { silent: false } : null;
+  return direct(name, args);
+}
+__name(checkKind, "checkKind");
+function analyzeCommand(command) {
+  const tokens2 = tokenize(withoutHeredocs(command));
+  let found = null;
+  let segment = [];
+  for (const token of [...tokens2, ";"]) {
+    if (!SEPARATORS.has(token)) {
+      segment.push(token);
+      continue;
+    }
+    const kind = checkKind(segment);
+    if (kind) found = found ? { silent: found.silent && kind.silent } : kind;
+    segment = [];
+  }
+  if (!found) return null;
+  const masked = tokens2.some((t) => t === "|" || t === "||" || t === "|&" || t === ";");
+  return { silent: found.silent && !masked };
+}
+__name(analyzeCommand, "analyzeCommand");
+function textOf(content) {
+  if (typeof content === "string") return content;
+  if (!Array.isArray(content)) return "";
+  return content.map((b) => b && b.type === "text" && typeof b.text === "string" ? b.text : "").filter(Boolean).join("\n");
+}
+__name(textOf, "textOf");
+function parseLine(line) {
+  try {
+    const value = JSON.parse(line);
+    return value && typeof value === "object" ? value : null;
+  } catch {
+    return null;
+  }
+}
+__name(parseLine, "parseLine");
+function promptText(entry) {
+  if (!entry || entry.type !== "user" || entry.isSidechain === true || entry.isMeta === true || entry.isCompactSummary === true) return null;
+  const content = entry.message?.content;
+  if (Array.isArray(content) && content.some((b) => b && b.type === "tool_result")) return null;
+  const text = textOf(content);
+  const trimmed = text.trim();
+  if (!trimmed || trimmed.startsWith("<local-command-") || trimmed.startsWith("[Request interrupted")) return null;
+  if (isNotification(entry, trimmed)) return null;
+  return text;
+}
+__name(promptText, "promptText");
+function isNotification(entry, trimmed) {
+  return entry.origin?.kind === "task-notification" || trimmed.startsWith("<task-notification>");
+}
+__name(isNotification, "isNotification");
+function notificationText(entry) {
+  if (!entry || entry.type !== "user" || entry.isSidechain === true || entry.isMeta === true) return null;
+  const text = textOf(entry.message?.content).trim();
+  return text && isNotification(entry, text) ? text : null;
+}
+__name(notificationText, "notificationText");
+function userPrompts(text) {
+  const out = [];
+  for (const line of text.split("\n")) {
+    if (!isPromptCandidate(line)) continue;
+    const entry = parseLine(line);
+    const found = promptText(entry);
+    if (found !== null && typeof entry?.timestamp === "string") out.push({ ts: entry.timestamp, text: found });
+  }
+  return out;
+}
+__name(userPrompts, "userPrompts");
+function isPromptCandidate(line) {
+  return USER_LINE.test(line) && !TOOL_RESULT_LINE.test(line);
+}
+__name(isPromptCandidate, "isPromptCandidate");
+function firstPrompt(text) {
+  let pos = 0;
+  while (pos < text.length) {
+    let end = text.indexOf("\n", pos);
+    if (end === -1) end = text.length;
+    const line = text.slice(pos, end);
+    if (isPromptCandidate(line)) {
+      const found = promptText(parseLine(line));
+      if (found !== null) return found;
+    }
+    pos = end + 1;
+  }
+  return "";
+}
+__name(firstPrompt, "firstPrompt");
+function lastPromptEnd(text) {
+  let end = text.length;
+  while (end > 0) {
+    const nl = text.lastIndexOf("\n", end - 1);
+    const line = text.slice(nl + 1, end);
+    if (isPromptCandidate(line)) {
+      const found = promptText(parseLine(line));
+      if (found !== null) return { start: end + 1, lineStart: nl + 1, prompt: found };
+    }
+    end = nl;
+  }
+  return { start: 0, lineStart: 0, prompt: null };
+}
+__name(lastPromptEnd, "lastPromptEnd");
+function fullResultText(content) {
+  return typeof content === "string" ? content : Array.isArray(content) ? content.map((b) => b && typeof b.text === "string" ? b.text : "").join("\n") : "";
+}
+__name(fullResultText, "fullResultText");
+function isTruncated(text) {
+  return TRUNCATED.some((re) => re.test(text));
+}
+__name(isTruncated, "isTruncated");
+function statusOf(full, isError, silent) {
+  const truncated = isTruncated(full);
+  const status = rawStatus(full.length > RESULT_TAIL ? full.slice(-RESULT_TAIL) : full, isError, silent);
+  return { status: truncated && status === "passed" ? "unknown" : status, truncated };
+}
+__name(statusOf, "statusOf");
+function rawStatus(text, isError, silent) {
+  const ev = parseEvidence(text);
+  const bad = ev.runners.some((r) => r.failed + r.errors > 0);
+  if (isError || bad || ev.exit_code !== null && ev.exit_code !== 0) return "failed";
+  if (ev.trust === "parsed" && !ev.conflict) return "passed";
+  if (ev.exit_code === 0) return "passed";
+  if (silent && !FAILURE_MARKER.test(text)) return "passed";
+  return "unknown";
+}
+__name(rawStatus, "rawStatus");
+function scanTurn(text, from, to) {
+  const out = { edits: [], calls: [], finalMessage: "", lastEdit: -1, subagentCalls: 0, subagentReports: 0 };
+  const byId = /* @__PURE__ */ new Map();
+  const seen = /* @__PURE__ */ new Set();
+  let seq = 0;
+  let pos = from;
+  while (pos < to) {
+    let end = text.indexOf("\n", pos);
+    if (end === -1 || end > to) end = to;
+    const line = text.slice(pos, end);
+    pos = end + 1;
+    if (!line.trim()) continue;
+    if (TOOL_RESULT_LINE.test(line)) {
+      let wanted = false;
+      for (const m of line.matchAll(TOOL_USE_ID)) if (byId.has(m[1] ?? "")) wanted = true;
+      if (!wanted) continue;
+      const entry2 = parseLine(line);
+      if (!entry2 || entry2.isSidechain === true || !Array.isArray(entry2.message?.content)) continue;
+      for (const block of entry2.message.content) {
+        const call = block && block.type === "tool_result" && typeof block.tool_use_id === "string" ? byId.get(block.tool_use_id) : void 0;
+        if (!call) continue;
+        const result = statusOf(fullResultText(block.content), block.is_error === true, call.silent);
+        call.status = result.status;
+        call.truncated = result.truncated;
+      }
+      continue;
+    }
+    if (line.includes("task-notification") && notificationText(parseLine(line)) !== null) {
+      out.subagentReports++;
+      continue;
+    }
+    if (!/"type"\s*:\s*"assistant"/.test(line)) continue;
+    const entry = parseLine(line);
+    if (!entry || entry.type !== "assistant" || entry.isSidechain === true || !Array.isArray(entry.message?.content)) continue;
+    const message = textOf(entry.message.content).trim();
+    if (message) out.finalMessage = message;
+    for (const block of entry.message.content) {
+      if (!block || block.type !== "tool_use" || typeof block.name !== "string") continue;
+      const id = typeof block.id === "string" ? block.id : "";
+      if (id) {
+        if (seen.has(id)) continue;
+        seen.add(id);
+      }
+      if (EDIT_TOOLS.has(block.name)) {
+        const path = block.name === "NotebookEdit" ? block.input?.notebook_path ?? block.input?.file_path : block.input?.file_path;
+        if (typeof path === "string" && path) {
+          if (!out.edits.includes(path)) out.edits.push(path);
+          out.lastEdit = seq++;
+        }
+      } else if (SUBAGENT_TOOLS.has(block.name)) {
+        out.subagentCalls++;
+      } else if (block.name === "Bash" && typeof block.input?.command === "string") {
+        const kind = analyzeCommand(block.input.command);
+        if (!kind) continue;
+        const call = { cmd: block.input.command.slice(0, CMD_MAX), silent: kind.silent, seq: seq++, status: "unknown", truncated: false };
+        out.calls.push(call);
+        if (id) byId.set(id, call);
+      }
+    }
+  }
+  return out;
+}
+__name(scanTurn, "scanTurn");
+var passedAfterLastEdit = /* @__PURE__ */ __name((scan) => scan.calls.some((c) => c.seq > scan.lastEdit && c.status === "passed"), "passedAfterLastEdit");
+function analyzeTranscript(text) {
+  const empty = { task: "", finalMessage: "", edits: [], checks: [], passedCheckAfterLastEdit: false, marks: { truncatedChecks: 0, subagentCalls: 0, subagentReports: 0, stalePass: false } };
+  try {
+    if (typeof text !== "string" || !text) return empty;
+    const task = firstPrompt(text).slice(0, TASK_MAX);
+    const { start, lineStart } = lastPromptEnd(text);
+    const turn = scanTurn(text, start, text.length);
+    const passedCheckAfterLastEdit = turn.lastEdit >= 0 && passedAfterLastEdit(turn);
+    let stalePass = false;
+    if (turn.edits.length > 0 && !passedCheckAfterLastEdit && lineStart > 0) {
+      const previous = lastPromptEnd(text.slice(0, lineStart));
+      const before = scanTurn(text, previous.start, lineStart);
+      stalePass = before.lastEdit >= 0 ? passedAfterLastEdit(before) : before.calls.some((c) => c.status === "passed");
+    }
+    const checks = turn.calls.map((c) => ({ cmd: c.cmd, status: c.status, ...c.truncated ? { truncated: true } : {} }));
+    const marks = { truncatedChecks: turn.calls.filter((c) => c.truncated).length, subagentCalls: turn.subagentCalls, subagentReports: turn.subagentReports, stalePass };
+    return { task, finalMessage: turn.finalMessage.slice(-FINAL_MAX), edits: turn.edits, checks, passedCheckAfterLastEdit, marks };
+  } catch {
+    return empty;
+  }
+}
+__name(analyzeTranscript, "analyzeTranscript");
 
 // src/engine/evals.ts
 var MIN_PER_CLASS = 10;
@@ -3922,7 +4312,7 @@ function findRecording(lines3, key) {
 __name(findRecording, "findRecording");
 var ratio = /* @__PURE__ */ __name((a, b) => b === 0 ? null : a / b, "ratio");
 function metrics(items, positive) {
-  const verdicts = positive === "yes" ? { yes: 0, review: 0, no: 0 } : { met: 0, unsure: 0, missing: 0 };
+  const verdicts = positive === "yes" ? { yes: 0, review: 0, no: 0 } : positive === "block" ? { block: 0, allow: 0, skipped: 0, unsure: 0 } : { met: 0, unsure: 0, missing: 0 };
   const undecidedVerdict = positive === "yes" ? "review" : "unsure";
   for (const item of items) verdicts[item.verdict] = (verdicts[item.verdict] ?? 0) + 1;
   const predicted = items.filter((i) => i.verdict === positive);
@@ -4435,12 +4825,31 @@ function criteriaFor(suite, item) {
   return list2;
 }
 __name(criteriaFor, "criteriaFor");
+function stopRequest(pack, suite, item) {
+  const name = typeof item["transcript"] === "string" ? item["transcript"] : "";
+  const file = resolve4(suite.dir, name);
+  if (!name || !file.startsWith(resolve4(suite.dir) + sep2) || !existsSync4(file)) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: the transcript file is missing or outside the suite.`);
+  const facts3 = analyzeTranscript(readFileSync8(file, "utf8"));
+  const skip = stopSkipReason(facts3);
+  if (skip) return { planned: [], finish: /* @__PURE__ */ __name(() => ({ verdict: "skipped", reason: skip }), "finish") };
+  const planned = [{ id: "stop", state: stopState(facts3, facts3.finalMessage), questions: stopQuestions(pack) }];
+  return {
+    planned,
+    finish: /* @__PURE__ */ __name((outcomes) => {
+      const decision = decideStop(outcomes[0]?.answers ?? null, pack, void 0);
+      return decision ? { verdict: decision.would_block ? "block" : "allow", p: decision.claims_done } : { verdict: "unsure", p: Number.NaN };
+    }, "finish")
+  };
+}
+__name(stopRequest, "stopRequest");
 function request(context, pack, suite, item) {
   const command = suite.config.command;
-  if (command !== "done" && command !== "verify" && command !== "judge") throw new RefereeError("bad_input", `Suite ${suite.name} uses ${command}; eval handles done, verify and judge suites for now.`);
+  if (command !== "done" && command !== "verify" && command !== "judge" && command !== "stop") throw new RefereeError("bad_input", `Suite ${suite.name} uses ${command}; eval handles done, verify, judge and stop suites for now.`);
   let planned;
   let finish;
-  if (command === "done") {
+  if (command === "stop") {
+    ({ planned, finish } = stopRequest(pack, suite, item));
+  } else if (command === "done") {
     const evidence = doneEvidence(typeof item["evidence"] === "string" ? item["evidence"] : "");
     if (!evidence.trim()) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: the evidence is empty.`);
     ({ planned, finish } = doneRequest(pack, void 0, criteriaFor(suite, item), evidence));
@@ -4636,7 +5045,7 @@ var COUNTING = /\b(?:how many|count (?:the|how)|counting|number of|sum of|total 
 var COMPOUND = /\b(?:and|or|ve|veya)\b/i;
 function lintQuestions(questions, model) {
   const out = [];
-  const add = /* @__PURE__ */ __name((rule, severity, question2, message) => out.push({ rule, severity, question: question2, message }), "add");
+  const add = /* @__PURE__ */ __name((rule, severity, question3, message) => out.push({ rule, severity, question: question3, message }), "add");
   if (typeof model !== "string" || !model.trim() || /latest/i.test(model)) add("model", "warn", "(pack)", "pack.json should pin a model such as jev-1.13.0, not leave it open or use a latest alias.");
   for (const [id, q] of Object.entries(questions)) {
     const raw = q;
@@ -4797,8 +5206,8 @@ function suggestThreshold(records, current) {
   const labelled = records.filter((r) => r.decision?.would_block === true && (r.label === "right" || r.label === "wrong"));
   const right = labelled.filter((r) => r.label === "right").length;
   const wrong = labelled.length - right;
-  const base = { need: { right: MIN_LABELS_PER_CLASS, wrong: MIN_LABELS_PER_CLASS }, have: { right, wrong }, question: "stop.gate", key: "claims_done", current };
-  if (right < MIN_LABELS_PER_CLASS || wrong < MIN_LABELS_PER_CLASS) return { ...base, available: false, suggested: null, reason: "too_few_labels" };
+  const base2 = { need: { right: MIN_LABELS_PER_CLASS, wrong: MIN_LABELS_PER_CLASS }, have: { right, wrong }, question: "stop.gate", key: "claims_done", current };
+  if (right < MIN_LABELS_PER_CLASS || wrong < MIN_LABELS_PER_CLASS) return { ...base2, available: false, suggested: null, reason: "too_few_labels" };
   const overall = { precision: round(right / labelled.length), precision_ci95: pair(right, labelled.length), false_block_rate_ci95: pair(wrong, labelled.length) };
   const keptAt = /* @__PURE__ */ __name((t) => {
     const kept = labelled.filter((r) => (r.decision?.claims_done ?? 0) >= t);
@@ -4813,10 +5222,10 @@ function suggestThreshold(records, current) {
     const { n, k } = keptAt(t);
     return { labelled: n, right: k, precision: round(k / n), precision_ci95: pair(k, n) };
   }, "summary");
-  if (meets(current)) return { ...base, available: true, suggested: current, reason: "already_meets_target", kept: summary(current), overall };
+  if (meets(current)) return { ...base2, available: true, suggested: current, reason: "already_meets_target", kept: summary(current), overall };
   const candidates = [...new Set(labelled.map((r) => Math.floor((r.decision?.claims_done ?? 0) * 1e3) / 1e3))].filter((t) => t > current && t <= 1).sort((a, b) => a - b);
-  for (const t of candidates) if (meets(t)) return { ...base, available: true, suggested: t, reason: "raise_claims_done", kept: summary(t), overall };
-  return { ...base, available: true, suggested: null, reason: "no_threshold_reaches_target", overall };
+  for (const t of candidates) if (meets(t)) return { ...base2, available: true, suggested: t, reason: "raise_claims_done", kept: summary(t), overall };
+  return { ...base2, available: true, suggested: null, reason: "no_threshold_reaches_target", overall };
 }
 __name(suggestThreshold, "suggestThreshold");
 
@@ -4923,57 +5332,6 @@ __name(stopStats, "stopStats");
 // src/engine/stopgate/weak.ts
 import { readFileSync as readFileSync11 } from "node:fs";
 import { join as join11 } from "node:path";
-
-// src/engine/stopgate/transcript.ts
-var USER_LINE = /"type"\s*:\s*"user"/;
-var TOOL_RESULT_LINE = /"type"\s*:\s*"tool_result"/;
-function textOf(content) {
-  if (typeof content === "string") return content;
-  if (!Array.isArray(content)) return "";
-  return content.map((b) => b && b.type === "text" && typeof b.text === "string" ? b.text : "").filter(Boolean).join("\n");
-}
-__name(textOf, "textOf");
-function parseLine(line) {
-  try {
-    const value = JSON.parse(line);
-    return value && typeof value === "object" ? value : null;
-  } catch {
-    return null;
-  }
-}
-__name(parseLine, "parseLine");
-function promptText(entry) {
-  if (!entry || entry.type !== "user" || entry.isSidechain === true || entry.isMeta === true || entry.isCompactSummary === true) return null;
-  const content = entry.message?.content;
-  if (Array.isArray(content) && content.some((b) => b && b.type === "tool_result")) return null;
-  const text = textOf(content);
-  const trimmed = text.trim();
-  if (!trimmed || trimmed.startsWith("<local-command-") || trimmed.startsWith("[Request interrupted")) return null;
-  if (isNotification(entry, trimmed)) return null;
-  return text;
-}
-__name(promptText, "promptText");
-function isNotification(entry, trimmed) {
-  return entry.origin?.kind === "task-notification" || trimmed.startsWith("<task-notification>");
-}
-__name(isNotification, "isNotification");
-function userPrompts(text) {
-  const out = [];
-  for (const line of text.split("\n")) {
-    if (!isPromptCandidate(line)) continue;
-    const entry = parseLine(line);
-    const found = promptText(entry);
-    if (found !== null && typeof entry?.timestamp === "string") out.push({ ts: entry.timestamp, text: found });
-  }
-  return out;
-}
-__name(userPrompts, "userPrompts");
-function isPromptCandidate(line) {
-  return USER_LINE.test(line) && !TOOL_RESULT_LINE.test(line);
-}
-__name(isPromptCandidate, "isPromptCandidate");
-
-// src/engine/stopgate/weak.ts
 var W = String.raw`(?<![\p{L}\p{N}])`;
 var E = String.raw`(?![\p{L}\p{N}])`;
 var compile2 = /* @__PURE__ */ __name((patterns) => patterns.map((p) => new RegExp(`${W}${p}${E}`, "iu")), "compile");
@@ -5072,9 +5430,9 @@ __name(suggestForStops, "suggestForStops");
 // src/engine/usage.ts
 import { existsSync as existsSync7, readdirSync as readdirSync6, readFileSync as readFileSync12 } from "node:fs";
 import { join as join12 } from "node:path";
-var SEPARATORS = /* @__PURE__ */ new Set(["&&", "||", "|", "|&", ";", "&", "\n", "(", ")"]);
-var ASSIGNMENT2 = /^[A-Za-z_][A-Za-z0-9_]*=/;
-function withoutHeredocs(command) {
+var SEPARATORS2 = /* @__PURE__ */ new Set(["&&", "||", "|", "|&", ";", "&", "\n", "(", ")"]);
+var ASSIGNMENT3 = /^[A-Za-z_][A-Za-z0-9_]*=/;
+function withoutHeredocs2(command) {
   const out = [];
   let delimiter = null;
   for (const line of command.split("\n")) {
@@ -5088,8 +5446,8 @@ function withoutHeredocs(command) {
   }
   return out.join("\n");
 }
-__name(withoutHeredocs, "withoutHeredocs");
-function tokenize(command) {
+__name(withoutHeredocs2, "withoutHeredocs");
+function tokenize2(command) {
   const tokens2 = [];
   let current = "";
   let quote = null;
@@ -5126,14 +5484,14 @@ function tokenize(command) {
   flush();
   return tokens2;
 }
-__name(tokenize, "tokenize");
+__name(tokenize2, "tokenize");
 function subcommand(token) {
   return token && /^[a-z][a-z-]*$/.test(token) ? token : "other";
 }
 __name(subcommand, "subcommand");
 function callIn(segment) {
   let i = 0;
-  while (i < segment.length && (ASSIGNMENT2.test(segment[i] ?? "") || ["{", "time", "exec", "command", "env"].includes(segment[i] ?? ""))) i++;
+  while (i < segment.length && (ASSIGNMENT3.test(segment[i] ?? "") || ["{", "time", "exec", "command", "env"].includes(segment[i] ?? ""))) i++;
   const first = segment[i];
   if (first === "claude-referee") return subcommand(segment[i + 1]);
   if (first === "npx") {
@@ -5154,8 +5512,8 @@ __name(callIn, "callIn");
 function cliCallsIn(command) {
   const calls = [];
   let segment = [];
-  for (const token of [...tokenize(withoutHeredocs(command)), ";"]) {
-    if (!SEPARATORS.has(token)) {
+  for (const token of [...tokenize2(withoutHeredocs2(command)), ";"]) {
+    if (!SEPARATORS2.has(token)) {
       segment.push(token);
       continue;
     }
