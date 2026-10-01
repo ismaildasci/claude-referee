@@ -272,7 +272,7 @@ Registered in [done-v2-holdout4.md](decisions/done-v2-holdout4.md) before any re
 
 - **The registered check failed on all three counts:** 2 wrong `met` (rubocop with a baseline notice, p 0.91; sbt "No tests to run", p 0.72, both exit-code-only), `missing` found in 20 of 26 (0.77), `met` found in 12 of 21 (0.57).
 - Most misses are tools with no parser (Maven, `ctest`, `meson`, `deno`, `ava`, `rake test`, Gradle, `sbt`): every hold-out finds new tools.
-- After the first look: `met` is capped at `unsure` when the log says no tests ran (the sbt case moved to dev). 1 wrong `met` remains in the 46 left. A warning-words cap was considered and not applied (it would cost 7 of 15 true `met`).
+- After the first look: `met` is capped at `unsure` when the log says no tests ran (the sbt case moved to dev). 1 wrong `met` remains in the 46 left. A plain warning-words cap was considered and not applied (a recount over the recorded data finds 5 of 15, the earlier 7 was not reproducible). A narrower cap (exit-code-only evidence, a lint or clean criterion, a warning or notice message in the log) was then accepted by Jev at p 0.91 with both orders agreeing; on the recorded data it caps only the wrong `rubocop` case and loses 0 of 15 true `met` (fitted to that case, so not a clean test; see [the record](decisions/exit-code-only-met.md)). The case stays in this hold-out and the allowance of 1 is unchanged.
 - Limits: same model family writes and labels; invented outputs; one model version; the suite allows 1 wrong `met` because that is what was observed.
 
 ### done v2 on a third hold-out

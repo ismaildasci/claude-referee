@@ -1,6 +1,7 @@
 // done: does the check output show each criterion holds? One request; every criterion is a Noul on the same evidence.
 // Recognised runner output is parsed in code and only those facts reach Jev; unrecognised output can never become met.
 // A non-zero exit code in the evidence is missing without a request; skipped, risky or incomplete tests cap met at unsure.
+// Exit-code-only evidence for a lint or clean criterion that shows a warning or notice message is capped at unsure.
 
 import type { EntryType, Questions } from "@typesafe-ai/sdk";
 import { RefereeError } from "../../engine/errors.ts";
@@ -33,6 +34,16 @@ function hasSkips(parsed: ParsedEvidence): boolean {
 
 const UNPARSED_NEXT = 'No recognised runner summary or exit code in the evidence, so it cannot count as met. Pipe the runner\'s full output, or add an exit code line: { your-command; echo "exit code: $?"; } 2>&1 | claude-referee done --criteria "..."';
 
+const CLEAN_CRITERION = /\b(?:lint\w*|clean|warning[- ]?free|no warnings?)\b/i;
+const WARN_WORDS = /\b(?:warnings?|notices?|deprecat\w*)\b/i;
+const WARN_NEGATED = /\b(?:0|no|zero|without) (?:warnings?|notices?)\b/gi;
+const WARN_FLAG = /--?[\w-]*warn[\w-]*(?:[ =]\S+)?/gi;
+const WARNING_NEXT = "The log shows a warning or notice and only an exit code backs the lint criterion, so done won't say met. Pipe the linter's full summary, or say yourself that the warning is acceptable.";
+
+export function hasWarningMessage(evidence: string): boolean {
+  return WARN_WORDS.test(evidence.replace(WARN_FLAG, " ").replace(WARN_NEGATED, " "));
+}
+
 function factsOf(parsed: ParsedEvidence): Record<string, unknown> {
   return { trust: parsed.trust, exit_code: parsed.exit_code, exit_lines: parsed.exit_lines, runners: parsed.runners, conflict: parsed.conflict, lines: parsed.lines };
 }
@@ -59,18 +70,21 @@ export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, crit
   const met = threshold(pack, thresholds, "done.met", "met", 0.7);
   const missing = threshold(pack, thresholds, "done.met", "missing", 0.5);
   const finish = ([outcome]: Outcome[]): Result => {
-    const per = criteria.map((_, i) => {
+    const warnCap = parsed.trust === "exit_code" && hasWarningMessage(evidence);
+    const per = criteria.map((criterion, i) => {
       const answer = outcome?.answers?.[`c${i + 1}`];
       const p = answer?.type === "noul" ? answer.noul : 0;
       const raw: Verdict = p >= met ? "met" : p < missing ? "missing" : "unsure";
       const skipCap = raw === "met" && hasSkips(parsed);
       const noTestsCap = raw === "met" && NO_TESTS.test(evidence);
-      const verdict: Verdict = raw === "met" && (parsed.trust === "unparsed" || parsed.conflict || skipCap || noTestsCap) ? "unsure" : raw;
-      return { i: i + 1, verdict, p, skipCap, noTestsCap };
+      const warningCap = raw === "met" && warnCap && CLEAN_CRITERION.test(criterion);
+      const verdict: Verdict = raw === "met" && (parsed.trust === "unparsed" || parsed.conflict || skipCap || noTestsCap || warningCap) ? "unsure" : raw;
+      return { i: i + 1, verdict, p, skipCap, noTestsCap, warningCap };
     });
     const settled = per.every((c) => c.verdict !== "missing") && parsed.trust !== "unparsed" && !parsed.conflict;
     const noTestsCapped = settled && per.some((c) => c.noTestsCap);
     const skipCapped = settled && !noTestsCapped && per.some((c) => c.skipCap);
+    const warningCapped = settled && !noTestsCapped && !skipCapped && per.some((c) => c.warningCap);
     const verdict: Verdict = per.some((c) => c.verdict === "missing") ? "missing" : per.some((c) => c.verdict === "unsure") ? "unsure" : "met";
     return {
       ok: true,
@@ -79,9 +93,9 @@ export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, crit
       trust: parsed.trust,
       ...(parsed.exit_code !== null ? { exit_code: parsed.exit_code } : {}),
       ...(parsed.runners.length > 0 ? { runners: parsed.runners.map((r) => ({ runner: r.runner, passed: r.passed, failed: r.failed, errors: r.errors, skipped: r.skipped })) } : {}),
-      ...(noTestsCapped && verdict === "unsure" ? { reason: "no_tests_run" } : skipCapped && verdict === "unsure" ? { reason: "skipped_tests" } : {}),
+      ...(noTestsCapped && verdict === "unsure" ? { reason: "no_tests_run" } : skipCapped && verdict === "unsure" ? { reason: "skipped_tests" } : warningCapped && verdict === "unsure" ? { reason: "warning_in_log" } : {}),
       ...(per.length > 1 ? { criteria: per.map(({ i, verdict: v, p: pp }) => ({ i, verdict: v, p: pp })) } : {}),
-      next_step: verdict === "met" ? undefined : noTestsCapped && verdict === "unsure" ? NO_TESTS_NEXT : skipCapped && verdict === "unsure" ? SKIPPED_NEXT : parsed.trust === "unparsed" && per.every((c) => c.verdict !== "missing") ? UNPARSED_NEXT : NEXT[verdict],
+      next_step: verdict === "met" ? undefined : noTestsCapped && verdict === "unsure" ? NO_TESTS_NEXT : skipCapped && verdict === "unsure" ? SKIPPED_NEXT : warningCapped && verdict === "unsure" ? WARNING_NEXT : parsed.trust === "unparsed" && per.every((c) => c.verdict !== "missing") ? UNPARSED_NEXT : NEXT[verdict],
     };
   };
   const state = (parsed.trust === "unparsed" ? { evidence } : { evidence: factsOf(parsed) }) as EntryType;
@@ -100,7 +114,7 @@ export const done: Command = {
       verdict: "met, unsure or missing; the lowest across criteria",
       trust: "parsed (a runner summary was recognised), exit_code (only an exit code line) or unparsed (met is not possible)",
       runners: "Parsed counts per recognised runner",
-      reason: "exit_code_nonzero when the evidence has a non-zero exit code (missing, Jev not asked); skipped_tests or no_tests_run when met was capped at unsure because tests were skipped, risky or incomplete, or the log says no tests ran",
+      reason: "exit_code_nonzero when the evidence has a non-zero exit code (missing, Jev not asked); skipped_tests, no_tests_run or warning_in_log when met was capped at unsure because tests were skipped, risky or incomplete, the log says no tests ran, or a lint or clean criterion has only an exit code behind it and the log shows a warning or notice",
       p: "Lowest probability that a criterion holds",
       criteria: "Per criterion, by position, when more than one",
       next_step: "Only when not met",

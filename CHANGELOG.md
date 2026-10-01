@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Changed
+
+- `done` caps `met` at `unsure` (`reason: "warning_in_log"`) when the evidence is only an exit code line, the criterion is about lint or being clean, and the log shows a warning or notice message (flags such as `--max-warnings` and "0 warnings" do not count). Build, typecheck and test criteria are unaffected. Decided with Jev (p 0.91, both orders agreeing); on the recorded hold-outs it caps 1 wrong `met` and loses 0 true ones ([record](docs/decisions/exit-code-only-met.md)). The question "should an exit code alone ever give met" is closed: yes, except in that case.
+
 ### Added
 
 - `docs/verify-skill.md` and `docs/recipes/verify/SKILL.md`: a copyable project `verify` skill that pipes the test output to `claude-referee done` before a commit (Claude Code 2.1.286 guidance, cited in the page). The plugin does not install it; a test checks its frontmatter. The recipe appends an `exit code:` line, says what to do without a verdict (for example the pre-publish npx 404), and the page carries a not-on-npm note and a privacy note (test output is sent to the TypeSafe API).

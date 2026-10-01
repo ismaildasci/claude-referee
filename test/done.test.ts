@@ -326,3 +326,34 @@ test("a log that says '0 tests failed' or runs 10 tests is not read as no tests"
     await server.close();
   }
 });
+
+test("a lint criterion backed only by an exit code is capped at unsure when the log shows a warning or notice", async () => {
+  const evidence = "$ bundle exec rubocop\nNotice: .rubocop_todo.yml baseline in effect, 37 existing offenses are suppressed\n58 files inspected, no offenses detected\nrubocop exit code: 0\n";
+  const server = await fakeJev(nouls(0.97));
+  try {
+    const out = io(server, evidence);
+    await run(["done", "--criteria", "lint is clean", "--evidence", "-"], out, commands);
+    assert.equal(out.json()["verdict"], "unsure");
+    assert.equal(out.json()["reason"], "warning_in_log");
+  } finally {
+    await server.close();
+  }
+});
+
+test("the warning cap leaves build criteria, flags and zero-warning lines alone", async () => {
+  const cases: [string, string][] = [
+    ["the build succeeds", "src/a.cpp:1:1: warning: unused variable\ncmake exit code: 0\n"],
+    ["lint is clean", "$ npx eslint . --max-warnings 0\neslint exit code: 0\n"],
+    ["lint is clean", "0 warnings\nstylelint exit code: 0\n"],
+  ];
+  for (const [criterion, evidence] of cases) {
+    const server = await fakeJev(nouls(0.97));
+    try {
+      const out = io(server, evidence);
+      await run(["done", "--criteria", criterion, "--evidence", "-"], out, commands);
+      assert.equal(out.json()["verdict"], "met", evidence);
+    } finally {
+      await server.close();
+    }
+  }
+});
