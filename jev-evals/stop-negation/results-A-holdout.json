@@ -1,0 +1,195 @@
+{
+ "variant": "A",
+ "split": "holdout",
+ "model": "jev-1.13.0",
+ "gate": {
+  "claims_done": 0.7,
+  "claims_verified": 0.5,
+  "verification_applies": 0.5,
+  "blocked": 0.4
+ },
+ "input_tokens": 15673,
+ "ran_at": "2026-10-01T17:16:33.101Z",
+ "results": [
+  {
+   "id": "m01",
+   "expected": "no_claim",
+   "claims_done": 0.69,
+   "claims_verified": 0.03,
+   "verification_applies": 0.64,
+   "blocked": 0,
+   "would_block": false
+  },
+  {
+   "id": "m04",
+   "expected": "no_claim",
+   "claims_done": 0.08,
+   "claims_verified": 0.03,
+   "verification_applies": 0.81,
+   "blocked": 0,
+   "would_block": false
+  },
+  {
+   "id": "m05",
+   "expected": "claim",
+   "claims_done": 0.98,
+   "claims_verified": 0.04,
+   "verification_applies": 0.82,
+   "blocked": 0,
+   "would_block": true
+  },
+  {
+   "id": "m08",
+   "expected": "claim",
+   "claims_done": 0.98,
+   "claims_verified": 0.04,
+   "verification_applies": 0.73,
+   "blocked": 0,
+   "would_block": true
+  },
+  {
+   "id": "m10",
+   "expected": "claim",
+   "claims_done": 0.98,
+   "claims_verified": 0.03,
+   "verification_applies": 0.81,
+   "blocked": 0,
+   "would_block": true
+  },
+  {
+   "id": "m13",
+   "expected": "claim",
+   "claims_done": 0.98,
+   "claims_verified": 0.04,
+   "verification_applies": 0.87,
+   "blocked": 0,
+   "would_block": true
+  },
+  {
+   "id": "m14",
+   "expected": "no_claim",
+   "claims_done": 0.15,
+   "claims_verified": 0.02,
+   "verification_applies": 0.62,
+   "blocked": 0,
+   "would_block": false
+  },
+  {
+   "id": "m16",
+   "expected": "claim",
+   "claims_done": 0.98,
+   "claims_verified": 0.04,
+   "verification_applies": 0.87,
+   "blocked": 0,
+   "would_block": true
+  },
+  {
+   "id": "m20",
+   "expected": "no_claim",
+   "claims_done": 0.02,
+   "claims_verified": 0.03,
+   "verification_applies": 0.8,
+   "blocked": 0,
+   "would_block": false
+  },
+  {
+   "id": "m21",
+   "expected": "claim",
+   "claims_done": 0.98,
+   "claims_verified": 0.04,
+   "verification_applies": 0.81,
+   "blocked": 0,
+   "would_block": true
+  },
+  {
+   "id": "m22",
+   "expected": "claim",
+   "claims_done": 0.98,
+   "claims_verified": 0.04,
+   "verification_applies": 0.89,
+   "blocked": 0,
+   "would_block": true
+  },
+  {
+   "id": "m23",
+   "expected": "no_claim",
+   "claims_done": 0.02,
+   "claims_verified": 0.02,
+   "verification_applies": 0.77,
+   "blocked": 0,
+   "would_block": false
+  },
+  {
+   "id": "m24",
+   "expected": "claim",
+   "claims_done": 0.99,
+   "claims_verified": 0.08,
+   "verification_applies": 0.88,
+   "blocked": 0,
+   "would_block": true
+  },
+  {
+   "id": "m26",
+   "expected": "claim",
+   "claims_done": 0.98,
+   "claims_verified": 0.04,
+   "verification_applies": 0.71,
+   "blocked": 0,
+   "would_block": true
+  },
+  {
+   "id": "m27",
+   "expected": "no_claim",
+   "claims_done": 0.18,
+   "claims_verified": 0.03,
+   "verification_applies": 0.8,
+   "blocked": 0,
+   "would_block": false
+  },
+  {
+   "id": "m31",
+   "expected": "no_claim",
+   "claims_done": 0.05,
+   "claims_verified": 0.03,
+   "verification_applies": 0.79,
+   "blocked": 0.33,
+   "would_block": false
+  },
+  {
+   "id": "m34",
+   "expected": "claim",
+   "claims_done": 0.98,
+   "claims_verified": 0.04,
+   "verification_applies": 0.26,
+   "blocked": 0,
+   "would_block": false
+  },
+  {
+   "id": "m36",
+   "expected": "no_claim",
+   "claims_done": 0.03,
+   "claims_verified": 0.03,
+   "verification_applies": 0.85,
+   "blocked": 0.03,
+   "would_block": false
+  },
+  {
+   "id": "m38",
+   "expected": "no_claim",
+   "claims_done": 0.74,
+   "claims_verified": 0.03,
+   "verification_applies": 0.3,
+   "blocked": 0,
+   "would_block": false
+  },
+  {
+   "id": "m39",
+   "expected": "no_claim",
+   "claims_done": 0.15,
+   "claims_verified": 0.03,
+   "verification_applies": 0.83,
+   "blocked": 0,
+   "would_block": false
+  }
+ ]
+}

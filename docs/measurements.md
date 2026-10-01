@@ -124,7 +124,7 @@ Setup: `done --criteria "all tests pass"` on 33 failing or unfinished test logs,
 ## Not measured yet
 
 - Whether claude-referee lowers the total cost of a task. The A/B planned for v0.4 will be pre-registered in `bench/PREREG.md` before its first run.
-- How the earlier kit's `done` thresholds perform on held-out cases. They were chosen on the same 25 cases they were scored on, so its 24 of 25 is in-sample. `done` v2 has its own held-out result, below. The Stop done-gate has none yet.
+- How the earlier kit's `done` thresholds perform on held-out cases. They were chosen on the same 25 cases they were scored on, so its 24 of 25 is in-sample. `done` v2 has its own held-out result, below. The Stop done-gate has no measurement on real turns yet; its wording on invented negated sentences is [below](#the-stop-gate-on-negated-sentences).
 
 ## Measured with claude-referee itself
 
@@ -258,6 +258,10 @@ Registered in [done-v2-holdout2.md](decisions/done-v2-holdout2.md) before any re
 - Limits: the same model family wrote and labelled the cases; invented outputs may not match real tool versions; one model version; the suite allows 1 wrong `met` only because that is what was observed.
 - **After the first look:** two parsers were added (Python `unittest`, `cargo clippy` with a `warnings` fact) and the four cases they changed moved to `dev`; the clippy warning case went from p 0.90 to 0.15 and the `unittest` run with skips from 0.26 to 0.74. The 41 cases that stayed have no wrong `met` (11 `met`, 4 `unsure`, 26 `missing`), as a regression check, not a pass; see [the record](decisions/done-v2-holdout2.md).
 - Related: `eval` now applies the exit-code rule the way `done` does, so a non-zero exit code is `missing` in code in both; the first hold-out and dev numbers did not change.
+
+### The Stop gate on negated sentences
+
+Registered in [stop-negation.md](decisions/stop-negation.md) before any request. `scripts/stop-wording.mjs`, `jev-1.13.0`, 2026-10-01: 40 invented final messages (20 that only say what was not run, tested or committed, 20 done-claims), two labellers agreeing 40 of 40, dev and hold-out of 20 each. The current `stop.*` wording blocked 0 of 10 negated messages on dev and 0 of 10 on the hold-out, and 10 of 10 and 9 of 10 true done-claims (the one miss is a README edit, let through by `verification_applies`). The registered screen stopped there: no wording variant was run on the hold-out and nothing changed. Two of the 20 negated messages came near the `claims_done` threshold (0.74, saved by `verification_applies` 0.3, and 0.69). Limits: invented, English, one model family writes and labels, empty `checks`, 10 cases per class per split; it says nothing about the real turns that prompted it. Cases and answers: [jev-evals/stop-negation](../jev-evals/stop-negation/).
 
 ### claims on Turkish sources
 
