@@ -13,7 +13,7 @@ import { FAKE, memoryIo, tempDir } from "./helpers.ts";
 async function call(args: string[], answer: Answerer, stdin = "", cwd?: string, behave?: (r: FakeRequest) => Behaviour | undefined) {
   const server = await fakeJev(answer, behave ? { behave } : {});
   try {
-    const io = memoryIo({ stdin, env: { TYPESAFE_API_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: tempDir() }, ...(cwd ? { cwd } : {}) });
+    const io = memoryIo({ stdin, env: { TYPESAFE_API_KEY: "ts_test", REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: tempDir() }, ...(cwd ? { cwd } : {}) });
     const code = await run(args, io, commands);
     return { code, out: io.json(), requests: server.requests };
   } finally {
@@ -144,7 +144,7 @@ test("judge prints the whole result when the details file can't be written", asy
   const items = Array.from({ length: 25 }, (_, i) => ({ id: `item-${"x".repeat(80)}-${i}`, text: `rm -rf /tmp/${i}` }));
   const server = await fakeJev((r) => Object.fromEntries(Object.keys(r.questions).map((id) => [id, { type: "noul", noul: 0.95 }])));
   try {
-    const io = memoryIo({ stdin: JSON.stringify(items), env: { TYPESAFE_API_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: join(blocker, "data") } });
+    const io = memoryIo({ stdin: JSON.stringify(items), env: { TYPESAFE_API_KEY: "ts_test", REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: join(blocker, "data") } });
     assert.equal(await run(["judge", "--question", "line.risky", "--items", "-"], io, commands), 0);
     const out = io.json();
     assert.equal(out["verdict"], "flagged");

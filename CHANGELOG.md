@@ -9,6 +9,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - A timeout or abort that fires after the API's headers have arrived no longer kills the CLI and the hooks with an uncaught `AbortError` or `TimeoutError` and no output. The SDK (0.6.0) leaves that rejection behind; only those two are ignored, the command now ends with its JSON `timeout` line. Checked on Node 22 only.
 - A PHPUnit `Tests: 45, Assertions: 90` line was read as a jest summary, which put a phantom `jest 0/0/0/0` runner next to `phpunit` in the facts sent to Jev. The jest parser now needs a `passed`, `failed`, `skipped`, `todo` or `total` count on its `Tests:` line. 4 `done-v2` cases whose evidence changed were re-recorded; no wrong `met`, and the held-out counts did not move (15 of 18 `met`, 27 of 30 `missing`).
 - A probability exactly on a band is no longer pushed over it by float arithmetic: `judge` now counts 0.10 as `no` at the 0.9 band (`1 - 0.9` is 0.0999...8 in JavaScript), and `decide` counts a margin of exactly 0.1 as `weak` instead of a tie.
+- The TypeSafe key is sent only to `https://api.typesafe.ai`. A `TYPESAFE_BASE_URL` pointing elsewhere (for example set by a project's `.claude/settings.json` `env`) used to receive it; now it needs its own `REFEREE_BASE_URL_KEY`, and without one no request is made and `doctor` says why. The three live-check scripts follow the same rule.
 
 ## [0.1.3] - 2026-10-01
 

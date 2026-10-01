@@ -5,7 +5,7 @@ import { listModels } from "../../engine/client.ts";
 import { DEFAULT_BASE_URL, PROFILES, VERSION, resolveModel } from "../../engine/config.ts";
 import { dirSize, resolveDataDir, tildify } from "../../engine/datadir.ts";
 import { isRefereeError } from "../../engine/errors.ts";
-import { noKeyNextStep, resolveKey, runCommand, type KeySource } from "../../engine/key.ts";
+import { isTypeSafeHost, noKeyNextStep, resolveEndpointKey, runCommand, type KeySource } from "../../engine/key.ts";
 import { listPacks, packDirs } from "../../engine/pack.ts";
 import { findProjectFile } from "../../engine/project.ts";
 import type { Command } from "../types.ts";
@@ -39,7 +39,7 @@ export const doctor: Command = {
     inputs: { "--online": "Also list the models the key can use (one free API call)." },
     outputs: {
       verdict: "ready or not_ready",
-      key_source: "Where the key was found: plugin_setting, TYPESAFE_API_KEY, EVAL_TYPESAFE_API_KEY, TYPESAFE_API_KEY_CMD or keychain. Never the key.",
+      key_source: "Where the key was found: REFEREE_BASE_URL_KEY (only for another host), plugin_setting, TYPESAFE_API_KEY, EVAL_TYPESAFE_API_KEY, TYPESAFE_API_KEY_CMD or keychain. Never the key.",
       packs: "Installed packs with version, content hash and source.",
       base_url: "Only when TYPESAFE_BASE_URL points somewhere other than the default; credentials and query are removed.",
       next_step: "What to fix when not ready.",
@@ -56,7 +56,7 @@ export const doctor: Command = {
     let keyError: string | null = null;
     let key: string | null = null;
     try {
-      const resolved = await resolveKey(io.env, io.platform);
+      const resolved = await resolveEndpointKey(io.env, io.platform);
       keySource = resolved.source;
       key = resolved.key;
     } catch (error) {
@@ -78,7 +78,9 @@ export const doctor: Command = {
     const ready = nodeOk(node) && keySource !== null && (online === null || online === "ok");
     const nextStep = !nodeOk(node)
       ? "Install Node 20.3 or later on the PATH Claude Code uses."
-      : keyError === "no_api_key"
+      : keyError === "no_api_key" && !isTypeSafeHost(io.env["TYPESAFE_BASE_URL"])
+        ? "TYPESAFE_BASE_URL points away from api.typesafe.ai: set REFEREE_BASE_URL_KEY to that host's key, or unset TYPESAFE_BASE_URL. The TypeSafe key is never sent there."
+        : keyError === "no_api_key"
         ? noKeyNextStep(io.platform)
         : keyError
           ? "The stored key is malformed; store it again."

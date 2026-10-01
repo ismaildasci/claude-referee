@@ -21,6 +21,11 @@ if (!Number.isFinite(tieMargin) || tieMargin < 0) {
 }
 
 function apiKey() {
+  const own = process.env.REFEREE_BASE_URL_KEY?.trim();
+  if (!/^https:\/\/api\.typesafe\.ai(\/|$)/.test(BASE)) {
+    if (own) return own;
+    throw new Error("TYPESAFE_BASE_URL points away from api.typesafe.ai: set REFEREE_BASE_URL_KEY; the TypeSafe key is never sent to another host.");
+  }
   const fromEnv = process.env.TYPESAFE_API_KEY?.trim();
   if (fromEnv) return fromEnv;
   return execFileSync("security", ["find-generic-password", "-s", "TYPESAFE_API_KEY", "-w"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();

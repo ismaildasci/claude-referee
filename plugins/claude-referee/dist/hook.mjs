@@ -1357,6 +1357,26 @@ async function resolveKey(env, platform, runner = runCommand, memo = processMemo
   throw new RefereeError("no_api_key", "No TypeSafe API key found.", { next_step: noKeyNextStep(platform) });
 }
 __name(resolveKey, "resolveKey");
+function isTypeSafeHost(baseUrl) {
+  const raw = baseUrl?.trim();
+  if (!raw) return true;
+  try {
+    const url = new URL(raw);
+    return url.protocol === "https:" && url.hostname === "api.typesafe.ai" && url.port === "";
+  } catch {
+    return false;
+  }
+}
+__name(isTypeSafeHost, "isTypeSafeHost");
+async function resolveEndpointKey(env, platform, runner = runCommand, memo = processMemo) {
+  if (isTypeSafeHost(env["TYPESAFE_BASE_URL"])) return resolveKey(env, platform, runner, memo);
+  const own = env["REFEREE_BASE_URL_KEY"];
+  if (own?.trim()) return { key: validateKey(own, "REFEREE_BASE_URL_KEY"), source: "REFEREE_BASE_URL_KEY" };
+  throw new RefereeError("no_api_key", "TYPESAFE_BASE_URL points away from api.typesafe.ai, and the TypeSafe key is never sent to another host.", {
+    next_step: "Set REFEREE_BASE_URL_KEY to the key for that host, or unset TYPESAFE_BASE_URL."
+  });
+}
+__name(resolveEndpointKey, "resolveEndpointKey");
 
 // src/engine/redact.ts
 var STOP = [
@@ -1611,7 +1631,7 @@ var Session = class {
     if (breakerSession && breakerOpen(this.dataDir, breakerSession)) {
       throw new RefereeError("breaker_open", "Skipped: Jev failed three times in a row in this session.", { next_step: "Hooks skip Jev until the session ends; the CLI still calls it." });
     }
-    this.keyPromise ??= resolveKey(this.options.env, this.options.platform);
+    this.keyPromise ??= resolveEndpointKey(this.options.env, this.options.platform);
     const { key: apiKey } = await this.keyPromise;
     let reply;
     try {

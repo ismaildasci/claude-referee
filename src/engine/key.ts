@@ -1,11 +1,12 @@
 // API key lookup: plugin setting, TYPESAFE_API_KEY, EVAL_TYPESAFE_API_KEY, TYPESAFE_API_KEY_CMD, macOS Keychain.
+// The TypeSafe key goes only to https://api.typesafe.ai; another TYPESAFE_BASE_URL needs its own REFEREE_BASE_URL_KEY.
 // The key command is read only from the process environment and runs once, without a shell, within 5 s.
 
 import { execFile } from "node:child_process";
 import type { Env } from "./config.ts";
 import { RefereeError } from "./errors.ts";
 
-export type KeySource = "plugin_setting" | "TYPESAFE_API_KEY" | "EVAL_TYPESAFE_API_KEY" | "TYPESAFE_API_KEY_CMD" | "keychain";
+export type KeySource = "REFEREE_BASE_URL_KEY" | "plugin_setting" | "TYPESAFE_API_KEY" | "EVAL_TYPESAFE_API_KEY" | "TYPESAFE_API_KEY_CMD" | "keychain";
 
 export interface ResolvedKey {
   readonly key: string;
@@ -95,4 +96,24 @@ export async function resolveKey(env: Env, platform: NodeJS.Platform, runner: Ru
     if (out?.trim()) return { key: validateKey(out, "keychain"), source: "keychain" };
   }
   throw new RefereeError("no_api_key", "No TypeSafe API key found.", { next_step: noKeyNextStep(platform) });
+}
+
+export function isTypeSafeHost(baseUrl: string | undefined): boolean {
+  const raw = baseUrl?.trim();
+  if (!raw) return true;
+  try {
+    const url = new URL(raw);
+    return url.protocol === "https:" && url.hostname === "api.typesafe.ai" && url.port === "";
+  } catch {
+    return false;
+  }
+}
+
+export async function resolveEndpointKey(env: Env, platform: NodeJS.Platform, runner: Runner = runCommand, memo = processMemo): Promise<ResolvedKey> {
+  if (isTypeSafeHost(env["TYPESAFE_BASE_URL"])) return resolveKey(env, platform, runner, memo);
+  const own = env["REFEREE_BASE_URL_KEY"];
+  if (own?.trim()) return { key: validateKey(own, "REFEREE_BASE_URL_KEY"), source: "REFEREE_BASE_URL_KEY" };
+  throw new RefereeError("no_api_key", "TYPESAFE_BASE_URL points away from api.typesafe.ai, and the TypeSafe key is never sent to another host.", {
+    next_step: "Set REFEREE_BASE_URL_KEY to the key for that host, or unset TYPESAFE_BASE_URL.",
+  });
 }

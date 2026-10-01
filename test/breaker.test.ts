@@ -38,7 +38,7 @@ function hookSession(url: string, dataDir: string, sessionId: string): Session {
   const home = tempDir("referee-home-");
   return new Session({
     command: "hook",
-    env: { TYPESAFE_API_KEY: "ts_test_key", TYPESAFE_BASE_URL: url },
+    env: { TYPESAFE_API_KEY: "ts_test_key", REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: url },
     cwd: home,
     home,
     platform: "linux",
@@ -80,7 +80,7 @@ test("the CLI profile never uses the breaker", async () => {
   try {
     for (let i = 0; i < 3; i++) recordBreaker(dataDir, "s1", false, NOW);
     const home = tempDir("referee-home-");
-    const cli = new Session({ command: "done", env: { TYPESAFE_API_KEY: "ts_test_key", TYPESAFE_BASE_URL: server.url }, cwd: home, home, platform: "linux", now: () => NOW, pack: { name: "generic", version: "0.1.0" }, dataDir, sessionId: "s1" });
+    const cli = new Session({ command: "done", env: { TYPESAFE_API_KEY: "ts_test_key", REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: server.url }, cwd: home, home, platform: "linux", now: () => NOW, pack: { name: "generic", version: "0.1.0" }, dataDir, sessionId: "s1" });
     assert.notEqual(await errorCode(cli.run([planned])), "breaker_open");
     assert.ok(server.requests.length >= 1);
   } finally {

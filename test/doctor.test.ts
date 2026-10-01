@@ -31,7 +31,7 @@ test("doctor without a key is not ready and says how to add one", async () => {
 test("doctor --online checks the key by listing models", async () => {
   const server = await fakeJev();
   try {
-    const io = memoryIo({ env: { TYPESAFE_API_KEY: "ts_test", TYPESAFE_BASE_URL: server.url } });
+    const io = memoryIo({ env: { TYPESAFE_API_KEY: "ts_test", REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: server.url } });
     await run(["doctor", "--online"], io, commands);
     assert.deepEqual(io.json()["models"], ["jev-latest"]);
   } finally {
@@ -39,7 +39,7 @@ test("doctor --online checks the key by listing models", async () => {
   }
   const bad = await fakeJev(undefined, { status: 401 });
   try {
-    const io = memoryIo({ env: { TYPESAFE_API_KEY: "ts_test", TYPESAFE_BASE_URL: bad.url } });
+    const io = memoryIo({ env: { TYPESAFE_API_KEY: "ts_test", REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: bad.url } });
     await run(["doctor", "--online"], io, commands);
     assert.equal(io.json()["online"], "auth_failed");
     assert.equal(io.json()["verdict"], "not_ready");
@@ -49,13 +49,23 @@ test("doctor --online checks the key by listing models", async () => {
 });
 
 test("doctor shows a non-default base URL without credentials, and hides the default", async () => {
-  const custom = memoryIo({ env: { TYPESAFE_API_KEY: "ts_test", TYPESAFE_BASE_URL: "https://user:hunter2secret@proxy.example.com:8443/jev/" } });
+  const custom = memoryIo({ env: { TYPESAFE_API_KEY: "ts_test", REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: "https://user:hunter2secret@proxy.example.com:8443/jev/" } });
   await run(["doctor"], custom, commands);
   assert.equal(custom.json()["base_url"], "https://proxy.example.com:8443/jev");
   assert.ok(!custom.out.join("").includes("hunter2secret"));
   for (const value of [undefined, "https://api.typesafe.ai", "https://api.typesafe.ai/"]) {
-    const io = memoryIo({ env: { TYPESAFE_API_KEY: "ts_test", ...(value ? { TYPESAFE_BASE_URL: value } : {}) } });
+    const io = memoryIo({ env: { TYPESAFE_API_KEY: "ts_test", ...(value ? { REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: value } : {}) } });
     await run(["doctor"], io, commands);
     assert.equal(io.json()["base_url"], undefined, String(value));
   }
+});
+
+test("doctor with another host and only the TypeSafe key is not ready and names REFEREE_BASE_URL_KEY", async () => {
+  const io = memoryIo({ platform: "linux", env: { TYPESAFE_API_KEY: "ts_test_1234567890", TYPESAFE_BASE_URL: "https://proxy.example.test" } });
+  assert.equal(await run(["doctor"], io, commands), 0);
+  const out = io.json();
+  assert.equal(out["verdict"], "not_ready");
+  assert.equal(out["key_source"], null);
+  assert.match(String(out["next_step"]), /REFEREE_BASE_URL_KEY/);
+  assert.ok(!io.out.join("").includes("ts_test_1234567890"));
 });

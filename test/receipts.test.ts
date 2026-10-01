@@ -13,7 +13,7 @@ test("receipts sums this project's runs, per day with --tokens, and exports them
   const server = await fakeJev();
   const dataDir = tempDir();
   const cwd = tempDir();
-  const env = { TYPESAFE_API_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: dataDir };
+  const env = { TYPESAFE_API_KEY: "ts_test", REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: dataDir };
   try {
     for (const flags of [[], [], ["--fresh"]]) {
       await run(["done", "--criteria", "tests pass", ...flags], memoryIo({ env, cwd, stdin: "PASS private-evidence-text" }), commands);

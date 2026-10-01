@@ -12,7 +12,7 @@ import { memoryIo, secretsFile, tempDir } from "./helpers.ts";
 const nouls = (p: number) => (request: FakeRequest) => Object.fromEntries(Object.keys(request.questions).map((id) => [id, { type: "noul", noul: p }]));
 
 function io(server: FakeJev | null, stdin: string, dataDir = tempDir()) {
-  return memoryIo({ stdin, env: { TYPESAFE_API_KEY: "ts_test", ...(server ? { TYPESAFE_BASE_URL: server.url } : {}), REFEREE_DATA_DIR: dataDir } });
+  return memoryIo({ stdin, env: { TYPESAFE_API_KEY: "ts_test", ...(server ? { REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: server.url } : {}), REFEREE_DATA_DIR: dataDir } });
 }
 
 test("done bands: met, unsure and missing all exit 0", async () => {
@@ -124,7 +124,7 @@ test("done with credentials in the evidence sends nothing and prints no secret",
 test("done sends the model named in REFEREE_MODEL", async () => {
   const server = await fakeJev(nouls(0.9));
   try {
-    const out = memoryIo({ stdin: "Tests: 3 passed", env: { TYPESAFE_API_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: tempDir(), REFEREE_MODEL: "jev-9.9.9" } });
+    const out = memoryIo({ stdin: "Tests: 3 passed", env: { TYPESAFE_API_KEY: "ts_test", REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: tempDir(), REFEREE_MODEL: "jev-9.9.9" } });
     assert.equal(await run(["done", "--criteria", "all tests pass"], out, commands), 0);
     assert.equal(server.requests[0]?.model, "jev-9.9.9");
   } finally {

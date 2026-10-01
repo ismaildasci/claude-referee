@@ -1362,6 +1362,26 @@ async function resolveKey(env, platform, runner = runCommand, memo = processMemo
   throw new RefereeError("no_api_key", "No TypeSafe API key found.", { next_step: noKeyNextStep(platform) });
 }
 __name(resolveKey, "resolveKey");
+function isTypeSafeHost(baseUrl) {
+  const raw = baseUrl?.trim();
+  if (!raw) return true;
+  try {
+    const url = new URL(raw);
+    return url.protocol === "https:" && url.hostname === "api.typesafe.ai" && url.port === "";
+  } catch {
+    return false;
+  }
+}
+__name(isTypeSafeHost, "isTypeSafeHost");
+async function resolveEndpointKey(env, platform, runner = runCommand, memo = processMemo) {
+  if (isTypeSafeHost(env["TYPESAFE_BASE_URL"])) return resolveKey(env, platform, runner, memo);
+  const own = env["REFEREE_BASE_URL_KEY"];
+  if (own?.trim()) return { key: validateKey(own, "REFEREE_BASE_URL_KEY"), source: "REFEREE_BASE_URL_KEY" };
+  throw new RefereeError("no_api_key", "TYPESAFE_BASE_URL points away from api.typesafe.ai, and the TypeSafe key is never sent to another host.", {
+    next_step: "Set REFEREE_BASE_URL_KEY to the key for that host, or unset TYPESAFE_BASE_URL."
+  });
+}
+__name(resolveEndpointKey, "resolveEndpointKey");
 
 // src/engine/receipts.ts
 import { appendFileSync, existsSync as existsSync3, mkdirSync as mkdirSync4, readdirSync as readdirSync3, readFileSync as readFileSync5 } from "node:fs";
@@ -1666,7 +1686,7 @@ var Session = class {
     if (breakerSession && breakerOpen(this.dataDir, breakerSession)) {
       throw new RefereeError("breaker_open", "Skipped: Jev failed three times in a row in this session.", { next_step: "Hooks skip Jev until the session ends; the CLI still calls it." });
     }
-    this.keyPromise ??= resolveKey(this.options.env, this.options.platform);
+    this.keyPromise ??= resolveEndpointKey(this.options.env, this.options.platform);
     const { key: apiKey } = await this.keyPromise;
     let reply;
     try {
@@ -2059,7 +2079,7 @@ var doctor = {
     inputs: { "--online": "Also list the models the key can use (one free API call)." },
     outputs: {
       verdict: "ready or not_ready",
-      key_source: "Where the key was found: plugin_setting, TYPESAFE_API_KEY, EVAL_TYPESAFE_API_KEY, TYPESAFE_API_KEY_CMD or keychain. Never the key.",
+      key_source: "Where the key was found: REFEREE_BASE_URL_KEY (only for another host), plugin_setting, TYPESAFE_API_KEY, EVAL_TYPESAFE_API_KEY, TYPESAFE_API_KEY_CMD or keychain. Never the key.",
       packs: "Installed packs with version, content hash and source.",
       base_url: "Only when TYPESAFE_BASE_URL points somewhere other than the default; credentials and query are removed.",
       next_step: "What to fix when not ready."
@@ -2076,7 +2096,7 @@ var doctor = {
     let keyError = null;
     let key = null;
     try {
-      const resolved = await resolveKey(io.env, io.platform);
+      const resolved = await resolveEndpointKey(io.env, io.platform);
       keySource = resolved.source;
       key = resolved.key;
     } catch (error) {
@@ -2096,7 +2116,7 @@ var doctor = {
     const dataDir = resolveDataDir(io.env, io.home, io.cwd, flags.dataDir);
     const projectFile = findProjectFile(io.cwd);
     const ready = nodeOk(node) && keySource !== null && (online === null || online === "ok");
-    const nextStep = !nodeOk(node) ? "Install Node 20.3 or later on the PATH Claude Code uses." : keyError === "no_api_key" ? noKeyNextStep(io.platform) : keyError ? "The stored key is malformed; store it again." : online && online !== "ok" ? `The key check failed (${online}).` : void 0;
+    const nextStep = !nodeOk(node) ? "Install Node 20.3 or later on the PATH Claude Code uses." : keyError === "no_api_key" && !isTypeSafeHost(io.env["TYPESAFE_BASE_URL"]) ? "TYPESAFE_BASE_URL points away from api.typesafe.ai: set REFEREE_BASE_URL_KEY to that host's key, or unset TYPESAFE_BASE_URL. The TypeSafe key is never sent there." : keyError === "no_api_key" ? noKeyNextStep(io.platform) : keyError ? "The stored key is malformed; store it again." : online && online !== "ok" ? `The key check failed (${online}).` : void 0;
     return {
       ok: true,
       verdict: ready ? "ready" : "not_ready",

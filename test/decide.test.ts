@@ -38,7 +38,7 @@ const firstWins: Answerer = (r) => {
 async function decideWith(answer: Answerer, input: unknown, cwd?: string) {
   const server = await fakeJev(answer);
   try {
-    const io = memoryIo({ stdin: JSON.stringify(input), env: { TYPESAFE_API_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: tempDir() }, ...(cwd ? { cwd } : {}) });
+    const io = memoryIo({ stdin: JSON.stringify(input), env: { TYPESAFE_API_KEY: "ts_test", REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: tempDir() }, ...(cwd ? { cwd } : {}) });
     const code = await run(["decide"], io, commands);
     return { code, out: io.json(), line: io.out.join("").trim(), requests: server.requests };
   } finally {
@@ -114,7 +114,7 @@ test("decide never sends the home directory in context file paths", async () => 
   const server = await fakeJev(favour({ redis: 0.9, memory: 0.1 }));
   try {
     const input = { decision: "d", options: OPTIONS.slice(0, 2), context_files: [join(cwd, "adr.md")] };
-    const io = memoryIo({ stdin: JSON.stringify(input), home, cwd, env: { TYPESAFE_API_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: tempDir() } });
+    const io = memoryIo({ stdin: JSON.stringify(input), home, cwd, env: { TYPESAFE_API_KEY: "ts_test", REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: tempDir() } });
     assert.equal(await run(["decide"], io, commands), 0);
     for (const r of server.requests) assert.ok(!JSON.stringify(r).includes(home), JSON.stringify(r.state));
     assert.deepEqual(Object.keys((server.requests[0]?.state as { context_files: object }).context_files), ["~/app/adr.md"]);
@@ -149,7 +149,7 @@ test("decide uses a pack's decide.micro questions when the input has none; bad: 
   const server = await fakeJev(answer);
   try {
     const input = { decision: "d", options: OPTIONS.slice(0, 2) };
-    const io = memoryIo({ stdin: JSON.stringify(input), env: { TYPESAFE_API_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: tempDir(), REFEREE_PACKS_DIR: packs } });
+    const io = memoryIo({ stdin: JSON.stringify(input), env: { TYPESAFE_API_KEY: "ts_test", REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: tempDir(), REFEREE_PACKS_DIR: packs } });
     assert.equal(await run(["decide", "--pack", "micro-test"], io, commands), 0);
     assert.equal(server.requests.length, 4);
     assert.deepEqual(Object.keys(server.requests[2]?.questions ?? {}), ["stateless", "risky"]);

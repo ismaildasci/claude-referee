@@ -15,7 +15,7 @@ function session(server: FakeJev | null, dataDir: string, extra: { fresh?: boole
   const home = tempDir("referee-home-");
   return new Session({
     command: "test",
-    env: { TYPESAFE_API_KEY: "ts_test_key", ...(server ? { TYPESAFE_BASE_URL: server.url } : {}) },
+    env: { TYPESAFE_API_KEY: "ts_test_key", ...(server ? { REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: server.url } : {}) },
     cwd: home,
     home,
     platform: "linux",

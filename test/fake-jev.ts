@@ -21,6 +21,7 @@ export interface Behaviour {
 export interface FakeJev {
   readonly url: string;
   readonly requests: FakeRequest[];
+  readonly authorizations: string[];
   close(): Promise<void>;
 }
 
@@ -53,6 +54,7 @@ export async function fakeJev(
   options: { hang?: boolean; status?: number; retryAfter?: string; behave?: (request: FakeRequest) => Behaviour | undefined } = {},
 ): Promise<FakeJev> {
   const requests: FakeRequest[] = [];
+  const authorizations: string[] = [];
   const server: Server = createServer(async (req, res) => {
     if (req.method === "GET") {
       res.writeHead(options.status ?? 200, { "content-type": "application/json" });
@@ -61,6 +63,7 @@ export async function fakeJev(
     }
     const body = JSON.parse(await readBody(req)) as FakeRequest;
     requests.push(body);
+    authorizations.push(String(req.headers.authorization ?? ""));
     const behaviour = options.behave?.(body) ?? options;
     if (behaviour.hang) return;
     if (behaviour.status) {
@@ -76,6 +79,7 @@ export async function fakeJev(
   return {
     url: `http://127.0.0.1:${port}`,
     requests,
+    authorizations,
     close: () =>
       new Promise<void>((resolve) => {
         server.closeAllConnections();

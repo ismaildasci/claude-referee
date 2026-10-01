@@ -658,7 +658,7 @@ async function withMock<T>(fn: (base: string, requests: () => number) => Promise
 
 function runCli(args: string[], base: string): Promise<{ code: number | null; stdout: string; stderr: string }> {
   return new Promise((done, fail) => {
-    const child = spawn(process.execPath, [script, ...args], { cwd: repo, env: { PATH: process.env.PATH ?? "", TYPESAFE_BASE_URL: base, TYPESAFE_API_KEY: "test-key" } });
+    const child = spawn(process.execPath, [script, ...args], { cwd: repo, env: { PATH: process.env.PATH ?? "", REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: base, TYPESAFE_API_KEY: "test-key" } });
     let stdout = "";
     let stderr = "";
     child.stdout.on("data", (chunk) => (stdout += chunk));

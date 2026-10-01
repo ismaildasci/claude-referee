@@ -9,7 +9,7 @@ import { callJev, type Answer, type JevReply } from "./client.ts";
 import { BATCH_DEADLINE_MS, CACHE_TTL_MS, PROFILES, costUsd, estimateTokens, resolveModel, type Env } from "./config.ts";
 import { resolveDataDir, projectId } from "./datadir.ts";
 import { RefereeError, isRefereeError, type ErrorCode } from "./errors.ts";
-import { resolveKey, type ResolvedKey } from "./key.ts";
+import { resolveEndpointKey, type ResolvedKey } from "./key.ts";
 import { appendReceipt, newReceiptId, type Receipt } from "./receipts.ts";
 import { redact, stopError, type PackPatterns, type Stop } from "./redact.ts";
 
@@ -186,7 +186,7 @@ export class Session {
     if (breakerSession && breakerOpen(this.dataDir, breakerSession)) {
       throw new RefereeError("breaker_open", "Skipped: Jev failed three times in a row in this session.", { next_step: "Hooks skip Jev until the session ends; the CLI still calls it." });
     }
-    this.keyPromise ??= resolveKey(this.options.env, this.options.platform);
+    this.keyPromise ??= resolveEndpointKey(this.options.env, this.options.platform);
     const { key: apiKey } = await this.keyPromise;
     let reply: JevReply;
     try {

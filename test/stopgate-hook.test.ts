@@ -37,7 +37,7 @@ async function run(options: { transcript?: string | null; stopGate?: string | nu
   const server: FakeJev = await fakeJev(options.answer ?? answers(0.95, 0.1, 0.9), options.status ? { status: options.status } : undefined);
   try {
     const stdin = JSON.stringify({ hook_event_name: "Stop", cwd: root, session_id: "s1", transcript_path: transcript, ...(options.message ? { last_assistant_message: options.message } : {}), ...options.input });
-    const returned = await stopGate({ env: { REFEREE_DATA_DIR: dataDir, TYPESAFE_API_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, ...options.env }, home, now: () => Date.parse("2026-10-01T12:00:00Z"), readStdin: async () => stdin }, root);
+    const returned = await stopGate({ env: { REFEREE_DATA_DIR: dataDir, TYPESAFE_API_KEY: "ts_test", REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, ...options.env }, home, now: () => Date.parse("2026-10-01T12:00:00Z"), readStdin: async () => stdin }, root);
     return { stops: readStops(dataDir), requests: server.requests, printed: returned === undefined ? "" : "output", dataDir };
   } finally {
     await server.close();
@@ -119,7 +119,7 @@ test("three Jev failures in a session open the breaker and later stops skip Jev"
   const server = await fakeJev(answers(0.95, 0.1, 0.9), { status: 503 });
   try {
     for (let i = 0; i < 4; i++) {
-      await stopGate({ env: { REFEREE_DATA_DIR: dataDir, TYPESAFE_API_KEY: "ts_test", TYPESAFE_BASE_URL: server.url }, home, now: () => Date.parse("2026-10-01T12:00:00Z") + i, readStdin: async () => JSON.stringify({ cwd: root, session_id: "s9", transcript_path: transcript }) }, root);
+      await stopGate({ env: { REFEREE_DATA_DIR: dataDir, TYPESAFE_API_KEY: "ts_test", REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: server.url }, home, now: () => Date.parse("2026-10-01T12:00:00Z") + i, readStdin: async () => JSON.stringify({ cwd: root, session_id: "s9", transcript_path: transcript }) }, root);
     }
     const stops = readStops(dataDir);
     assert.equal(stops.length, 4);

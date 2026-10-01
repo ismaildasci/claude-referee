@@ -99,6 +99,7 @@ claude-referee trims the key and rejects it with a configuration error if it con
 | `TYPESAFE_API_KEY_CMD` | A command that prints the key |
 | `TYPESAFE_MODEL` | Overrides the `model` setting. The pack's thresholds were tuned on the default model |
 | `TYPESAFE_BASE_URL` | The API root, `https://api.typesafe.ai` by default. For proxies and tests |
+| `REFEREE_BASE_URL_KEY` | The key for a `TYPESAFE_BASE_URL` that isn't `https://api.typesafe.ai`. Without it no request is sent: the TypeSafe key never goes to another host |
 | `REFEREE_HOOKS=off` | Turns every hook off |
 | `REFEREE_DATA_DIR`, `REFEREE_PACKS_DIR`, `REFEREE_PACK`, `REFEREE_MODEL` | Set for you. The session briefing hook exports them to Claude's shell through `CLAUDE_ENV_FILE`, so the commands Claude runs use the same data directory, pack and `model` setting as the hooks. `TYPESAFE_MODEL` still wins over `REFEREE_MODEL`. It never exports the key |
 

@@ -30,7 +30,7 @@ const CASES = [
 async function record(root: string, extra: string[] = [], answer = byEvidence) {
   const server = await fakeJev(answer);
   try {
-    const io = memoryIo({ env: { TYPESAFE_API_KEY: "ts_test_secret_key_123", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: tempDir() } });
+    const io = memoryIo({ env: { TYPESAFE_API_KEY: "ts_test_secret_key_123", REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: tempDir() } });
     const code = await run(["eval", "record", "--suite", "s1", "--evals-dir", root, ...extra], io, commands);
     return { code, out: io.json(), requests: server.requests.length };
   } finally {
