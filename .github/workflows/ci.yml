@@ -48,6 +48,8 @@ jobs:
           echo "bundle bytes: $size"
           test "$(wc -c < "$tmp/claude-referee/dist/cli.mjs")" -lt 250000
           test "$(wc -c < "$tmp/claude-referee/dist/hook.mjs")" -lt 200000
+      - name: Hook start latency stays within 40 ms of a bare node at p95
+        run: node scripts/hook-latency.mjs
       - name: Recorded evals score within each suite's allowance (offline, no key)
         run: node plugins/claude-referee/dist/cli.mjs eval score --suite all --fail-on violated
 

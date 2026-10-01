@@ -244,3 +244,7 @@ How it works: output from a recognised runner is parsed in code into counts, an 
 - `failure.env`: no wrong `yes` and no wrong `no` on either split. Dev: 11 `yes`, 3 `review`, 10 `no` of 24. Hold-out: 15 `yes`, 7 `review`, 16 `no` of 38 (recall 0.78; a definite answer on 81% of cases).
 - So the 0.9 band costs coverage, not accuracy: everything the bands let through was right, and the misses sit in `review`. On routine lines the question rarely reaches `no` (imports, logging and comments often land between 0.13 and 0.38).
 - Limits: the cases are invented and one session wrote them, so real diffs (long hunks, minified code) and real CI logs are untested; with 31 cases per label, no wrong `yes` bounds the rate only to about 10% (rule of three); one model version; the near-misses were textbook ones and may not be hard enough to find the error rate. The stress cases were not blind to the dev results.
+
+### Hook start latency
+
+`node scripts/hook-latency.mjs`, 2026-10-01, macOS arm64, Node 25.5, 40 runs each after one warm-up, empty event on stdin, no key and no network. p95: a bare `node -e ""` 66.3 ms; `hook.mjs session-start` 93.7 ms (+27.5 ms); `hook.mjs stop` 90.8 ms (+24.5 ms). The budget (registered in the roadmap) is at most 40 ms over a bare node at p95; CI runs the same script on Linux with Node 20.3. Limits: one machine, a hook that exits early (the Stop hook with no project file, the briefing without a project), not a hook that asks Jev; the latency of a Jev call is in [Latency](#latency).
