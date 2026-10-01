@@ -12,7 +12,8 @@
     "build": "node scripts/build.mjs",
     "typecheck": "tsc -p tsconfig.json",
     "test": "node --test \"test/**/*.test.ts\"",
-    "check": "npm run typecheck && npm test && npm run build"
+    "check": "npm run typecheck && npm test && npm run build",
+    "ci:local": "bash scripts/ci-local.sh"
   },
   "devDependencies": {
     "@types/node": "26.6.3",
