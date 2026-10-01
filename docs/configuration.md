@@ -143,7 +143,7 @@ The matching entry in `thresholds.json`:
 { "done.met": { "met": 0.7, "missing": 0.5 } }
 ```
 
-Where the bundled numbers come from: `done.met`'s 0.7 and 0.5 were chosen on 25 cases in the earlier private kit, so they're in-sample, with no hold-out yet. `verify.relation` (supports 0.8, contradicts and says nothing 0.5) and `verify.injection` (0.7) were set by hand and checked once on 60 held-out claims. A replay of the recorded answers found nothing to tune: see [verify v2](measurements.md#verify-v2-on-held-out-claims). The 0.9 bands for `judge` follow the kit's rule of acting only at 0.90 or above. `line.risky` and `failure.env` have no eval yet.
+Where the bundled numbers come from: `done.met`'s 0.7 and 0.5 were chosen on 25 cases in the earlier private kit, so they're in-sample, with no hold-out yet. `verify.relation` (supports 0.8, contradicts and says nothing 0.5) and `verify.injection` (0.7) were set by hand and checked once on 60 held-out claims. A replay of the recorded answers found nothing to tune: see [verify v2](measurements.md#verify-v2-on-held-out-claims). The 0.9 bands for `judge` follow the kit's rule of acting only at 0.90 or above. `line.risky` and `failure.env` were checked once on 62 invented cases each with no wrong `yes` at the 0.9 band, but only 52% and 81% of hold-out cases got a definite answer ([result](measurements.md#judge-on-invented-lines-and-logs)).
 
 `cheatsheet/session.md` may use three placeholders: `{{pack}}`, `{{cli}}` (the absolute path of the bundled CLI) and `{{checks}}` (the area's check commands). The briefing is capped at 800 characters.
 
