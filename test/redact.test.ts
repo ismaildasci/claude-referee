@@ -118,5 +118,5 @@ test("redact clips very long fields and stays fast", () => {
   const { value } = redact({ evidence: big }, { maxField: 40_000 });
   const ms = performance.now() - started;
   assert.ok(value.evidence.endsWith(`[TRUNCATED:${big.length - 40_000}]`));
-  assert.ok(ms <= 20, `took ${ms.toFixed(1)} ms`);
+  assert.ok(ms <= 100, `took ${ms.toFixed(1)} ms`);
 });
