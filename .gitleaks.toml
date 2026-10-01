@@ -1,0 +1,12 @@
+# Default rules plus an allowlist for the files that hold deliberately fake secrets (redaction fixtures) and benign case ids that look like keys.
+title = "claude-referee"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Fake credentials used as redaction and key-lookup fixtures; case ids in a measurement file"
+paths = [
+  '''^test/(redact|key|doctor)\.test\.ts$''',
+  '''^jev-evals/decide-close/subsets\.json$''',
+]

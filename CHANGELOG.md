@@ -11,6 +11,10 @@ All notable changes to this project are documented here. The format follows [Kee
 - A probability exactly on a band is no longer pushed over it by float arithmetic: `judge` now counts 0.10 as `no` at the 0.9 band (`1 - 0.9` is 0.0999...8 in JavaScript), and `decide` counts a margin of exactly 0.1 as `weak` instead of a tie.
 - The TypeSafe key is sent only to `https://api.typesafe.ai`. A `TYPESAFE_BASE_URL` pointing elsewhere (for example set by a project's `.claude/settings.json` `env`) used to receive it; now it needs its own `REFEREE_BASE_URL_KEY`, and without one no request is made and `doctor` says why. The three live-check scripts follow the same rule.
 
+### Added
+
+- CI scans the whole git history with gitleaks 8.30.1 (pinned, checksum verified); `.gitleaks.toml` allows only the fake-credential fixtures in `test/redact.test.ts`, `test/key.test.ts` and `test/doctor.test.ts` and the case ids in `jev-evals/decide-close/subsets.json`. The history scan of 67 commits found nothing else.
+
 ## [0.1.3] - 2026-10-01
 
 ## [0.1.2] - 2026-10-01

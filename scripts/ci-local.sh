@@ -31,4 +31,6 @@ claude plugin validate --strict . | tail -1
 claude plugin validate --strict plugins/claude-referee | tail -1
 
 step "private terms"; bash scripts/check-no-private.sh
+step "secrets in git history (gitleaks, when installed)"
+if command -v gitleaks >/dev/null; then gitleaks git --redact --no-banner . 2>&1 | tail -1; test "${PIPESTATUS[0]}" -eq 0; else echo "gitleaks not installed here; CI runs it"; fi
 printf '\nci-local: all steps passed\n'
