@@ -358,6 +358,39 @@ test("the warning cap leaves build criteria, flags and zero-warning lines alone"
   }
 });
 
+test("a lint criterion backed only by an exit code is capped when the log shows failure or skip wording or a swallowed exit code", async () => {
+  const capped: string[] = [
+    "$ semgrep scan --config p/python --error\nScan summary: 0 findings\n2 files only partially analyzed, 5 files skipped\nsemgrep exit code: 0\n",
+    "$ conftest test deploy/k8s/*.yaml || true\nFAIL - deploy/k8s/a.yaml - missing limits\nFAIL - deploy/k8s/b.yaml - latest tag\nexit code: 0\n",
+    "$ hadolint --no-fail Dockerfile\nexit code: 0\n",
+  ];
+  const kept: string[] = [
+    "$ staticcheck ./...\nexit code: 0\n",
+    "$ lint --report\n0 errors, no findings, without violations, 0 failures\nlint exit code: 0\n",
+  ];
+  for (const [list, verdict] of [[capped, "unsure"], [kept, "met"]] as const) {
+    for (const evidence of list) {
+      const server = await fakeJev(nouls(0.97));
+      try {
+        const out = io(server, evidence);
+        await run(["done", "--criteria", "lint is clean", "--evidence", "-"], out, commands);
+        assert.equal(out.json()["verdict"], verdict, evidence);
+        if (verdict === "unsure") assert.equal(out.json()["reason"], "warning_in_log");
+      } finally {
+        await server.close();
+      }
+    }
+  }
+  const server = await fakeJev(nouls(0.97));
+  try {
+    const out = io(server, "$ tsc --noEmit\n2 tests failed earlier, now fixed\ntsc exit code: 0\n");
+    await run(["done", "--criteria", "the build succeeds", "--evidence", "-"], out, commands);
+    assert.equal(out.json()["verdict"], "met");
+  } finally {
+    await server.close();
+  }
+});
+
 test("done caps met at unsure for parsed runs that are empty, cancelled, flaky or cut off, and keeps clean ones met", async () => {
   const cases: [string, string][] = [
     ["Starting 0 tests across 1 binary (3 tests skipped)\n     Summary [   0.000s] 0 tests run: 0 passed, 3 skipped\nnextest exit code: 0\n", "nextest empty"],

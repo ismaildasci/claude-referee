@@ -1,7 +1,7 @@
 // done: does the check output show each criterion holds? One request; every criterion is a Noul on the same evidence.
 // Recognised runner output is parsed in code and only those facts reach Jev; unrecognised output can never become met.
 // A non-zero exit code in the evidence is missing without a request; skipped, risky or incomplete tests cap met at unsure.
-// Exit-code-only evidence for a lint or clean criterion that shows a warning or notice message is capped at unsure.
+// Exit-code-only evidence for a lint or clean criterion that shows a warning, notice, failure or skip message, or a swallowed exit code, is capped at unsure.
 // A parsed run that is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion with parsed warnings, is capped the same way.
 
 import type { EntryType, Questions } from "@typesafe-ai/sdk";
@@ -48,10 +48,18 @@ const CLEAN_CRITERION = /\b(?:lint\w*|clean|warning[- ]?free|no warnings?)\b/i;
 const WARN_WORDS = /\b(?:warnings?|notices?|deprecat\w*)\b/i;
 const WARN_NEGATED = /\b(?:0|no|zero|without) (?:warnings?|notices?)\b/gi;
 const WARN_FLAG = /--?[\w-]*warn[\w-]*(?:[ =]\S+)?/gi;
-const WARNING_NEXT = "The log shows a warning or notice and only an exit code backs the lint criterion, so done won't say met. Pipe the linter's full summary, or say yourself that the warning is acceptable.";
+const PROBLEM_WORDS = /\b(?:fail\w*|skipp\w*|partial\w*|errors?|violations?|findings?)\b/i;
+const PROBLEM_NEGATED = /\b(?:0|no|zero|without) (?:errors?|findings?|violations?|failures?)\b/gi;
+const SWALLOWED = /\|\|\s*true\b|--no-fail\b|--exit-zero\b/i;
+const WARNING_NEXT = "The log shows a warning, notice, failure or skip wording, or a swallowed exit code, and only an exit code backs the lint criterion, so done won't say met. Pipe the linter's full summary, or say yourself that the warning is acceptable.";
 
 export function hasWarningMessage(evidence: string): boolean {
   return WARN_WORDS.test(evidence.replace(WARN_FLAG, " ").replace(WARN_NEGATED, " "));
+}
+
+export function hasProblemMessage(evidence: string): boolean {
+  const log = evidence.replace(/(?:^|\n)[ \t]*\$[^\n]*/g, " ").replace(PROBLEM_NEGATED, " ");
+  return PROBLEM_WORDS.test(log) || SWALLOWED.test(evidence);
 }
 
 function factsOf(parsed: ParsedEvidence): Record<string, unknown> {
@@ -80,7 +88,7 @@ export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, crit
   const met = threshold(pack, thresholds, "done.met", "met", 0.7);
   const missing = threshold(pack, thresholds, "done.met", "missing", 0.5);
   const finish = ([outcome]: Outcome[]): Result => {
-    const warnCap = (parsed.trust === "exit_code" && hasWarningMessage(evidence)) || hasParsedWarnings(parsed);
+    const warnCap = (parsed.trust === "exit_code" && (hasWarningMessage(evidence) || hasProblemMessage(evidence))) || hasParsedWarnings(parsed);
     const per = criteria.map((criterion, i) => {
       const answer = outcome?.answers?.[`c${i + 1}`];
       const p = answer?.type === "noul" ? answer.noul : 0;

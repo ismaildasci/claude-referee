@@ -3770,11 +3770,19 @@ var CLEAN_CRITERION = /\b(?:lint\w*|clean|warning[- ]?free|no warnings?)\b/i;
 var WARN_WORDS = /\b(?:warnings?|notices?|deprecat\w*)\b/i;
 var WARN_NEGATED = /\b(?:0|no|zero|without) (?:warnings?|notices?)\b/gi;
 var WARN_FLAG = /--?[\w-]*warn[\w-]*(?:[ =]\S+)?/gi;
-var WARNING_NEXT = "The log shows a warning or notice and only an exit code backs the lint criterion, so done won't say met. Pipe the linter's full summary, or say yourself that the warning is acceptable.";
+var PROBLEM_WORDS = /\b(?:fail\w*|skipp\w*|partial\w*|errors?|violations?|findings?)\b/i;
+var PROBLEM_NEGATED = /\b(?:0|no|zero|without) (?:errors?|findings?|violations?|failures?)\b/gi;
+var SWALLOWED = /\|\|\s*true\b|--no-fail\b|--exit-zero\b/i;
+var WARNING_NEXT = "The log shows a warning, notice, failure or skip wording, or a swallowed exit code, and only an exit code backs the lint criterion, so done won't say met. Pipe the linter's full summary, or say yourself that the warning is acceptable.";
 function hasWarningMessage(evidence) {
   return WARN_WORDS.test(evidence.replace(WARN_FLAG, " ").replace(WARN_NEGATED, " "));
 }
 __name(hasWarningMessage, "hasWarningMessage");
+function hasProblemMessage(evidence) {
+  const log = evidence.replace(/(?:^|\n)[ \t]*\$[^\n]*/g, " ").replace(PROBLEM_NEGATED, " ");
+  return PROBLEM_WORDS.test(log) || SWALLOWED.test(evidence);
+}
+__name(hasProblemMessage, "hasProblemMessage");
 function factsOf(parsed) {
   return { trust: parsed.trust, exit_code: parsed.exit_code, exit_lines: parsed.exit_lines, runners: parsed.runners, conflict: parsed.conflict, lines: parsed.lines };
 }
@@ -3801,7 +3809,7 @@ function doneRequest(pack, thresholds, criteria, evidence) {
   const met = threshold(pack, thresholds, "done.met", "met", 0.7);
   const missing = threshold(pack, thresholds, "done.met", "missing", 0.5);
   const finish = /* @__PURE__ */ __name(([outcome]) => {
-    const warnCap = parsed.trust === "exit_code" && hasWarningMessage(evidence) || hasParsedWarnings(parsed);
+    const warnCap = parsed.trust === "exit_code" && (hasWarningMessage(evidence) || hasProblemMessage(evidence)) || hasParsedWarnings(parsed);
     const per = criteria.map((criterion, i) => {
       const answer = outcome?.answers?.[`c${i + 1}`];
       const p = answer?.type === "noul" ? answer.noul : 0;
