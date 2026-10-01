@@ -259,6 +259,15 @@ Registered in [done-v2-holdout2.md](decisions/done-v2-holdout2.md) before any re
 - **After the first look:** two parsers were added (Python `unittest`, `cargo clippy` with a `warnings` fact) and the four cases they changed moved to `dev`; the clippy warning case went from p 0.90 to 0.15 and the `unittest` run with skips from 0.26 to 0.74. The 41 cases that stayed have no wrong `met` (11 `met`, 4 `unsure`, 26 `missing`), as a regression check, not a pass; see [the record](decisions/done-v2-holdout2.md).
 - Related: `eval` now applies the exit-code rule the way `done` does, so a non-zero exit code is `missing` in code in both; the first hold-out and dev numbers did not change.
 
+### done v2 on a fourth hold-out
+
+Registered in [done-v2-holdout4.md](decisions/done-v2-holdout4.md) before any request, with the labelling convention fixed in advance. `eval record --suite done-v2-h4`, `jev-1.13.0`, 2026-10-01: 47 invented outputs (21 `met`, 26 `missing`) from agents that did not read the repository, kept when a second agent labelled them the same. Cases: [cases.jsonl](../jev-evals/done-v2-h4/cases.jsonl) (one case later moved to `done-v2`).
+
+- **The registered check failed on all three counts:** 2 wrong `met` (rubocop with a baseline notice, p 0.91; sbt "No tests to run", p 0.72, both exit-code-only), `missing` found in 20 of 26 (0.77), `met` found in 12 of 21 (0.57).
+- Most misses are tools with no parser (Maven, `ctest`, `meson`, `deno`, `ava`, `rake test`, Gradle, `sbt`): every hold-out finds new tools.
+- After the first look: `met` is capped at `unsure` when the log says no tests ran (the sbt case moved to dev). 1 wrong `met` remains in the 46 left. A warning-words cap was considered and not applied (it would cost 7 of 15 true `met`).
+- Limits: same model family writes and labels; invented outputs; one model version; the suite allows 1 wrong `met` because that is what was observed.
+
 ### done v2 on a third hold-out
 
 Registered in [done-v2-holdout3.md](decisions/done-v2-holdout3.md) before any request. `eval record --suite done-v2-h3`, `jev-1.13.0`, 2026-10-01: 46 invented outputs (20 `met`, 26 `missing`) written by agents that did not read the repository and kept when a second agent labelled them the same (2 of 48 rejected). Cases: [cases.jsonl](../jev-evals/done-v2-h3/cases.jsonl). Answers: [recorded.jsonl](../jev-evals/done-v2-h3/recorded.jsonl).
