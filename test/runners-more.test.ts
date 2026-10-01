@@ -104,3 +104,9 @@ test("cargo build: warnings and errors for cargo build and check, and clippy out
   assert.equal(cargoBuild.parse("$ cargo clippy\n    Checking x v0.1.0\nwarning: y\n"), null);
   assert.equal(cargoBuild.parse("test a ... ok\nrunning 3 tests\n"), null);
 });
+
+test("cargo build does not read cargo nextest logs", () => {
+  const log = "   Compiling mosaic-core v0.8.1 (/srv/work/mosaic/crates/core)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.41s\n------------\n Nextest run ID 6f1c2a7e-3b7a-4e1d-9d52-0a9b44c1d0f3 with nextest profile: default\n    Starting 23 tests across 4 binaries\n     Summary [   0.612s] 23 tests run: 23 passed, 0 skipped\n";
+  assert.equal(cargoBuild.parse(log), null);
+  assert.equal(cargoBuild.parse("   Compiling x v0.1.0\n    Finished `dev` profile in 1s\n")?.runner, "cargo build");
+});

@@ -173,6 +173,8 @@ const viteParser: RunnerParser = {
   },
 };
 
+export const NEXTEST_MARK = /\bcargo[- ]nextest\b|^\s*Nextest run ID \S+ with nextest profile|^\s*Starting \d+ tests? across \d+ binar|^\s*Summary \[\s*[\d.]+s\] .*\btests? run:|test --no-run --message-format json-render-diagnostics/;
+
 const CARGO_BUILD_CMD = /\bcargo (?:build|check)\b/;
 const CARGO_PROGRESS = /^\s+(?:Compiling|Checking) \S+ v\d/;
 const CARGO_FINISHED = /^\s+Finished `?\w+`? (?:profile|\[)/;
@@ -181,7 +183,7 @@ const cargoBuild: RunnerParser = {
   name: "cargo build",
   parse(text) {
     const lines = prepare(text);
-    if (lines.some((l) => CLIPPY_MARK.test(l))) return null;
+    if (lines.some((l) => CLIPPY_MARK.test(l) || NEXTEST_MARK.test(l))) return null;
     const marked = lines.some((l) => CARGO_BUILD_CMD.test(l)) || (lines.some((l) => CARGO_PROGRESS.test(l)) && lines.some((l) => CARGO_FINISHED.test(l) || CLIPPY_COMPILE.test(l)));
     if (!marked || lines.some((l) => /^running \d+ tests?$/.test(l))) return null;
     let generated = 0;

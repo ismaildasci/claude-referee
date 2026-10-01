@@ -27,3 +27,9 @@ Of 49 cases written, 47 were kept (22 `met`, 25 `missing`); two were dropped on 
 **Decision.** None applied. Nothing was tuned on these cases, no case moved to dev, and the suite's allowance stays 0. `done` v2 is not called measured: five hold-outs, none passed; the safety side (no wrong `met`) held this time, the coverage side did not.
 
 **Limits.** One author wrote and labelled every case (no second labeller), so the labels were not independently checked; invented outputs; one model version.
+
+## After the look (2026-10-01): parsers for the eleven misses
+
+Eleven parsers were written from real runs and the tools' own source ([runner-parsers-met-recall.md](runner-parsers-met-recall.md)), then the 47 recorded texts were replayed offline: the facts changed for 12 cases (the 11 expected-`met` misses and `h5-e-04`). Those 12 moved to the dev split of `done-v2`, were re-recorded there, and left `done-v2-h5` with 35 cases that are a regression check only: 0 wrong `met`, `met` in 11 of the 11 expected `met` cases left, 24 expected `missing` as 22 `missing` and 2 `unsure` (the same two as before: `hadolint --no-fail` and `yamllint`).
+
+On the moved cases 9 of 11 expected `met` now come out `met` (`next build` p 0.60 and `nix build` p 0.57 stay `unsure`). **These are dev numbers, not a pass**: the cases drove the parser work. The registered check is not repeated on them and `done` v2 stays not measured; a sixth hold-out in other tools would be the next measurement.

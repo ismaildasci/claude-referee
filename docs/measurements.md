@@ -275,6 +275,8 @@ Registered in [done-v2-holdout5.md](decisions/done-v2-holdout5.md) before any re
 - No wrong `met`, unlike the second to fourth sets. The `hadolint --no-fail` case (warnings, exit code 0, "lint is clean") was answered at p 0.93 and held at `unsure` by the lint-warning cap from the fourth set.
 - Nothing was changed after the look; the suite allows 0 wrong `met`. `done` v2 stays not measured: five invented hold-outs, none passed.
 - Limits: a single labeller, so labels are unchecked by a second agent; invented outputs; one model version.
+- **After the look (2026-10-01), dev numbers, not a pass:** parsers for `cargo nextest`, `prove`, `dart test`, `flutter test`, Julia, `behave`, `kaocha`, `tox`, `biome`, `next build` and `nix build` were written from real runs of the tools and their own source ([sources and limits](decisions/runner-parsers-met-recall.md)). Replaying the 47 recorded texts offline changed the facts of 12 cases; they moved to `done-v2` dev and were re-recorded (12 requests). Of the 11 expected `met`, 9 now come out `met` (p 0.95 to 0.98); `next build` (p 0.60) and `nix build` (p 0.57) stay `unsure`. 0 wrong `met`. The 35 cases left in `done-v2-h5` are a regression check only: 0 wrong `met`, 11 of 11 remaining expected `met` found, the two `unsure` cases unchanged.
+- The same change adds an `incomplete` fact (cut-off, empty, cancelled or flaky runs cap `met` at `unsure`, `reason: "incomplete_run"`) and caps a lint or clean criterion at `unsure` when a parsed runner shows warnings. Offline `eval score --suite all` still passes with no wrong `met`.
 
 ### done v2 on a fourth hold-out
 

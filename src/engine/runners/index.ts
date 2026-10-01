@@ -2,10 +2,13 @@
 // Several summaries or failure markers are merged worst-case; unrecognised output is "unparsed" and can never become met.
 
 import { parsers as compiled } from "./compiled.ts";
+import { parsers as builds } from "./builds.ts";
 import { parsers as js } from "./js.ts";
 import { parsers as more } from "./more.ts";
 import { parsers as phpRuby } from "./php-ruby.ts";
 import { parsers as python } from "./python.ts";
+import { parsers as scenarios } from "./scenarios.ts";
+import { parsers as suites } from "./suites.ts";
 import type { RunnerFacts, RunnerParser } from "./types.ts";
 
 export type { RunnerFacts, RunnerParser } from "./types.ts";
@@ -21,7 +24,7 @@ export interface ParsedEvidence {
   readonly lines: number;
 }
 
-const PARSERS: readonly RunnerParser[] = [...python, ...js, ...compiled, ...phpRuby, ...more];
+const PARSERS: readonly RunnerParser[] = [...python, ...js, ...compiled, ...phpRuby, ...more, ...suites, ...scenarios, ...builds];
 
 export function parseEvidence(text: string): ParsedEvidence {
   const runners = PARSERS.map((p) => p.parse(text)).filter((r): r is RunnerFacts => r !== null);

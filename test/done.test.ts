@@ -357,3 +357,47 @@ test("the warning cap leaves build criteria, flags and zero-warning lines alone"
     }
   }
 });
+
+test("done caps met at unsure for parsed runs that are empty, cancelled, flaky or cut off, and keeps clean ones met", async () => {
+  const cases: [string, string][] = [
+    ["Starting 0 tests across 1 binary (3 tests skipped)\n     Summary [   0.000s] 0 tests run: 0 passed, 3 skipped\nnextest exit code: 0\n", "nextest empty"],
+    ["Nextest run ID 61bfad98-0da3-4243-aea4-81ecbdc24e31 with nextest profile: default\n    Starting 23 tests across 4 binaries\n        PASS [   0.012s] (1/23) nx tests::a\nnextest exit code: 0\n", "nextest cut off"],
+    ["00:01 +9: test/a_test.dart: reads quoted fields\ndart exit code: 0\n", "dart cut off"],
+    ["Checked 1 file in 2ms. Fixed 1 file.\nbiome exit code: 0\n", "biome fixed files"],
+  ];
+  for (const [evidence, label] of cases) {
+    const server = await fakeJev(nouls(0.97));
+    try {
+      const out = io(server, evidence);
+      await run(["done", "--criteria", "all tests pass", "--evidence", "-"], out, commands);
+      assert.equal(out.json()["verdict"], "unsure", label);
+      assert.ok(["incomplete_run", "no_tests_run"].includes(String(out.json()["reason"])), label);
+    } finally {
+      await server.close();
+    }
+  }
+  const server = await fakeJev(nouls(0.97));
+  try {
+    const out = io(server, "Nextest run ID 61bfad98 with nextest profile: default\n     Summary [   0.612s] 23 tests run: 23 passed, 0 skipped\nnextest exit code: 0\n");
+    await run(["done", "--criteria", "all tests pass", "--evidence", "-"], out, commands);
+    assert.equal(out.json()["verdict"], "met");
+    assert.equal("reason" in out.json(), false);
+  } finally {
+    await server.close();
+  }
+});
+
+test("a lint criterion is capped at unsure when a parsed runner shows warnings, a build criterion is not", async () => {
+  const log = "Checked 1 file in 3ms. No fixes applied.\nFound 1 warning.\nbiome exit code: 0\n";
+  for (const [criterion, verdict] of [["lint is clean", "unsure"], ["the build succeeds", "met"]] as const) {
+    const server = await fakeJev(nouls(0.97));
+    try {
+      const out = io(server, log);
+      await run(["done", "--criteria", criterion, "--evidence", "-"], out, commands);
+      assert.equal(out.json()["verdict"], verdict, criterion);
+      if (verdict === "unsure") assert.equal(out.json()["reason"], "warning_in_log");
+    } finally {
+      await server.close();
+    }
+  }
+});
