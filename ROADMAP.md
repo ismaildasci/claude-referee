@@ -20,9 +20,9 @@ What it is not: a model router, a context compactor or a general code reviewer. 
 
 Released by 0.1.3: `done` v2 (runner output parsed in code), `verify` v2, the done-gate in `shadow` mode, the pack linter, `eval record` and `eval score`, `npm run ci:local`, and the live API checks and close-call option-order measurement ([results](docs/measurements.md)).
 
-In `main`, not released:
+Released in 0.1.4:
 
-- A request aborted after the API's headers arrived no longer kills the process with an uncaught error (SDK 0.6.0 bug; checked on Node 22 only).
+- A request aborted after the API's headers arrived no longer kills the process with an uncaught error (SDK 0.6.0 bug; covered by a test that runs in CI on Node 22 and 24).
 - The TypeSafe key goes only to `https://api.typesafe.ai`; another `TYPESAFE_BASE_URL` needs `REFEREE_BASE_URL_KEY`.
 - `done` answers `missing` without asking Jev when the evidence has a non-zero exit code.
 - The PHPUnit `Tests:` line is no longer read as a jest summary; `judge` and `decide` no longer let float arithmetic move a value that sits exactly on a band.
