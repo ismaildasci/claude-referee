@@ -1737,9 +1737,11 @@ function appendStop(dataDir, record) {
       chmodSync(file, 384);
     } catch {
     }
-    if (statSync2(file).size > MAX_BYTES) {
+    const size = statSync2(file).size;
+    if (size > MAX_BYTES) {
       const cutoff = new Date(Date.now() - RETENTION_MS).toISOString();
-      writeAtomic(file, parseLines(readFileSync6(file, "utf8")).filter((r) => r.ts >= cutoff));
+      const kept = parseLines(readFileSync6(file, "utf8")).filter((r) => r.ts >= cutoff);
+      if (statSync2(file).size === size) writeAtomic(file, kept);
     }
   } catch {
     return;

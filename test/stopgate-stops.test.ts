@@ -1,7 +1,7 @@
 // Stop done-gate store and labelling CLI: append/read, label rewrite, stats arithmetic, receipts --stops, --unlabelled, --label.
 
 import assert from "node:assert/strict";
-import { appendFileSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { commands } from "../src/cli/commands/index.ts";
@@ -216,4 +216,35 @@ test("stopStats counts Jev errors and times every attempt, so slow failures are 
   assert.equal(clean.p95_all_ms, 400);
   assert.equal(stopStats([rec("n", { skipped: "no_edits" })]).error_rate, null);
   assert.equal(stopStats([]).p95_all_ms, null);
+});
+
+test("labelStop never rewrites stops.jsonl: labels go to labels.jsonl and are merged on read, last one wins", () => {
+  const dir = tempDir();
+  appendStop(dir, rec("s1", { block: true }));
+  const before = readFileSync(stopsFile(dir), "utf8");
+  assert.equal(labelStop(dir, "s1", "wrong", "2026-09-30T12:00:00.000Z"), true);
+  assert.equal(readFileSync(stopsFile(dir), "utf8"), before);
+  appendStop(dir, rec("s2", { block: true }));
+  assert.equal(labelStop(dir, "s1", "right", "2026-09-30T13:00:00.000Z"), true);
+  const read = readStops(dir);
+  assert.deepEqual(read.map((r) => r.id), ["s1", "s2"]);
+  assert.equal(read[0]?.label, "right");
+  assert.equal(read[0]?.labelled_at, "2026-09-30T13:00:00.000Z");
+  assert.equal(read[1]?.label, undefined);
+  assert.equal(stopStats(read).labelled, 1);
+});
+
+test("a label written inline by an older version is still read, and a newer label overrides it", () => {
+  const dir = tempDir();
+  appendStop(dir, rec("s1", { block: true, label: "right" as const, labelled_at: "2026-09-29T10:00:00.000Z" } as never));
+  assert.equal(readStops(dir)[0]?.label, "right");
+  labelStop(dir, "s1", "wrong", "2026-09-30T10:00:00.000Z");
+  assert.equal(readStops(dir)[0]?.label, "wrong");
+});
+
+test("labelling an unknown id writes nothing", () => {
+  const dir = tempDir();
+  appendStop(dir, rec("s1", { block: true }));
+  assert.equal(labelStop(dir, "nope", "right", "2026-09-30T12:00:00.000Z"), false);
+  assert.equal(existsSync(join(dir, "labels.jsonl")), false);
 });

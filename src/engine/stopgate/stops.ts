@@ -1,5 +1,5 @@
 // Local store of the Stop done-gate in shadow mode: one JSON line per stop in <dataDir>/stops.jsonl.
-// Best-effort writes that never throw; labels are rewritten atomically; stats feed the precision measurement.
+// Best-effort writes that never throw; labels are appended to labels.jsonl and merged on read, so labelling never rewrites the stops; stats feed the precision measurement.
 
 import { appendFileSync, chmodSync, existsSync, mkdirSync, readFileSync, renameSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -27,6 +27,10 @@ export interface StopStats {
 
 export function stopsFile(dataDir: string): string {
   return join(dataDir, "stops.jsonl");
+}
+
+export function labelsFile(dataDir: string): string {
+  return join(dataDir, "labels.jsonl");
 }
 
 export function newStopId(now: number, random: () => number = Math.random): string {
@@ -66,32 +70,64 @@ export function appendStop(dataDir: string, record: StopRecord): void {
     } catch {
       void 0;
     }
-    if (statSync(file).size > MAX_BYTES) {
+    const size = statSync(file).size;
+    if (size > MAX_BYTES) {
       const cutoff = new Date(Date.now() - RETENTION_MS).toISOString();
-      writeAtomic(file, parseLines(readFileSync(file, "utf8")).filter((r) => r.ts >= cutoff));
+      const kept = parseLines(readFileSync(file, "utf8")).filter((r) => r.ts >= cutoff);
+      if (statSync(file).size === size) writeAtomic(file, kept);
     }
   } catch {
     return;
   }
 }
 
+interface LabelLine {
+  readonly id: string;
+  readonly label: "right" | "wrong";
+  readonly labelled_at: string;
+}
+
+function readLabels(dataDir: string): Map<string, LabelLine> {
+  const out = new Map<string, LabelLine>();
+  try {
+    const file = labelsFile(dataDir);
+    if (!existsSync(file)) return out;
+    for (const line of readFileSync(file, "utf8").split("\n")) {
+      if (!line.trim()) continue;
+      try {
+        const v = JSON.parse(line) as Partial<LabelLine> | null;
+        if (v && typeof v.id === "string" && (v.label === "right" || v.label === "wrong") && typeof v.labelled_at === "string") out.set(v.id, v as LabelLine);
+      } catch {
+        continue;
+      }
+    }
+  } catch {
+    return out;
+  }
+  return out;
+}
+
 export function readStops(dataDir: string): StopRecord[] {
   const file = stopsFile(dataDir);
   try {
     if (!existsSync(file)) return [];
-    return parseLines(readFileSync(file, "utf8"));
+    const labels = readLabels(dataDir);
+    return parseLines(readFileSync(file, "utf8")).map((r) => {
+      const l = labels.get(r.id);
+      return l ? { ...r, label: l.label, labelled_at: l.labelled_at } : r;
+    });
   } catch {
     return [];
   }
 }
 
 export function labelStop(dataDir: string, id: string, label: "right" | "wrong", nowIso: string): boolean {
-  const records = readStops(dataDir);
-  if (!records.some((r) => r.id === id)) return false;
-  writeAtomic(
-    stopsFile(dataDir),
-    records.map((r) => (r.id === id ? { ...r, label, labelled_at: nowIso } : r)),
-  );
+  if (!readStops(dataDir).some((r) => r.id === id)) return false;
+  try {
+    appendFileSync(labelsFile(dataDir), JSON.stringify({ id, label, labelled_at: nowIso }) + "\n", { mode: 0o600 });
+  } catch {
+    return false;
+  }
   return true;
 }
 

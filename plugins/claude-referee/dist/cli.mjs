@@ -3913,6 +3913,10 @@ function stopsFile(dataDir) {
   return join10(dataDir, "stops.jsonl");
 }
 __name(stopsFile, "stopsFile");
+function labelsFile(dataDir) {
+  return join10(dataDir, "labels.jsonl");
+}
+__name(labelsFile, "labelsFile");
 function parseLines(text) {
   const out = [];
   for (const line of text.split("\n")) {
@@ -3927,29 +3931,47 @@ function parseLines(text) {
   return out;
 }
 __name(parseLines, "parseLines");
-function writeAtomic(file, records) {
-  const tmp = `${file}.${process.pid}.tmp`;
-  writeFileSync4(tmp, records.map((r) => JSON.stringify(r)).join("\n") + (records.length ? "\n" : ""), { mode: 384 });
-  renameSync(tmp, file);
+function readLabels(dataDir) {
+  const out = /* @__PURE__ */ new Map();
+  try {
+    const file = labelsFile(dataDir);
+    if (!existsSync6(file)) return out;
+    for (const line of readFileSync10(file, "utf8").split("\n")) {
+      if (!line.trim()) continue;
+      try {
+        const v = JSON.parse(line);
+        if (v && typeof v.id === "string" && (v.label === "right" || v.label === "wrong") && typeof v.labelled_at === "string") out.set(v.id, v);
+      } catch {
+        continue;
+      }
+    }
+  } catch {
+    return out;
+  }
+  return out;
 }
-__name(writeAtomic, "writeAtomic");
+__name(readLabels, "readLabels");
 function readStops(dataDir) {
   const file = stopsFile(dataDir);
   try {
     if (!existsSync6(file)) return [];
-    return parseLines(readFileSync10(file, "utf8"));
+    const labels = readLabels(dataDir);
+    return parseLines(readFileSync10(file, "utf8")).map((r) => {
+      const l = labels.get(r.id);
+      return l ? { ...r, label: l.label, labelled_at: l.labelled_at } : r;
+    });
   } catch {
     return [];
   }
 }
 __name(readStops, "readStops");
 function labelStop(dataDir, id, label, nowIso) {
-  const records = readStops(dataDir);
-  if (!records.some((r) => r.id === id)) return false;
-  writeAtomic(
-    stopsFile(dataDir),
-    records.map((r) => r.id === id ? { ...r, label, labelled_at: nowIso } : r)
-  );
+  if (!readStops(dataDir).some((r) => r.id === id)) return false;
+  try {
+    appendFileSync3(labelsFile(dataDir), JSON.stringify({ id, label, labelled_at: nowIso }) + "\n", { mode: 384 });
+  } catch {
+    return false;
+  }
   return true;
 }
 __name(labelStop, "labelStop");

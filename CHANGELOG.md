@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Fixed
 
+- Labelling a stop (`receipts --stops --label`) rewrote the whole `stops.jsonl`, so a stop recorded by another session at that moment could be lost. Labels are now appended to `labels.jsonl` and merged on read; labels written inline by earlier versions are still read. The size-based pruning of old stops now skips the rewrite when the file changed under it.
 - A project's `stop.gate` threshold for `claims_verified` or `blocked` could only be raised, which made the done-gate fire more, the opposite of "a project can only make a check stricter". Those two now accept only a lower value. Shadow mode only; `decideStop` now has direct tests for every threshold edge.
 
 ### Added
