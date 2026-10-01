@@ -220,3 +220,25 @@ test("done keeps the label in front of an exit code so a silent command can be j
     await server.close();
   }
 });
+
+test("done reports missing without asking Jev when the exit code is not zero, even after a clean summary", async () => {
+  const server = await fakeJev(nouls(0.99));
+  try {
+    const out = io(server, "=== 12 passed in 1.0s ===\nexit code: 1\n");
+    assert.equal(await run(["done", "--criteria", "all tests pass", "--criteria", "lint is clean", "--evidence", "-"], out, commands), 0);
+    const result = out.json();
+    assert.equal(result["verdict"], "missing");
+    assert.equal(result["reason"], "exit_code_nonzero");
+    assert.equal(result["exit_code"], 1);
+    assert.equal(server.requests.length, 0);
+    assert.match(String(result["next_step"]), /exit/i);
+  } finally {
+    await server.close();
+  }
+});
+
+test("done --dry-run still shows the request for a non-zero exit code", async () => {
+  const out = io(null, "=== 12 passed in 1.0s ===\nexit code: 1\n");
+  assert.equal(await run(["done", "--criteria", "all tests pass", "--evidence", "-", "--dry-run"], out, commands), 0);
+  assert.equal(out.json()["dry_run"], true);
+});

@@ -3000,6 +3000,7 @@ var done = {
       verdict: "met, unsure or missing; the lowest across criteria",
       trust: "parsed (a runner summary was recognised), exit_code (only an exit code line) or unparsed (met is not possible)",
       runners: "Parsed counts per recognised runner",
+      reason: "exit_code_nonzero when the evidence has a non-zero exit code: missing, and Jev was not asked",
       p: "Lowest probability that a criterion holds",
       criteria: "Per criterion, by position, when more than one",
       next_step: "Only when not met"
@@ -3015,6 +3016,20 @@ var done = {
     if (criteria.length > 10) throw new RefereeError("bad_input", "At most 10 criteria per call.");
     const evidence = doneEvidence(await readSource(context, str(context, "evidence"), "evidence"));
     if (!evidence.trim()) throw new RefereeError("bad_input", "The evidence is empty.");
+    const exit = parseEvidence(evidence);
+    if (exit.exit_code !== null && exit.exit_code !== 0 && !context.flags.dryRun) {
+      return {
+        ok: true,
+        verdict: "missing",
+        reason: "exit_code_nonzero",
+        trust: exit.trust,
+        exit_code: exit.exit_code,
+        p: 0,
+        requests: 0,
+        cached: 0,
+        next_step: `The check exited with code ${exit.exit_code}, so nothing can be met and Jev was not asked. Fix the failure and run the check again.`
+      };
+    }
     const { pack, project } = openPack(context);
     const { planned, finish } = doneRequest(pack, project?.thresholds, criteria, evidence);
     return jevCommand(context, "done", pack, planned, finish);
