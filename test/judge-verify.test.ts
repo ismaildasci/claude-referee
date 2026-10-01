@@ -189,3 +189,8 @@ test("judge --dry-run of 200 items stays under 1,500 characters and writes no fi
   assert.equal(io.json()["requests"], 200);
   assert.deepEqual(readdirSync(dataDir, { recursive: true }), []);
 });
+
+test("judge counts an answer of exactly 1 - band as no", async () => {
+  const { out } = await call(["judge", "--question", "line.risky"], byItem({ "x = 1": 0.1 }), "x = 1\n");
+  assert.deepEqual([out["yes"], out["no"], out["review"]], [0, 1, 0]);
+});

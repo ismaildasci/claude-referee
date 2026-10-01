@@ -67,7 +67,7 @@ function facts(runner: string, f: Omit<RunnerFacts, "runner" | "failing" | "summ
 
 function parseJest(text: string): RunnerFacts | null {
   const lines = toLines(text);
-  const tests = tally(lines, /^\s*Tests:\s+(\d.*)$/);
+  const tests = tally(lines, /^\s*Tests:\s+(?=.*\b\d+\s+(?:failed|passed|skipped|todo|total)\b)(\d.*)$/);
   const suites = tally(lines, /^\s*Test Suites:\s+(\d.*)$/);
   const noTests = lines.find((l) => /^\s*No tests found\b/.test(l)) ?? null;
   const ids = new Set<string>();

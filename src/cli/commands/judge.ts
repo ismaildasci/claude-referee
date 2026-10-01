@@ -2,6 +2,7 @@
 // Answers at or above the auto band count as yes, at or below 1 - auto as no; everything between goes to review.
 
 import type { Questions } from "@typesafe-ai/sdk";
+import { atLeast, atMost } from "../../engine/compare.ts";
 import { RefereeError } from "../../engine/errors.ts";
 import { threshold } from "../../engine/pack.ts";
 import type { Planned } from "../../engine/session.ts";
@@ -115,10 +116,10 @@ export const judge: Command = {
             const p = answer?.type === "noul" ? answer.noul : 0.5;
             const band = auto[id] ?? 0.9;
             const label = ids.length > 1 ? `${outcome.id}/${id}` : outcome.id;
-            if (p >= band) {
+            if (atLeast(p, band)) {
               yes += 1;
               flagged.push(label);
-            } else if (p <= 1 - band) {
+            } else if (atMost(p, 1 - band)) {
               no += 1;
             } else {
               review += 1;

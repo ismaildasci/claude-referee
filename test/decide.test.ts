@@ -178,3 +178,9 @@ test("decide rejects option names made only of digits, which would defeat the re
   assert.equal(out["error"], "bad_input");
   assert.match(String(out["next_step"]), /starts with a letter/);
 });
+
+test("decide counts a margin of exactly 0.1 as weak, not a tie", async () => {
+  const { out } = await decideWith(favour({ redis: 0.5, memory: 0.4, postgres: 0.1, edge: 0 }), { decision: "Pick a rate limiter", options: OPTIONS });
+  assert.equal(out["lean"], "redis");
+  assert.equal(out["verdict"], "weak");
+});

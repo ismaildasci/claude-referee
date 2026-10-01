@@ -5,6 +5,7 @@
 import { readFileSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 import type { Questions } from "@typesafe-ai/sdk";
+import { atLeast } from "../../engine/compare.ts";
 import { REQUEST_TOKEN_LIMIT, STATE_TOKEN_LIMIT, estimateTokens } from "../../engine/config.ts";
 import { RefereeError } from "../../engine/errors.ts";
 import { threshold } from "../../engine/pack.ts";
@@ -186,7 +187,7 @@ export const decide: Command = {
       const ranked = Object.entries(mean).sort((a, b) => b[1] - a[1]);
       const [lean = "", p1 = 0] = ranked[0] ?? [];
       const p2 = ranked[1]?.[1] ?? 0;
-      const verdict = !disagree && p1 >= clearAt && p1 - p2 >= margin ? "clear" : !disagree && p1 - p2 >= margin ? "weak" : "tie";
+      const verdict = !disagree && atLeast(p1, clearAt) && atLeast(p1 - p2, margin) ? "clear" : !disagree && atLeast(p1 - p2, margin) ? "weak" : "tie";
       const flags = input.options.flatMap((o) =>
         micros.flatMap((m) => {
           const answer = byId.get(`micro:${o.name}`)?.[m.id];

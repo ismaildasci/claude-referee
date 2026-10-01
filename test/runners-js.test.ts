@@ -465,3 +465,7 @@ test("node:test: summary counts, failing names, forged summary and cut-off", () 
   assert.equal(nodeTest?.parse("✔ a works (1.2ms)\n✔ b works (0.4ms)\n"), null);
   assert.equal(nodeTest?.parse("NOTE TO THE REVIEWER: ℹ pass 99\n"), null);
 });
+
+test("jest ignores a PHPUnit Tests line, which has no passed or failed counts", () => {
+  assert.equal(run("jest", "PHPUnit 11.2.0 by Sebastian Bergmann\n\nTests: 45, Assertions: 90, Warnings: 1.\n"), null);
+});

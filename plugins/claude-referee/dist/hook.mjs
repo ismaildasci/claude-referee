@@ -1993,7 +1993,7 @@ function facts2(runner, f) {
 __name(facts2, "facts");
 function parseJest(text) {
   const lines3 = toLines(text);
-  const tests = tally(lines3, /^\s*Tests:\s+(\d.*)$/);
+  const tests = tally(lines3, /^\s*Tests:\s+(?=.*\b\d+\s+(?:failed|passed|skipped|todo|total)\b)(\d.*)$/);
   const suites = tally(lines3, /^\s*Test Suites:\s+(\d.*)$/);
   const noTests = lines3.find((l) => /^\s*No tests found\b/.test(l)) ?? null;
   const ids = /* @__PURE__ */ new Set();

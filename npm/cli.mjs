@@ -719,6 +719,11 @@ __name(installAbortGuard, "installAbortGuard");
 import { readFileSync as readFileSync7, statSync as statSync3 } from "node:fs";
 import { resolve as resolve3 } from "node:path";
 
+// src/engine/compare.ts
+var EPSILON = 1e-9;
+var atLeast = /* @__PURE__ */ __name((value, bound) => value - bound >= -EPSILON, "atLeast");
+var atMost = /* @__PURE__ */ __name((value, bound) => bound - value >= -EPSILON, "atMost");
+
 // src/engine/config.ts
 var KIT = "claude-referee";
 var VERSION = "0.1.3";
@@ -2001,7 +2006,7 @@ var decide = {
       const ranked = Object.entries(mean).sort((a, b) => b[1] - a[1]);
       const [lean = "", p1 = 0] = ranked[0] ?? [];
       const p2 = ranked[1]?.[1] ?? 0;
-      const verdict = !disagree && p1 >= clearAt && p1 - p2 >= margin ? "clear" : !disagree && p1 - p2 >= margin ? "weak" : "tie";
+      const verdict = !disagree && atLeast(p1, clearAt) && atLeast(p1 - p2, margin) ? "clear" : !disagree && atLeast(p1 - p2, margin) ? "weak" : "tie";
       const flags = input.options.flatMap(
         (o) => micros.flatMap((m) => {
           const answer = byId.get(`micro:${o.name}`)?.[m.id];
@@ -2385,7 +2390,7 @@ function facts2(runner, f) {
 __name(facts2, "facts");
 function parseJest(text) {
   const lines3 = toLines(text);
-  const tests = tally(lines3, /^\s*Tests:\s+(\d.*)$/);
+  const tests = tally(lines3, /^\s*Tests:\s+(?=.*\b\d+\s+(?:failed|passed|skipped|todo|total)\b)(\d.*)$/);
   const suites2 = tally(lines3, /^\s*Test Suites:\s+(\d.*)$/);
   const noTests = lines3.find((l) => /^\s*No tests found\b/.test(l)) ?? null;
   const ids = /* @__PURE__ */ new Set();
@@ -3297,10 +3302,10 @@ var judge = {
             const p = answer?.type === "noul" ? answer.noul : 0.5;
             const band = auto[id] ?? 0.9;
             const label = ids.length > 1 ? `${outcome.id}/${id}` : outcome.id;
-            if (p >= band) {
+            if (atLeast(p, band)) {
               yes += 1;
               flagged.push(label);
-            } else if (p <= 1 - band) {
+            } else if (atMost(p, 1 - band)) {
               no += 1;
             } else {
               review += 1;
