@@ -53,10 +53,10 @@ test("phpunit: failures and errors", () => {
   const f = phpunit.parse(PHP_FAIL);
   assert.deepEqual(f, {
     runner: "phpunit",
-    passed: 8,
+    passed: 7,
     failed: 2,
     errors: 1,
-    skipped: 1,
+    skipped: 2,
     failing: [
       "Tests\\UserTest::testName",
       "Tests\\UserTest::testOther with data set #1 (array(1, 2))",
@@ -332,4 +332,9 @@ test("runners do not claim each other's output", () => {
   assert.equal(phpunit.parse(RSPEC_FAIL), null);
   assert.equal(rspec.parse(PHP_FAIL), null);
   assert.equal(phpunit.parse("Tests:       1 failed, 2 passed, 3 total\n"), null);
+});
+
+test("phpunit: risky and incomplete tests count as not fully passed, next to skipped", () => {
+  const f = phpunit.parse("OK, but there were issues!\nTests: 187, Assertions: 412, Skipped: 2, Risky: 1, Incomplete: 1.\n");
+  assert.deepEqual({ passed: f?.passed, failed: f?.failed, skipped: f?.skipped }, { passed: 183, failed: 0, skipped: 4 });
 });

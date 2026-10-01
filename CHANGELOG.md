@@ -9,8 +9,13 @@ All notable changes to this project are documented here. The format follows [Kee
 - Labelling a stop (`receipts --stops --label`) rewrote the whole `stops.jsonl`, so a stop recorded by another session at that moment could be lost. Labels are now appended to `labels.jsonl` and merged on read; labels written inline by earlier versions are still read. The size-based pruning of old stops now skips the rewrite when the file changed under it.
 - A project's `stop.gate` threshold for `claims_verified` or `blocked` could only be raised, which made the done-gate fire more, the opposite of "a project can only make a check stricter". Those two now accept only a lower value. Shadow mode only; `decideStop` now has direct tests for every threshold edge.
 
+### Changed
+
+- `done` never says `met` when tests were skipped, risky or incomplete (a skipped or ignored count above 0, or PHPUnit's "OK, but incomplete, skipped, or risky tests!"): the verdict is `unsure` with `reason: "skipped_tests"`, whatever Jev answers. The skipped count stays in the facts.
+
 ### Added
 
+- Parsers for `node --test` TAP output, the `eslint` summary line (warnings are a separate fact), `tsc -b`, `golangci-lint`, `vite build` and `cargo build`/`check` (warnings are a separate fact). Fewer runs depend on an exit code alone. PHPUnit's `Risky:` and `Incomplete:` counts now count as not fully passed (in `skipped`). The 10 cases of `done-v2-h3` and one of `done-v2-h2` that these changed moved to `done-v2` as dev.
 - `jev-evals/done-v2-h3`: a third hold-out for `done` v2 (46 cases, registered in `docs/decisions/done-v2-holdout3.md`). It failed its registered check (2 wrong `met`); the suite's allowance is those 2 observed cases.
 - Parsers for Python `unittest` and `cargo clippy`. Clippy output reports its warnings as a separate `warnings` fact, so a criterion like "lint is clean" no longer rests on an exit code alone.
 - `jev-evals/done-v2-h2`: a second hold-out for `done` v2 (45 cases, registered in `docs/decisions/done-v2-holdout2.md`). It failed its registered check with one wrong `met`; the suite's allowance is that one case. `eval` now applies the non-zero exit-code rule like `done` does.

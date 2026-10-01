@@ -469,3 +469,25 @@ test("node:test: summary counts, failing names, forged summary and cut-off", () 
 test("jest ignores a PHPUnit Tests line, which has no passed or failed counts", () => {
   assert.equal(run("jest", "PHPUnit 11.2.0 by Sebastian Bergmann\n\nTests: 45, Assertions: 90, Warnings: 1.\n"), null);
 });
+
+test("node:test reads the TAP summary and not ok lines", () => {
+  const pass = run("node:test", "TAP version 13\n# Subtest: a\nok 1 - a\n1..1\n# tests 6\n# suites 2\n# pass 6\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 171.2\n");
+  assert.deepEqual(counts(pass), [6, 0, 0, 0]);
+  const fail = run("node:test", "not ok 2 - retry\n# tests 6\n# pass 5\n# fail 1\n# cancelled 0\n# skipped 1\n");
+  assert.deepEqual(counts(fail), [5, 1, 0, 1]);
+  assert.deepEqual(fail?.failing, ["retry"]);
+});
+
+test("eslint reads a clean summary and reports warnings as their own fact", () => {
+  const clean = run("eslint", "\u001b[1m\u001b[32m✔ 0 problems (0 errors, 0 warnings)\u001b[39m\u001b[22m\n");
+  assert.deepEqual({ e: clean?.errors, w: clean?.warnings }, { e: 0, w: 0 });
+  const warn = run("eslint", "src/a.ts\n  3:1  warning  Unexpected console statement  no-console\n\n✖ 1 problem (0 errors, 1 warning)\n");
+  assert.deepEqual({ e: warn?.errors, w: warn?.warnings }, { e: 0, w: 1 });
+});
+
+test("tsc recognises a tsc -b run with no errors", () => {
+  const f = run("tsc", "[10:42:07] Projects in this build: \n    * packages/core/tsconfig.json\n\n[10:42:07] Building project '/srv/work/x/packages/api/tsconfig.json'...\n");
+  assert.deepEqual({ r: f?.runner, e: f?.errors }, { r: "tsc", e: 0 });
+  const bad = run("tsc", "[10:42:07] Building project '/srv/work/x/tsconfig.json'...\n\nsrc/a.ts(3,5): error TS2322: Type 'string' is not assignable to type 'number'.\n");
+  assert.equal(bad?.errors, 1);
+});

@@ -185,26 +185,30 @@ function parseEslint(text: string): RunnerFacts | null {
   const lines = toLines(text);
   let summary: string | null = null;
   let errorsMax = 0;
+  let warningsMax = 0;
   let file = "";
   const entries = new Set<string>();
+  const warned = new Set<string>();
   let sawLine = false;
   for (const l of lines) {
-    const s = /^\s*✖\s+(\d+) problems?\s+\((\d+) errors?,\s*(\d+) warnings?\)/.exec(l);
+    const s = /^\s*[✖✔]\s+(\d+) problems?\s+\((\d+) errors?,\s*(\d+) warnings?\)/.exec(l);
     if (s !== null) {
       summary = l;
       errorsMax = Math.max(errorsMax, Number(s[2]));
+      warningsMax = Math.max(warningsMax, Number(s[3]));
       continue;
     }
     const d = /^\s+(\d+):(\d+)\s+(error|warning)\s+(.*?)(?:\s{2,}([@\w/.-]+))?\s*$/.exec(l);
     if (d !== null) {
       sawLine = true;
       if (d[3] === "error") entries.add(`${file === "" ? "" : `${file}:`}${d[1]}:${d[2]} ${d[5] ?? "error"}`);
+      else warned.add(`${file}:${d[1]}:${d[2]}`);
       continue;
     }
     if (/^\S*[./\\]\S*$/.test(l)) file = l;
   }
   if (summary === null && !sawLine) return null;
-  return facts("eslint", { passed: 0, failed: 0, errors: Math.max(errorsMax, entries.size), skipped: 0, failing: entries, summary });
+  return { ...facts("eslint", { passed: 0, failed: 0, errors: Math.max(errorsMax, entries.size), skipped: 0, failing: entries, summary }), warnings: Math.max(warningsMax, warned.size) };
 }
 
 function parseTsc(text: string): RunnerFacts | null {
@@ -227,7 +231,8 @@ function parseTsc(text: string): RunnerFacts | null {
     const g = /^\s*error\s+(TS\d+):/.exec(l);
     if (g !== null) entries.add(g[1] ?? "");
   }
-  if (summary === null && entries.size === 0) return null;
+  const build = lines.some((l) => /^\s*(?:\[[^\]]*\]\s*)?(?:Projects in this build:|Building project ')/.test(l));
+  if (summary === null && entries.size === 0 && !build) return null;
   const errors = Math.max(errorsMax, entries.size);
   return facts("tsc", { passed: summary !== null && errors === 0 ? 1 : 0, failed: 0, errors, skipped: 0, failing: entries, summary });
 }
@@ -235,7 +240,7 @@ function parseTsc(text: string): RunnerFacts | null {
 function parseNodeTest(text: string): RunnerFacts | null {
   const lines = toLines(text);
   const num = (key: string): number | null => {
-    const hit = [...lines].reverse().map((l) => new RegExp(`^ℹ ${key} (\\d+)\\s*$`).exec(l)).find((m) => m !== null);
+    const hit = [...lines].reverse().map((l) => new RegExp(`^(?:ℹ|#) ${key} (\\d+)\\s*$`).exec(l)).find((m) => m !== null);
     return hit ? Number(hit[1]) : null;
   };
   const tests = num("tests");
@@ -247,8 +252,10 @@ function parseNodeTest(text: string): RunnerFacts | null {
     if (/^✖ failing tests:\s*$/.test(l)) inFailing = true;
     const m = /^✖ (.+?) \(\d+(?:\.\d+)?ms\)\s*$/.exec(l);
     if (m !== null && !inFailing) ids.add(m[1] as string);
+    const tap = /^not ok \d+ - (.+?)\s*$/.exec(l);
+    if (tap !== null) ids.add(tap[1] as string);
   }
-  const summary = tests !== null && pass !== null && fail !== null ? lines.filter((l) => /^ℹ (?:tests|pass|fail) \d+\s*$/.test(l)).slice(-3).join(" ") : null;
+  const summary = tests !== null && pass !== null && fail !== null ? lines.filter((l) => /^(?:ℹ|#) (?:tests|pass|fail) \d+\s*$/.test(l)).slice(-3).join(" ") : null;
   const failed = Math.max(fail ?? 0, ids.size);
   if (summary === null && failed === 0) return null;
   return facts("node:test", { passed: pass ?? 0, failed, errors: 0, skipped: num("skipped") ?? 0, failing: ids, summary });

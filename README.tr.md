@@ -226,7 +226,7 @@ Her komut tek satır JSON basar: `ok`, karar, birkaç sayı, varsa bir `next_ste
 > { npx tsc --noEmit; echo "tsc exit code: $?"; } 2>&1 | npx claude-referee done --criteria "typecheck passes" --evidence -
 > ```
 
-`done`, yalnızca bir test çalıştırıcısının, linter'ın ya da tip denetleyicisinin özetini ya da bir çıkış kodu satırını tanırsa `met` döndürür. Başka her şey `trust: unparsed` ile `unsure` olarak gelir. Kanıtta sıfırdan farklı bir çıkış kodu varsa sonuç `missing` olur (`reason: exit_code_nonzero`) ve Jev'e sorulmaz.
+`done`, yalnızca bir test çalıştırıcısının, linter'ın ya da tip denetleyicisinin özetini ya da bir çıkış kodu satırını tanırsa `met` döndürür. Başka her şey `trust: unparsed` ile `unsure` olarak gelir. Kanıtta sıfırdan farklı bir çıkış kodu varsa sonuç `missing` olur (`reason: exit_code_nonzero`) ve Jev'e sorulmaz. Atlanan, riskli ya da tamamlanmamış testler `met`'i `unsure` ile sınırlar (`reason: skipped_tests`).
 
 ## Makinenden ne çıkar
 

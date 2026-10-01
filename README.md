@@ -232,7 +232,7 @@ Each command prints one line of JSON: `ok`, the verdict, a few numbers, a `next_
 > { npx tsc --noEmit; echo "tsc exit code: $?"; } 2>&1 | npx claude-referee done --criteria "typecheck passes" --evidence -
 > ```
 
-`done` returns `met` only when it recognises a test runner, linter or type checker summary, or an exit code line. Anything else comes back `unsure` with `trust: unparsed`. A non-zero exit code in the evidence is `missing` (`reason: exit_code_nonzero`) and Jev isn't asked.
+`done` returns `met` only when it recognises a test runner, linter or type checker summary, or an exit code line. Anything else comes back `unsure` with `trust: unparsed`. A non-zero exit code in the evidence is `missing` (`reason: exit_code_nonzero`) and Jev isn't asked. Skipped, risky or incomplete tests cap `met` at `unsure` (`reason: skipped_tests`).
 
 ## What leaves your machine
 

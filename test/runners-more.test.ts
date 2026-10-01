@@ -16,7 +16,7 @@ const unittest = parser("unittest");
 const clippy = parser("clippy");
 
 test("exports unittest and clippy", () => {
-  assert.deepEqual(parsers.map((p) => p.name), ["unittest", "clippy"]);
+  assert.deepEqual(parsers.map((p) => p.name), ["unittest", "clippy", "golangci-lint", "vite", "cargo build"]);
 });
 
 test("unittest: OK with skips", () => {
@@ -71,4 +71,36 @@ test("clippy: several packages add up, and the lint name alone (no command echo)
 test("unittest does not claim cargo or pytest verbose lines", () => {
   assert.equal(unittest.parse("test lexer::tests::empty_input ... ok\ntest lexer::tests::single_ident ... FAILED\n"), null);
   assert.equal(unittest.parse("tests/test_a.py::test_x PASSED\ntests/test_a.py::test_y FAILED\n"), null);
+});
+
+const golangci = parser("golangci-lint");
+const vite = parser("vite");
+const cargoBuild = parser("cargo build");
+
+test("golangci-lint: clean run, issues and unrelated text", () => {
+  const clean = golangci.parse('$ golangci-lint run ./...\nlevel=info msg="[runner] Issues before processing: 0, after processing: 0"\nlevel=info msg="File cache stats: 118 entries"\n');
+  assert.deepEqual({ r: clean?.runner, e: clean?.errors, f: clean?.failed }, { r: "golangci-lint", e: 0, f: 0 });
+  const dirty = golangci.parse("$ golangci-lint run\ninternal/a.go:12:5: Error return value of `f.Close` is not checked (errcheck)\ninternal/b.go:40:2: ineffectual assignment to `x` (ineffassign)\n\n2 issues:\n* errcheck: 1\n* ineffassign: 1\n");
+  assert.equal(dirty?.errors, 2);
+  assert.match(String(dirty?.summary_line), /2 issues/);
+  assert.equal(golangci.parse("level=info msg=hello\n"), null);
+});
+
+test("vite: build success with warnings, build failure, unrelated text", () => {
+  const ok = vite.parse("vite v5.2.11 building for production...\n✓ 842 modules transformed.\n(!) Some chunks are larger than 500 kB after minification.\n✓ built in 7.34s\n");
+  assert.deepEqual({ r: ok?.runner, e: ok?.errors, w: ok?.warnings }, { r: "vite", e: 0, w: 1 });
+  assert.equal(ok?.summary_line, "✓ built in 7.34s");
+  const bad = vite.parse("vite v5.2.11 building for production...\nerror during build:\nRollupError: Could not resolve \"./missing\" from \"src/main.ts\"\n");
+  assert.equal(bad?.errors, 1);
+  assert.equal(bad?.summary_line, null);
+  assert.equal(vite.parse("built in 3s\n"), null);
+});
+
+test("cargo build: warnings and errors for cargo build and check, and clippy output is left to clippy", () => {
+  const w = cargoBuild.parse("$ cargo check --all-targets\n    Checking bytesieve v0.7.3\nwarning: use of deprecated method `x`\nwarning: `bytesieve` (lib) generated 1 warning\n    Finished `dev` profile in 3.47s\n");
+  assert.deepEqual({ r: w?.runner, e: w?.errors, w: w?.warnings }, { r: "cargo build", e: 0, w: 1 });
+  const bad = cargoBuild.parse("$ cargo build\n   Compiling x v0.1.0\nerror[E0425]: cannot find value `y`\nerror: could not compile `x` (bin \"x\") due to 1 previous error\n");
+  assert.equal(bad?.errors, 1);
+  assert.equal(cargoBuild.parse("$ cargo clippy\n    Checking x v0.1.0\nwarning: y\n"), null);
+  assert.equal(cargoBuild.parse("test a ... ok\nrunning 3 tests\n"), null);
 });

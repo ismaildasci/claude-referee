@@ -72,7 +72,7 @@ const phpunit: RunnerParser = {
         const c = counts(m[2] ?? "");
         const failures = c["failures"] ?? 0;
         const errors = c["errors"] ?? 0;
-        const skipped = c["skipped"] ?? 0;
+        const skipped = (c["skipped"] ?? 0) + (c["incomplete"] ?? 0) + (c["risky"] ?? 0);
         summaryFailures = Math.max(summaryFailures, failures);
         summaryErrors = Math.max(summaryErrors, errors);
         candidates.push({ index, line, passed: Math.max(0, Number(m[1]) - failures - errors - skipped), skipped });

@@ -118,4 +118,101 @@ const clippy: RunnerParser = {
   },
 };
 
-export const parsers: readonly RunnerParser[] = [unittest, clippy];
+const GOLANGCI_MARK = /\bgolangci-lint\b|\[runner\] Issues before processing/;
+const GOLANGCI_ISSUE = /^\S+\.go:\d+:\d+: .+ \([\w-]+\)\s*$/;
+const GOLANGCI_AFTER = /Issues before processing: \d+, after processing: (\d+)/;
+const GOLANGCI_COUNT = /^(\d+) issues?:\s*$/;
+
+const golangci: RunnerParser = {
+  name: "golangci-lint",
+  parse(text) {
+    const lines = prepare(text);
+    if (!lines.some((l) => GOLANGCI_MARK.test(l))) return null;
+    let after = 0;
+    let counted = 0;
+    let issues = 0;
+    let summary: string | null = null;
+    for (const line of lines) {
+      const a = GOLANGCI_AFTER.exec(line);
+      if (a) {
+        after = Math.max(after, Number(a[1]));
+        summary ??= clip(line, MAX_SUMMARY);
+        continue;
+      }
+      const c = GOLANGCI_COUNT.exec(line);
+      if (c) {
+        counted = Math.max(counted, Number(c[1]));
+        summary = clip(line, MAX_SUMMARY);
+        continue;
+      }
+      if (GOLANGCI_ISSUE.test(line)) issues++;
+    }
+    return { runner: "golangci-lint", passed: 0, failed: 0, errors: Math.max(after, counted, issues), skipped: 0, failing: [], summary_line: summary };
+  },
+};
+
+const VITE_MARK = /^vite v\d+\.\d+(?:\.\d+)?\S* building\b/;
+const VITE_BUILT = /^✓ built in \S+\s*$/;
+const VITE_ERROR = /^(?:error during build:|✗ Build failed in\b|\[vite[:\]])/;
+const VITE_WARN = /^\(!\) /;
+
+const viteParser: RunnerParser = {
+  name: "vite",
+  parse(text) {
+    const lines = prepare(text);
+    if (!lines.some((l) => VITE_MARK.test(l))) return null;
+    let errors = 0;
+    let warnings = 0;
+    let built: string | null = null;
+    for (const line of lines) {
+      if (VITE_BUILT.test(line)) built = clip(line, MAX_SUMMARY);
+      else if (VITE_ERROR.test(line)) errors++;
+      else if (VITE_WARN.test(line)) warnings++;
+    }
+    return { runner: "vite", passed: 0, failed: 0, errors, skipped: 0, warnings, failing: [], summary_line: errors > 0 ? null : built };
+  },
+};
+
+const CARGO_BUILD_CMD = /\bcargo (?:build|check)\b/;
+const CARGO_PROGRESS = /^\s+(?:Compiling|Checking) \S+ v\d/;
+const CARGO_FINISHED = /^\s+Finished `?\w+`? (?:profile|\[)/;
+
+const cargoBuild: RunnerParser = {
+  name: "cargo build",
+  parse(text) {
+    const lines = prepare(text);
+    if (lines.some((l) => CLIPPY_MARK.test(l))) return null;
+    const marked = lines.some((l) => CARGO_BUILD_CMD.test(l)) || (lines.some((l) => CARGO_PROGRESS.test(l)) && lines.some((l) => CARGO_FINISHED.test(l) || CLIPPY_COMPILE.test(l)));
+    if (!marked || lines.some((l) => /^running \d+ tests?$/.test(l))) return null;
+    let generated = 0;
+    let headers = 0;
+    let errorHeaders = 0;
+    let dueTo = 0;
+    let couldNot = false;
+    let summary: string | null = null;
+    for (const line of lines) {
+      const g = CLIPPY_GENERATED.exec(line);
+      if (g) {
+        generated += Number(g[1]);
+        summary = clip(line, MAX_SUMMARY);
+        continue;
+      }
+      if (CLIPPY_WARNING.test(line)) {
+        headers++;
+        continue;
+      }
+      const c = CLIPPY_COMPILE.exec(line);
+      if (c) {
+        couldNot = true;
+        dueTo += Number(c[1] ?? 0);
+        summary = clip(line, MAX_SUMMARY);
+        continue;
+      }
+      if (CLIPPY_ERROR.test(line)) errorHeaders++;
+    }
+    const errors = Math.max(errorHeaders, dueTo, couldNot ? 1 : 0);
+    return { runner: "cargo build", passed: 0, failed: 0, errors, skipped: 0, warnings: Math.max(generated, headers), failing: [], summary_line: summary };
+  },
+};
+
+export const parsers: readonly RunnerParser[] = [unittest, clippy, golangci, viteParser, cargoBuild];

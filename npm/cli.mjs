@@ -2528,26 +2528,30 @@ function parseEslint(text) {
   const lines3 = toLines(text);
   let summary = null;
   let errorsMax = 0;
+  let warningsMax = 0;
   let file = "";
   const entries = /* @__PURE__ */ new Set();
+  const warned = /* @__PURE__ */ new Set();
   let sawLine = false;
   for (const l of lines3) {
-    const s = /^\s*✖\s+(\d+) problems?\s+\((\d+) errors?,\s*(\d+) warnings?\)/.exec(l);
+    const s = /^\s*[✖✔]\s+(\d+) problems?\s+\((\d+) errors?,\s*(\d+) warnings?\)/.exec(l);
     if (s !== null) {
       summary = l;
       errorsMax = Math.max(errorsMax, Number(s[2]));
+      warningsMax = Math.max(warningsMax, Number(s[3]));
       continue;
     }
     const d = /^\s+(\d+):(\d+)\s+(error|warning)\s+(.*?)(?:\s{2,}([@\w/.-]+))?\s*$/.exec(l);
     if (d !== null) {
       sawLine = true;
       if (d[3] === "error") entries.add(`${file === "" ? "" : `${file}:`}${d[1]}:${d[2]} ${d[5] ?? "error"}`);
+      else warned.add(`${file}:${d[1]}:${d[2]}`);
       continue;
     }
     if (/^\S*[./\\]\S*$/.test(l)) file = l;
   }
   if (summary === null && !sawLine) return null;
-  return facts2("eslint", { passed: 0, failed: 0, errors: Math.max(errorsMax, entries.size), skipped: 0, failing: entries, summary });
+  return { ...facts2("eslint", { passed: 0, failed: 0, errors: Math.max(errorsMax, entries.size), skipped: 0, failing: entries, summary }), warnings: Math.max(warningsMax, warned.size) };
 }
 __name(parseEslint, "parseEslint");
 function parseTsc(text) {
@@ -2570,7 +2574,8 @@ function parseTsc(text) {
     const g2 = /^\s*error\s+(TS\d+):/.exec(l);
     if (g2 !== null) entries.add(g2[1] ?? "");
   }
-  if (summary === null && entries.size === 0) return null;
+  const build = lines3.some((l) => /^\s*(?:\[[^\]]*\]\s*)?(?:Projects in this build:|Building project ')/.test(l));
+  if (summary === null && entries.size === 0 && !build) return null;
   const errors = Math.max(errorsMax, entries.size);
   return facts2("tsc", { passed: summary !== null && errors === 0 ? 1 : 0, failed: 0, errors, skipped: 0, failing: entries, summary });
 }
@@ -2578,7 +2583,7 @@ __name(parseTsc, "parseTsc");
 function parseNodeTest(text) {
   const lines3 = toLines(text);
   const num = /* @__PURE__ */ __name((key) => {
-    const hit = [...lines3].reverse().map((l) => new RegExp(`^ℹ ${key} (\\d+)\\s*$`).exec(l)).find((m) => m !== null);
+    const hit = [...lines3].reverse().map((l) => new RegExp(`^(?:ℹ|#) ${key} (\\d+)\\s*$`).exec(l)).find((m) => m !== null);
     return hit ? Number(hit[1]) : null;
   }, "num");
   const tests = num("tests");
@@ -2590,8 +2595,10 @@ function parseNodeTest(text) {
     if (/^✖ failing tests:\s*$/.test(l)) inFailing = true;
     const m = /^✖ (.+?) \(\d+(?:\.\d+)?ms\)\s*$/.exec(l);
     if (m !== null && !inFailing) ids.add(m[1]);
+    const tap = /^not ok \d+ - (.+?)\s*$/.exec(l);
+    if (tap !== null) ids.add(tap[1]);
   }
-  const summary = tests !== null && pass !== null && fail !== null ? lines3.filter((l) => /^ℹ (?:tests|pass|fail) \d+\s*$/.test(l)).slice(-3).join(" ") : null;
+  const summary = tests !== null && pass !== null && fail !== null ? lines3.filter((l) => /^(?:ℹ|#) (?:tests|pass|fail) \d+\s*$/.test(l)).slice(-3).join(" ") : null;
   const failed = Math.max(fail ?? 0, ids.size);
   if (summary === null && failed === 0) return null;
   return facts2("node:test", { passed: pass ?? 0, failed, errors: 0, skipped: num("skipped") ?? 0, failing: ids, summary });
@@ -2716,7 +2723,98 @@ var clippy = {
     return facts3;
   }
 };
-var parsers3 = [unittest, clippy];
+var GOLANGCI_MARK = /\bgolangci-lint\b|\[runner\] Issues before processing/;
+var GOLANGCI_ISSUE = /^\S+\.go:\d+:\d+: .+ \([\w-]+\)\s*$/;
+var GOLANGCI_AFTER = /Issues before processing: \d+, after processing: (\d+)/;
+var GOLANGCI_COUNT = /^(\d+) issues?:\s*$/;
+var golangci = {
+  name: "golangci-lint",
+  parse(text) {
+    const lines3 = prepare2(text);
+    if (!lines3.some((l) => GOLANGCI_MARK.test(l))) return null;
+    let after = 0;
+    let counted = 0;
+    let issues = 0;
+    let summary = null;
+    for (const line of lines3) {
+      const a = GOLANGCI_AFTER.exec(line);
+      if (a) {
+        after = Math.max(after, Number(a[1]));
+        summary ??= clip3(line, MAX_SUMMARY3);
+        continue;
+      }
+      const c = GOLANGCI_COUNT.exec(line);
+      if (c) {
+        counted = Math.max(counted, Number(c[1]));
+        summary = clip3(line, MAX_SUMMARY3);
+        continue;
+      }
+      if (GOLANGCI_ISSUE.test(line)) issues++;
+    }
+    return { runner: "golangci-lint", passed: 0, failed: 0, errors: Math.max(after, counted, issues), skipped: 0, failing: [], summary_line: summary };
+  }
+};
+var VITE_MARK = /^vite v\d+\.\d+(?:\.\d+)?\S* building\b/;
+var VITE_BUILT = /^✓ built in \S+\s*$/;
+var VITE_ERROR = /^(?:error during build:|✗ Build failed in\b|\[vite[:\]])/;
+var VITE_WARN = /^\(!\) /;
+var viteParser = {
+  name: "vite",
+  parse(text) {
+    const lines3 = prepare2(text);
+    if (!lines3.some((l) => VITE_MARK.test(l))) return null;
+    let errors = 0;
+    let warnings = 0;
+    let built = null;
+    for (const line of lines3) {
+      if (VITE_BUILT.test(line)) built = clip3(line, MAX_SUMMARY3);
+      else if (VITE_ERROR.test(line)) errors++;
+      else if (VITE_WARN.test(line)) warnings++;
+    }
+    return { runner: "vite", passed: 0, failed: 0, errors, skipped: 0, warnings, failing: [], summary_line: errors > 0 ? null : built };
+  }
+};
+var CARGO_BUILD_CMD = /\bcargo (?:build|check)\b/;
+var CARGO_PROGRESS = /^\s+(?:Compiling|Checking) \S+ v\d/;
+var CARGO_FINISHED = /^\s+Finished `?\w+`? (?:profile|\[)/;
+var cargoBuild = {
+  name: "cargo build",
+  parse(text) {
+    const lines3 = prepare2(text);
+    if (lines3.some((l) => CLIPPY_MARK.test(l))) return null;
+    const marked = lines3.some((l) => CARGO_BUILD_CMD.test(l)) || lines3.some((l) => CARGO_PROGRESS.test(l)) && lines3.some((l) => CARGO_FINISHED.test(l) || CLIPPY_COMPILE.test(l));
+    if (!marked || lines3.some((l) => /^running \d+ tests?$/.test(l))) return null;
+    let generated = 0;
+    let headers = 0;
+    let errorHeaders = 0;
+    let dueTo = 0;
+    let couldNot = false;
+    let summary = null;
+    for (const line of lines3) {
+      const g2 = CLIPPY_GENERATED.exec(line);
+      if (g2) {
+        generated += Number(g2[1]);
+        summary = clip3(line, MAX_SUMMARY3);
+        continue;
+      }
+      if (CLIPPY_WARNING.test(line)) {
+        headers++;
+        continue;
+      }
+      const c = CLIPPY_COMPILE.exec(line);
+      if (c) {
+        couldNot = true;
+        dueTo += Number(c[1] ?? 0);
+        summary = clip3(line, MAX_SUMMARY3);
+        continue;
+      }
+      if (CLIPPY_ERROR.test(line)) errorHeaders++;
+    }
+    const errors = Math.max(errorHeaders, dueTo, couldNot ? 1 : 0);
+    return { runner: "cargo build", passed: 0, failed: 0, errors, skipped: 0, warnings: Math.max(generated, headers), failing: [], summary_line: summary };
+  }
+};
+var parsers3 = [unittest, clippy, golangci, viteParser, cargoBuild];
 
 // src/engine/runners/php-ruby.ts
 var MAX_FAILING4 = 10;
@@ -2776,7 +2874,7 @@ var phpunit = {
         const c = counts(m[2] ?? "");
         const failures = c["failures"] ?? 0;
         const errors2 = c["errors"] ?? 0;
-        const skipped = c["skipped"] ?? 0;
+        const skipped = (c["skipped"] ?? 0) + (c["incomplete"] ?? 0) + (c["risky"] ?? 0);
         summaryFailures = Math.max(summaryFailures, failures);
         summaryErrors = Math.max(summaryErrors, errors2);
         candidates.push({ index, line, passed: Math.max(0, Number(m[1]) - failures - errors2 - skipped), skipped });
@@ -3065,6 +3163,12 @@ function doneEvidence(text) {
   return clip(stripAnsi(text), 2e3, 12e3);
 }
 __name(doneEvidence, "doneEvidence");
+var SKIPPED_NEXT = "Some tests were skipped, risky or incomplete, so done won't say met. Look at them: if they are expected (a platform-only test), say so yourself; otherwise run the skipped ones.";
+var SKIP_WORDS = /^OK, but .*\b(?:incomplete|skipped|risky)\b/i;
+function hasSkips(parsed) {
+  return parsed.runners.some((r) => r.skipped > 0 || r.summary_line !== null && SKIP_WORDS.test(r.summary_line));
+}
+__name(hasSkips, "hasSkips");
 var UNPARSED_NEXT = `No recognised runner summary or exit code in the evidence, so it cannot count as met. Pipe the runner's full output, or add an exit code line: { your-command; echo "exit code: $?"; } 2>&1 | claude-referee done --criteria "..."`;
 function factsOf(parsed) {
   return { trust: parsed.trust, exit_code: parsed.exit_code, exit_lines: parsed.exit_lines, runners: parsed.runners, conflict: parsed.conflict, lines: parsed.lines };
@@ -3096,9 +3200,11 @@ function doneRequest(pack, thresholds, criteria, evidence) {
       const answer = outcome?.answers?.[`c${i + 1}`];
       const p = answer?.type === "noul" ? answer.noul : 0;
       const raw = p >= met ? "met" : p < missing ? "missing" : "unsure";
-      const verdict2 = raw === "met" && (parsed.trust === "unparsed" || parsed.conflict) ? "unsure" : raw;
-      return { i: i + 1, verdict: verdict2, p };
+      const skipCap = raw === "met" && hasSkips(parsed);
+      const verdict2 = raw === "met" && (parsed.trust === "unparsed" || parsed.conflict || skipCap) ? "unsure" : raw;
+      return { i: i + 1, verdict: verdict2, p, skipCap };
     });
+    const skipCapped = per.some((c) => c.skipCap) && per.every((c) => c.verdict !== "missing") && parsed.trust !== "unparsed" && !parsed.conflict;
     const verdict = per.some((c) => c.verdict === "missing") ? "missing" : per.some((c) => c.verdict === "unsure") ? "unsure" : "met";
     return {
       ok: true,
@@ -3107,8 +3213,9 @@ function doneRequest(pack, thresholds, criteria, evidence) {
       trust: parsed.trust,
       ...parsed.exit_code !== null ? { exit_code: parsed.exit_code } : {},
       ...parsed.runners.length > 0 ? { runners: parsed.runners.map((r) => ({ runner: r.runner, passed: r.passed, failed: r.failed, errors: r.errors, skipped: r.skipped })) } : {},
-      ...per.length > 1 ? { criteria: per } : {},
-      next_step: verdict === "met" ? void 0 : parsed.trust === "unparsed" && per.every((c) => c.verdict !== "missing") ? UNPARSED_NEXT : NEXT[verdict]
+      ...skipCapped && verdict === "unsure" ? { reason: "skipped_tests" } : {},
+      ...per.length > 1 ? { criteria: per.map(({ i, verdict: v, p: pp }) => ({ i, verdict: v, p: pp })) } : {},
+      next_step: verdict === "met" ? void 0 : skipCapped && verdict === "unsure" ? SKIPPED_NEXT : parsed.trust === "unparsed" && per.every((c) => c.verdict !== "missing") ? UNPARSED_NEXT : NEXT[verdict]
     };
   }, "finish");
   const state = parsed.trust === "unparsed" ? { evidence } : { evidence: factsOf(parsed) };
@@ -3127,7 +3234,7 @@ var done = {
       verdict: "met, unsure or missing; the lowest across criteria",
       trust: "parsed (a runner summary was recognised), exit_code (only an exit code line) or unparsed (met is not possible)",
       runners: "Parsed counts per recognised runner",
-      reason: "exit_code_nonzero when the evidence has a non-zero exit code: missing, and Jev was not asked",
+      reason: "exit_code_nonzero when the evidence has a non-zero exit code (missing, Jev not asked); skipped_tests when met was capped at unsure because tests were skipped, risky or incomplete",
       p: "Lowest probability that a criterion holds",
       criteria: "Per criterion, by position, when more than one",
       next_step: "Only when not met"

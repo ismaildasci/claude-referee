@@ -1,6 +1,6 @@
 // done: does the check output show each criterion holds? One request; every criterion is a Noul on the same evidence.
 // Recognised runner output is parsed in code and only those facts reach Jev; unrecognised output can never become met.
-// A non-zero exit code in the evidence is missing without a request.
+// A non-zero exit code in the evidence is missing without a request; skipped, risky or incomplete tests cap met at unsure.
 
 import type { EntryType, Questions } from "@typesafe-ai/sdk";
 import { RefereeError } from "../../engine/errors.ts";
@@ -20,6 +20,13 @@ const NEXT: Readonly<Record<Exclude<Verdict, "met">, string>> = {
 
 export function doneEvidence(text: string): string {
   return clip(stripAnsi(text), 2_000, 12_000);
+}
+
+const SKIPPED_NEXT = "Some tests were skipped, risky or incomplete, so done won't say met. Look at them: if they are expected (a platform-only test), say so yourself; otherwise run the skipped ones.";
+const SKIP_WORDS = /^OK, but .*\b(?:incomplete|skipped|risky)\b/i;
+
+function hasSkips(parsed: ParsedEvidence): boolean {
+  return parsed.runners.some((r) => r.skipped > 0 || (r.summary_line !== null && SKIP_WORDS.test(r.summary_line)));
 }
 
 const UNPARSED_NEXT = 'No recognised runner summary or exit code in the evidence, so it cannot count as met. Pipe the runner\'s full output, or add an exit code line: { your-command; echo "exit code: $?"; } 2>&1 | claude-referee done --criteria "..."';
@@ -54,9 +61,11 @@ export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, crit
       const answer = outcome?.answers?.[`c${i + 1}`];
       const p = answer?.type === "noul" ? answer.noul : 0;
       const raw: Verdict = p >= met ? "met" : p < missing ? "missing" : "unsure";
-      const verdict: Verdict = raw === "met" && (parsed.trust === "unparsed" || parsed.conflict) ? "unsure" : raw;
-      return { i: i + 1, verdict, p };
+      const skipCap = raw === "met" && hasSkips(parsed);
+      const verdict: Verdict = raw === "met" && (parsed.trust === "unparsed" || parsed.conflict || skipCap) ? "unsure" : raw;
+      return { i: i + 1, verdict, p, skipCap };
     });
+    const skipCapped = per.some((c) => c.skipCap) && per.every((c) => c.verdict !== "missing") && parsed.trust !== "unparsed" && !parsed.conflict;
     const verdict: Verdict = per.some((c) => c.verdict === "missing") ? "missing" : per.some((c) => c.verdict === "unsure") ? "unsure" : "met";
     return {
       ok: true,
@@ -65,8 +74,9 @@ export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, crit
       trust: parsed.trust,
       ...(parsed.exit_code !== null ? { exit_code: parsed.exit_code } : {}),
       ...(parsed.runners.length > 0 ? { runners: parsed.runners.map((r) => ({ runner: r.runner, passed: r.passed, failed: r.failed, errors: r.errors, skipped: r.skipped })) } : {}),
-      ...(per.length > 1 ? { criteria: per } : {}),
-      next_step: verdict === "met" ? undefined : parsed.trust === "unparsed" && per.every((c) => c.verdict !== "missing") ? UNPARSED_NEXT : NEXT[verdict],
+      ...(skipCapped && verdict === "unsure" ? { reason: "skipped_tests" } : {}),
+      ...(per.length > 1 ? { criteria: per.map(({ i, verdict: v, p: pp }) => ({ i, verdict: v, p: pp })) } : {}),
+      next_step: verdict === "met" ? undefined : skipCapped && verdict === "unsure" ? SKIPPED_NEXT : parsed.trust === "unparsed" && per.every((c) => c.verdict !== "missing") ? UNPARSED_NEXT : NEXT[verdict],
     };
   };
   const state = (parsed.trust === "unparsed" ? { evidence } : { evidence: factsOf(parsed) }) as EntryType;
@@ -85,7 +95,7 @@ export const done: Command = {
       verdict: "met, unsure or missing; the lowest across criteria",
       trust: "parsed (a runner summary was recognised), exit_code (only an exit code line) or unparsed (met is not possible)",
       runners: "Parsed counts per recognised runner",
-      reason: "exit_code_nonzero when the evidence has a non-zero exit code: missing, and Jev was not asked",
+      reason: "exit_code_nonzero when the evidence has a non-zero exit code (missing, Jev not asked); skipped_tests when met was capped at unsure because tests were skipped, risky or incomplete",
       p: "Lowest probability that a criterion holds",
       criteria: "Per criterion, by position, when more than one",
       next_step: "Only when not met",

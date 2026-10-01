@@ -242,3 +242,57 @@ test("done --dry-run still shows the request for a non-zero exit code", async ()
   assert.equal(await run(["done", "--criteria", "all tests pass", "--evidence", "-", "--dry-run"], out, commands), 0);
   assert.equal(out.json()["dry_run"], true);
 });
+
+test("done never says met when tests were skipped, risky or incomplete, whatever Jev answers", async () => {
+  const cases: [string, string][] = [
+    ["=== 11 passed, 2 skipped in 1.00s ===\nexit code: 0\n", "pytest skipped"],
+    ["Tests: 12, Assertions: 30, Incomplete: 1, Risky: 2.\nOK, but incomplete, skipped, or risky tests!\nexit code: 0\n", "phpunit risky"],
+    ["test result: ok. 14 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.10s\nexit code: 0\n", "cargo ignored"],
+  ];
+  for (const [evidence, label] of cases) {
+    const server = await fakeJev(nouls(0.97));
+    try {
+      const out = io(server, evidence);
+      assert.equal(await run(["done", "--criteria", "all tests pass", "--evidence", "-"], out, commands), 0, label);
+      const result = out.json();
+      assert.equal(result["verdict"], "unsure", label);
+      assert.equal(result["reason"], "skipped_tests", label);
+      assert.equal(result["p"], 0.97, label);
+      assert.match(String(result["next_step"]), /skipped|risky|incomplete/i, label);
+    } finally {
+      await server.close();
+    }
+  }
+});
+
+test("done still says met for a clean run, and a skip does not turn a missing into anything else", async () => {
+  const clean = await fakeJev(nouls(0.97));
+  try {
+    const out = io(clean, "=== 12 passed in 1.00s ===\nexit code: 0\n");
+    await run(["done", "--criteria", "all tests pass", "--evidence", "-"], out, commands);
+    assert.equal(out.json()["verdict"], "met");
+    assert.equal("reason" in out.json(), false);
+  } finally {
+    await clean.close();
+  }
+  const low = await fakeJev(nouls(0.1));
+  try {
+    const out = io(low, "=== 11 passed, 2 skipped in 1.00s ===\nexit code: 0\n");
+    await run(["done", "--criteria", "all tests pass", "--evidence", "-"], out, commands);
+    assert.equal(out.json()["verdict"], "missing");
+  } finally {
+    await low.close();
+  }
+});
+
+test("a summary that merely prints a zero skipped count is not capped", async () => {
+  const server = await fakeJev(nouls(0.97));
+  try {
+    const out = io(server, "Passed!  - Failed:     0, Passed:    12, Skipped:     0, Total:    12, Duration: 1 s - app.dll (net8.0)\nexit code: 0\n");
+    await run(["done", "--criteria", "all tests pass", "--evidence", "-"], out, commands);
+    assert.equal(out.json()["verdict"], "met");
+    assert.equal("reason" in out.json(), false);
+  } finally {
+    await server.close();
+  }
+});
