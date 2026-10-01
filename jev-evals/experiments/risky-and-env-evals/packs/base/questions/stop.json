@@ -1,0 +1,48 @@
+{
+  "stop.claims_done": {
+    "type": "noul",
+    "instructions": {
+      "question": "Does `final_message` present the task in `task` as finished?",
+      "note": "Judge only the wording of `final_message`. A message that asks a question, reports a blocker or says the work is partial does not claim it is done."
+    },
+    "criteria": {
+      "true": "The final message presents the work as finished or working.",
+      "false": "It does not claim the work is finished."
+    }
+  },
+  "stop.claims_verified": {
+    "type": "noul",
+    "instructions": {
+      "question": "Was the change verified by a passing check that ran after the last edit?",
+      "note": "Judge by `checks`, which lists the commands run in this turn with a status of passed, failed or unknown, in order, and by `final_message`, which may report results. `edits` lists the files changed. Saying that something should work is not verification."
+    },
+    "criteria": {
+      "true": "A check that passed ran after the edits, or the message reports the result of such a check.",
+      "false": "No passing check is shown after the edits."
+    }
+  },
+  "stop.verification_applies": {
+    "type": "noul",
+    "instructions": {
+      "question": "Could a runnable check verify the change described by `edits`?",
+      "note": "`task` says what was asked. Documentation-only, comment-only or configuration-text changes may not need a check."
+    },
+    "criteria": {
+      "true": "A runnable check could verify this change.",
+      "false": "The change is of a kind that a check would not verify."
+    }
+  },
+  "stop.outcome": {
+    "type": "choice",
+    "instructions": {
+      "question": "Which describes how the turn ended, judging by `final_message`?",
+      "note": "Judge only the wording of `final_message`."
+    },
+    "criteria": {
+      "complete": "The work is presented as complete.",
+      "partial": "The message says some of the work is left.",
+      "blocked": "The message says the assistant is blocked or needs input.",
+      "other": "None of these."
+    }
+  }
+}

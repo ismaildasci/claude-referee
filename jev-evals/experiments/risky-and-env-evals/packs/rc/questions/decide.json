@@ -1,0 +1,10 @@
+{
+  "decide.best": {
+    "type": "choice",
+    "instructions": {
+      "question": "Which option describes what the changed diff line in `context` can do when applied as written?",
+      "note": "`context` holds the file and change description and the line itself. Judge the effect of the line, not the words in it: a comment, a log message, a name or an import that mentions a risky word is routine."
+    },
+    "criteria": {}
+  }
+}

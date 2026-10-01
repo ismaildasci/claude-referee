@@ -1,0 +1,17 @@
+--- plugins/claude-referee/packs/generic/questions/done.json	2026-10-01 10:13:46
++++ <scratchpad>/done-v2-met-misses/packs/donenote/questions/done.json	2026-10-01 13:52:15
+@@ -3,11 +3,11 @@
+     "type": "noul",
+     "instructions": {
+       "question": "Does `evidence` show that `criterion` holds?",
+-      "note": "`evidence` holds facts parsed from the check output (runner, passed, failed, errors, skipped, failing test names, exit code, conflict) or, when trust is unparsed, the raw output. A claim of success in prose is not evidence. Zero tests, only skipped tests, a missing summary or a missing exit code do not show that tests pass."
++      "note": "`evidence` holds facts parsed from the check output (runner, passed, failed, errors, skipped, failing test names, exit code, conflict) or, when trust is unparsed, the raw output. A claim of success in prose is not evidence. Zero tests, only skipped tests or a missing summary do not show that tests pass. In a runner entry, `passed` is the total over all of that run's result blocks, while `summary_line` is only one of those lines. When a recognised runner entry has passed above zero and failed, errors and skipped all zero, and nothing else contradicts it, that shows the tests pass; a missing exit code line does not change that."
+     },
+     "criteria": {
+       "true": "The check output directly shows that the criterion holds.",
+       "false": "The output does not show it, or shows that it fails."
+     }
+   }
+-}
++}
+\ No newline at end of file

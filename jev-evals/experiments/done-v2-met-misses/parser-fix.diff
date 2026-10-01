@@ -1,0 +1,4 @@
+70c70
+<   const tests = tally(lines, /^\s*Tests:\s+(\d.*)$/);
+---
+>   const tests = tally(lines, /^\s*Tests:\s+(?=.*\b\d+\s+(?:failed|passed|skipped|todo|total)\b)(\d.*)$/);

@@ -1,0 +1,1456 @@
+[
+ {
+  "id": "d-pytest-pass",
+  "split": "dev",
+  "exp": "met",
+  "p": 0.97,
+  "nrec": 2,
+  "allp": [
+   0.98,
+   0.97
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": 0,
+  "runners": [
+   "pytest:42/0/0/0"
+  ],
+  "verdict": "met",
+  "variant": "pytest_exit0"
+ },
+ {
+  "id": "d-jest-pass",
+  "split": "dev",
+  "exp": "met",
+  "p": 0.98,
+  "nrec": 2,
+  "allp": [
+   0.97,
+   0.98
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": 0,
+  "runners": [
+   "jest:27/0/0/0"
+  ],
+  "verdict": "met",
+  "variant": "jest_exit0"
+ },
+ {
+  "id": "d-cargo-pass",
+  "split": "dev",
+  "exp": "met",
+  "p": 0.65,
+  "nrec": 2,
+  "allp": [
+   0.64,
+   0.65
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "cargo test:10/0/0/0"
+  ],
+  "verdict": "unsure",
+  "variant": "cargo_exit0"
+ },
+ {
+  "id": "d-phpunit-pass",
+  "split": "dev",
+  "exp": "met",
+  "p": 0.97,
+  "nrec": 2,
+  "allp": [
+   0.97,
+   0.97
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": 0,
+  "runners": [
+   "phpunit:51/0/0/0"
+  ],
+  "verdict": "met",
+  "variant": "phpunit_ok"
+ },
+ {
+  "id": "d-eslint-clean",
+  "split": "dev",
+  "exp": "met",
+  "p": 0.23,
+  "nrec": 2,
+  "allp": [
+   0.23,
+   0.23
+  ],
+  "trust": "exit_code",
+  "conflict": false,
+  "exit": 0,
+  "runners": [],
+  "verdict": "missing",
+  "variant": "eslint_exit0"
+ },
+ {
+  "id": "d-ruff-clean",
+  "split": "dev",
+  "exp": "met",
+  "p": 0.94,
+  "nrec": 2,
+  "allp": [
+   0.94,
+   0.94
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": 0,
+  "runners": [
+   "ruff:1/0/0/0"
+  ],
+  "verdict": "met",
+  "variant": "ruff_all_passed"
+ },
+ {
+  "id": "d-tsc-silent-exit0",
+  "split": "dev",
+  "exp": "met",
+  "p": 0.21,
+  "nrec": 2,
+  "allp": [
+   0.25,
+   0.21
+  ],
+  "trust": "exit_code",
+  "conflict": false,
+  "exit": 0,
+  "runners": [],
+  "verdict": "missing",
+  "variant": "tsc_empty_exit0"
+ },
+ {
+  "id": "d-build-exit0",
+  "split": "dev",
+  "exp": "met",
+  "p": 0.57,
+  "nrec": 2,
+  "allp": [
+   0.5,
+   0.57
+  ],
+  "trust": "exit_code",
+  "conflict": false,
+  "exit": 0,
+  "runners": [],
+  "verdict": "unsure",
+  "variant": "make_build_exit0"
+ },
+ {
+  "id": "d-vitest-warn",
+  "split": "dev",
+  "exp": "met",
+  "p": 0.97,
+  "nrec": 2,
+  "allp": [
+   0.98,
+   0.97
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": 0,
+  "runners": [
+   "vitest:25/0/0/0"
+  ],
+  "verdict": "met",
+  "variant": "vitest_deprecation_warnings"
+ },
+ {
+  "id": "d-dotnet-pass",
+  "split": "dev",
+  "exp": "met",
+  "p": 0.82,
+  "nrec": 2,
+  "allp": [
+   0.72,
+   0.82
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "dotnet test:36/0/0/0"
+  ],
+  "verdict": "met",
+  "variant": "dotnet_passed"
+ },
+ {
+  "id": "d-multi-pass",
+  "split": "dev",
+  "exp": "met",
+  "p": 0.97,
+  "nrec": 2,
+  "allp": [
+   0.97,
+   0.97
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": 0,
+  "runners": [
+   "pytest:26/0/0/0",
+   "jest:14/0/0/0"
+  ],
+  "verdict": "met",
+  "variant": "jest_and_pytest_pass"
+ },
+ {
+  "id": "d-multi-fail",
+  "split": "dev",
+  "exp": "missing",
+  "p": 0.01,
+  "nrec": 2,
+  "allp": [
+   0.01,
+   0.01
+  ],
+  "trust": "parsed",
+  "conflict": true,
+  "exit": 1,
+  "runners": [
+   "jest:18/1/0/0",
+   "go test:2/0/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "go_pass_jest_fail"
+ },
+ {
+  "id": "d-pytest-fail",
+  "split": "dev",
+  "exp": "missing",
+  "p": 0.01,
+  "nrec": 2,
+  "allp": [
+   0.01,
+   0.01
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "pytest:30/1/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "pytest_failed"
+ },
+ {
+  "id": "d-mocha-fail",
+  "split": "dev",
+  "exp": "missing",
+  "p": 0.02,
+  "nrec": 2,
+  "allp": [
+   0.02,
+   0.02
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "mocha:5/1/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "mocha_failing"
+ },
+ {
+  "id": "d-dotnet-fail",
+  "split": "dev",
+  "exp": "missing",
+  "p": 0.01,
+  "nrec": 2,
+  "allp": [
+   0.01,
+   0.01
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "dotnet test:14/1/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "dotnet_failed"
+ },
+ {
+  "id": "d-eslint-errors",
+  "split": "dev",
+  "exp": "missing",
+  "p": 0.01,
+  "nrec": 3,
+  "allp": [
+   0.01,
+   0.01,
+   0.01
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": 1,
+  "runners": [
+   "eslint:0/0/2/0"
+  ],
+  "verdict": "missing",
+  "variant": "eslint_errors"
+ },
+ {
+  "id": "d-tsc-errors",
+  "split": "dev",
+  "exp": "missing",
+  "p": 0.01,
+  "nrec": 2,
+  "allp": [
+   0.02,
+   0.01
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": 2,
+  "runners": [
+   "tsc:0/0/3/0",
+   "dotnet test:0/0/3/0"
+  ],
+  "verdict": "missing",
+  "variant": "tsc_errors"
+ },
+ {
+  "id": "d-pytest-cut",
+  "split": "dev",
+  "exp": "missing",
+  "p": 0.08,
+  "nrec": 1,
+  "allp": [
+   0.08
+  ],
+  "trust": "unparsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [],
+  "verdict": "missing",
+  "variant": "pytest_green_then_truncated"
+ },
+ {
+  "id": "d-gotest-cut",
+  "split": "dev",
+  "exp": "missing",
+  "p": 0.3,
+  "nrec": 2,
+  "allp": [
+   0.28,
+   0.3
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "go test:3/0/1/0"
+  ],
+  "verdict": "missing",
+  "variant": "go_ok_lines_then_truncated"
+ },
+ {
+  "id": "d-jest-cut-fail",
+  "split": "dev",
+  "exp": "missing",
+  "p": 0.01,
+  "nrec": 2,
+  "allp": [
+   0.01,
+   0.01
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "jest:0/1/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "jest_fail_then_truncated"
+ },
+ {
+  "id": "d-cargo-cut-fail",
+  "split": "dev",
+  "exp": "missing",
+  "p": 0.02,
+  "nrec": 2,
+  "allp": [
+   0.02,
+   0.02
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "cargo test:9/1/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "cargo_failed_test_then_truncated"
+ },
+ {
+  "id": "d-vitest-zero",
+  "split": "dev",
+  "exp": "missing",
+  "p": 0.02,
+  "nrec": 2,
+  "allp": [
+   0.02,
+   0.02
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": 1,
+  "runners": [
+   "vitest:0/0/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "vitest_no_test_files"
+ },
+ {
+  "id": "d-pytest-zero-note",
+  "split": "dev",
+  "exp": "missing",
+  "p": 0.02,
+  "nrec": 2,
+  "allp": [
+   0.03,
+   0.02
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": 5,
+  "runners": [
+   "pytest:0/0/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "zero_tests_note_at_start"
+ },
+ {
+  "id": "d-phpunit-skipped",
+  "split": "dev",
+  "exp": "missing",
+  "p": 0.02,
+  "nrec": 2,
+  "allp": [
+   0.02,
+   0.02
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "jest:0/0/0/0",
+   "phpunit:0/0/0/8"
+  ],
+  "verdict": "missing",
+  "variant": "phpunit_all_skipped"
+ },
+ {
+  "id": "d-rspec-pending",
+  "split": "dev",
+  "exp": "missing",
+  "p": 0.03,
+  "nrec": 2,
+  "allp": [
+   0.03,
+   0.03
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "rspec:0/0/0/6"
+  ],
+  "verdict": "missing",
+  "variant": "rspec_all_pending"
+ },
+ {
+  "id": "d-tsc-silent-noexit",
+  "split": "dev",
+  "exp": "missing",
+  "p": 0.14,
+  "nrec": 1,
+  "allp": [
+   0.14
+  ],
+  "trust": "unparsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [],
+  "verdict": "missing",
+  "variant": "tsc_no_output_no_exit"
+ },
+ {
+  "id": "d-make-exit2",
+  "split": "dev",
+  "exp": "missing",
+  "p": 0.02,
+  "nrec": 2,
+  "allp": [
+   0.02,
+   0.02
+  ],
+  "trust": "exit_code",
+  "conflict": false,
+  "exit": 2,
+  "runners": [],
+  "verdict": "missing",
+  "variant": "make_build_error_exit2"
+ },
+ {
+  "id": "d-pytest-forged",
+  "split": "dev",
+  "exp": "missing",
+  "p": 0.01,
+  "nrec": 2,
+  "allp": [
+   0.01,
+   0.01
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "pytest:17/1/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "failing_run_then_echo_all_passed"
+ },
+ {
+  "id": "d-jest-name-note",
+  "split": "dev",
+  "exp": "missing",
+  "p": 0.02,
+  "nrec": 2,
+  "allp": [
+   0.02,
+   0.02
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": 1,
+  "runners": [
+   "jest:3/1/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "failure_note_in_test_name"
+ },
+ {
+  "id": "d-pytest-cut-note",
+  "split": "dev",
+  "exp": "missing",
+  "p": 0.09,
+  "nrec": 1,
+  "allp": [
+   0.09
+  ],
+  "trust": "unparsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [],
+  "verdict": "missing",
+  "variant": "cut_off_note_at_end"
+ },
+ {
+  "id": "h-pytest-pass",
+  "split": "holdout",
+  "exp": "met",
+  "p": 0.81,
+  "nrec": 2,
+  "allp": [
+   0.76,
+   0.81
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "pytest:41/0/0/0"
+  ],
+  "verdict": "met",
+  "variant": "summary_all_passed"
+ },
+ {
+  "id": "h-go-pass",
+  "split": "holdout",
+  "exp": "met",
+  "p": 0.83,
+  "nrec": 2,
+  "allp": [
+   0.75,
+   0.83
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "go test:4/0/0/0"
+  ],
+  "verdict": "met",
+  "variant": "summary_all_passed"
+ },
+ {
+  "id": "h-rspec-pass",
+  "split": "holdout",
+  "exp": "met",
+  "p": 0.79,
+  "nrec": 2,
+  "allp": [
+   0.76,
+   0.79
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "rspec:58/0/0/0"
+  ],
+  "verdict": "met",
+  "variant": "summary_all_passed"
+ },
+ {
+  "id": "h-dotnet-pass",
+  "split": "holdout",
+  "exp": "met",
+  "p": 0.78,
+  "nrec": 2,
+  "allp": [
+   0.7,
+   0.78
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "dotnet test:63/0/0/0"
+  ],
+  "verdict": "met",
+  "variant": "summary_all_passed"
+ },
+ {
+  "id": "h-ruff-pass",
+  "split": "holdout",
+  "exp": "met",
+  "p": 0.81,
+  "nrec": 2,
+  "allp": [
+   0.82,
+   0.81
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "ruff:1/0/0/0"
+  ],
+  "verdict": "met",
+  "variant": "summary_all_passed"
+ },
+ {
+  "id": "h-cargo-pass",
+  "split": "holdout",
+  "exp": "met",
+  "p": 0.64,
+  "nrec": 2,
+  "allp": [
+   0.71,
+   0.64
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "cargo test:14/0/0/0"
+  ],
+  "verdict": "unsure",
+  "variant": "summary_all_passed"
+ },
+ {
+  "id": "h-mocha-pass",
+  "split": "holdout",
+  "exp": "met",
+  "p": 0.74,
+  "nrec": 2,
+  "allp": [
+   0.73,
+   0.74
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "mocha:6/0/0/0"
+  ],
+  "verdict": "met",
+  "variant": "summary_all_passed"
+ },
+ {
+  "id": "h-vitest-pass",
+  "split": "holdout",
+  "exp": "met",
+  "p": 0.75,
+  "nrec": 2,
+  "allp": [
+   0.8,
+   0.75
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "vitest:26/0/0/0"
+  ],
+  "verdict": "met",
+  "variant": "summary_all_passed"
+ },
+ {
+  "id": "h-tsc-silent-0",
+  "split": "holdout",
+  "exp": "met",
+  "p": 0.91,
+  "nrec": 2,
+  "allp": [
+   0.24,
+   0.91
+  ],
+  "trust": "exit_code",
+  "conflict": false,
+  "exit": 0,
+  "runners": [],
+  "verdict": "met",
+  "variant": "prints_nothing_exit_0"
+ },
+ {
+  "id": "h-eslint-silent-0",
+  "split": "holdout",
+  "exp": "met",
+  "p": 0.92,
+  "nrec": 2,
+  "allp": [
+   0.21,
+   0.92
+  ],
+  "trust": "exit_code",
+  "conflict": false,
+  "exit": 0,
+  "runners": [],
+  "verdict": "met",
+  "variant": "prints_nothing_exit_0"
+ },
+ {
+  "id": "h-build-silent-0",
+  "split": "holdout",
+  "exp": "met",
+  "p": 0.8,
+  "nrec": 2,
+  "allp": [
+   0.53,
+   0.8
+  ],
+  "trust": "exit_code",
+  "conflict": false,
+  "exit": 0,
+  "runners": [],
+  "verdict": "met",
+  "variant": "prints_nothing_exit_0"
+ },
+ {
+  "id": "h-pytest-warn",
+  "split": "holdout",
+  "exp": "met",
+  "p": 0.75,
+  "nrec": 2,
+  "allp": [
+   0.76,
+   0.75
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "pytest:27/0/0/0"
+  ],
+  "verdict": "met",
+  "variant": "deprecation_warnings"
+ },
+ {
+  "id": "h-phpunit-warn",
+  "split": "holdout",
+  "exp": "met",
+  "p": 0.21,
+  "nrec": 2,
+  "allp": [
+   0.2,
+   0.21
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "jest:0/0/0/0",
+   "phpunit:45/0/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "deprecation_warnings"
+ },
+ {
+  "id": "h-jest-warn",
+  "split": "holdout",
+  "exp": "met",
+  "p": 0.8,
+  "nrec": 2,
+  "allp": [
+   0.77,
+   0.8
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "jest:31/0/0/0"
+  ],
+  "verdict": "met",
+  "variant": "deprecation_warnings"
+ },
+ {
+  "id": "h-multi-pass",
+  "split": "holdout",
+  "exp": "met",
+  "p": 0.76,
+  "nrec": 2,
+  "allp": [
+   0.81,
+   0.76
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "pytest:22/0/0/0",
+   "jest:14/0/0/0"
+  ],
+  "verdict": "met",
+  "variant": "both_pass"
+ },
+ {
+  "id": "h-multi-pass-go-vitest",
+  "split": "holdout",
+  "exp": "met",
+  "p": 0.81,
+  "nrec": 2,
+  "allp": [
+   0.76,
+   0.81
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "vitest:8/0/0/0",
+   "go test:2/0/0/0"
+  ],
+  "verdict": "met",
+  "variant": "both_pass"
+ },
+ {
+  "id": "h-multi-fail-pytest-jest",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.02,
+  "nrec": 2,
+  "allp": [
+   0.02,
+   0.02
+  ],
+  "trust": "parsed",
+  "conflict": true,
+  "exit": null,
+  "runners": [
+   "pytest:22/0/0/0",
+   "jest:13/1/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "one_fails"
+ },
+ {
+  "id": "h-multi-fail-go-vitest",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.02,
+  "nrec": 2,
+  "allp": [
+   0.02,
+   0.02
+  ],
+  "trust": "parsed",
+  "conflict": true,
+  "exit": null,
+  "runners": [
+   "vitest:8/0/0/0",
+   "go test:1/1/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "one_fails"
+ },
+ {
+  "id": "h-pytest-rerun",
+  "split": "holdout",
+  "exp": "met",
+  "p": 0.58,
+  "nrec": 2,
+  "allp": [
+   0.63,
+   0.58
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "pytest:18/0/0/0"
+  ],
+  "verdict": "unsure",
+  "variant": "rerun_then_pass"
+ },
+ {
+  "id": "h-rspec-retry",
+  "split": "holdout",
+  "exp": "met",
+  "p": 0.79,
+  "nrec": 2,
+  "allp": [
+   0.72,
+   0.79
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "rspec:39/0/0/0"
+  ],
+  "verdict": "met",
+  "variant": "rerun_then_pass"
+ },
+ {
+  "id": "h-pytest-fail",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.01,
+  "nrec": 2,
+  "allp": [
+   0.01,
+   0.01
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "pytest:40/1/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "failing_tests"
+ },
+ {
+  "id": "h-rspec-fail",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.01,
+  "nrec": 2,
+  "allp": [
+   0.01,
+   0.01
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "rspec:41/1/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "failing_tests"
+ },
+ {
+  "id": "h-phpunit-fail",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.01,
+  "nrec": 2,
+  "allp": [
+   0.01,
+   0.01
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "jest:0/0/0/0",
+   "phpunit:27/1/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "failing_tests"
+ },
+ {
+  "id": "h-dotnet-fail",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.01,
+  "nrec": 2,
+  "allp": [
+   0.01,
+   0.01
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "dotnet test:62/1/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "failing_tests"
+ },
+ {
+  "id": "h-pytest-cut-greens",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.19,
+  "nrec": 2,
+  "allp": [
+   0.19,
+   0.19
+  ],
+  "trust": "unparsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [],
+  "verdict": "missing",
+  "variant": "cut_before_summary"
+ },
+ {
+  "id": "h-jest-cut-greens",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.87,
+  "nrec": 1,
+  "allp": [
+   0.87
+  ],
+  "trust": "unparsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [],
+  "verdict": "unsure",
+  "variant": "cut_before_summary"
+ },
+ {
+  "id": "h-vitest-cut-greens",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.84,
+  "nrec": 2,
+  "allp": [
+   0.84,
+   0.84
+  ],
+  "trust": "unparsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [],
+  "verdict": "unsure",
+  "variant": "cut_before_summary"
+ },
+ {
+  "id": "h-cargo-cut",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.43,
+  "nrec": 2,
+  "allp": [
+   0.41,
+   0.43
+  ],
+  "trust": "unparsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [],
+  "verdict": "missing",
+  "variant": "cut_before_summary"
+ },
+ {
+  "id": "h-mocha-cut-fail",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.01,
+  "nrec": 2,
+  "allp": [
+   0.01,
+   0.01
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "mocha:0/1/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "cut_but_failure_visible"
+ },
+ {
+  "id": "h-go-cut-fail",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.01,
+  "nrec": 2,
+  "allp": [
+   0.01,
+   0.01
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "go test:3/1/1/0"
+  ],
+  "verdict": "missing",
+  "variant": "cut_but_failure_visible"
+ },
+ {
+  "id": "h-pytest-cut-fail",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.02,
+  "nrec": 1,
+  "allp": [
+   0.02
+  ],
+  "trust": "unparsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [],
+  "verdict": "missing",
+  "variant": "cut_but_failure_visible"
+ },
+ {
+  "id": "h-pytest-zero",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.03,
+  "nrec": 2,
+  "allp": [
+   0.03,
+   0.03
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "pytest:0/0/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "no_tests_collected"
+ },
+ {
+  "id": "h-jest-zero",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.02,
+  "nrec": 2,
+  "allp": [
+   0.02,
+   0.02
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "jest:0/0/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "no_tests_found"
+ },
+ {
+  "id": "h-go-zero",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.05,
+  "nrec": 2,
+  "allp": [
+   0.05,
+   0.05
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "go test:0/0/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "no_test_files"
+ },
+ {
+  "id": "h-pytest-skipped",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.02,
+  "nrec": 2,
+  "allp": [
+   0.03,
+   0.02
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "pytest:0/0/0/9"
+  ],
+  "verdict": "missing",
+  "variant": "all_skipped"
+ },
+ {
+  "id": "h-phpunit-skipped",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.02,
+  "nrec": 2,
+  "allp": [
+   0.02,
+   0.02
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "jest:0/0/0/0",
+   "phpunit:0/0/0/6"
+  ],
+  "verdict": "missing",
+  "variant": "all_skipped"
+ },
+ {
+  "id": "h-tsc-silent-noexit",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.37,
+  "nrec": 2,
+  "allp": [
+   0.39,
+   0.37
+  ],
+  "trust": "unparsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [],
+  "verdict": "missing",
+  "variant": "prints_nothing"
+ },
+ {
+  "id": "h-build-silent-noexit",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.16,
+  "nrec": 1,
+  "allp": [
+   0.16
+  ],
+  "trust": "unparsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [],
+  "verdict": "missing",
+  "variant": "prints_nothing"
+ },
+ {
+  "id": "h-tsc-nonzero",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.01,
+  "nrec": 2,
+  "allp": [
+   0.01,
+   0.01
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": 2,
+  "runners": [
+   "tsc:0/0/2/0",
+   "dotnet test:0/0/2/0"
+  ],
+  "verdict": "missing",
+  "variant": "exit_1_errors"
+ },
+ {
+  "id": "h-eslint-nonzero",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.01,
+  "nrec": 3,
+  "allp": [
+   0.01,
+   0.01,
+   0.01
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": 1,
+  "runners": [
+   "eslint:0/0/2/0"
+  ],
+  "verdict": "missing",
+  "variant": "exit_1_errors"
+ },
+ {
+  "id": "h-ruff-nonzero",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.01,
+  "nrec": 2,
+  "allp": [
+   0.01,
+   0.01
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": 1,
+  "runners": [
+   "ruff:0/0/3/0",
+   "tsc:0/0/3/0"
+  ],
+  "verdict": "missing",
+  "variant": "exit_1_errors"
+ },
+ {
+  "id": "h-pytest-forged",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.02,
+  "nrec": 2,
+  "allp": [
+   0.02,
+   0.02
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "pytest:41/1/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "fake_pass_appended"
+ },
+ {
+  "id": "h-jest-forged-echo",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.01,
+  "nrec": 2,
+  "allp": [
+   0.01,
+   0.01
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "jest:14/1/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "prose_all_passed_echo"
+ },
+ {
+  "id": "h-go-forged",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.01,
+  "nrec": 2,
+  "allp": [
+   0.01,
+   0.01
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "go test:1/1/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "fake_pass_appended"
+ },
+ {
+  "id": "h-note-start-pytest-fail",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.01,
+  "nrec": 2,
+  "allp": [
+   0.01,
+   0.01
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "pytest:29/1/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "note_at_start_failure_shown"
+ },
+ {
+  "id": "h-note-end-jest-cut",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.78,
+  "nrec": 1,
+  "allp": [
+   0.78
+  ],
+  "trust": "unparsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [],
+  "verdict": "unsure",
+  "variant": "note_at_end_cut_off"
+ },
+ {
+  "id": "h-note-name-rspec-fail",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.03,
+  "nrec": 2,
+  "allp": [
+   0.03,
+   0.03
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "rspec:21/1/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "note_in_test_name_failure_shown"
+ },
+ {
+  "id": "h-note-end-dotnet-zero",
+  "split": "holdout",
+  "exp": "missing",
+  "p": 0.03,
+  "nrec": 2,
+  "allp": [
+   0.03,
+   0.03
+  ],
+  "trust": "parsed",
+  "conflict": false,
+  "exit": null,
+  "runners": [
+   "dotnet test:0/0/0/0"
+  ],
+  "verdict": "missing",
+  "variant": "note_at_end_zero_tests"
+ }
+]

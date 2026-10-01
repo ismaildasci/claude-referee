@@ -1,0 +1,12 @@
+{"variant":"env-base","case":"e-d11","split":"dev","stopped":false,"answers":[{"failure.env":{"type":"noul","noul":0.92}}]}
+{"variant":"env-base","case":"e-d05","split":"dev","stopped":false,"answers":[{"failure.env":{"type":"noul","noul":0.98}}]}
+{"variant":"env-base","case":"e-d09","split":"dev","stopped":false,"answers":[{"failure.env":{"type":"noul","noul":0.96}}]}
+{"variant":"env-base","case":"e-d12","split":"dev","stopped":false,"answers":[{"failure.env":{"type":"noul","noul":0.83}}]}
+{"variant":"env-base","case":"e-d03","split":"dev","stopped":false,"answers":[{"failure.env":{"type":"noul","noul":0.93}}]}
+{"variant":"env-base","case":"e-d10","split":"dev","stopped":false,"answers":[{"failure.env":{"type":"noul","noul":0.96}}]}
+{"variant":"env-base","case":"c-d03","split":"dev","stopped":false,"answers":[{"failure.env":{"type":"noul","noul":0.57}}]}
+{"variant":"env-base","case":"c-d04","split":"dev","stopped":false,"answers":[{"failure.env":{"type":"noul","noul":0.15}}]}
+{"variant":"env-base","case":"c-d07","split":"dev","stopped":false,"answers":[{"failure.env":{"type":"noul","noul":0.08}}]}
+{"variant":"env-base","case":"c-d05","split":"dev","stopped":false,"answers":[{"failure.env":{"type":"noul","noul":0.06}}]}
+{"variant":"env-base","case":"c-d09","split":"dev","stopped":false,"answers":[{"failure.env":{"type":"noul","noul":0.05}}]}
+{"variant":"env-base","case":"c-d11","split":"dev","stopped":false,"answers":[{"failure.env":{"type":"noul","noul":0.04}}]}

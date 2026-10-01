@@ -1,0 +1,6 @@
+{
+  "name": "generic",
+  "version": "0.1.0",
+  "model": "jev-1.13.0",
+  "description": "Language-neutral questions for done, verify, decide and judge."
+}

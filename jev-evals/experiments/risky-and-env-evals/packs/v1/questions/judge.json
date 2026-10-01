@@ -1,0 +1,24 @@
+{
+  "line.risky": {
+    "type": "noul",
+    "instructions": {
+      "question": "Would applying this changed line as written change what the program does in a way that a reviewer must check?",
+      "note": "`item` is one line of a diff. `context` says which file and what the change is. Judge the effect of the line, not the words in it: a comment, a log message, a name or an import that mentions a risky word is routine. A small change (one operator, one constant, a removed check, a swallowed error) in code that handles security, stored data, shared state, money or errors is not routine."
+    },
+    "criteria": {
+      "true": "The line, as written, can open a security hole, lose or corrupt data, create a race, give a wrong amount of money, hide or change an error, or log a secret or credential.",
+      "false": "The line cannot change what the program does or exposes: comments, formatting, an unused import, a rename with the body unchanged, or a log message that holds no secret."
+    }
+  },
+  "failure.env": {
+    "type": "noul",
+    "instructions": {
+      "question": "Does the output show a cause that lies outside the code under test?",
+      "note": "`item` is the output of one failing test. Outside the code means the machine, the network or the CI setup. Error words such as timeout, connection refused, not found or permission denied inside a scenario the test simulates or asserts, or caused by a path or loop the code gets wrong, do not count."
+    },
+    "criteria": {
+      "true": "The output shows the machine or setup failing: an unreachable host or DNS error, a missing tool, library, file or fixture that the setup should provide, an operating-system permission error, a port in use, a full disk, a memory or file-handle limit, an expired certificate, or a stopped daemon.",
+      "false": "The output shows the code under test, or the test, misbehaving: a failed assertion or wrong value, an exception raised by repository code, an application-level error response, an infinite loop, or a path or import that the code builds wrongly."
+    }
+  }
+}

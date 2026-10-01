@@ -1,0 +1,76 @@
+{
+ "B1": [
+  {
+   "id": "ba1-iac-apply",
+   "margin": 0.105,
+   "p1": 0.52,
+   "dist": 0.004999999999999977
+  },
+  {
+   "id": "bb1-flaky-tests",
+   "margin": 0.09,
+   "p1": 0.425,
+   "dist": 0.010000000000000037
+  },
+  {
+   "id": "bb1-recovery-policy",
+   "margin": 0.08,
+   "p1": 0.385,
+   "dist": 0.01999999999999999
+  },
+  {
+   "id": "vb1-secrets-norot",
+   "margin": 0.075,
+   "p1": 0.5249999999999999,
+   "dist": 0.025000000000000105
+  },
+  {
+   "id": "bb1-advisory-handling",
+   "margin": 0.07,
+   "p1": 0.4,
+   "dist": 0.03
+  },
+  {
+   "id": "ba1-mysql-postgres",
+   "margin": 0.135,
+   "p1": 0.46499999999999997,
+   "dist": 0.035
+  }
+ ],
+ "B2": [
+  {
+   "case": "d-build-exit0",
+   "p": 0.5,
+   "dist": 0
+  },
+  {
+   "case": "d-dotnet-pass",
+   "p": 0.72,
+   "dist": 0.020000000000000018
+  },
+  {
+   "case": "d-cargo-pass",
+   "p": 0.65,
+   "dist": 0.04999999999999993
+  },
+  {
+   "case": "d-cargo-pass",
+   "p": 0.64,
+   "dist": 0.05999999999999994
+  }
+ ],
+ "B3": [
+  {
+   "case": "d-v-027",
+   "claim": "claim:1:a",
+   "mean_supports": 0.97,
+   "dist": 0.16999999999999993
+  },
+  {
+   "case": "d-v-023",
+   "claim": "claim:1:a",
+   "mean_supports": 0.98,
+   "dist": 0.17999999999999994
+  }
+ ]
+}

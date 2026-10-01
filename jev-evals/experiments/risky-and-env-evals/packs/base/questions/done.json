@@ -1,0 +1,13 @@
+{
+  "done.met": {
+    "type": "noul",
+    "instructions": {
+      "question": "Does `evidence` show that `criterion` holds?",
+      "note": "`evidence` holds facts parsed from the check output (runner, passed, failed, errors, skipped, failing test names, exit code, conflict) or, when trust is unparsed, the raw output. A claim of success in prose is not evidence. Zero tests, only skipped tests, a missing summary or a missing exit code do not show that tests pass."
+    },
+    "criteria": {
+      "true": "The check output directly shows that the criterion holds.",
+      "false": "The output does not show it, or shows that it fails."
+    }
+  }
+}

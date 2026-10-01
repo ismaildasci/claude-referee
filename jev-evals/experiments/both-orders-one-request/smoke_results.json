@@ -1,0 +1,659 @@
+{
+ "n_decisions": 39,
+ "n_complete": 39,
+ "noise": {
+  "N_p95_T1_vs_T2": 0,
+  "T": 0.04,
+  "mean_T1_vs_T2": 0,
+  "gate_inconclusive": false
+ },
+ "A1": {
+  "decisive": 27,
+  "assessable": true,
+  "leader_differs": [],
+  "pass": true
+ },
+ "A2": {
+  "agree_P1_T1": 37,
+  "agree_T1_T2": 39,
+  "agree_P1_E": 37,
+  "agree_E_T1": 39,
+  "agree_P1_P2": 39,
+  "pass": true
+ },
+ "B1": {
+  "breaches": 11,
+  "of": 39,
+  "cutoff": 11,
+  "ids": [
+   "vb1-alerting-cpuhit",
+   "ba1-metrics-retention",
+   "ba1-poison-message",
+   "ba1-service-hosting",
+   "ba1-iac-apply",
+   "bb1-flaky-tests",
+   "bb1-product-rendering",
+   "va2-ratelimit-slowreview",
+   "va2-flags-percentrollout",
+   "vb2-migration-slot",
+   "ba2-staging-envs"
+  ],
+  "pass": true
+ },
+ "B2": {
+  "mean_P1_vs_T1": 0.031153846153846174,
+  "mean_T1_vs_T2": 0,
+  "diff": 0.031153846153846174,
+  "p95_P1_vs_T1": 0.07500000000000007,
+  "max_P1_vs_T1": 0.07500000000000007,
+  "pass": false
+ },
+ "B_extra": {
+  "mean_P1_vs_P2": 0,
+  "mean_P1_vs_E": 0.031153846153846174,
+  "mean_T1_vs_E": 0,
+  "mean_T2_vs_E": 0
+ },
+ "C1": {
+  "mean_signed_shift_leader_p": 0.002692307692307675,
+  "se": 0.005165435034014655,
+  "pass": true
+ },
+ "C2": {
+  "mean_gap_pair": 0.10538461538461535,
+  "mean_gap_two": 0.10102564102564099,
+  "gap_diff_pair_minus_two": 0.004358974358974366,
+  "disagree_rate_pair": 0.1794871794871795,
+  "disagree_rate_two": 0.3076923076923077,
+  "rate_diff": -0.12820512820512822,
+  "pass": false
+ },
+ "D": {
+  "verdict_agree_P1_T1": 34,
+  "verdict_agree_T1_T2": 39,
+  "false_clear_ids": [],
+  "counts": {
+   "E": {
+    "weak": 24,
+    "tie": 15
+   },
+   "T1": {
+    "weak": 24,
+    "tie": 15
+   },
+   "T2": {
+    "weak": 24,
+    "tie": 15
+   },
+   "P1": {
+    "weak": 29,
+    "tie": 10
+   },
+   "P2": {
+    "weak": 29,
+    "tie": 10
+   },
+   "P3": {
+    "weak": 29,
+    "tie": 10
+   }
+  },
+  "pass": false
+ },
+ "G": {
+  "pair_records": 117,
+  "note": "structure checked in stored form below",
+  "failures": 0,
+  "pass": true
+ },
+ "tokens": {
+  "pair_total_r12": 39000,
+  "two_total_r12": 62400,
+  "saving_fraction": 0.375,
+  "mean_pair_per_decision": 500,
+  "mean_two_per_decision": 800,
+  "usd_at_0_042_per_M": {
+   "pair_per_decision": 0.000021,
+   "two_per_decision": 0.0000336
+  },
+  "pass": true
+ },
+ "latency": {
+  "observations": 78,
+  "clean": 78,
+  "median_pair_ms": 1200,
+  "median_two_ms": 1000,
+  "mean_pair_ms": 1200,
+  "mean_two_ms": 1000,
+  "pair_faster_share": 0,
+  "median_saving_ms": -200,
+  "p95_pair_ms": 1200,
+  "p95_two_ms": 1000,
+  "claim_allowed": false,
+  "regression": false
+ },
+ "requests": {
+  "raw_records": 195,
+  "requests_in_raw": 273,
+  "retried_records": 0
+ },
+ "overall": {
+  "noise_gate_inconclusive": false,
+  "validity_all_pass_or_na": false,
+  "failed": [
+   "B2",
+   "C2",
+   "D"
+  ],
+  "tokens_benefit": true
+ },
+ "per_decision": [
+  {
+   "id": "va1-flags-nobudget",
+   "leader24": "dbtable",
+   "margin24": 0.226,
+   "P1_lead": "dbtable",
+   "T1_lead": "dbtable",
+   "T2_lead": "dbtable",
+   "E_lead": "dbtable",
+   "d_P1_T1": 0.025,
+   "d_T1_T2": 0,
+   "gapP": 0.1,
+   "gapT": 0.12
+  },
+  {
+   "id": "vb1-secrets-norot",
+   "leader24": "kubesecrets",
+   "margin24": 0.09,
+   "P1_lead": "kubesecrets",
+   "T1_lead": "kubesecrets",
+   "T2_lead": "kubesecrets",
+   "E_lead": "kubesecrets",
+   "d_P1_T1": 0.02,
+   "d_T1_T2": 0,
+   "gapP": 0.06,
+   "gapT": 0.1
+  },
+  {
+   "id": "vb1-apiver-nonotice",
+   "leader24": "header",
+   "margin24": 0.151,
+   "P1_lead": "header",
+   "T1_lead": "header",
+   "T2_lead": "header",
+   "E_lead": "header",
+   "d_P1_T1": 0.02,
+   "d_T1_T2": 0,
+   "gapP": 0.08,
+   "gapT": 0
+  },
+  {
+   "id": "vb1-migration-window",
+   "leader24": "batched",
+   "margin24": 0.224,
+   "P1_lead": "batched",
+   "T1_lead": "batched",
+   "T2_lead": "batched",
+   "E_lead": "batched",
+   "d_P1_T1": 0.015,
+   "d_T1_T2": 0,
+   "gapP": 0.23,
+   "gapT": 0.18
+  },
+  {
+   "id": "vb1-alerting-cpuhit",
+   "leader24": "cpu",
+   "margin24": 0.305,
+   "P1_lead": "cpu",
+   "T1_lead": "cpu",
+   "T2_lead": "cpu",
+   "E_lead": "cpu",
+   "d_P1_T1": 0.075,
+   "d_T1_T2": 0,
+   "gapP": 0.14,
+   "gapT": 0.13
+  },
+  {
+   "id": "vb1-repo-rareshared",
+   "leader24": "monorepo",
+   "margin24": 0.08,
+   "P1_lead": "polyrepo",
+   "T1_lead": "monorepo",
+   "T2_lead": "monorepo",
+   "E_lead": "monorepo",
+   "d_P1_T1": 0.035,
+   "d_T1_T2": 0,
+   "gapP": 0.09,
+   "gapT": 0.1
+  },
+  {
+   "id": "vb1-alerting-nodefslo",
+   "leader24": "slo",
+   "margin24": 0.304,
+   "P1_lead": "slo",
+   "T1_lead": "slo",
+   "T2_lead": "slo",
+   "E_lead": "slo",
+   "d_P1_T1": 0.01,
+   "d_T1_T2": 0,
+   "gapP": 0.1,
+   "gapT": 0.16
+  },
+  {
+   "id": "ba1-metrics-retention",
+   "leader24": "thanos",
+   "margin24": 0.131,
+   "P1_lead": "thanos",
+   "T1_lead": "thanos",
+   "T2_lead": "thanos",
+   "E_lead": "thanos",
+   "d_P1_T1": 0.045,
+   "d_T1_T2": 0,
+   "gapP": 0.1,
+   "gapT": 0.08
+  },
+  {
+   "id": "ba1-poison-message",
+   "leader24": "deadletter",
+   "margin24": 0.351,
+   "P1_lead": "deadletter",
+   "T1_lead": "deadletter",
+   "T2_lead": "deadletter",
+   "E_lead": "deadletter",
+   "d_P1_T1": 0.075,
+   "d_T1_T2": 0,
+   "gapP": 0.09,
+   "gapT": 0.05
+  },
+  {
+   "id": "ba1-cache-stampede",
+   "leader24": "redislock",
+   "margin24": 0.025,
+   "P1_lead": "redislock",
+   "T1_lead": "redislock",
+   "T2_lead": "redislock",
+   "E_lead": "redislock",
+   "d_P1_T1": 0.03,
+   "d_T1_T2": 0,
+   "gapP": 0.09,
+   "gapT": 0.08
+  },
+  {
+   "id": "ba1-tenant-isolation",
+   "leader24": "schemaper",
+   "margin24": 0.021,
+   "P1_lead": "sharedrls",
+   "T1_lead": "sharedrls",
+   "T2_lead": "sharedrls",
+   "E_lead": "sharedrls",
+   "d_P1_T1": 0.015,
+   "d_T1_T2": 0,
+   "gapP": 0.16,
+   "gapT": 0.17
+  },
+  {
+   "id": "ba1-mysql-postgres",
+   "leader24": "cdccutover",
+   "margin24": 0.087,
+   "P1_lead": "cdccutover",
+   "T1_lead": "cdccutover",
+   "T2_lead": "cdccutover",
+   "E_lead": "cdccutover",
+   "d_P1_T1": 0.03,
+   "d_T1_T2": 0,
+   "gapP": 0.11,
+   "gapT": 0.11
+  },
+  {
+   "id": "ba1-events-retention",
+   "leader24": "partdrop",
+   "margin24": 0.233,
+   "P1_lead": "partdrop",
+   "T1_lead": "partdrop",
+   "T2_lead": "partdrop",
+   "E_lead": "partdrop",
+   "d_P1_T1": 0.01,
+   "d_T1_T2": 0,
+   "gapP": 0.22,
+   "gapT": 0.1
+  },
+  {
+   "id": "ba1-service-hosting",
+   "leader24": "managedkube",
+   "margin24": 0.168,
+   "P1_lead": "managedkube",
+   "T1_lead": "managedkube",
+   "T2_lead": "managedkube",
+   "E_lead": "managedkube",
+   "d_P1_T1": 0.04,
+   "d_T1_T2": 0,
+   "gapP": 0.06,
+   "gapT": 0.1
+  },
+  {
+   "id": "ba1-iac-apply",
+   "leader24": "ciapply",
+   "margin24": 0.243,
+   "P1_lead": "ciapply",
+   "T1_lead": "ciapply",
+   "T2_lead": "ciapply",
+   "E_lead": "ciapply",
+   "d_P1_T1": 0.075,
+   "d_T1_T2": 0,
+   "gapP": 0.02,
+   "gapT": 0.06
+  },
+  {
+   "id": "bb1-flaky-tests",
+   "leader24": "fakebroker",
+   "margin24": 0.087,
+   "P1_lead": "fakebroker",
+   "T1_lead": "fakebroker",
+   "T2_lead": "fakebroker",
+   "E_lead": "fakebroker",
+   "d_P1_T1": 0.05,
+   "d_T1_T2": 0,
+   "gapP": 0.11,
+   "gapT": 0.15
+  },
+  {
+   "id": "bb1-release-cadence",
+   "leader24": "train",
+   "margin24": 0.088,
+   "P1_lead": "train",
+   "T1_lead": "train",
+   "T2_lead": "train",
+   "E_lead": "train",
+   "d_P1_T1": 0.01,
+   "d_T1_T2": 0,
+   "gapP": 0.16,
+   "gapT": 0.16
+  },
+  {
+   "id": "bb1-recovery-policy",
+   "leader24": "flagoff",
+   "margin24": 0.064,
+   "P1_lead": "flagoff",
+   "T1_lead": "flagoff",
+   "T2_lead": "flagoff",
+   "E_lead": "flagoff",
+   "d_P1_T1": 0.025,
+   "d_T1_T2": 0,
+   "gapP": 0.12,
+   "gapT": 0.09
+  },
+  {
+   "id": "bb1-big-refactor-review",
+   "leader24": "codemod",
+   "margin24": 0.362,
+   "P1_lead": "codemod",
+   "T1_lead": "codemod",
+   "T2_lead": "codemod",
+   "E_lead": "codemod",
+   "d_P1_T1": 0,
+   "d_T1_T2": 0,
+   "gapP": 0.1,
+   "gapT": 0.04
+  },
+  {
+   "id": "bb1-product-rendering",
+   "leader24": "isr",
+   "margin24": 0.23,
+   "P1_lead": "isr",
+   "T1_lead": "isr",
+   "T2_lead": "isr",
+   "E_lead": "isr",
+   "d_P1_T1": 0.05,
+   "d_T1_T2": 0,
+   "gapP": 0.19,
+   "gapT": 0.21
+  },
+  {
+   "id": "bb1-mobile-api-style",
+   "leader24": "composite",
+   "margin24": 0.266,
+   "P1_lead": "composite",
+   "T1_lead": "composite",
+   "T2_lead": "composite",
+   "E_lead": "composite",
+   "d_P1_T1": 0.01,
+   "d_T1_T2": 0,
+   "gapP": 0.19,
+   "gapT": 0.13
+  },
+  {
+   "id": "bb1-advisory-handling",
+   "leader24": "reachable",
+   "margin24": 0.125,
+   "P1_lead": "reachable",
+   "T1_lead": "reachable",
+   "T2_lead": "reachable",
+   "E_lead": "reachable",
+   "d_P1_T1": 0.02,
+   "d_T1_T2": 0,
+   "gapP": 0.09,
+   "gapT": 0.14
+  },
+  {
+   "id": "bb1-secret-scanning",
+   "leader24": "cijob",
+   "margin24": 0.291,
+   "P1_lead": "cijob",
+   "T1_lead": "cijob",
+   "T2_lead": "cijob",
+   "E_lead": "cijob",
+   "d_P1_T1": 0.01,
+   "d_T1_T2": 0,
+   "gapP": 0.06,
+   "gapT": 0.11
+  },
+  {
+   "id": "bb1-debt-allocation",
+   "leader24": "fixedshare",
+   "margin24": 0.419,
+   "P1_lead": "fixedshare",
+   "T1_lead": "fixedshare",
+   "T2_lead": "fixedshare",
+   "E_lead": "fixedshare",
+   "d_P1_T1": 0.035,
+   "d_T1_T2": 0,
+   "gapP": 0.18,
+   "gapT": 0.12
+  },
+  {
+   "id": "va2-ratelimit-slowreview",
+   "leader24": "postgres",
+   "margin24": 0.106,
+   "P1_lead": "postgres",
+   "T1_lead": "postgres",
+   "T2_lead": "postgres",
+   "E_lead": "postgres",
+   "d_P1_T1": 0.06,
+   "d_T1_T2": 0,
+   "gapP": 0.16,
+   "gapT": 0.08
+  },
+  {
+   "id": "va2-jobs-auditevents",
+   "leader24": "kafka",
+   "margin24": 0.049,
+   "P1_lead": "kafka",
+   "T1_lead": "kafka",
+   "T2_lead": "kafka",
+   "E_lead": "kafka",
+   "d_P1_T1": 0.02,
+   "d_T1_T2": 0,
+   "gapP": 0.12,
+   "gapT": 0.03
+  },
+  {
+   "id": "va2-flags-budgetpending",
+   "leader24": "dbtable",
+   "margin24": 0.291,
+   "P1_lead": "dbtable",
+   "T1_lead": "dbtable",
+   "T2_lead": "dbtable",
+   "E_lead": "dbtable",
+   "d_P1_T1": 0.015,
+   "d_T1_T2": 0,
+   "gapP": 0.12,
+   "gapT": 0.08
+  },
+  {
+   "id": "va2-flags-percentrollout",
+   "leader24": "vendor",
+   "margin24": 0.256,
+   "P1_lead": "vendor",
+   "T1_lead": "vendor",
+   "T2_lead": "vendor",
+   "E_lead": "vendor",
+   "d_P1_T1": 0.065,
+   "d_T1_T2": 0,
+   "gapP": 0.04,
+   "gapT": 0.07
+  },
+  {
+   "id": "vb2-secrets-vmmix",
+   "leader24": "kubesecrets",
+   "margin24": 0.123,
+   "P1_lead": "kubesecrets",
+   "T1_lead": "kubesecrets",
+   "T2_lead": "kubesecrets",
+   "E_lead": "kubesecrets",
+   "d_P1_T1": 0.01,
+   "d_T1_T2": 0,
+   "gapP": 0.01,
+   "gapT": 0.02
+  },
+  {
+   "id": "vb2-migration-slot",
+   "leader24": "batched",
+   "margin24": 0.395,
+   "P1_lead": "batched",
+   "T1_lead": "batched",
+   "T2_lead": "batched",
+   "E_lead": "batched",
+   "d_P1_T1": 0.07,
+   "d_T1_T2": 0,
+   "gapP": 0.1,
+   "gapT": 0.22
+  },
+  {
+   "id": "vb2-email-internal",
+   "leader24": "gmail",
+   "margin24": 0.448,
+   "P1_lead": "gmail",
+   "T1_lead": "gmail",
+   "T2_lead": "gmail",
+   "E_lead": "gmail",
+   "d_P1_T1": 0.01,
+   "d_T1_T2": 0,
+   "gapP": 0.21,
+   "gapT": 0.18
+  },
+  {
+   "id": "vb2-repo-cadence",
+   "leader24": "monorepo",
+   "margin24": 0.072,
+   "P1_lead": "monorepo",
+   "T1_lead": "monorepo",
+   "T2_lead": "monorepo",
+   "E_lead": "monorepo",
+   "d_P1_T1": 0.025,
+   "d_T1_T2": 0,
+   "gapP": 0.07,
+   "gapT": 0.04
+  },
+  {
+   "id": "vb2-thumbs-paidcdn",
+   "leader24": "cdntransform",
+   "margin24": 0.311,
+   "P1_lead": "cdntransform",
+   "T1_lead": "cdntransform",
+   "T2_lead": "cdntransform",
+   "E_lead": "cdntransform",
+   "d_P1_T1": 0.02,
+   "d_T1_T2": 0,
+   "gapP": 0.07,
+   "gapT": 0.07
+  },
+  {
+   "id": "vb2-migration-midtable",
+   "leader24": "batched",
+   "margin24": 0.01,
+   "P1_lead": "batched",
+   "T1_lead": "single",
+   "T2_lead": "single",
+   "E_lead": "single",
+   "d_P1_T1": 0.04,
+   "d_T1_T2": 0,
+   "gapP": 0.05,
+   "gapT": 0.02
+  },
+  {
+   "id": "vb2-secrets-handrotate",
+   "leader24": "kubesecrets",
+   "margin24": 0.295,
+   "P1_lead": "kubesecrets",
+   "T1_lead": "kubesecrets",
+   "T2_lead": "kubesecrets",
+   "E_lead": "kubesecrets",
+   "d_P1_T1": 0.015,
+   "d_T1_T2": 0,
+   "gapP": 0.02,
+   "gapT": 0.07
+  },
+  {
+   "id": "ba2-region-failover",
+   "leader24": "warm",
+   "margin24": 0.043,
+   "P1_lead": "warm",
+   "T1_lead": "warm",
+   "T2_lead": "warm",
+   "E_lead": "warm",
+   "d_P1_T1": 0.02,
+   "d_T1_T2": 0,
+   "gapP": 0.13,
+   "gapT": 0.15
+  },
+  {
+   "id": "ba2-staging-envs",
+   "leader24": "ephemeral",
+   "margin24": 0.003,
+   "P1_lead": "ephemeral",
+   "T1_lead": "ephemeral",
+   "T2_lead": "ephemeral",
+   "E_lead": "ephemeral",
+   "d_P1_T1": 0.055,
+   "d_T1_T2": 0,
+   "gapP": 0.11,
+   "gapT": 0.17
+  },
+  {
+   "id": "ba2-timeseries-store",
+   "leader24": "pgpart",
+   "margin24": 0.297,
+   "P1_lead": "pgpart",
+   "T1_lead": "pgpart",
+   "T2_lead": "pgpart",
+   "E_lead": "pgpart",
+   "d_P1_T1": 0.025,
+   "d_T1_T2": 0,
+   "gapP": 0,
+   "gapT": 0.03
+  },
+  {
+   "id": "ba2-scheduled-jobs",
+   "leader24": "cronjob",
+   "margin24": 0.212,
+   "P1_lead": "cronjob",
+   "T1_lead": "cronjob",
+   "T2_lead": "cronjob",
+   "E_lead": "cronjob",
+   "d_P1_T1": 0.035,
+   "d_T1_T2": 0,
+   "gapP": 0.05,
+   "gapT": 0.02
+  }
+ ]
+}

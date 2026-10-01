@@ -1,0 +1,18 @@
+{
+ "rc": [
+  {"name":"security","text":"It can open a security hole: removed or weakened checks, injection, exposed or logged secrets, unsafe permissions or transport."},
+  {"name":"dataloss","text":"It can delete, overwrite or corrupt stored data or files."},
+  {"name":"concurrency","text":"It can create a race, a deadlock or unsafe shared state."},
+  {"name":"money","text":"It can produce a wrong amount of money: rounding, units, boundaries, fees, currency."},
+  {"name":"errors","text":"It can hide, swallow or change an error or a failure status."},
+  {"name":"routine","text":"It cannot change what the program does or exposes: comments, formatting, an unused import, a rename with the body unchanged, a log message that holds no secret."}
+ ],
+ "ec": [
+  {"name":"network","text":"The network or a remote service: unreachable host, DNS failure, refused or timed-out connection, TLS certificate problem."},
+  {"name":"tool","text":"A missing tool, library, file, credential or fixture that the machine setup should provide."},
+  {"name":"permission","text":"The operating system denied access to a file, directory or resource."},
+  {"name":"resource","text":"A machine resource limit or conflict: port in use, disk full, out of memory, too many open files, a daemon that is not running."},
+  {"name":"code","text":"The code under test or the test itself: failed assertion, wrong value, exception raised by repository code, a path or import the code builds wrongly, an infinite loop, an application-level error response."},
+  {"name":"unclear","text":"The output does not say enough to decide."}
+ ]
+}

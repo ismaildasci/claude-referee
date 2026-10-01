@@ -1,0 +1,1 @@
+[{"case":"d-build-exit0","p":0.5,"dist":0},{"case":"d-dotnet-pass","p":0.72,"dist":0.020000000000000018},{"case":"d-cargo-pass","p":0.65,"dist":0.04999999999999993},{"case":"d-gotest-cut","p":0.3,"dist":0.2}]

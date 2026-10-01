@@ -5,8 +5,9 @@ title = "claude-referee"
 useDefault = true
 
 [[allowlists]]
-description = "Fake credentials used as redaction and key-lookup fixtures; case ids in a measurement file"
+description = "Fake credentials used as redaction and key-lookup fixtures; case ids in measurement files"
 paths = [
   '''^test/(redact|key|doctor)\.test\.ts$''',
   '''^jev-evals/decide-close/subsets\.json$''',
+  '''^jev-evals/experiments/p-floor-near-bands/live\.mjs$''',
 ]

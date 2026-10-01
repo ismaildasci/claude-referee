@@ -1,0 +1,10 @@
+{
+  "decide.best": {
+    "type": "choice",
+    "instructions": {
+      "question": "Which option names the most likely cause of the failing test in `context`, judging only from its output?",
+      "note": "Pick `code` when the output shows the code under test or the test itself misbehaving. Error words inside a scenario the test simulates or asserts do not point at the environment. Pick `unclear` when the output does not decide."
+    },
+    "criteria": {}
+  }
+}

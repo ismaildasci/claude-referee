@@ -32,7 +32,7 @@ In `main`, not released:
 Still open:
 
 - Publishing to npm (after 2026-10-03 14:22 UTC, with a one-time code from the maintainer's authenticator), then trusted publishing with a manually triggered workflow behind a protected environment. No workflow publishes on a tag by itself.
-- Whether `decide` should send both orders in one request. A pilot on the 39 close-call decisions on 2026-10-01 passed its registered rules (leaders within re-ask noise, 33% fewer input tokens) but showed no latency gain, and the saving is about $0.000015 per decision, so no code change is planned until a fresh hold-out says otherwise. The pilot's raw data isn't in the repository yet.
+- Whether `decide` should send both orders in one request. A pilot on the 39 close-call decisions on 2026-10-01 passed its registered rules (leaders within re-ask noise, 33% fewer input tokens) but showed no latency gain, and the saving is about $0.000015 per decision, so no code change is planned until a fresh hold-out says otherwise. Raw data and scripts: [jev-evals/experiments](jev-evals/experiments/README.md).
 
 ## v0.2: evidence in code, and thresholds in the open
 

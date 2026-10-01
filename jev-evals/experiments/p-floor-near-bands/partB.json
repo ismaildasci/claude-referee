@@ -1,0 +1,267 @@
+{
+ "B1": {
+  "per_case": [
+   {
+    "id": "vb1-secrets-norot",
+    "reps": 6,
+    "range_max_option": 0.08,
+    "range_by_option": {
+     "wiki": 0.01,
+     "cloudsm": 0.08,
+     "kubesecrets": 0.08,
+     "envfile": 0
+    },
+    "distinct_leaders": 2,
+    "leader_p_series": [
+     0.52,
+     0.52,
+     0.55,
+     0.5,
+     0.5,
+     0.5
+    ]
+   },
+   {
+    "id": "va2-jobs-auditevents",
+    "reps": 6,
+    "range_max_option": 0.1,
+    "range_by_option": {
+     "inprocess": 0.01,
+     "kafka": 0.1,
+     "pgqueue": 0.1,
+     "cron": 0.01
+    },
+    "distinct_leaders": 1,
+    "leader_p_series": [
+     0.49,
+     0.59,
+     0.55,
+     0.58,
+     0.59,
+     0.58
+    ]
+   },
+   {
+    "id": "bb1-release-cadence",
+    "reps": 6,
+    "range_max_option": 0.07,
+    "range_by_option": {
+     "splitlane": 0.07,
+     "continuous": 0.01,
+     "ondemand": 0,
+     "train": 0.07
+    },
+    "distinct_leaders": 2,
+    "leader_p_series": [
+     0.51,
+     0.5,
+     0.51,
+     0.55,
+     0.51,
+     0.56
+    ]
+   },
+   {
+    "id": "bb1-advisory-handling",
+    "reps": 6,
+    "range_max_option": 0.06,
+    "range_by_option": {
+     "gate": 0.04,
+     "deadlines": 0.05,
+     "autopatch": 0.02,
+     "reachable": 0.06
+    },
+    "distinct_leaders": 1,
+    "leader_p_series": [
+     0.45,
+     0.41,
+     0.4,
+     0.39,
+     0.42,
+     0.41
+    ]
+   },
+   {
+    "id": "bb1-flaky-tests",
+    "reps": 6,
+    "range_max_option": 0.09,
+    "range_by_option": {
+     "stopline": 0,
+     "autoretry": 0.04,
+     "quarantine": 0.05,
+     "fakebroker": 0.09
+    },
+    "distinct_leaders": 1,
+    "leader_p_series": [
+     0.45,
+     0.51,
+     0.49,
+     0.51,
+     0.54,
+     0.48
+    ]
+   },
+   {
+    "id": "ba1-mysql-postgres",
+    "reps": 6,
+    "range_max_option": 0.1,
+    "range_by_option": {
+     "dualwrite": 0,
+     "cdccutover": 0.08,
+     "bysvc": 0.03,
+     "staymysql": 0.1
+    },
+    "distinct_leaders": 1,
+    "leader_p_series": [
+     0.47,
+     0.51,
+     0.52,
+     0.53,
+     0.52,
+     0.45
+    ]
+   },
+   {
+    "id": "bb1-recovery-policy",
+    "reps": 6,
+    "range_max_option": 0.1,
+    "range_by_option": {
+     "splitmigrate": 0.05,
+     "flagoff": 0.05,
+     "revert": 0.1,
+     "forward": 0
+    },
+    "distinct_leaders": 2,
+    "leader_p_series": [
+     0.36,
+     0.38,
+     0.36,
+     0.37,
+     0.39,
+     0.4
+    ]
+   },
+   {
+    "id": "ba1-iac-apply",
+    "reps": 6,
+    "range_max_option": 0.08,
+    "range_by_option": {
+     "ciapply": 0.08,
+     "reconciler": 0.07,
+     "nightly": 0.01,
+     "manualapply": 0.01
+    },
+    "distinct_leaders": 1,
+    "leader_p_series": [
+     0.59,
+     0.6,
+     0.53,
+     0.54,
+     0.56,
+     0.61
+    ]
+   }
+  ],
+  "stat_range": {
+   "n": 8,
+   "mean": 0.085,
+   "median": 0.08,
+   "max": 0.1,
+   "gt001": 8,
+   "ge002": 8,
+   "ge004": 8
+  },
+  "max_decimals_in_raw_api_p": 2,
+  "cases_with_leader_change": 3
+ },
+ "B2": {
+  "per_case": [
+   {
+    "id": "d-build-exit0",
+    "series": [
+     0.62,
+     0.64,
+     0.61,
+     0.62,
+     0.61
+    ],
+    "range": 0.03,
+    "verdicts": [
+     "unsure"
+    ]
+   },
+   {
+    "id": "d-dotnet-pass",
+    "series": [
+     0.78,
+     0.75,
+     0.77,
+     0.8,
+     0.78
+    ],
+    "range": 0.05,
+    "verdicts": [
+     "met"
+    ]
+   },
+   {
+    "id": "d-cargo-pass",
+    "series": [
+     0.67,
+     0.68,
+     0.68,
+     0.71,
+     0.71
+    ],
+    "range": 0.04,
+    "verdicts": [
+     "unsure",
+     "met"
+    ]
+   },
+   {
+    "id": "d-gotest-cut",
+    "series": [
+     0.3,
+     0.34,
+     0.27,
+     0.29,
+     0.28
+    ],
+    "range": 0.07,
+    "verdicts": [
+     "missing"
+    ]
+   }
+  ],
+  "stat_range": {
+   "n": 4,
+   "mean": 0.0475,
+   "median": 0.04,
+   "max": 0.07,
+   "gt001": 4,
+   "ge002": 4,
+   "ge004": 3
+  }
+ },
+ "B4": {
+  "part": "B4",
+  "id": "ba1-iac-apply",
+  "out": {
+   "ok": true,
+   "verdict": "weak",
+   "lean": "ciapply",
+   "p": {
+    "nightly": 0.01,
+    "reconciler": 0.32,
+    "manualapply": 0.05,
+    "ciapply": 0.61
+   },
+   "order_disagrees": false,
+   "requests": 2,
+   "cached": 0,
+   "next_step": "Add the missing fact to context; if the decision is easy to undo, go with ciapply. Asking the same question again won't change it.",
+   "receipt": "rmupeyvq7ixis"
+  }
+ }
+}
