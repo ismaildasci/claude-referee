@@ -159,7 +159,7 @@ npx claude-referee receipts --tokens
 > [!WARNING]
 > **Henüz npm'de değil.** npm paketi yayımlanana kadar (Ekim başı) `npx claude-referee` 404 hatası verir. Claude etkilenmez: eklenti kendi içindeki kopyayı çalıştırır. Bu sayfadaki komutları kendin çalıştırmak için bu alias'ı ekle ve belgelerde `npx claude-referee` geçen her yerde `claude-referee` yaz:
 > ```sh
-> alias claude-referee='npx --yes --package https://github.com/ismaildasci/claude-referee/releases/download/v0.1.2/claude-referee-0.1.2.tgz claude-referee'
+> alias claude-referee='npx --yes --package https://github.com/ismaildasci/claude-referee/releases/download/v0.1.3/claude-referee-0.1.3.tgz claude-referee'
 > ```
 
 Gerekenler: Claude Code 2.1.139 ya da sonrası (2.1.285 ile test edildi), Claude Code'un gördüğü `PATH` üzerinde Node 20.3 ya da sonrası ve bir [TypeSafe API anahtarı](https://docs.typesafe.ai).

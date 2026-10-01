@@ -4,6 +4,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-10-01
+
 ## [0.1.2] - 2026-10-01
 
 ### Added
@@ -82,6 +84,7 @@ First public release.
 - The SessionStart briefing, at most 800 characters, only in projects with `.claude/referee.json`.
 - The `generic` pack and the `jev` skill.
 
+[0.1.3]: https://github.com/ismaildasci/claude-referee/releases/tag/v0.1.3
 [0.1.2]: https://github.com/ismaildasci/claude-referee/releases/tag/v0.1.2
 [0.1.1]: https://github.com/ismaildasci/claude-referee/releases/tag/v0.1.1
 [0.1.0]: https://github.com/ismaildasci/claude-referee/releases/tag/v0.1.0
