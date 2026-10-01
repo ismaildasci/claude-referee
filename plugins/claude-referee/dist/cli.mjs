@@ -895,8 +895,8 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join as join2 } from "node:path";
 function roundNumber(key, value) {
   if (Number.isInteger(value)) return value;
-  const digits = key.endsWith("_usd") ? 6 : 2;
-  return Number(value.toFixed(digits));
+  if (key.endsWith("_usd")) return Number(value.toFixed(6));
+  return Math.floor(value * 100 + 1e-9) / 100;
 }
 __name(roundNumber, "roundNumber");
 function roundDeep(value, key = "") {

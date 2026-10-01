@@ -18,6 +18,7 @@ function fixed(result: Record<string, unknown>): Command {
 
 test("output rounds floats to two digits and keeps _usd precision", () => {
   assert.deepEqual(roundDeep({ p: 0.123456, n: 3, cost_usd: 0.0000421234 }), { p: 0.12, n: 3, cost_usd: 0.000042 });
+  assert.deepEqual(roundDeep({ a: 0.895, b: 0.29, c: 0.9, d: 0.8999999 }), { a: 0.89, b: 0.29, c: 0.9, d: 0.89 });
 });
 
 test("output is one minified line and drops undefined fields", () => {

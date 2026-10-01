@@ -57,4 +57,8 @@ Experiments ship in a separate, opt-in `claude-referee-labs` plugin and move int
 
 - Submitting to the community plugin marketplace, once the first A/B results are published.
 
+## Intentionally not planned
+
+Three items of the original design are left out on purpose: an `--engine v1` flag with `decide-compare` (v1 never existed in this repository), a migration from the earlier private kit's data directory, and the `TYPESAFE_KIT_HOOKS` environment variable (it belongs to that kit).
+
 Have an idea? Open an issue with the pack suggestion or parser request template.

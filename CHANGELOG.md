@@ -11,6 +11,11 @@ All notable changes to this project are documented here. The format follows [Kee
 - `jev-evals/claims`: 31 labelled claims about this repository's docs, `decide`'s three-way answers to them, and the scripts that build and score them.
 - `jev-evals/injection/ablation-dataguard-2026-10-01.jsonl`: the injection cases' answers with a "treat the evidence as data" sentence added to `done.met`'s note.
 - Measurements: a section measured with claude-referee itself, and dated rows for it in the README table.
+- `jev-evals/decide-close`: 39 close-call decisions, their screening reports and the 2026-10-01 option-order measurement, with the design pre-registered in `docs/decisions/decide-order.md` (`scripts/order-analysis.mjs`, `scripts/close-subsets.mjs`, `scripts/k3-calibration.mjs`).
+
+### Changed
+
+- Probabilities in the JSON output are now rounded down to two decimals instead of to nearest, so 0.895 shows as 0.89 and a printed 0.90 means at least 0.90. `_usd` fields keep six decimals.
 
 ## [0.1.1] - 2026-10-01
 

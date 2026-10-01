@@ -1,4 +1,4 @@
-// One-line JSON for Claude: decision first, floats rounded, nothing echoed back.
+// One-line JSON for Claude: decision first, floats rounded down to two places (0.895 shows as 0.89), nothing echoed back.
 // Results longer than DETAIL_LIMIT keep their scalar fields; the full result goes to a file.
 
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -16,8 +16,8 @@ export interface RenderOptions {
 
 function roundNumber(key: string, value: number): number {
   if (Number.isInteger(value)) return value;
-  const digits = key.endsWith("_usd") ? 6 : 2;
-  return Number(value.toFixed(digits));
+  if (key.endsWith("_usd")) return Number(value.toFixed(6));
+  return Math.floor(value * 100 + 1e-9) / 100;
 }
 
 export function roundDeep(value: unknown, key = ""): unknown {
