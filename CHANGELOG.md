@@ -4,6 +4,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-10-01
+
 ### Added
 
 - `jev-evals/done-v2`: 48 held-out and 30 dev labelled cases for `done` with their recorded answers; the injection suite now allows no wrong `met`.
@@ -75,5 +77,6 @@ First public release.
 - The SessionStart briefing, at most 800 characters, only in projects with `.claude/referee.json`.
 - The `generic` pack and the `jev` skill.
 
+[0.1.2]: https://github.com/ismaildasci/claude-referee/releases/tag/v0.1.2
 [0.1.1]: https://github.com/ismaildasci/claude-referee/releases/tag/v0.1.1
 [0.1.0]: https://github.com/ismaildasci/claude-referee/releases/tag/v0.1.0
