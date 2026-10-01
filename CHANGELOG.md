@@ -4,6 +4,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-10-01
+
 ### Changed
 
 - `done` never says `met` when the log itself says no tests ran (`no tests to run`, `no tests found`, `0 tests executed`, `Tests run: 0`, `nothing to run`), even with an exit code of 0: `unsure` with `reason: "no_tests_run"`.
