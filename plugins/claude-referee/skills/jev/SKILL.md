@@ -1,6 +1,6 @@
 ---
 name: jev
-description: Hand small, checkable judgements to TypeSafe Jev through the claude-referee CLI instead of judging them yourself. done checks test or lint output against criteria, decide scores 2-6 options against context files, judge runs one yes/no rule over many items, verify checks claims against a source. Use when a check's output decides "done", or when 20+ items need the same rule.
+description: Hand small, checkable judgements to TypeSafe Jev through the claude-referee CLI instead of judging them yourself. done checks test or lint output against criteria, decide scores 2-6 options against context files, judge runs one yes/no rule over many items, claims (old name verify) checks claims against a source. Use when a check's output decides "done", or when 20+ items need the same rule.
 ---
 
 # claude-referee

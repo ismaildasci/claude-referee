@@ -15,7 +15,7 @@ git diff --exit-code HEAD -- plugins/claude-referee/dist npm >/dev/null || { ech
 
 step "bundle runs without node_modules"
 tmp="$(mktemp -d)"; cp -R plugins/claude-referee "$tmp/"; cli="$tmp/claude-referee/dist/cli.mjs"
-for c in done decide judge verify receipts doctor eval; do
+for c in done decide judge claims verify receipts doctor eval; do
   clean_env node "$cli" "$c" --describe | node -e 'JSON.parse(require("fs").readFileSync(0, "utf8"))' || { echo "describe failed: $c"; exit 1; }
 done
 echo 'not json' | clean_env node "$tmp/claude-referee/dist/hook.mjs" session-start

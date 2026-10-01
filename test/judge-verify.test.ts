@@ -194,3 +194,18 @@ test("judge counts an answer of exactly 1 - band as no", async () => {
   const { out } = await call(["judge", "--question", "line.risky"], byItem({ "x = 1": 0.1 }), "x = 1\n");
   assert.deepEqual([out["yes"], out["no"], out["review"]], [0, 1, 0]);
 });
+
+test("claims is verify under its new name: same answers, same contract, and verify says it is the alias", async () => {
+  const answer = relations({ "1": rel(0.99, 0.005, 0.005) });
+  const viaClaims = await call(["claims", "--claim", "the sky is blue"], answer, "The sky is blue.");
+  const viaVerify = await call(["verify", "--claim", "the sky is blue"], answer, "The sky is blue.");
+  assert.equal(viaClaims.out["verdict"], "supported");
+  assert.equal(viaClaims.out["verdict"], viaVerify.out["verdict"]);
+  assert.equal(viaClaims.requests.length, viaVerify.requests.length);
+  const none = await call(["claims"], relations({}), "text");
+  assert.equal(none.out["error"], "bad_input");
+  const d = await call(["claims", "--describe"], relations({}));
+  assert.equal(d.out["command"], "claims");
+  const dv = await call(["verify", "--describe"], relations({}));
+  assert.match(String(dv.out["summary"]), /alias of claims/i);
+});

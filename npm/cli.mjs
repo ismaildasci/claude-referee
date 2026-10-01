@@ -3614,7 +3614,7 @@ function probabilities(answer) {
   return a?.type === "choice" && a.probabilities ? a.probabilities : null;
 }
 __name(probabilities, "probabilities");
-function verifyRequest(pack, thresholds, claims, source) {
+function verifyRequest(pack, thresholds, claims2, source) {
   const relation = question(pack, "verify.relation");
   const injection = question(pack, "verify.injection");
   const baseCriteria = relation.criteria ?? {};
@@ -3622,8 +3622,8 @@ function verifyRequest(pack, thresholds, claims, source) {
   const state = { source };
   const stateTokens = estimateTokens(JSON.stringify(state));
   if (stateTokens > STATE_TOKEN_LIMIT) throw new RefereeError("too_large", "The source is too large for one Jev request.", { next_step: "Pass the relevant section of the source." });
-  const checks = new Map(claims.map((c) => [c.id, checkClaim(c.text, source)]));
-  const asked = claims.filter((c) => {
+  const checks = new Map(claims2.map((c) => [c.id, checkClaim(c.text, source)]));
+  const asked = claims2.filter((c) => {
     const k = checks.get(c.id);
     return k !== void 0 && k.quotes_missing.length === 0 && k.numbers_missing.length === 0;
   });
@@ -3665,7 +3665,7 @@ function verifyRequest(pack, thresholds, claims, source) {
     const unanswered = [];
     const reasons = {};
     const listed = {};
-    for (const claim of claims) {
+    for (const claim of claims2) {
       const k = checks.get(claim.id);
       if (k && k.quotes_missing.length > 0) {
         const onlyCode = k.quotes_missing.every((q) => claim.text.includes(`\`${q}\``) && !claim.text.includes(`"${q}"`));
@@ -3713,7 +3713,7 @@ function verifyRequest(pack, thresholds, claims, source) {
     return {
       ok: true,
       verdict,
-      claims: claims.length,
+      claims: claims2.length,
       supported,
       ...unsupported.length ? { unsupported } : {},
       ...contradicted.length ? { contradicted } : {},
@@ -3730,8 +3730,8 @@ function verifyRequest(pack, thresholds, claims, source) {
 }
 __name(verifyRequest, "verifyRequest");
 var MAX_CLAIMS = 100;
-var verify = {
-  name: "verify",
+var claims = {
+  name: "claims",
   describe: {
     summary: "Check claims against a source text.",
     inputs: {
@@ -3762,17 +3762,18 @@ var verify = {
     const inline = list(context, "claim");
     if (claimsFile && inline.length) throw new RefereeError("bad_input", "Use --claim or --claims, not both.");
     if (claimsFile === "-" && (str(context, "source") ?? "-") === "-") throw new RefereeError("bad_input", "Only one of --source and --claims can read stdin.");
-    const claims = (claimsFile ? parseItems(await readSource(context, claimsFile, "claims")) : inline.map((text, i) => ({ id: String(i + 1), text }))).filter(
+    const claims2 = (claimsFile ? parseItems(await readSource(context, claimsFile, "claims")) : inline.map((text, i) => ({ id: String(i + 1), text }))).filter(
       (c) => c.text.trim()
     );
-    if (claims.length === 0) throw new RefereeError("bad_input", "Give at least one --claim or a --claims file.");
-    if (claims.length > MAX_CLAIMS) throw new RefereeError("too_large", `At most ${MAX_CLAIMS} claims per call.`);
+    if (claims2.length === 0) throw new RefereeError("bad_input", "Give at least one --claim or a --claims file.");
+    if (claims2.length > MAX_CLAIMS) throw new RefereeError("too_large", `At most ${MAX_CLAIMS} claims per call.`);
     const source = stripAnsi(await readSource(context, str(context, "source"), "source"));
     const { pack, project } = openPack(context);
-    const { planned, finish } = verifyRequest(pack, project?.thresholds, claims, source);
+    const { planned, finish } = verifyRequest(pack, project?.thresholds, claims2, source);
     return jevCommand(context, "verify", pack, planned, finish, { partial: true });
   }
 };
+var verify = { ...claims, name: "verify", describe: { ...claims.describe, summary: "Alias of claims: check claims against a source text." } };
 
 // src/cli/commands/eval.ts
 var LIST_LIMIT2 = 20;
@@ -4541,7 +4542,7 @@ var receipts = {
 };
 
 // src/cli/commands/index.ts
-var commands = [done, decide, judge, verify, receipts, doctor, evalCommand, lintPack];
+var commands = [done, decide, judge, claims, verify, receipts, doctor, evalCommand, lintPack];
 
 // src/cli/io.ts
 import { homedir } from "node:os";

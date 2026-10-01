@@ -149,8 +149,8 @@ export function verifyRequest(pack: Pack, thresholds: Thresholds | undefined, cl
 
 const MAX_CLAIMS = 100;
 
-export const verify: Command = {
-  name: "verify",
+export const claims: Command = {
+  name: "claims",
   describe: {
     summary: "Check claims against a source text.",
     inputs: {
@@ -192,3 +192,6 @@ export const verify: Command = {
     return jevCommand(context, "verify", pack, planned, finish, { partial: true });
   },
 };
+
+// `verify` is the old name of `claims`; it stays an alias until 1.0 so it isn't confused with Claude Code's /verify.
+export const verify: Command = { ...claims, name: "verify", describe: { ...claims.describe, summary: "Alias of claims: check claims against a source text." } };

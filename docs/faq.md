@@ -16,9 +16,9 @@ It shouldn't. Claude Code caches the conversation by prefix, and the hooks only 
 
 The session note never calls Jev, so sessions don't wait on it. A CLI call gives up after 30 seconds and reports `timeout`, which is an unknown, not a "no". The done-gate, when you turn it on, calls Jev with a budget of 2 seconds and fails open: you lose the check, not the session, and after three failures in a row it skips Jev until the session ends. TypeSafe documents limits of 100K tokens and 40 requests per second that "can change without notice" ([models](https://docs.typesafe.ai/models.md)); its [status page](https://status.typesafe.ai) lists past incidents. We found no SLA in its customer terms.
 
-## How is `claude-referee verify` different from Claude Code's `/verify`?
+## How is `claude-referee claims` different from Claude Code's `/verify`?
 
-They answer different questions. Claude Code's bundled `/verify` builds and runs your app to see that a change works. `claude-referee verify` checks whether claims in a text are supported by a source text you give it. The command is planned to be renamed `claims`, with `verify` kept as an alias until 1.0.
+They answer different questions. Claude Code's bundled `/verify` builds and runs your app to see that a change works. `claude-referee claims` checks whether claims in a text are supported by a source text you give it. It was called `verify` until 0.1.5; `verify` stays an alias until 1.0.
 
 ## How is the done-gate different from `/goal`?
 
