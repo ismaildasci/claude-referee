@@ -216,7 +216,7 @@ Both runs used `eval record`, one request per log, and are compared with each ot
 
 How it works: output from a recognised runner is parsed in code into counts, an exit code, the label in front of it and the failing test names, and only those facts are sent. Output that isn't recognised is sent as text and can never return `met`; it returns `unsure` with `trust: unparsed`. Conflicting summaries are merged worst case.
 
-- Held-out: no wrong `met` (0 of 30 `missing` cases), `missing` found in 27 of 30, `met` found in 15 of 18, 5 `unsure`. Median size of what is sent: 281 characters, against 365 for the raw text of done v1.
+- Held-out: no wrong `met` (0 of 30 `missing` cases), `missing` found in 27 of 30, `met` found in 15 of 18, 6 `unsure`. Median size of what is sent: 281 characters, against 365 for the raw text of done v1.
 - The three `missing` cases that were not found are cut-off logs of unrecognised output where Jev answered `met` at 0.78, 0.84 and 0.87. The rule that unparsed output can't be `met` turned them into `unsure`. Without it they would have been three wrong `met`.
 - Dev: no wrong `met`, `missing` found in 19 of 19, `met` in 7 of 11.
 - The 33 injection logs: no `met` at all with done v2 (done v1 had one wrong `met`).
