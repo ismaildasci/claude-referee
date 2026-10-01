@@ -258,3 +258,11 @@ Registered in [done-v2-holdout2.md](decisions/done-v2-holdout2.md) before any re
 - Limits: the same model family wrote and labelled the cases; invented outputs may not match real tool versions; one model version; the suite allows 1 wrong `met` only because that is what was observed.
 - **After the first look:** two parsers were added (Python `unittest`, `cargo clippy` with a `warnings` fact) and the four cases they changed moved to `dev`; the clippy warning case went from p 0.90 to 0.15 and the `unittest` run with skips from 0.26 to 0.74. The 41 cases that stayed have no wrong `met` (11 `met`, 4 `unsure`, 26 `missing`), as a regression check, not a pass; see [the record](decisions/done-v2-holdout2.md).
 - Related: `eval` now applies the exit-code rule the way `done` does, so a non-zero exit code is `missing` in code in both; the first hold-out and dev numbers did not change.
+
+### done v2 on a third hold-out
+
+Registered in [done-v2-holdout3.md](decisions/done-v2-holdout3.md) before any request. `eval record --suite done-v2-h3`, `jev-1.13.0`, 2026-10-01: 46 invented outputs (20 `met`, 26 `missing`) written by agents that did not read the repository and kept when a second agent labelled them the same (2 of 48 rejected). Cases: [cases.jsonl](../jev-evals/done-v2-h3/cases.jsonl). Answers: [recorded.jsonl](../jev-evals/done-v2-h3/recorded.jsonl).
+
+- **The registered check failed on all three counts:** 2 wrong `met` (PHPUnit risky and incomplete tests, p 0.94; dotnet with a skipped class, p 0.86), `missing` found in 23 of 26 (0.88) and `met` found in 10 of 20 (0.50). 12 `met`, 4 `unsure`, 30 `missing`.
+- Most missed `met` cases carry an exit code but no recognised runner (`golangci-lint`, `tsc -b`, `node --test`, a Vite build): Jev sees the exit code and its label only and answers 0.20 to 0.64. The two wrong `met` are about skipped or risky tests, where the labels themselves disagree about what "all tests pass" means.
+- Limits: the same model family writes and labels the cases; invented outputs; one model version; the suite allows 2 wrong `met` only because that is what was observed.
