@@ -266,6 +266,17 @@ Registered in [claims-tr.md](decisions/claims-tr.md) before any request. `eval r
 - **The registered check passed:** no wrong `supported` among 27 unsupported cases; 13 of 17 true claims confirmed (0.76; the English hold-out confirmed 19 of 24, 0.79). 12 cases were decided in code (a quote or number not in the source).
 - Limits: invented text, one model family writes and labels, one model version, Turkish only; it shows no collapse, not equality with English.
 
+### done v2 on a sixth hold-out
+
+Registered in [done-v2-holdout6.md](decisions/done-v2-holdout6.md) before any case was written, same bars as the fourth and fifth, with a separate second labeller this time. `eval record --suite done-v2-h6` and `done-v2-h6p`, `jev-1.13.0`, 2026-10-01. Main set: 53 invented outputs (22 `met`, 31 `missing`) in about 40 tools that have no parser (`crystal spec`, `gleam test`, Pester, `bats`, `ginkgo`, `karma`, `elm-test`, `staticcheck`, `semgrep`, `ktlint`, `hugo`, `mkdocs`, `astro`, `nuxt`, `ant`, `conftest`, and others) plus adversarial cases; 63 of 63 written cases got the same label from both processes and 2 were dropped on a re-read. Cases: [done-v2-h6](../jev-evals/done-v2-h6/cases.jsonl), [done-v2-h6p](../jev-evals/done-v2-h6p/cases.jsonl). Answers: `recorded.jsonl` in each.
+
+- **The registered check failed on all three counts:** 2 wrong `met` (bar 0), `missing` found in 26 of 31 (0.84, bar 0.9), `met` found in 11 of 22 (0.50, bar 0.6).
+- **Both wrong `met`** are exit-code-only logs under "lint is clean" (`semgrep` with partially analysed files, p 0.73; `conftest ... || true` printing two failures, p 0.70). With an exit code line and no parser Jev sees only the exit code.
+- **Split by criterion:** `all tests pass` expected `met` found in 1 of 11 (that one a Pest log read by the `jest` parser); lint, build and typecheck criteria found in 10 of 11. All 8 adversarial `missing` cases (notes to the judge, forged summaries, swallowed exit code, crash after the summary, authority claim) came back `missing`.
+- **Parser regression group (8 cases, separate):** 0 wrong `met`; expected `met` found in 4 of 5 (`cargo nextest`, `prove` from a real run, `flutter test`, `tox` 4, p 0.97 to 0.98); a successful `next build` came back `missing` at 0.40 because its facts carry no success marker. Expected `missing`: `behave` `missing`, `cargo nextest` with skips `unsure`, `biome` with warnings `unsure`. One real run, seven written from memory.
+- Nothing was changed after the look; `done-v2-h6` allows the observed 2 wrong `met`. `done` v2 stays not measured: six invented hold-outs, none passed.
+- Limits: the second labeller is the same model family; invented outputs; one model version; two main cases were claimed by a parser anyway (Pest by `jest`, `spago` by `rspec`).
+
 ### done v2 on a fifth hold-out
 
 Registered in [done-v2-holdout5.md](decisions/done-v2-holdout5.md) before any request, same method and bars as the fourth. `eval record --suite done-v2-h5`, `jev-1.13.0`, 2026-10-01: 47 invented outputs (22 `met`, 25 `missing`) in tools and formats absent from the earlier sets (`cargo nextest`, `mix`, `prove`, `busted`, `dart`, `flutter`, `dune`, `testthat`, Julia, Haskell, `xcodebuild`, `shellcheck`, `hadolint`, `biome`, `next build`, `nix build`, `tox`, and others) plus adversarial cases. One author wrote and labelled them (no second labeller; 2 of 49 dropped on a re-read). Cases: [cases.jsonl](../jev-evals/done-v2-h5/cases.jsonl). Answers: [recorded.jsonl](../jev-evals/done-v2-h5/recorded.jsonl).
