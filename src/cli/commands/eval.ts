@@ -3,7 +3,7 @@
 
 import { appendFileSync, existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { resolveModel } from "../../engine/config.ts";
+import { costUsd, estimateTokens, resolveModel } from "../../engine/config.ts";
 import { RefereeError } from "../../engine/errors.ts";
 import { findRecording, metrics, parseCases, parseRecordings, parseSweep, sweep, type EvalCase, type Recording } from "../../engine/evals.ts";
 import type { Result } from "../../engine/output.ts";
@@ -12,11 +12,13 @@ import { Session, questionHash, redactRequest, stateHash, type Outcome, type Pla
 import type { Command, Context } from "../types.ts";
 import { JEV_ERRORS, fitLine, openPack, reorder, str } from "../shared.ts";
 import { doneEvidence, doneRequest } from "./done.ts";
+import { judgeRequest } from "./judge.ts";
 import { verifyRequest } from "./verify.ts";
 
 interface SuiteConfig {
   readonly command: string;
   readonly criteria?: string | readonly string[];
+  readonly question?: string;
   readonly positive: string;
   readonly max_wrong_positive: number;
 }
@@ -55,6 +57,7 @@ function readSuite(root: string, name: string): Suite {
   const config: SuiteConfig = {
     command: raw["command"],
     ...(typeof raw["criteria"] === "string" || Array.isArray(raw["criteria"]) ? { criteria: raw["criteria"] as string | string[] } : {}),
+    ...(typeof raw["question"] === "string" ? { question: raw["question"] } : {}),
     positive: typeof raw["positive"] === "string" ? raw["positive"] : "met",
     max_wrong_positive: typeof raw["max_wrong_positive"] === "number" ? raw["max_wrong_positive"] : 0,
   };
@@ -86,13 +89,18 @@ function criteriaFor(suite: Suite, item: EvalCase): string[] {
 
 function request(context: Context, pack: Pack, suite: Suite, item: EvalCase): CaseRequest {
   const command = suite.config.command;
-  if (command !== "done" && command !== "verify") throw new RefereeError("bad_input", `Suite ${suite.name} uses ${command}; eval handles done and verify suites for now.`);
+  if (command !== "done" && command !== "verify" && command !== "judge") throw new RefereeError("bad_input", `Suite ${suite.name} uses ${command}; eval handles done, verify and judge suites for now.`);
   let planned: Planned[];
   let finish: (outcomes: Outcome[]) => Result;
   if (command === "done") {
     const evidence = doneEvidence(typeof item["evidence"] === "string" ? item["evidence"] : "");
     if (!evidence.trim()) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: the evidence is empty.`);
     ({ planned, finish } = doneRequest(pack, undefined, criteriaFor(suite, item), evidence));
+  } else if (command === "judge") {
+    const text = typeof item["text"] === "string" ? item["text"] : "";
+    if (!suite.config.question) throw new RefereeError("bad_input", `Suite ${suite.name}: a judge suite needs "question" in suite.json.`);
+    if (!text.trim()) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: a judge case needs text.`);
+    ({ planned, finish } = judgeRequest(pack, undefined, suite.config.question, text, typeof item["context"] === "string" ? item["context"] : undefined));
   } else {
     const claim = typeof item["claim"] === "string" ? item["claim"] : "";
     const source = typeof item["source"] === "string" ? item["source"] : "";
@@ -105,7 +113,17 @@ function request(context: Context, pack: Pack, suite: Suite, item: EvalCase): Ca
   return { suite, item, planned: { ...first, id: `${suite.name}/${item.id}` }, finish, qhash: questionHash(first.questions), shash: stateHash(redacted.body.state) };
 }
 
+function cap(context: Context, flag: string): number | undefined {
+  const raw = str(context, flag);
+  if (raw === undefined) return undefined;
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value < 0 || raw.trim() === "") throw new RefereeError("bad_input", `--${flag} takes a number of 0 or more.`);
+  return value;
+}
+
 async function record(context: Context, pack: Pack, list: readonly Suite[]): Promise<Result> {
+  const maxRequests = cap(context, "max-requests");
+  const maxUsd = cap(context, "max-usd");
   const { io, flags } = context;
   const session = new Session({
     command: "eval",
@@ -129,6 +147,14 @@ async function record(context: Context, pack: Pack, list: readonly Suite[]): Pro
     }
   }
   const plans = todo.map((t) => t.planned as Planned);
+  const tokens = plans.reduce((sum, p) => sum + estimateTokens(JSON.stringify([p.state, p.questions])), 0);
+  const usd = costUsd(session.model, tokens);
+  if (!flags.dryRun && maxRequests !== undefined && plans.length > maxRequests) {
+    throw new RefereeError("bad_input", `Recording would send ${plans.length} requests; --max-requests is ${maxRequests}. Nothing was sent.`, { next_step: "Record fewer cases (a smaller suite or --split) or raise the cap." });
+  }
+  if (!flags.dryRun && maxUsd !== undefined && usd !== null && usd > maxUsd) {
+    throw new RefereeError("bad_input", `Recording would cost about ${usd.toFixed(6)} USD (an estimate from about ${tokens} input tokens); --max-usd is ${maxUsd}. Nothing was sent.`, { next_step: "Record fewer cases or raise the cap." });
+  }
   if (flags.dryRun) return fitLine({ ...session.dryRun(plans), skipped });
   const outcomes = todo.length ? await session.run(plans, { partial: true }) : [];
   const failed: string[] = [];
@@ -220,10 +246,12 @@ export const evalCommand: Command = {
     inputs: {
       "record | score": "Positional action.",
       "--suite <name|all>": "A directory under the evals dir with suite.json, cases.jsonl and, once recorded, recorded.jsonl. 'all' takes every suite; score then skips suites without recordings.",
-      "--evals-dir <dir>": "Where the suites live; default jev-evals in the current directory.",
+      "--evals-dir <dir>": "Where the suites live; default jev-evals in the current directory. A suite.json names its command: done, verify or judge (a judge suite also names its question, and its cases have text and an expected yes, no or review).",
       "--split <dev|holdout>": "score: only cases from this split.",
       "--sweep <from:to:step>": "score: precision, recall and wrong positives per threshold; suggests one only with at least 10 cases per class.",
       "--fresh": "record: record every case again, even ones already recorded for this question text, input and model.",
+      "--max-requests <n>": "record: stop before the first request when more than n cases are still to record.",
+      "--max-usd <x>": "record: stop before the first request when the estimated input cost, from a token estimate, is above x USD.",
     },
     outputs: {
       verdict: "record: recorded or partial; score: pass, or violated when wrong positives exceed the suite's max_wrong_positive",
@@ -239,7 +267,7 @@ export const evalCommand: Command = {
     effects: "record sends each unrecorded case to the TypeSafe API and appends to recorded.jsonl; score reads files only.",
     cost: "record: one Jev request per case not yet recorded. score: free and offline.",
   },
-  options: { suite: { type: "string" }, split: { type: "string" }, sweep: { type: "string" }, "evals-dir": { type: "string" } },
+  options: { suite: { type: "string" }, split: { type: "string" }, sweep: { type: "string" }, "evals-dir": { type: "string" }, "max-requests": { type: "string" }, "max-usd": { type: "string" } },
   async run(context) {
     const action = context.positionals[0];
     if (action !== "record" && action !== "score") throw new RefereeError("bad_input", "eval needs an action: record or score.", { next_step: "Example: eval score --suite injection" });

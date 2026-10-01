@@ -117,3 +117,68 @@ test("eval score filters by split", async () => {
   const { out } = await score(root, ["--split", "holdout"]);
   assert.equal(out["cases"], 1);
 });
+
+test("eval record stops before the first request when --max-requests would be exceeded", async () => {
+  const root = suite(CASES);
+  const { code, out, requests } = await record(root, ["--max-requests", "1"]);
+  assert.equal(code, 1);
+  assert.equal(out["error"], "bad_input");
+  assert.match(String(out["message"]), /2 requests/);
+  assert.equal(requests, 0);
+  const again = await record(root, ["--max-requests", "2"]);
+  assert.equal(again.code, 0);
+  assert.equal(again.requests, 2);
+});
+
+test("eval record stops before the first request when the estimated cost is over --max-usd", async () => {
+  const root = suite(CASES);
+  const { code, out, requests } = await record(root, ["--max-usd", "0.0000001"]);
+  assert.equal(code, 1);
+  assert.equal(out["error"], "bad_input");
+  assert.match(String(out["message"]), /USD/);
+  assert.equal(requests, 0);
+  const bad = await record(root, ["--max-requests", "many"]);
+  assert.equal(bad.out["error"], "bad_input");
+});
+
+test("eval record counts only the cases still to record against the cap", async () => {
+  const root = suite(CASES);
+  await record(root);
+  const { code, requests } = await record(root, ["--max-requests", "0"]);
+  assert.equal(code, 0);
+  assert.equal(requests, 0);
+});
+
+const RISKY = [
+  { id: "rm", split: "holdout", expected: "yes", text: "rm -rf $BUILD_DIR/*" },
+  { id: "log", split: "holdout", expected: "no", text: "console.log('done')" },
+  { id: "maybe", split: "dev", expected: "yes", text: "retry(3)" },
+];
+const riskyAnswer = (request: FakeRequest) => {
+  const item = (request.state as { item: string }).item;
+  const p = item.startsWith("rm") ? 0.97 : item.startsWith("console") ? 0.02 : 0.5;
+  return Object.fromEntries(Object.keys(request.questions).map((id) => [id, { type: "noul", noul: p }]));
+};
+
+test("eval handles judge suites: record once, score offline with yes, no and review", async () => {
+  const root = suite(RISKY, { command: "judge", question: "line.risky", positive: "yes", max_wrong_positive: 0 });
+  const rec = await record(root, [], riskyAnswer);
+  assert.equal(rec.code, 0, JSON.stringify(rec.out));
+  assert.equal(rec.requests, 3);
+  const { code, out } = await score(root);
+  assert.equal(code, 0, JSON.stringify(out));
+  assert.deepEqual(out["verdicts"], { yes: 1, no: 1, review: 1 });
+  assert.equal(out["wrong_positive"], 0);
+  assert.equal(out["recall"], 0.5);
+});
+
+test("a judge suite without a question is rejected, and a yes on a no case violates the suite", async () => {
+  const noQuestion = suite(RISKY, { command: "judge", positive: "yes" });
+  const bad = await record(noQuestion, [], riskyAnswer);
+  assert.equal(bad.out["error"], "bad_input");
+  const root = suite([{ id: "rm", split: "holdout", expected: "no", text: "rm -rf $BUILD_DIR/*" }], { command: "judge", question: "line.risky", positive: "yes", max_wrong_positive: 0 });
+  await record(root, [], riskyAnswer);
+  const { out } = await score(root, ["--fail-on", "violated"]);
+  assert.equal(out["verdict"], "violated");
+  assert.equal(out["wrong_positive"], 1);
+});

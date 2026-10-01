@@ -4,8 +4,9 @@
 import type { Questions } from "@typesafe-ai/sdk";
 import { atLeast, atMost } from "../../engine/compare.ts";
 import { RefereeError } from "../../engine/errors.ts";
-import { threshold } from "../../engine/pack.ts";
-import type { Planned } from "../../engine/session.ts";
+import type { Result } from "../../engine/output.ts";
+import { threshold, type Pack, type Thresholds } from "../../engine/pack.ts";
+import type { Outcome, Planned } from "../../engine/session.ts";
 import type { Command } from "../types.ts";
 import { JEV_COST, JEV_EFFECTS, JEV_ERRORS, clip, jevCommand, openPack, question, readSource, str } from "../shared.ts";
 
@@ -45,6 +46,19 @@ export function parseItems(text: string): Item[] {
       }
     })
     .filter((x): x is Item => x !== null);
+}
+
+export function judgeRequest(pack: Pack, thresholds: Thresholds | undefined, id: string, text: string, shared?: string): { planned: Planned[]; finish: (outcomes: Outcome[]) => Result } {
+  const q = question(pack, id);
+  if (q.type !== "noul") throw new RefereeError("bad_input", `judge needs yes/no questions; ${id} is a ${q.type}.`);
+  const band = threshold(pack, thresholds, id, "auto", 0.9);
+  const planned: Planned[] = [{ id: "item", state: { item: clip(text, 4_000, 4_000), ...(shared ? { context: shared } : {}) }, questions: { [id]: q } }];
+  const finish = ([outcome]: Outcome[]): Result => {
+    const answer = outcome?.answers?.[id];
+    const p = answer?.type === "noul" ? answer.noul : 0.5;
+    return { ok: true, verdict: atLeast(p, band) ? "yes" : atMost(p, 1 - band) ? "no" : "review", p };
+  };
+  return { planned, finish };
 }
 
 export const judge: Command = {

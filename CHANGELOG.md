@@ -17,6 +17,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- `eval` handles `judge` suites (`suite.json` with `"command": "judge"` and a `question`; cases with `text` and an expected `yes`, `no` or `review`), and `eval record` takes `--max-requests` and `--max-usd`: it stops before the first request when more cases are still to record, or the estimated input cost is higher.
 - `scripts/docs-watch.mjs` and a weekly workflow compare TypeSafe's `models.md`, `api.md` and `llms.txt` with the hashes in `docs-watch.json` and fail when one changes, printing the limits row; TypeSafe's limits changed once without an announcement we could find.
 - CI scans the whole git history with gitleaks 8.30.1 (pinned, checksum verified); `.gitleaks.toml` allows only the fake-credential fixtures in `test/redact.test.ts`, `test/key.test.ts` and `test/doctor.test.ts` and the case ids in `jev-evals/decide-close/subsets.json`. The history scan of 67 commits found nothing else.
 

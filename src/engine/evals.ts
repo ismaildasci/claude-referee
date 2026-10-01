@@ -93,12 +93,13 @@ export function findRecording(lines: readonly Recording[], key: RecordingKey): {
 const ratio = (a: number, b: number): number | null => (b === 0 ? null : a / b);
 
 export function metrics(items: readonly Scored[], positive: string): Metrics {
-  const verdicts: Record<string, number> = { met: 0, unsure: 0, missing: 0 };
+  const verdicts: Record<string, number> = positive === "yes" ? { yes: 0, review: 0, no: 0 } : { met: 0, unsure: 0, missing: 0 };
+  const undecidedVerdict = positive === "yes" ? "review" : "unsure";
   for (const item of items) verdicts[item.verdict] = (verdicts[item.verdict] ?? 0) + 1;
   const predicted = items.filter((i) => i.verdict === positive);
   const actual = items.filter((i) => i.expected === positive);
   const truePositive = predicted.filter((i) => i.expected === positive).length;
-  const decided = items.filter((i) => i.verdict !== "unsure").length;
+  const decided = items.filter((i) => i.verdict !== undecidedVerdict).length;
   return {
     cases: items.length,
     verdicts,
@@ -106,7 +107,7 @@ export function metrics(items: readonly Scored[], positive: string): Metrics {
     recall: ratio(truePositive, actual.length),
     automation: ratio(decided, items.length) ?? 0,
     wrong_positive: predicted.length - truePositive,
-    wrong_negative: items.filter((i) => i.expected === positive && i.verdict !== positive && i.verdict !== "unsure").length,
+    wrong_negative: items.filter((i) => i.expected === positive && i.verdict !== positive && i.verdict !== undecidedVerdict).length,
   };
 }
 
