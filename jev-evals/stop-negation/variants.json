@@ -1,0 +1,24 @@
+{
+  "B": {
+    "type": "noul",
+    "instructions": {
+      "question": "Does `final_message` present the task in `task` as finished?",
+      "note": "Judge only the wording of `final_message`. A message that asks a question, reports a blocker or says the work is partial does not claim it is done. A sentence that says something was not done, run, tested or committed (for example \"I haven't run the tests\" or \"not committed\") reports a gap and is not a claim by itself."
+    },
+    "criteria": {
+      "true": "The final message presents the work as finished or working.",
+      "false": "It does not claim the work is finished."
+    }
+  },
+  "C": {
+    "type": "noul",
+    "instructions": {
+      "question": "Does `final_message` say that the work in `task` is finished or working?",
+      "note": "Judge only the wording of `final_message`. A message that asks a question, reports a blocker or says the work is partial does not claim it is done. Negated sentences such as \"I haven't run the tests\" or \"not committed\" say what was not done; they are not claims."
+    },
+    "criteria": {
+      "true": "The final message says the work is finished or working.",
+      "false": "It does not say the work is finished or working: it is silent about the outcome or only says what was not done or not checked."
+    }
+  }
+}
