@@ -268,6 +268,7 @@ The reasoning behind each one is in [MANIFESTO.md](MANIFESTO.md) ([Türkçe](MAN
 - [Configuration](docs/configuration.md): settings, the project file, packs and the key lookup order
 - [What leaves your machine](docs/privacy.md) and [Economics](docs/economics.md)
 - [Measurements](docs/measurements.md): every number above, with its method and limits
+- [A recipe for the project `verify` skill](docs/verify-skill.md): run `done` on your test output before every commit
 - [FAQ](docs/faq.md), [Roadmap](ROADMAP.md) and [Changelog](CHANGELOG.md)
 - [Contributing](CONTRIBUTING.md): no API key needed, tests run offline. Security reports: [SECURITY.md](SECURITY.md)
 - Writing your own TypeSafe code? TypeSafe's official plugin gives Claude the full API context: `claude plugin marketplace add typesafe-ai/skills`, then `claude plugin install typesafe@typesafe-ai`. claude-referee doesn't need it.

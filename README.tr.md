@@ -263,6 +263,7 @@ Belgeler İngilizce:
 - [Yapılandırma](docs/configuration.md): ayarlar, proje dosyası, pack'ler ve anahtar arama sırası
 - [Makinenden ne çıkar](docs/privacy.md) ve [ekonomi](docs/economics.md)
 - [Ölçümler](docs/measurements.md): yukarıdaki her sayı, yöntemi ve sınırlarıyla
+- [Proje `verify` skill'i için tarif](docs/verify-skill.md) (İngilizce): her commit öncesi test çıktısında `done` çalıştır
 - [SSS](docs/faq.md), [yol haritası](ROADMAP.md) ve [değişiklik günlüğü](CHANGELOG.md)
 - [Katkı](CONTRIBUTING.md): API anahtarı gerekmez, testler çevrimdışı çalışır. Güvenlik bildirimleri: [SECURITY.md](SECURITY.md)
 - Kendi TypeSafe kodunu mu yazıyorsun? TypeSafe'in resmî eklentisi Claude'a API'nin tüm bağlamını verir: `claude plugin marketplace add typesafe-ai/skills`, ardından `claude plugin install typesafe@typesafe-ai`. claude-referee'nin buna ihtiyacı yok.
