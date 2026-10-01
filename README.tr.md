@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/hero-dark.gif">
-    <img alt="claude-referee: güzel söz değil, kanıt. Claude tüm testlerin geçtiğini söylüyor; hakemin done-gate'i (active mod, planlandı) son düzenlemeden beri hiçbir kontrolün geçmediğini söyleyip Claude'dan cargo nextest çalıştırmasını istiyor ve 2 hata çıkıyor." src="assets/hero-light.gif" width="100%">
+    <img alt="evidence-referee: güzel söz değil, kanıt. Claude tüm testlerin geçtiğini söylüyor; hakemin done-gate'i (active mod, planlandı) son düzenlemeden beri hiçbir kontrolün geçmediğini söyleyip Claude'dan cargo nextest çalıştırmasını istiyor ve 2 hata çıkıyor." src="assets/hero-light.gif" width="100%">
   </picture>
 </p>
 
@@ -23,7 +23,7 @@
 
 Kodlama ajanları iyi yazar. "Tüm testler geçti. Bitti." akıcı tek bir cümledir ve yazmak hiçbir şeye mal olmaz. Onu doğrulamak bir test koşusu ister; cümle yanlışsa birileri bunu sonradan fark eder.
 
-claude-referee, bu tür cümleleri denetleyen, resmî olmayan bir Claude Code eklentisidir. Büyük kararları yine Claude verir. *Gerçekten bitti mi?* ya da *bu seçeneklerden hangisi kurallarımıza uyuyor?* gibi küçük ve denetlenebilir sorular Jev'e gider: TypeSafe'in, paragraf yerine "0,97 evet" gibi bir olasılıkla cevap veren modeli. Her kontrol makinende kayda geçer.
+evidence-referee, bu tür cümleleri denetleyen, resmî olmayan bir Claude Code eklentisidir. Büyük kararları yine Claude verir. *Gerçekten bitti mi?* ya da *bu seçeneklerden hangisi kurallarımıza uyuyor?* gibi küçük ve denetlenebilir sorular Jev'e gider: TypeSafe'in, paragraf yerine "0,97 evet" gibi bir olasılıkla cevap veren modeli. Her kontrol makinende kayda geçer.
 
 ## Ne yapar
 
@@ -35,19 +35,19 @@ claude-referee, bu tür cümleleri denetleyen, resmî olmayan bir Claude Code ek
 
 Bir kontrol hiçbir şey bulmazsa Claude hiçbir şey görmez. Bir şey bulursa Claude en fazla 300 karakterlik bir not görür.
 
-Neden yalnızca bir komut değil? claude-referee'den önceki kitte Claude `done` kontrolünü istediği zaman çalıştırabiliyordu ve 14 günde bir kez çalıştırdı. Kendiliğinden çalışmayan bir kontrol neredeyse yok hükmündedir. Bu yüzden Claude her durduğunda çalışan bir kontrol var; bugün yalnızca ne yapacağını kaydediyor.
+Neden yalnızca bir komut değil? evidence-referee'den önceki kitte Claude `done` kontrolünü istediği zaman çalıştırabiliyordu ve 14 günde bir kez çalıştırdı. Kendiliğinden çalışmayan bir kontrol neredeyse yok hükmündedir. Bu yüzden Claude her durduğunda çalışan bir kontrol var; bugün yalnızca ne yapacağını kaydediyor.
 
 ## Nasıl çalışır
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/how-it-works-dark.gif">
-  <img alt="Claude Code, hook olaylarını ve CLI çağrılarını makinendeki claude-referee'ye gönderir. claude-referee kanıtı kodda ayrıştırır, sırları durdurur, kişisel veriyi maskeler ve soruları tek bir istekte TypeSafe Jev API'sine gönderir. Jev olasılık döndürür; hakem bunları eşiklerle sessizliğe, kısa bir nota ya da JSON karara çevirir." src="assets/how-it-works-light.gif" width="100%">
+  <img alt="Claude Code, hook olaylarını ve CLI çağrılarını makinendeki evidence-referee'ye gönderir. evidence-referee kanıtı kodda ayrıştırır, sırları durdurur, kişisel veriyi maskeler ve soruları tek bir istekte TypeSafe Jev API'sine gönderir. Jev olasılık döndürür; hakem bunları eşiklerle sessizliğe, kısa bir nota ya da JSON karara çevirir." src="assets/how-it-works-light.gif" width="100%">
 </picture>
 
 1. Claude Code'da bir şey olur: bir oturum başlar ya da Claude komutlardan birini çalıştırır.
-2. claude-referee makinende çalışır. Parola ya da anahtara benzeyen her şeyi durdurur, e-posta ve IP adreslerini değiştirir ve soruyu küçük tek bir isteğe dönüştürür.
+2. evidence-referee makinende çalışır. Parola ya da anahtara benzeyen her şeyi durdurur, e-posta ve IP adreslerini değiştirir ve soruyu küçük tek bir isteğe dönüştürür.
 3. Jev olasılıklarla cevap verir.
-4. claude-referee bunları sabit eşiklerle karşılaştırır. Ya sessiz kalır, ya kısa bir not ekler ya da tek satırlık bir JSON sonuç basar.
+4. evidence-referee bunları sabit eşiklerle karşılaştırır. Ya sessiz kalır, ya kısa bir not ekler ya da tek satırlık bir JSON sonuç basar.
 
 Düz kod bir soruyu cevaplayabiliyorsa hiçbir modele sorulmaz. Diyagram tasarımın tamamını gösteriyor: bugün oturum notu, dört komut, test çıktısının kodda okunması ve `shadow` modda durunca yapılan kontrol çalışıyor; durmayı engelleyen `active` mod planlandı ([yol haritası](ROADMAP.md)); model değişimi uyarısı, Claude Code zaten sorduğu için bırakıldı.
 
@@ -60,7 +60,7 @@ Kısacası: seçeneklerin sırası Jev'in cevabını, soruyu yeniden sormaktan �
   <img alt="Durum panosu. Ölçülen: seçenek sırası Jev'in seçimini oynatıyor (0,52'ye kadar); yeniden sormak neredeyse oynatmıyor (0,01); iki sıra 24 sıranın tamamıyla eşleşiyor (20/20); brifing 600 karaktere sığıyor. Modellenen: tek küçük bir yargı genellikle para kaybettirir; toplu sorular 80K bağlamda yaklaşık 23 öğede başa baş gelir. Henüz gösterilmeyen: görev başına daha düşük toplam maliyet; 50 etiketli durdurmada done-gate kesinliği; done kontrolünün hold-out doğruluğu." src="assets/charts/status-board-light.png" width="100%">
 </picture>
 
-Buradaki sayıların çoğu tek bir özel kod tabanından, tek ekipten ve tek yazardan geliyor: claude-referee'den önceki kit, Eylül 2026. Onları genel sonuç değil, erken işaret olarak okuyun. 2026-09-30 ve 2026-10-01 tarihli satırlar ise claude-referee'nin kendisiyle, ham sonuçları bu depoda olan açık girdilerle ölçüldü. Her birinin nasıl ölçüldüğü [docs/measurements.md](docs/measurements.md) sayfasında (İngilizce).
+Buradaki sayıların çoğu tek bir özel kod tabanından, tek ekipten ve tek yazardan geliyor: evidence-referee'den önceki kit, Eylül 2026. Onları genel sonuç değil, erken işaret olarak okuyun. 2026-09-30 ve 2026-10-01 tarihli satırlar ise evidence-referee'nin kendisiyle, ham sonuçları bu depoda olan açık girdilerle ölçüldü. Her birinin nasıl ölçüldüğü [docs/measurements.md](docs/measurements.md) sayfasında (İngilizce).
 
 ### Seçenek sırası cevabı oynatıyor. Yeniden sormak oynatmıyor.
 
@@ -69,7 +69,7 @@ Buradaki sayıların çoğu tek bir özel kod tabanından, tek ekipten ve tek ya
   <img alt="0 ile 0,6 arası yatay çubuklar. Aynı istek yeniden: en fazla 0,01. Önbellek atlanarak taze koşu: en fazla 0,02. Seçeneklerin sırası değişince: ortalama 0,20, en fazla 0,52. Tek bir özel kod tabanından 20 gerçek, 4 seçenekli karar; her biri 24 sırayla." src="assets/charts/order-vs-retry-light.png" width="100%">
 </picture>
 
-Önceki kitte aynı seçenekler farklı sırayla yazılınca Jev'in bir seçeneğe verdiği olasılık 0,52'ye kadar değişti. Aynı soruyu birebir yeniden sormak ise en fazla 0,01 değiştirdi. Bu yüzden `decide` her seçimi iki kez sorar, bir kez senin sıranla, bir kez ters sırayla, ve ikisinin ortalamasını alır. Claude'a asla "yeniden sor" demez: beraberlik, eksik olgu eklenerek çözülür. claude-referee'nin 19'unda liderin 0,9 ya da üstünde olduğu 20 kararlık kendi açık setinde sıra en fazla 0,13, yeniden sormak en fazla 0,04 değiştirdi. Önceden kayda geçirilmiş 39 yakın kararlık sette ise sıra olasılığı ortalama 0,26, en fazla 0,42 değiştirdi; ters sıra, yazılan sırayı iki kez sormaktan daha çok 24 sıranın ortalamasına yaklaştırdı.
+Önceki kitte aynı seçenekler farklı sırayla yazılınca Jev'in bir seçeneğe verdiği olasılık 0,52'ye kadar değişti. Aynı soruyu birebir yeniden sormak ise en fazla 0,01 değiştirdi. Bu yüzden `decide` her seçimi iki kez sorar, bir kez senin sıranla, bir kez ters sırayla, ve ikisinin ortalamasını alır. Claude'a asla "yeniden sor" demez: beraberlik, eksik olgu eklenerek çözülür. evidence-referee'nin 19'unda liderin 0,9 ya da üstünde olduğu 20 kararlık kendi açık setinde sıra en fazla 0,13, yeniden sormak en fazla 0,04 değiştirdi. Önceden kayda geçirilmiş 39 yakın kararlık sette ise sıra olasılığı ortalama 0,26, en fazla 0,42 değiştirdi; ters sıra, yazılan sırayı iki kez sormaktan daha çok 24 sıranın ortalamasına yaklaştırdı.
 
 ### İki sıra yeterli
 
@@ -104,9 +104,9 @@ Bütün ölçümler tek tabloda:
 | 2026-09 | SessionStart brifing boyutu | 431–599 karakter (hedef 600) | Ölçüldü · tek çalışma alanının dört bölgesi |
 | 2026-09 | Aynı denetim, ikinci koşu | 0 Jev isteği (ilk koşu: 10) | Ölçüldü · 10 çiftlik tek denetim |
 | 2026-09 | Gönüllü `done` komutu | 14 günde 1 koşu | Ölçüldü · 14 gün, tek kod tabanı |
-| 2026-09-30 | API sınırları, canlı yoklama | 11 Score seviyesi ve 256 seçenek 400 alıyor; 1 seviyeli Score kabul ediliyor | Ölçüldü · claude-referee, 7 istek |
-| 2026-09-30 | Gecikme, p50 | 275–379 ms; 2,4 saniye boyunca saniyede yaklaşık 179 bin token'da 429 yok | Ölçüldü · claude-referee, 182 istek, tek makine |
-| 2026-09-30 | Seçenek sırası ve yeniden sormak | 0,13'e kadar ve 0,04'e kadar | Ölçüldü · claude-referee, 20 açık karar |
+| 2026-09-30 | API sınırları, canlı yoklama | 11 Score seviyesi ve 256 seçenek 400 alıyor; 1 seviyeli Score kabul ediliyor | Ölçüldü · evidence-referee, 7 istek |
+| 2026-09-30 | Gecikme, p50 | 275–379 ms; 2,4 saniye boyunca saniyede yaklaşık 179 bin token'da 429 yok | Ölçüldü · evidence-referee, 182 istek, tek makine |
+| 2026-09-30 | Seçenek sırası ve yeniden sormak | 0,13'e kadar ve 0,04'e kadar | Ölçüldü · evidence-referee, 20 açık karar |
 | 2026-09-30 | İki sıra ve 24 sıranın tamamı | 20'de 20 aynı lider; diğer bütün politikalar da | Ölçüldü · aynı 20 açık karar |
 | 2026-10-01 | Bir iddia kontrolü olarak `decide` | doğru iddialarda supports 0,97–1,00; 15 yanlışın 13'ünde 0,00–0,23 | Ölçüldü · bu deponun belgeleri hakkında 31 iddia |
 | 2026-10-01 | "Kanıtı veri olarak ele al" notu | hiçbir karar değişmedi; benimsenmedi | Ölçüldü · 33 enjeksiyon logu |
@@ -117,7 +117,7 @@ Diğer grafikler (kalibrasyon, seçenek başına sorular, sır kuralının ayar�
 
 Kısacası: tek bir küçük kontrol genellikle Claude tarafında kazandırdığından fazlasına mal olur. Kontroller, birçok öğe bir arada denetlendiğinde kazandırır.
 
-**Henüz iddia edilmeyen:** claude-referee'nin bir Claude Code görevini toplamda ucuzlattığı. Bunun için, planı çalıştırılmadan önce yayımlanan ve eklentili ve eklentisiz oturumları karşılaştıran bir test gerekiyor. Sonuç ne olursa olsun yayımlanacak.
+**Henüz iddia edilmeyen:** evidence-referee'nin bir Claude Code görevini toplamda ucuzlattığı. Bunun için, planı çalıştırılmadan önce yayımlanan ve eklentili ve eklentisiz oturumları karşılaştıran bir test gerekiyor. Sonuç ne olursa olsun yayımlanacak.
 
 Grafik, bir kontrolün cevabı Claude'a nasıl ulaştığına göre Claude tarafında ne kadar tuttuğunu gösteriyor. Bunlar Opus 5.5 ve 50 bin token'lık konuşma için yapılmış tahminler, ölçüm değil.
 
@@ -150,15 +150,17 @@ Aynı soruyu yeniden sormak bedava: cevaplar makinende önbelleğe alınır.
 Kendi rakamlarını görmek için Claude tarafında Claude Code'daki `/usage` komutunu, Jev tarafında şunu kullan:
 
 ```sh
-npx claude-referee receipts --tokens
+npx evidence-referee receipts --tokens
 ```
 
 ## Kurulum
 
 > [!WARNING]
-> **Henüz npm'de değil.** npm paketi yayımlanana kadar (Ekim başı) `npx claude-referee` 404 hatası verir. Claude etkilenmez: eklenti kendi içindeki kopyayı çalıştırır. Bu sayfadaki komutları kendin çalıştırmak için bu alias'ı ekle ve belgelerde `npx claude-referee` geçen her yerde `claude-referee` yaz:
+> **Ad değişti.** Claude Code 2.1.287, `claude-` önekini üçüncü taraf eklenti adlarına kapattığı için claude-referee artık evidence-referee. Bir sonraki sürüme kadar sürüm tarball'ları ve etiketleri (v0.1.6'ya kadar) eski adı taşır ve aşağıdaki alias bunlardan birini gösterir; GitHub eski depo adresini yönlendirir.
+>
+> **Henüz npm'de değil.** npm paketi yayımlanana kadar (Ekim başı) `npx evidence-referee` 404 hatası verir. Claude etkilenmez: eklenti kendi içindeki kopyayı çalıştırır. Bu sayfadaki komutları kendin çalıştırmak için bu alias'ı ekle ve belgelerde `npx evidence-referee` geçen her yerde `evidence-referee` yaz:
 > ```sh
-> alias claude-referee='npx --yes --package https://github.com/ismaildasci/claude-referee/releases/download/v0.1.6/claude-referee-0.1.6.tgz claude-referee'
+> alias evidence-referee='npx --yes --package https://github.com/ismaildasci/claude-referee/releases/download/v0.1.6/claude-referee-0.1.6.tgz claude-referee'
 > ```
 
 Gerekenler: Claude Code 2.1.139 ya da sonrası (2.1.285 ile test edildi), Claude Code'un gördüğü `PATH` üzerinde Node 20.3 ya da sonrası ve bir [TypeSafe API anahtarı](https://docs.typesafe.ai).
@@ -166,8 +168,8 @@ Gerekenler: Claude Code 2.1.139 ya da sonrası (2.1.285 ile test edildi), Claude
 **1. Eklentiyi kur**
 
 ```sh
-claude plugin marketplace add ismaildasci/claude-referee
-claude plugin install claude-referee@claude-referee
+claude plugin marketplace add ismaildasci/evidence-referee
+claude plugin install evidence-referee@evidence-referee
 ```
 
 **2. Anahtarını bir kez sakla.** Claude'un çalıştırdığı komutlar da hakemin hook'ları da onu burada arar:
@@ -176,12 +178,12 @@ claude plugin install claude-referee@claude-referee
 # macOS: Keychain'e kaydeder ve anahtarı sorar; böylece anahtar kabuk geçmişine girmez
 security add-generic-password -a "$USER" -s TYPESAFE_API_KEY -w
 
-# Linux (henüz test edilmedi): Secret Service'e kaydet, sonra kabuk profilinden claude-referee'yi ona yönlendir
+# Linux (henüz test edilmedi): Secret Service'e kaydet, sonra kabuk profilinden evidence-referee'yi ona yönlendir
 secret-tool store --label="TypeSafe API key" service typesafe
 export TYPESAFE_API_KEY_CMD="secret-tool lookup service typesafe"
 ```
 
-Ya da `TYPESAFE_API_KEY` tanımla. `/plugin configure claude-referee` de anahtarı saklar, ama Claude Code eklenti sırlarını yalnızca hook'lara iletir, kabuğa iletmez. Tam arama sırası [yapılandırma](docs/configuration.md#the-api-key) sayfasında (İngilizce).
+Ya da `TYPESAFE_API_KEY` tanımla. `/plugin configure evidence-referee` de anahtarı saklar, ama Claude Code eklenti sırlarını yalnızca hook'lara iletir, kabuğa iletmez. Tam arama sırası [yapılandırma](docs/configuration.md#the-api-key) sayfasında (İngilizce).
 
 **3. Bir projede aç:** `.claude/referee.json` dosyasını commit'le. Bu dosya yoksa hakem sessiz kalır:
 
@@ -192,7 +194,7 @@ Ya da `TYPESAFE_API_KEY` tanımla. `/plugin configure claude-referee` de anahtar
 **4. Kurulumu denetle:**
 
 ```sh
-npx claude-referee doctor            # anahtarı tek bir ücretsiz çağrıyla denetlemek için --online ekle
+npx evidence-referee doctor            # anahtarı tek bir ücretsiz çağrıyla denetlemek için --online ekle
 ```
 
 `doctor` çalışıyor ama Claude brifingi görmüyorsa Claude Code büyük olasılıkla `PATH` üzerinde Node'u bulamıyordur. Windows henüz test edilmedi.
@@ -201,13 +203,13 @@ npx claude-referee doctor            # anahtarı tek bir ücretsiz çağrıyla d
 
 ```sh
 # Bitti mi? Kontrol çıktısını doğrudan boruyla ver; Claude'un okumasına gerek kalmaz.
-npm test 2>&1 | npx claude-referee done --criteria "all tests pass" --evidence -
+npm test 2>&1 | npx evidence-referee done --criteria "all tests pass" --evidence -
 
 # Tek bir evet/hayır kuralını birçok öğeye uygula: burada bir diff'in eklenen her satırı.
-git diff -U0 --no-ext-diff | grep '^+[^+]' | npx claude-referee judge --question line.risky --items -
+git diff -U0 --no-ext-diff | grep '^+[^+]' | npx evidence-referee judge --question line.risky --items -
 
 # Seçenekler arasında seç. Bağlam dosyalarını hakem kendisi okur.
-npx claude-referee decide <<'EOF'
+npx evidence-referee decide <<'EOF'
 {"decision": "Where should rate-limit counters live?",
  "options": [{"name": "redis", "text": "Redis, already deployed"},
              {"name": "memory", "text": "In-process LRU on each instance"}],
@@ -215,15 +217,15 @@ npx claude-referee decide <<'EOF'
 EOF
 
 # Jev'i çağırmadan neyin gönderileceğini gör
-npm test 2>&1 | npx claude-referee done --criteria "all tests pass" --evidence - --dry-run
+npm test 2>&1 | npx evidence-referee done --criteria "all tests pass" --evidence - --dry-run
 ```
 
 Her komut tek satır JSON basar: `ok`, karar, birkaç sayı, varsa bir `next_step` ve bir makbuz kimliği. "Bitmedi" dahil her karar 0 ile çıkar; CI'da `--fail-on missing,unsure` bu kararlarda 3 ile çıkar. `--describe` her komutun tam sözleşmesini basar.
 
 > [!TIP]
-> **Kanıtı açık yaz.** Başarıda hiçbir şey basmayan bir kontrol hiçbir şey göstermez. claude-referee geliştirilirken hakem "typecheck geçiyor" ölçütüne `missing` (0,46) dedi, çünkü `tsc` hiç çıktı basmamıştı; çıkış kodu eklenince sonuç `met` (0,97) oldu. (Bir kez ölçüldü, 2026-09-30.)
+> **Kanıtı açık yaz.** Başarıda hiçbir şey basmayan bir kontrol hiçbir şey göstermez. evidence-referee geliştirilirken hakem "typecheck geçiyor" ölçütüne `missing` (0,46) dedi, çünkü `tsc` hiç çıktı basmamıştı; çıkış kodu eklenince sonuç `met` (0,97) oldu. (Bir kez ölçüldü, 2026-09-30.)
 > ```sh
-> { npx tsc --noEmit; echo "tsc exit code: $?"; } 2>&1 | npx claude-referee done --criteria "typecheck passes" --evidence -
+> { npx tsc --noEmit; echo "tsc exit code: $?"; } 2>&1 | npx evidence-referee done --criteria "typecheck passes" --evidence -
 > ```
 
 `done`, yalnızca bir test çalıştırıcısının, linter'ın ya da tip denetleyicisinin özetini ya da bir çıkış kodu satırını tanırsa `met` döndürür. Başka her şey `trust: unparsed` ile `unsure` olarak gelir. Kanıtta sıfırdan farklı bir çıkış kodu varsa sonuç `missing` olur (`reason: exit_code_nonzero`) ve Jev'e sorulmaz. Atlanan, riskli ya da tamamlanmamış testler `met`'i `unsure` ile sınırlar (`reason: skipped_tests`); tanınan ama yarıda kesilmiş, boş, iptal edilmiş ya da kararsız (flaky) bir çalıştırma da öyle (`reason: incomplete_run`).
@@ -266,8 +268,8 @@ Belgeler İngilizce:
 - [Proje `verify` skill'i için tarif](docs/verify-skill.md) (İngilizce): her commit öncesi test çıktısında `done` çalıştır
 - [SSS](docs/faq.md), [yol haritası](ROADMAP.md) ve [değişiklik günlüğü](CHANGELOG.md)
 - [Katkı](CONTRIBUTING.md): API anahtarı gerekmez, testler çevrimdışı çalışır. Güvenlik bildirimleri: [SECURITY.md](SECURITY.md)
-- Kendi TypeSafe kodunu mu yazıyorsun? TypeSafe'in resmî eklentisi Claude'a API'nin tüm bağlamını verir: `claude plugin marketplace add typesafe-ai/skills`, ardından `claude plugin install typesafe@typesafe-ai`. claude-referee'nin buna ihtiyacı yok.
+- Kendi TypeSafe kodunu mu yazıyorsun? TypeSafe'in resmî eklentisi Claude'a API'nin tüm bağlamını verir: `claude plugin marketplace add typesafe-ai/skills`, ardından `claude plugin install typesafe@typesafe-ai`. evidence-referee'nin buna ihtiyacı yok.
 
 ---
 
-<sub>claude-referee bağımsız, resmî olmayan bir projedir; Anthropic ya da TypeSafe ile bağlantılı değildir ve onlar tarafından onaylanmamıştır. Hata durumunda yolu açık bırakır, kapatılabilir ve bir güvenlik sınırı değildir. MIT lisanslıdır. "Claude" ve "Claude Code" Anthropic, PBC'nin ticari markalarıdır; "TypeSafe" ve "Jev" sahiplerinin ticari markalarıdır ve burada yalnızca claude-referee'nin neyle çalıştığını söylemek için kullanılır.</sub>
+<sub>evidence-referee bağımsız, resmî olmayan bir projedir; Anthropic ya da TypeSafe ile bağlantılı değildir ve onlar tarafından onaylanmamıştır. Hata durumunda yolu açık bırakır, kapatılabilir ve bir güvenlik sınırı değildir. MIT lisanslıdır. "Claude" ve "Claude Code" Anthropic, PBC'nin ticari markalarıdır; "TypeSafe" ve "Jev" sahiplerinin ticari markalarıdır ve burada yalnızca evidence-referee'nin neyle çalıştığını söylemek için kullanılır.</sub>

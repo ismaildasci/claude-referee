@@ -731,9 +731,9 @@ import { readdirSync, realpathSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 // src/engine/config.ts
-var KIT = "claude-referee";
+var KIT = "evidence-referee";
 var DEFAULT_MODEL = "jev-1.13.0";
-var MARKETPLACE = "claude-referee";
+var MARKETPLACE = "evidence-referee";
 var USD_PER_MTOK = {
   "jev-1.13.0": 0.042
 };
@@ -818,7 +818,7 @@ __name(isRefereeError, "isRefereeError");
 var NAME = /^[a-z0-9][a-z0-9-]{0,63}$/;
 function bundledPackDirs() {
   const here = dirname(fileURLToPath(import.meta.url));
-  return [join2(here, "packs"), join2(here, "..", "packs"), join2(here, "..", "..", "plugins", "claude-referee", "packs")];
+  return [join2(here, "packs"), join2(here, "..", "packs"), join2(here, "..", "..", "plugins", "evidence-referee", "packs")];
 }
 __name(bundledPackDirs, "bundledPackDirs");
 function packDirs(env, bundled = bundledPackDirs()) {
@@ -1237,9 +1237,9 @@ var stderrLogger = {
   }, "debug"),
   info: /* @__PURE__ */ __name(() => {
   }, "info"),
-  warn: /* @__PURE__ */ __name((message) => void process.stderr.write(`[claude-referee] ${message}
+  warn: /* @__PURE__ */ __name((message) => void process.stderr.write(`[evidence-referee] ${message}
 `), "warn"),
-  error: /* @__PURE__ */ __name((message) => void process.stderr.write(`[claude-referee] ${message}
+  error: /* @__PURE__ */ __name((message) => void process.stderr.write(`[evidence-referee] ${message}
 `), "error")
 };
 async function guarded(options, fn, model) {
@@ -1338,7 +1338,7 @@ function validateKey(raw, source) {
 }
 __name(validateKey, "validateKey");
 function noKeyNextStep(platform) {
-  const hooks = "Hooks can also use /plugin configure claude-referee or claude plugin configure claude-referee --values-stdin (Claude Code 2.1.285+).";
+  const hooks = "Hooks can also use /plugin configure evidence-referee or claude plugin configure evidence-referee --values-stdin (Claude Code 2.1.285+).";
   if (platform === "darwin") {
     return `Store the key in the Keychain: security add-generic-password -a "$USER" -s TYPESAFE_API_KEY -w (it prompts for the key). ${hooks}`;
   }
@@ -3671,7 +3671,7 @@ __name(analyzeTranscript, "analyzeTranscript");
 
 // src/hooks/stop.ts
 var EXCERPT = 200;
-var SOFT_NOTE = "claude-referee: this turn edited files and claimed it was done, but no passing check ran after the last edit. Run the project's tests or build before trusting it.";
+var SOFT_NOTE = "evidence-referee: this turn edited files and claimed it was done, but no passing check ran after the last edit. Run the project's tests or build before trusting it.";
 async function stopGate(io2, _pluginRoot) {
   const started = io2.now();
   const { env } = io2;

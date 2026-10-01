@@ -42,7 +42,7 @@ function hasParsedWarnings(parsed: ParsedEvidence): boolean {
   return parsed.runners.some((r) => (r.warnings ?? 0) > 0);
 }
 
-const UNPARSED_NEXT = 'No recognised runner summary or exit code in the evidence, so it cannot count as met. Pipe the runner\'s full output, or add an exit code line: { your-command; echo "exit code: $?"; } 2>&1 | claude-referee done --criteria "..."';
+const UNPARSED_NEXT = 'No recognised runner summary or exit code in the evidence, so it cannot count as met. Pipe the runner\'s full output, or add an exit code line: { your-command; echo "exit code: $?"; } 2>&1 | evidence-referee done --criteria "..."';
 
 const CLEAN_CRITERION = /\b(?:lint\w*|clean|warning[- ]?free|no warnings?)\b/i;
 const WARN_WORDS = /\b(?:warnings?|notices?|deprecat\w*)\b/i;

@@ -9,7 +9,7 @@ for (const c of cases.slice(0, limit)) {
   if (done.has(c.id)) continue;
   writeFileSync(`${S}/cli-in.json`, JSON.stringify({ decision: c.decision, context: c.context, options: c.options }));
   const t0 = performance.now();
-  const out = execFileSync("node", ["plugins/claude-referee/dist/cli.mjs", "decide", "--in", `${S}/cli-in.json`, "--fresh", "--data-dir", `${S}/data`], { encoding: "utf8" });
+  const out = execFileSync("node", ["plugins/evidence-referee/dist/cli.mjs", "decide", "--in", `${S}/cli-in.json`, "--fresh", "--data-dir", `${S}/data`], { encoding: "utf8" });
   const wall_ms = performance.now() - t0;
   const r = JSON.parse(out.trim().split("\n").pop());
   appendFileSync(`${S}/cli.jsonl`, JSON.stringify({ id: c.id, ok: r.ok, verdict: r.verdict, lean: r.lean, p: r.p, order_disagrees: r.order_disagrees, wall_ms, keys: Object.keys(r) }) + "\n");

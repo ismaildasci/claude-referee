@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/hero-dark.gif">
-    <img alt="claude-referee: evidence over eloquence. Claude says all tests pass; the referee's done-gate (active mode, planned) replies that no check has passed since the last edit and asks Claude to run cargo nextest, which shows 2 failures." src="assets/hero-light.gif" width="100%">
+    <img alt="evidence-referee: evidence over eloquence. Claude says all tests pass; the referee's done-gate (active mode, planned) replies that no check has passed since the last edit and asks Claude to run cargo nextest, which shows 2 failures." src="assets/hero-light.gif" width="100%">
   </picture>
 </p>
 
@@ -20,14 +20,14 @@
 </p>
 
 <!-- Demo: once v0.1 runs, record it with `vhs assets/demo.tape` (keep it under 2 MB; `gifsicle -O3` if needed) and uncomment.
-<p align="center"><img src="assets/demo.gif" alt="claude-referee demo in a terminal" width="100%"></p>
+<p align="center"><img src="assets/demo.gif" alt="evidence-referee demo in a terminal" width="100%"></p>
 -->
 
 ---
 
 Coding agents write well. "All tests pass. Done." is one fluent line, and it costs nothing to write. Checking it takes a test run, and if the line is wrong, someone finds out later.
 
-claude-referee is an unofficial plugin for Claude Code that checks lines like that. Claude still makes the big decisions. Small questions that can be checked, such as *is it really done?* or *which of these options fits our rules?*, go to Jev: a model from TypeSafe that answers with a probability, like "0.97 yes", instead of a paragraph. Every check is logged on your machine.
+evidence-referee is an unofficial plugin for Claude Code that checks lines like that. Claude still makes the big decisions. Small questions that can be checked, such as *is it really done?* or *which of these options fits our rules?*, go to Jev: a model from TypeSafe that answers with a probability, like "0.97 yes", instead of a paragraph. Every check is logged on your machine.
 
 ## What it does
 
@@ -41,19 +41,19 @@ claude-referee is an unofficial plugin for Claude Code that checks lines like th
 
 If a check finds nothing, Claude sees nothing. If it finds something, Claude sees a note of 300 characters at most.
 
-Why not just a command? In the kit that came before claude-referee, Claude could run the `done` check whenever it liked, and it ran once in 14 days. A check that doesn't run by itself barely exists. That's why there is a check that runs every time Claude stops; today it only records what it would do.
+Why not just a command? In the kit that came before evidence-referee, Claude could run the `done` check whenever it liked, and it ran once in 14 days. A check that doesn't run by itself barely exists. That's why there is a check that runs every time Claude stops; today it only records what it would do.
 
 ## How it works
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/how-it-works-dark.gif">
-  <img alt="Claude Code sends hook events and CLI calls to claude-referee on your machine. It parses evidence in code, stops secrets and redacts personal data, then batches the questions into one request to the TypeSafe Jev API. Jev returns probabilities; the referee thresholds them into silence, a short note or a JSON verdict." src="assets/how-it-works-light.gif" width="100%">
+  <img alt="Claude Code sends hook events and CLI calls to evidence-referee on your machine. It parses evidence in code, stops secrets and redacts personal data, then batches the questions into one request to the TypeSafe Jev API. Jev returns probabilities; the referee thresholds them into silence, a short note or a JSON verdict." src="assets/how-it-works-light.gif" width="100%">
 </picture>
 
 1. Something happens in Claude Code: a session starts, or Claude runs one of the commands.
-2. claude-referee runs on your machine. It stops anything that looks like a password or key, replaces emails and IP addresses, and turns the question into one small request.
+2. evidence-referee runs on your machine. It stops anything that looks like a password or key, replaces emails and IP addresses, and turns the question into one small request.
 3. Jev answers with probabilities.
-4. claude-referee compares them with fixed thresholds. It stays silent, adds a short note, or prints a one-line JSON result.
+4. evidence-referee compares them with fixed thresholds. It stays silent, adds a short note, or prints a one-line JSON result.
 
 If plain code can answer a question, no model is asked. The diagram shows the full design: the session note, the four commands, reading test output in code and the stop check in `shadow` mode work today, and blocking a stop (`active`) is planned ([roadmap](ROADMAP.md)); the model-switch warning was dropped because Claude Code already asks.
 
@@ -66,7 +66,7 @@ In short: the order of the options changes Jev's answer more than asking again d
   <img alt="Status board. Measured: option order moves Jev's pick (up to 0.52); asking again barely does (0.01); two orders match all 24 (20/20); the briefing fits in 600 characters. Modelled: one small judgement usually loses money; batches break even at about 23 items (80K context). Not shown yet: lower total cost per task; done-gate precision on 50 labelled stops; held-out accuracy for the done check." src="assets/charts/status-board-light.png" width="100%">
 </picture>
 
-Most numbers here come from one private codebase, one team and one author: the kit that came before claude-referee, in September 2026. Treat them as early signs, not general results. The rows dated 2026-09-30 and 2026-10-01 were measured with claude-referee itself, on public inputs whose raw results are in this repository. How each one was measured is in [docs/measurements.md](docs/measurements.md).
+Most numbers here come from one private codebase, one team and one author: the kit that came before evidence-referee, in September 2026. Treat them as early signs, not general results. The rows dated 2026-09-30 and 2026-10-01 were measured with evidence-referee itself, on public inputs whose raw results are in this repository. How each one was measured is in [docs/measurements.md](docs/measurements.md).
 
 ### Option order moves the answer. Asking again doesn't.
 
@@ -75,7 +75,7 @@ Most numbers here come from one private codebase, one team and one author: the k
   <img alt="Horizontal bars on a 0 to 0.6 axis. Same request asked again: at most 0.01. Fresh re-run with the cache bypassed: at most 0.02. Options reordered: 0.20 on average, at most 0.52. Measured on 20 real 4-option decisions from one private codebase, 24 orders each." src="assets/charts/order-vs-retry-light.png" width="100%">
 </picture>
 
-In the earlier kit, when the same options were listed in a different order, Jev's probability for one option moved by up to 0.52. Asking the exact same question again moved it by 0.01 at most. So `decide` asks every choice twice, once in your order and once reversed, and averages the two. It never tells Claude to simply ask again: a tie is settled by adding the missing fact. On claude-referee's own public set of 20 decisions, 19 of them with a leader at 0.9 or more, order moved it by up to 0.13 and asking again by up to 0.04. On a pre-registered set of 39 close-call decisions, order moved it by 0.26 on average and up to 0.42, and the reversed order brought the answer closer to the all-orders answer than asking the written order twice did.
+In the earlier kit, when the same options were listed in a different order, Jev's probability for one option moved by up to 0.52. Asking the exact same question again moved it by 0.01 at most. So `decide` asks every choice twice, once in your order and once reversed, and averages the two. It never tells Claude to simply ask again: a tie is settled by adding the missing fact. On evidence-referee's own public set of 20 decisions, 19 of them with a leader at 0.9 or more, order moved it by up to 0.13 and asking again by up to 0.04. On a pre-registered set of 39 close-call decisions, order moved it by 0.26 on average and up to 0.42, and the reversed order brought the answer closer to the all-orders answer than asking the written order twice did.
 
 ### Two orders are enough
 
@@ -110,9 +110,9 @@ All measurements in one table:
 | 2026-09 | SessionStart briefing size | 431–599 characters (target 600) | Measured · four areas of one workspace |
 | 2026-09 | Same audit, second run | 0 Jev requests (first run: 10) | Measured · one 10-pair audit |
 | 2026-09 | Voluntary `done` command | 1 run in 14 days | Measured · 14 days, one codebase |
-| 2026-09-30 | API limits, live probe | 11 Score levels and 256 options get a 400; a 1-level Score is accepted | Measured · claude-referee, 7 requests |
-| 2026-09-30 | Latency, p50 | 275–379 ms; no 429 at about 179K tokens/s for 2.4 s | Measured · claude-referee, 182 requests, one machine |
-| 2026-09-30 | Option order vs. asking again | up to 0.13 vs. up to 0.04 | Measured · claude-referee, 20 public decisions |
+| 2026-09-30 | API limits, live probe | 11 Score levels and 256 options get a 400; a 1-level Score is accepted | Measured · evidence-referee, 7 requests |
+| 2026-09-30 | Latency, p50 | 275–379 ms; no 429 at about 179K tokens/s for 2.4 s | Measured · evidence-referee, 182 requests, one machine |
+| 2026-09-30 | Option order vs. asking again | up to 0.13 vs. up to 0.04 | Measured · evidence-referee, 20 public decisions |
 | 2026-09-30 | Two orders vs. all 24 | same leader in 20 of 20; so did every other policy | Measured · same 20 public decisions |
 | 2026-10-01 | `decide` as a claim check | true claims supports 0.97–1.00; 13 of 15 false ones 0.00–0.23 | Measured · 31 claims about this repository's docs |
 | 2026-10-01 | A "treat the evidence as data" note | no verdict changed; not adopted | Measured · 33 injection logs |
@@ -123,7 +123,7 @@ More charts (calibration, per-option questions, secret-rule tuning, briefing siz
 
 In short: one small check usually costs more on Claude's side than it saves. Checks pay off when many items are checked at once.
 
-**Not claimed yet:** that claude-referee makes a Claude Code task cheaper overall. That needs a test that compares sessions with and without it, with the plan published before it runs. The result will be published either way.
+**Not claimed yet:** that evidence-referee makes a Claude Code task cheaper overall. That needs a test that compares sessions with and without it, with the plan published before it runs. The result will be published either way.
 
 The chart shows what one check costs on Claude's side, depending on how its answer reaches Claude. These are estimates for Opus 5.5 with 50K tokens of conversation, not measurements.
 
@@ -156,15 +156,17 @@ Asking the same question again is free: answers are cached on your machine.
 To see your own numbers, use `/usage` in Claude Code for Claude, and this for Jev:
 
 ```sh
-npx claude-referee receipts --tokens
+npx evidence-referee receipts --tokens
 ```
 
 ## Install
 
 > [!WARNING]
-> **Not on npm yet.** Until the npm package is published (early October), `npx claude-referee` fails with a 404. Claude isn't affected: the plugin runs its own bundled copy. To run the commands on this page yourself, add this alias and type `claude-referee` wherever the docs say `npx claude-referee`:
+> **The name changed.** Claude Code 2.1.287 reserves the `claude-` prefix for third-party plugin names, so claude-referee is now evidence-referee. Until the next release, release tarballs and tags (up to v0.1.6) still use the old name, and the alias below points at one of them; GitHub redirects the old repository URL.
+>
+> **Not on npm yet.** Until the npm package is published (early October), `npx evidence-referee` fails with a 404. Claude isn't affected: the plugin runs its own bundled copy. To run the commands on this page yourself, add this alias and type `evidence-referee` wherever the docs say `npx evidence-referee`:
 > ```sh
-> alias claude-referee='npx --yes --package https://github.com/ismaildasci/claude-referee/releases/download/v0.1.6/claude-referee-0.1.6.tgz claude-referee'
+> alias evidence-referee='npx --yes --package https://github.com/ismaildasci/claude-referee/releases/download/v0.1.6/claude-referee-0.1.6.tgz claude-referee'
 > ```
 
 You need Claude Code 2.1.139 or later (tested with 2.1.285), Node 20.3 or later on the `PATH` Claude Code sees, and a [TypeSafe API key](https://docs.typesafe.ai).
@@ -172,8 +174,8 @@ You need Claude Code 2.1.139 or later (tested with 2.1.285), Node 20.3 or later 
 **1. Install the plugin**
 
 ```sh
-claude plugin marketplace add ismaildasci/claude-referee
-claude plugin install claude-referee@claude-referee
+claude plugin marketplace add ismaildasci/evidence-referee
+claude plugin install evidence-referee@evidence-referee
 ```
 
 **2. Store your key once.** The commands Claude runs and the referee's hooks both look for it here:
@@ -182,12 +184,12 @@ claude plugin install claude-referee@claude-referee
 # macOS: saves it in the Keychain and prompts for the key, so it stays out of your shell history
 security add-generic-password -a "$USER" -s TYPESAFE_API_KEY -w
 
-# Linux (not yet tested): store it with Secret Service, then point claude-referee at it from your shell profile
+# Linux (not yet tested): store it with Secret Service, then point evidence-referee at it from your shell profile
 secret-tool store --label="TypeSafe API key" service typesafe
 export TYPESAFE_API_KEY_CMD="secret-tool lookup service typesafe"
 ```
 
-Or set `TYPESAFE_API_KEY`. `/plugin configure claude-referee` also stores the key, but Claude Code passes plugin secrets to hooks only, not to the shell. The full lookup order is in [configuration](docs/configuration.md#the-api-key).
+Or set `TYPESAFE_API_KEY`. `/plugin configure evidence-referee` also stores the key, but Claude Code passes plugin secrets to hooks only, not to the shell. The full lookup order is in [configuration](docs/configuration.md#the-api-key).
 
 **3. Turn it on for a project** by committing `.claude/referee.json`. Without this file, the referee stays silent:
 
@@ -198,7 +200,7 @@ Or set `TYPESAFE_API_KEY`. `/plugin configure claude-referee` also stores the ke
 **4. Check the setup:**
 
 ```sh
-npx claude-referee doctor            # add --online to check the key with one free call
+npx evidence-referee doctor            # add --online to check the key with one free call
 ```
 
 If `doctor` works but Claude sees no briefing, Claude Code probably can't find Node on its `PATH`. Windows isn't tested yet.
@@ -207,13 +209,13 @@ If `doctor` works but Claude sees no briefing, Claude Code probably can't find N
 
 ```sh
 # Is it done? Pipe the check output straight in, so Claude never has to read it.
-npm test 2>&1 | npx claude-referee done --criteria "all tests pass" --evidence -
+npm test 2>&1 | npx evidence-referee done --criteria "all tests pass" --evidence -
 
 # Run one yes/no rule over many items: here, every added line of a diff.
-git diff -U0 --no-ext-diff | grep '^+[^+]' | npx claude-referee judge --question line.risky --items -
+git diff -U0 --no-ext-diff | grep '^+[^+]' | npx evidence-referee judge --question line.risky --items -
 
 # Pick between options. The referee reads the context files itself.
-npx claude-referee decide <<'EOF'
+npx evidence-referee decide <<'EOF'
 {"decision": "Where should rate-limit counters live?",
  "options": [{"name": "redis", "text": "Redis, already deployed"},
              {"name": "memory", "text": "In-process LRU on each instance"}],
@@ -221,15 +223,15 @@ npx claude-referee decide <<'EOF'
 EOF
 
 # See what would be sent, without calling Jev
-npm test 2>&1 | npx claude-referee done --criteria "all tests pass" --evidence - --dry-run
+npm test 2>&1 | npx evidence-referee done --criteria "all tests pass" --evidence - --dry-run
 ```
 
 Each command prints one line of JSON: `ok`, the verdict, a few numbers, a `next_step` when there is one, and a receipt ID. Every verdict exits 0, including "not done"; in CI, `--fail-on missing,unsure` exits 3 on those verdicts. `--describe` prints any command's full contract.
 
 > [!TIP]
-> **Make the evidence explicit.** A check that prints nothing on success shows nothing. While building claude-referee, the referee answered `missing` (0.46) to "typecheck passes" because `tsc` printed no output; adding the exit code turned it into `met` (0.97). (Measured once, 2026-09-30.)
+> **Make the evidence explicit.** A check that prints nothing on success shows nothing. While building evidence-referee, the referee answered `missing` (0.46) to "typecheck passes" because `tsc` printed no output; adding the exit code turned it into `met` (0.97). (Measured once, 2026-09-30.)
 > ```sh
-> { npx tsc --noEmit; echo "tsc exit code: $?"; } 2>&1 | npx claude-referee done --criteria "typecheck passes" --evidence -
+> { npx tsc --noEmit; echo "tsc exit code: $?"; } 2>&1 | npx evidence-referee done --criteria "typecheck passes" --evidence -
 > ```
 
 `done` returns `met` only when it recognises a test runner, linter or type checker summary, or an exit code line. Anything else comes back `unsure` with `trust: unparsed`. A non-zero exit code in the evidence is `missing` (`reason: exit_code_nonzero`) and Jev isn't asked. Skipped, risky or incomplete tests cap `met` at `unsure` (`reason: skipped_tests`), and so does a recognised run that is cut off, empty, cancelled or flaky (`reason: incomplete_run`).
@@ -271,8 +273,8 @@ The reasoning behind each one is in [MANIFESTO.md](MANIFESTO.md) ([Türkçe](MAN
 - [A recipe for the project `verify` skill](docs/verify-skill.md): run `done` on your test output before every commit
 - [FAQ](docs/faq.md), [Roadmap](ROADMAP.md) and [Changelog](CHANGELOG.md)
 - [Contributing](CONTRIBUTING.md): no API key needed, tests run offline. Security reports: [SECURITY.md](SECURITY.md)
-- Writing your own TypeSafe code? TypeSafe's official plugin gives Claude the full API context: `claude plugin marketplace add typesafe-ai/skills`, then `claude plugin install typesafe@typesafe-ai`. claude-referee doesn't need it.
+- Writing your own TypeSafe code? TypeSafe's official plugin gives Claude the full API context: `claude plugin marketplace add typesafe-ai/skills`, then `claude plugin install typesafe@typesafe-ai`. evidence-referee doesn't need it.
 
 ---
 
-<sub>claude-referee is an independent, unofficial project, not affiliated with or endorsed by Anthropic or TypeSafe. It fails open, it can be switched off, and it is not a security boundary. MIT licensed. "Claude" and "Claude Code" are trademarks of Anthropic, PBC; "TypeSafe" and "Jev" are trademarks of their owner, used here only to say what claude-referee works with.</sub>
+<sub>evidence-referee is an independent, unofficial project, not affiliated with or endorsed by Anthropic or TypeSafe. It fails open, it can be switched off, and it is not a security boundary. MIT licensed. "Claude" and "Claude Code" are trademarks of Anthropic, PBC; "TypeSafe" and "Jev" are trademarks of their owner, used here only to say what evidence-referee works with.</sub>

@@ -1,7 +1,7 @@
 // Part A: offline floor/round/3-decimal what-if over recorded answers. Run from repo root; read-only.
 import { readFileSync, writeFileSync } from "node:fs";
 const R = "jev-evals/";
-const TH = JSON.parse(readFileSync("plugins/claude-referee/packs/generic/thresholds.json", "utf8"));
+const TH = JSON.parse(readFileSync("plugins/evidence-referee/packs/generic/thresholds.json", "utf8"));
 const rows = (s) => readFileSync(R + s + "/recorded.jsonl", "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
 const dec = (v) => (String(v).split(".")[1] || "").length;
 const schemes = {

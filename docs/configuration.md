@@ -1,6 +1,6 @@
 # Configuration
 
-claude-referee combines settings from four places. Each one overrides the ones before it:
+evidence-referee combines settings from four places. Each one overrides the ones before it:
 
 1. **Plugin settings**, your defaults for every project
 2. **The project file** `.claude/referee.json`, what this repository uses
@@ -17,7 +17,7 @@ Hooks stay off in any project without a project file. `hooks_enabled: false` in 
 
 | Where | Who writes it | What it sets |
 |---|---|---|
-| `/plugin configure claude-referee`, or `claude plugin configure claude-referee --values-stdin` (Claude Code 2.1.285+) | You | `api_key` (stored by Claude Code as a sensitive value), `packs_dir`, `hooks_enabled`, `model` (default `jev-1.13.0`) |
+| `/plugin configure evidence-referee`, or `claude plugin configure evidence-referee --values-stdin` (Claude Code 2.1.285+) | You | `api_key` (stored by Claude Code as a sensitive value), `packs_dir`, `hooks_enabled`, `model` (default `jev-1.13.0`) |
 | `.claude/referee.json` (commit it) | The repository | The pack, optional `areas`, which hooks run, stricter thresholds |
 | `.claude/referee.local.json` (gitignore it) | You | Personal overrides, same schema as the project file |
 | Environment | You | See [environment variables](#environment-variables) |
@@ -50,7 +50,7 @@ Hooks stay off in any project without a project file. `hooks_enabled: false` in 
 | `hooks.stopGate` | `off`, `shadow` or `soft`; `active` is not built yet | `off` |
 | `hooks.preModelSwitch` | Read but not used: the cache guard was dropped, see [decisions](decisions/dropped.md) | `false` |
 
-`areas` tells claude-referee which checks count as proof for which part of the repository. The session briefing shows only the area where the session started. A pack can ship default areas in `areas.json`; they apply only when the project file has no `areas`. Planned: an evidence file will count only if it changed after Claude's last edit, so a stale report is treated as no evidence.
+`areas` tells evidence-referee which checks count as proof for which part of the repository. The session briefing shows only the area where the session started. A pack can ship default areas in `areas.json`; they apply only when the project file has no `areas`. Planned: an evidence file will count only if it changed after Claude's last edit, so a stale report is treated as no evidence.
 
 ### Done-gate modes
 
@@ -58,7 +58,7 @@ The done-gate looks at a stop only when Claude edited files and no check passed 
 
 - **`off`**: nothing runs.
 - **`soft`**: records exactly like `shadow`, and when Jev would block it also prints one `systemMessage`, a warning shown to you in the transcript. It never blocks, never sets an error exit code and gives Claude no context, so Claude's behaviour does not change. It is not recommended before labelled stops show a false-block rate you accept.
-- **`shadow`**: asks Jev and records the decision in `stops.jsonl` in the data directory (your labels go to `labels.jsonl` next to it, so labelling never rewrites the stops), but never blocks and prints nothing. It records the turns it skipped and why (no edits, a passing check after the last edit, `stop_hook_active`, background tasks, circuit breaker open). `claude-referee receipts --stops` lists the decisions with precision and false-block figures; `--unlabelled` shows the ones to review, and `--label <id> --right` or `--wrong` marks one. A check whose output Claude Code cut (a saved-to-file preview, a `... [N lines truncated] ...` gap, a command moved to the background) never counts as a passing check, so such a turn is asked about. The record also carries code-side marks when they apply, never sent to Jev: `truncated_checks`, `subagent_calls`, `subagent_reports` (a subagent or background task finished during the turn) and `stale_pass` (the previous turn had a passing check, this turn edited and has none). The record keeps the first 200 characters of the prompt and of the final message on your machine to help you label. For an unlabelled stop, `--stops` may also show `suggestion: {label: "right", reason}`, a hint read from your next prompt in the session transcript (`reported_broken` or `repeated_request`); it is never stored, never counted and never replaces your label. With at least 10 labels of each class, `--stops` adds `threshold_suggestion`: exact (Clopper-Pearson) 95% intervals and, if one exists, the smallest `claims_done` at or above the current value whose labelled stops have a precision lower bound of 0.8 or more. It only ever suggests raising the threshold and changes nothing itself.
+- **`shadow`**: asks Jev and records the decision in `stops.jsonl` in the data directory (your labels go to `labels.jsonl` next to it, so labelling never rewrites the stops), but never blocks and prints nothing. It records the turns it skipped and why (no edits, a passing check after the last edit, `stop_hook_active`, background tasks, circuit breaker open). `evidence-referee receipts --stops` lists the decisions with precision and false-block figures; `--unlabelled` shows the ones to review, and `--label <id> --right` or `--wrong` marks one. A check whose output Claude Code cut (a saved-to-file preview, a `... [N lines truncated] ...` gap, a command moved to the background) never counts as a passing check, so such a turn is asked about. The record also carries code-side marks when they apply, never sent to Jev: `truncated_checks`, `subagent_calls`, `subagent_reports` (a subagent or background task finished during the turn) and `stale_pass` (the previous turn had a passing check, this turn edited and has none). The record keeps the first 200 characters of the prompt and of the final message on your machine to help you label. For an unlabelled stop, `--stops` may also show `suggestion: {label: "right", reason}`, a hint read from your next prompt in the session transcript (`reported_broken` or `repeated_request`); it is never stored, never counted and never replaces your label. With at least 10 labels of each class, `--stops` adds `threshold_suggestion`: exact (Clopper-Pearson) 95% intervals and, if one exists, the smallest `claims_done` at or above the current value whose labelled stops have a precision lower bound of 0.8 or more. It only ever suggests raising the threshold and changes nothing itself.
 - **`active`** (not built yet): when Jev says the claim is unverified, the stop is blocked and Claude gets a note of at most 300 characters naming the area's check command. It blocks at most three times per session, with a 60-second cool-down.
 
 `active` isn't recommended until shadow mode has at least 50 labelled stops with a precision of at least 0.8 and no more than 5% false blocks. It must also let through no more false "done" claims than Claude Code's built-in `/goal`, at a lower total cost. Both modes send the data listed in [privacy](privacy.md).
@@ -67,7 +67,7 @@ The one measurement so far is a [self-generated study](measurements.md#the-stop-
 
 ## The API key
 
-claude-referee looks for the key in this order:
+evidence-referee looks for the key in this order:
 1. The plugin setting
 2. `TYPESAFE_API_KEY`
 3. `EVAL_TYPESAFE_API_KEY`
@@ -91,7 +91,7 @@ export TYPESAFE_API_KEY_CMD="secret-tool lookup service typesafe"
 - run without a shell, so it must be a single command that prints only the key
 - run at most once per process, with a 5-second timeout
 
-claude-referee trims the key and rejects it with a configuration error if it contains spaces, control characters or non-ASCII characters. `npx claude-referee doctor` shows which source provided the key, never the key itself.
+evidence-referee trims the key and rejects it with a configuration error if it contains spaces, control characters or non-ASCII characters. `npx evidence-referee doctor` shows which source provided the key, never the key itself.
 
 ## Environment variables
 
@@ -159,7 +159,7 @@ Where the bundled numbers come from: `done.met`'s 0.7 and 0.5 were chosen on 25 
 }
 ```
 
-Packs are data only; claude-referee never runs code from a pack.
+Packs are data only; evidence-referee never runs code from a pack.
 
 The `generic` pack has these questions: `done.met`, `verify.relation`, `verify.injection`, `decide.best`, `decide.fit`, and for `judge`, `line.risky` and `failure.env`.
 
@@ -167,21 +167,21 @@ The `generic` pack ships with the plugin. Your team's packs can live in a privat
 1. Point `packs_dir` at that repository.
 2. Name the pack in `.claude/referee.json`.
 
-`npx claude-referee lint-pack <path>` checks a pack against TypeSafe's question-writing rules.
+`npx evidence-referee lint-pack <path>` checks a pack against TypeSafe's question-writing rules.
 
 ## Always-on cost
 
-While claude-referee is enabled, its skill listing adds at most 250 tokens to every session, even in projects without `.claude/referee.json`. Each release is checked against that limit. Hooks start a short Node process at the events they handle. `claude plugin details claude-referee` shows the always-on token count.
+While evidence-referee is enabled, its skill listing adds at most 250 tokens to every session, even in projects without `.claude/referee.json`. Each release is checked against that limit. Hooks start a short Node process at the events they handle. `claude plugin details evidence-referee` shows the always-on token count.
 
 ## Update and uninstall
 
-- **Update:** third-party marketplaces don't auto-update by default. Run `claude plugin marketplace update claude-referee`, then `claude plugin update claude-referee@claude-referee`. You can also turn on auto-update for the marketplace in `/plugin` → **Marketplaces**.
-- **Export receipts:** `npx claude-referee receipts export --out receipts.jsonl`.
+- **Update:** third-party marketplaces don't auto-update by default. Run `claude plugin marketplace update evidence-referee`, then `claude plugin update evidence-referee@evidence-referee`. You can also turn on auto-update for the marketplace in `/plugin` → **Marketplaces**.
+- **Export receipts:** `npx evidence-referee receipts export --out receipts.jsonl`.
 - **Check or void receipts:** `receipts verify` checks the hash chain; `receipts overrule <id>` voids one decision and deletes the cached answers it used.
-- **Uninstall:** `claude plugin uninstall claude-referee@claude-referee` deletes claude-referee's data directory, including receipts and the cache, unless you add `--keep-data`.
+- **Uninstall:** `claude plugin uninstall evidence-referee@evidence-referee` deletes evidence-referee's data directory, including receipts and the cache, unless you add `--keep-data`.
 
 ## Troubleshooting
 
 - **Hooks stay silent but `doctor` works in your terminal.** Claude Code probably can't find Node 20.3 or later on its own `PATH`. That happens most often when Claude Code is launched from a desktop app instead of a shell.
 - **`doctor` finds no key, but hooks work.** The key is stored only as a plugin setting, which reaches hooks but not the shell. Add the Keychain item or `TYPESAFE_API_KEY_CMD`.
-- **`npx claude-referee` and Claude disagree.** `npx claude-referee` runs the copy published to npm, while Claude runs the copy bundled with the plugin. Run `npx claude-referee@<version>` with the plugin's version, which `/plugin` shows, to match them.
+- **`npx evidence-referee` and Claude disagree.** `npx evidence-referee` runs the copy published to npm, while Claude runs the copy bundled with the plugin. Run `npx evidence-referee@<version>` with the plugin's version, which `/plugin` shows, to match them.

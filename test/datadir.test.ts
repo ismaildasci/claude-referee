@@ -13,9 +13,9 @@ test("datadir order: flag, CLAUDE_PLUGIN_DATA, REFEREE_DATA_DIR, default", () =>
   assert.equal(resolveDataDir({ CLAUDE_PLUGIN_DATA: "/a", REFEREE_DATA_DIR: "/b" }, home, "/w", "x"), "/w/x");
   assert.equal(resolveDataDir({ CLAUDE_PLUGIN_DATA: "/a", REFEREE_DATA_DIR: "/b" }, home, "/w"), "/a");
   assert.equal(resolveDataDir({ REFEREE_DATA_DIR: "/b" }, home, "/w"), "/b");
-  assert.equal(resolveDataDir({}, home, "/w"), "/home/u/.claude/plugins/data/claude-referee-claude-referee");
-  assert.equal(resolveDataDir({ CLAUDE_CONFIG_DIR: "/cfg" }, home, "/w"), "/cfg/plugins/data/claude-referee-claude-referee");
-  assert.equal(pluginDataId(), "claude-referee-claude-referee");
+  assert.equal(resolveDataDir({}, home, "/w"), "/home/u/.claude/plugins/data/evidence-referee-evidence-referee");
+  assert.equal(resolveDataDir({ CLAUDE_CONFIG_DIR: "/cfg" }, home, "/w"), "/cfg/plugins/data/evidence-referee-evidence-referee");
+  assert.equal(pluginDataId(), "evidence-referee-evidence-referee");
 });
 
 test("datadir project id is a stable 12-character hash", () => {

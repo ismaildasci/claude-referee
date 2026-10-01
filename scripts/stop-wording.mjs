@@ -7,7 +7,7 @@ import { setTimeout as sleep } from "node:timers/promises";
 
 const BASE = (process.env.TYPESAFE_BASE_URL || "https://api.typesafe.ai").replace(/\/+$/, "");
 const MODEL = "jev-1.13.0";
-const PACK = "plugins/claude-referee/packs/generic";
+const PACK = "plugins/evidence-referee/packs/generic";
 const SUITE = "jev-evals/stop-negation";
 const [mode, ...rest] = process.argv.slice(2);
 const flag = (name, fallback) => (rest.includes(name) ? rest[rest.indexOf(name) + 1] : fallback);

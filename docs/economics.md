@@ -1,8 +1,8 @@
 # Economics: where the money goes
 
-Claude's turns decide the cost, not the Jev bill. A batched Jev judgement costs about $0.0001–0.0003. Every Claude Code request re-reads the whole cached conversation, so one extra Claude turn at 80K tokens of context costs about $0.016 on Opus 5.5 before any output. claude-referee is designed around that gap.
+Claude's turns decide the cost, not the Jev bill. A batched Jev judgement costs about $0.0001–0.0003. Every Claude Code request re-reads the whole cached conversation, so one extra Claude turn at 80K tokens of context costs about $0.016 on Opus 5.5 before any output. evidence-referee is designed around that gap.
 
-The tables on this page are **modelled** from list prices and the formulas below; they aren't measurements. The last section summarises measurements: our own from before this project, and third parties'. Measure your own numbers with `/usage` in Claude Code and `npx claude-referee receipts --tokens`. The A/B harness planned for v0.4 will run paired comparisons in `bench/`.
+The tables on this page are **modelled** from list prices and the formulas below; they aren't measurements. The last section summarises measurements: our own from before this project, and third parties'. Measure your own numbers with `/usage` in Claude Code and `npx evidence-referee receipts --tokens`. The A/B harness planned for v0.4 will run paired comparisons in `bench/`.
 
 ## Prices
 
@@ -104,7 +104,7 @@ Opus 5.5 with 50K tokens of cached context. This is the table behind the README 
 | Asking the same question again | A full extra turn for almost no new information | Jev's answers vary by about 0.01 between runs |
 | Switching the main model mid-session | At 300K context, switching to Sonnet 5.5 ≈$0.75 vs staying ≈$0.06 | The new model re-reads everything uncached |
 
-Two consequences shape claude-referee:
+Two consequences shape evidence-referee:
 
 - Hooks are silent unless they find something.
 - Batched checks replace one-by-one tool calls.
@@ -113,8 +113,8 @@ Output is short and never echoes its input. There is no main-model routing, and 
 
 ## What the evidence says so far
 
-- In the sessions measured before claude-referee was built, 321 CLI calls ran at a median context of 230–470K tokens, not 50K, and returned a median of 76–221 tokens. At list prices that's roughly $0.10 of Claude-side cost per call, against about $0.0007 on Jev for a whole `decide` decision. The size of the context, not the Jev bill, set the cost ([measurements](measurements.md)).
+- In the sessions measured before evidence-referee was built, 321 CLI calls ran at a median context of 230–470K tokens, not 50K, and returned a median of 76–221 tokens. At list prices that's roughly $0.10 of Claude-side cost per call, against about $0.0007 on Jev for a whole `decide` decision. The size of the context, not the Jev bill, set the cost ([measurements](measurements.md)).
 - Pruning tool output saves little at safe thresholds. The best-calibrated public study hid about 5% of large-output text ([winnow](https://github.com/GhalebDweikat/winnow/blob/51d80b945c74c8384bc47fa817179f668289afd8/docs/DESIGN.md)).
 - TypeSafe's skill-suggestion cookbook cut wrong skill loads from 16.8% to 7.3%, with a Haiku 4.5 agent on jev-1.12 ([cookbook](https://docs.typesafe.ai/cookbooks/skill_suggestion.md)).
 
-No one has yet published a repeated Claude Code A/B that counts task success, cache effects and Jev cost together. claude-referee's A/B harness (planned for v0.4) will set out how it does that in `bench/PREREG.md` before its first run, and the results will be published either way.
+No one has yet published a repeated Claude Code A/B that counts task success, cache effects and Jev cost together. evidence-referee's A/B harness (planned for v0.4) will set out how it does that in `bench/PREREG.md` before its first run, and the results will be published either way.

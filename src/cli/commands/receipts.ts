@@ -30,7 +30,7 @@ export const receipts: Command = {
       overrule: "Positional: \"overrule <id>\" voids one decision: it is recorded in overruled.jsonl and the cached answers it used are deleted, so the next run asks again. The receipt itself is not rewritten.",
       "--out <file>": "Target file for export.",
       "--tokens": "Rows per day and command: runs, requests, cache hits, input tokens and the share of --fresh runs.",
-      "--usage": "Claude-side: claude-referee CLI calls per day and command, counted from this project's Claude Code transcripts (subagents included, each tool call once), with the size of what each call returned. Nothing from the transcripts is printed.",
+      "--usage": "Claude-side: evidence-referee CLI calls per day and command, counted from this project's Claude Code transcripts (subagents included, each tool call once), with the size of what each call returned. Nothing from the transcripts is printed.",
       "--stops": "List the Stop done-gate's shadow stops of this project, newest first, at most 20, with stats (precision and false block rate over labelled would_block stops, p95 ms, skips per reason). Excerpts only; nothing else from the store is printed.",
       "--unlabelled": "With --stops: only would_block stops without a label.",
       "--label <id>": "Mark one stop with --right (the block would have been correct) or --wrong (a false block).",

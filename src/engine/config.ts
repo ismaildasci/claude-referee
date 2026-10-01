@@ -1,10 +1,10 @@
 // Constants shared by the CLI and hooks: names, model, prices, output limits and request budgets.
 // Prices: https://docs.typesafe.ai/models.md (input tokens only; output tokens are free).
 
-export const KIT = "claude-referee";
+export const KIT = "evidence-referee";
 export const VERSION = "0.1.6";
 export const DEFAULT_MODEL = "jev-1.13.0";
-export const MARKETPLACE = "claude-referee";
+export const MARKETPLACE = "evidence-referee";
 export const DEFAULT_BASE_URL = "https://api.typesafe.ai";
 
 export const USD_PER_MTOK: Readonly<Record<string, number>> = {

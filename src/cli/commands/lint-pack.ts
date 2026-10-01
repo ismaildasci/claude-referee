@@ -53,7 +53,7 @@ export const lintPack: Command = {
   options: { recorded: { type: "string" } },
   async run(context) {
     const target = context.positionals[0];
-    if (!target) throw new RefereeError("bad_input", "Give the pack directory.", { next_step: "Example: lint-pack plugins/claude-referee/packs/generic" });
+    if (!target) throw new RefereeError("bad_input", "Give the pack directory.", { next_step: "Example: lint-pack plugins/evidence-referee/packs/generic" });
     const dir = resolve(context.io.cwd, target);
     if (!existsSync(join(dir, "pack.json"))) throw new RefereeError("bad_input", `No pack.json in ${dir}.`);
     const meta = readJson(join(dir, "pack.json")) as { model?: unknown };

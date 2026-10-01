@@ -43,7 +43,7 @@ Not by itself, and moving it is not justified. Dev only: lowering met to 0.65 wo
    `-  const tests = tally(lines, /^\s*Tests:\s+(\d.*)$/);`
    `+  const tests = tally(lines, /^\s*Tests:\s+(?=.*\b\d+\s+(?:failed|passed|skipped|todo|total)\b)(\d.*)$/);`
    Needs re-recording of the 4 changed phpunit cases only.
-2. Question text (live-tested above, weak evidence, see limits): plugins/claude-referee/packs/generic/questions/done.json note per question-note.diff. It changes qhash, so all 78 done-v2 recordings (and any CI that checks hashes) need re-recording: 78 requests. Do the parser fix (1) first so h-phpunit-warn is judged on correct facts.
+2. Question text (live-tested above, weak evidence, see limits): plugins/evidence-referee/packs/generic/questions/done.json note per question-note.diff. It changes qhash, so all 78 done-v2 recordings (and any CI that checks hashes) need re-recording: 78 requests. Do the parser fix (1) first so h-phpunit-warn is judged on correct facts.
 3. Not tested live, facts side: in compiled.ts cargo, report `summary_line` consistent with `passed` (for example join all result lines or state the total) so the facts do not contradict themselves; and capture the nearest preceding `$ <command>` line next to a bare `exit code:` line in exit_lines. These two would remove the need for the note sentences; unverified.
 
 ## 6. Limits

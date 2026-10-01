@@ -41,8 +41,8 @@ function rateLimitWait(error: unknown, attempt: number): number | undefined {
 const stderrLogger = {
   debug: () => {},
   info: () => {},
-  warn: (message: string) => void process.stderr.write(`[claude-referee] ${message}\n`),
-  error: (message: string) => void process.stderr.write(`[claude-referee] ${message}\n`),
+  warn: (message: string) => void process.stderr.write(`[evidence-referee] ${message}\n`),
+  error: (message: string) => void process.stderr.write(`[evidence-referee] ${message}\n`),
 };
 
 async function guarded<T>(options: CallOptions, fn: (client: TypeSafeClient, signal: AbortSignal) => Promise<T>, model?: string): Promise<T> {

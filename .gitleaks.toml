@@ -1,5 +1,5 @@
 # Default rules plus an allowlist for the files that hold deliberately fake secrets (redaction fixtures) and benign case ids that look like keys.
-title = "claude-referee"
+title = "evidence-referee"
 
 [extend]
 useDefault = true

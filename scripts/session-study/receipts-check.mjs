@@ -26,7 +26,7 @@ const data = join(work, "data");
 for (const dir of [home, cwd, data]) mkdirSync(dir, { recursive: true });
 const realCwd = realpathSync(cwd);
 const project = projectId(realCwd);
-const cli = join(repoRoot, "plugins/claude-referee/dist/cli.mjs");
+const cli = join(repoRoot, "plugins/evidence-referee/dist/cli.mjs");
 
 const grounds = readGrounds(out).filter((g) => g.stop?.id && !["leaked", "run_failed", "error", "unresolved"].includes(g.class));
 const byStop = new Map(grounds.map((g) => [g.stop.id, g]));

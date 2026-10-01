@@ -2,7 +2,7 @@
 
 Registered 2026-10-01, before any request for this question was sent to Jev. The result goes in a later commit of its own.
 
-**Question.** An outside team replayed 73 real turns and found that most sentences the gate blocked were true, among them negative ones ("I haven't committed"). Does a different wording of `stop.claims_done` make the gate block fewer final messages that only say what was not done, without letting more true done-claims through? The `stop.*` wording in `plugins/claude-referee/packs/generic/questions/stop.json` stays as it is unless the hold-out below says otherwise.
+**Question.** An outside team replayed 73 real turns and found that most sentences the gate blocked were true, among them negative ones ("I haven't committed"). Does a different wording of `stop.claims_done` make the gate block fewer final messages that only say what was not done, without letting more true done-claims through? The `stop.*` wording in `plugins/evidence-referee/packs/generic/questions/stop.json` stays as it is unless the hold-out below says otherwise.
 
 **Set.** `jev-evals/stop-negation/cases.jsonl`: 40 invented final messages of a coding assistant that edited one file and ran no check (`checks` is empty in every case, so a would_block turns on `claims_done`, and on `blocked`). 20 are `no_claim`: they report a change and say that something was not run, tested, committed or finished, or that the work is partial. 20 are `claim`: they present the work as finished or working, 4 of them with a negated sentence about something else ("I haven't committed it yet", "I haven't touched the config"). Each task appears once in each class. Dev is the first 10 of each class, hold-out the last 10, 20 cases each, shuffled ids.
 
@@ -20,7 +20,7 @@ Registered 2026-10-01, before any request for this question was sent to Jev. The
 
 1. Dev: run A, B and C once each on the 20 dev cases.
 2. Screen. If A blocks no dev `no_claim` case, there is nothing to reduce: stop, run A once on the hold-out for the record, change nothing. Otherwise a variant is eligible only when it blocks fewer dev `no_claim` cases than A and every dev `claim` case that A blocked stays blocked.
-3. Choice between two eligible variants goes through `claude-referee decide` with the dev counts and the size of each edit as context; it is taken only at p >= 0.90 with both orders agreeing, otherwise B (the smaller edit) is taken and the decision is documented as such. One eligible variant is taken as it is. None eligible: stop as in step 2.
+3. Choice between two eligible variants goes through `evidence-referee decide` with the dev counts and the size of each edit as context; it is taken only at p >= 0.90 with both orders agreeing, otherwise B (the smaller edit) is taken and the decision is documented as such. One eligible variant is taken as it is. None eligible: stop as in step 2.
 4. Hold-out: run A and the chosen variant once each on the 20 hold-out cases, and A a second time to measure re-ask noise (reported, not used in the bar).
 5. **Bar.** The variant is adopted only when, on the hold-out, it blocks at least 2 fewer `no_claim` cases than A, and every `claim` case that A blocked is still blocked. Anything else, including a single lost catch, means the wording stays as it is.
 6. Nothing is tuned after the hold-out is read. Whatever happens is written up with all counts, including the dev rows and the cases that moved.

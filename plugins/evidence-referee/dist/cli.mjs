@@ -725,10 +725,10 @@ var atLeast = /* @__PURE__ */ __name((value, bound) => value - bound >= -EPSILON
 var atMost = /* @__PURE__ */ __name((value, bound) => bound - value >= -EPSILON, "atMost");
 
 // src/engine/config.ts
-var KIT = "claude-referee";
+var KIT = "evidence-referee";
 var VERSION = "0.1.6";
 var DEFAULT_MODEL = "jev-1.13.0";
-var MARKETPLACE = "claude-referee";
+var MARKETPLACE = "evidence-referee";
 var DEFAULT_BASE_URL = "https://api.typesafe.ai";
 var USD_PER_MTOK = {
   "jev-1.13.0": 0.042
@@ -784,7 +784,7 @@ import { fileURLToPath } from "node:url";
 var NAME = /^[a-z0-9][a-z0-9-]{0,63}$/;
 function bundledPackDirs() {
   const here = dirname(fileURLToPath(import.meta.url));
-  return [join(here, "packs"), join(here, "..", "packs"), join(here, "..", "..", "plugins", "claude-referee", "packs")];
+  return [join(here, "packs"), join(here, "..", "packs"), join(here, "..", "..", "plugins", "evidence-referee", "packs")];
 }
 __name(bundledPackDirs, "bundledPackDirs");
 function packDirs(env, bundled = bundledPackDirs()) {
@@ -1172,9 +1172,9 @@ var stderrLogger = {
   }, "debug"),
   info: /* @__PURE__ */ __name(() => {
   }, "info"),
-  warn: /* @__PURE__ */ __name((message) => void process.stderr.write(`[claude-referee] ${message}
+  warn: /* @__PURE__ */ __name((message) => void process.stderr.write(`[evidence-referee] ${message}
 `), "warn"),
-  error: /* @__PURE__ */ __name((message) => void process.stderr.write(`[claude-referee] ${message}
+  error: /* @__PURE__ */ __name((message) => void process.stderr.write(`[evidence-referee] ${message}
 `), "error")
 };
 async function guarded(options, fn, model) {
@@ -1333,7 +1333,7 @@ function validateKey(raw, source) {
 }
 __name(validateKey, "validateKey");
 function noKeyNextStep(platform) {
-  const hooks = "Hooks can also use /plugin configure claude-referee or claude plugin configure claude-referee --values-stdin (Claude Code 2.1.285+).";
+  const hooks = "Hooks can also use /plugin configure evidence-referee or claude plugin configure evidence-referee --values-stdin (Claude Code 2.1.285+).";
   if (platform === "darwin") {
     return `Store the key in the Keychain: security add-generic-password -a "$USER" -s TYPESAFE_API_KEY -w (it prompts for the key). ${hooks}`;
   }
@@ -1910,7 +1910,7 @@ async function jevCommand(context, command, pack, planned, finish, options = {})
     const outcomes = await session.run(planned, options);
     const result = finish(outcomes, session);
     const receipt = session.record(typeof result["verdict"] === "string" ? { verdict: result["verdict"] } : {});
-    if (!session.saved()) io.warn("[claude-referee] Could not write to the data directory; this run was not cached or logged.\n");
+    if (!session.saved()) io.warn("[evidence-referee] Could not write to the data directory; this run was not cached or logged.\n");
     if (flags.verbose) io.warn(JSON.stringify({ requests: receipt.requests, cached: receipt.cached, input_tokens: receipt.input_tokens, cost_usd: receipt.cost_usd, model: receipt.model, ms: receipt.ms }) + "\n");
     return reorder({ ...result, ...session.stats(), receipt: receipt.id });
   } catch (error) {
@@ -3771,7 +3771,7 @@ function hasParsedWarnings(parsed) {
   return parsed.runners.some((r) => (r.warnings ?? 0) > 0);
 }
 __name(hasParsedWarnings, "hasParsedWarnings");
-var UNPARSED_NEXT = `No recognised runner summary or exit code in the evidence, so it cannot count as met. Pipe the runner's full output, or add an exit code line: { your-command; echo "exit code: $?"; } 2>&1 | claude-referee done --criteria "..."`;
+var UNPARSED_NEXT = `No recognised runner summary or exit code in the evidence, so it cannot count as met. Pipe the runner's full output, or add an exit code line: { your-command; echo "exit code: $?"; } 2>&1 | evidence-referee done --criteria "..."`;
 var CLEAN_CRITERION = /\b(?:lint\w*|clean|warning[- ]?free|no warnings?)\b/i;
 var WARN_WORDS = /\b(?:warnings?|notices?|deprecat\w*)\b/i;
 var WARN_NEGATED = /\b(?:0|no|zero|without) (?:warnings?|notices?)\b/gi;
@@ -5141,7 +5141,7 @@ var lintPack = {
   options: { recorded: { type: "string" } },
   async run(context) {
     const target = context.positionals[0];
-    if (!target) throw new RefereeError("bad_input", "Give the pack directory.", { next_step: "Example: lint-pack plugins/claude-referee/packs/generic" });
+    if (!target) throw new RefereeError("bad_input", "Give the pack directory.", { next_step: "Example: lint-pack plugins/evidence-referee/packs/generic" });
     const dir = resolve5(context.io.cwd, target);
     if (!existsSync5(join9(dir, "pack.json"))) throw new RefereeError("bad_input", `No pack.json in ${dir}.`);
     const meta = readJson2(join9(dir, "pack.json"));
@@ -5488,6 +5488,7 @@ function tokenize2(command) {
   return tokens2;
 }
 __name(tokenize2, "tokenize");
+var NAMES = ["evidence-referee", "claude-referee"];
 function subcommand(token) {
   return token && /^[a-z][a-z-]*$/.test(token) ? token : "other";
 }
@@ -5496,18 +5497,18 @@ function callIn(segment) {
   let i = 0;
   while (i < segment.length && (ASSIGNMENT3.test(segment[i] ?? "") || ["{", "time", "exec", "command", "env"].includes(segment[i] ?? ""))) i++;
   const first = segment[i];
-  if (first === "claude-referee") return subcommand(segment[i + 1]);
+  if (first !== void 0 && NAMES.includes(first)) return subcommand(segment[i + 1]);
   if (first === "npx") {
     i++;
     while ((segment[i] ?? "").startsWith("-")) i += segment[i] === "--package" || segment[i] === "-p" ? 2 : 1;
     const name = segment[i] ?? "";
-    return name === "claude-referee" || name.startsWith("claude-referee@") ? subcommand(segment[i + 1]) : null;
+    return NAMES.some((n) => name === n || name.startsWith(`${n}@`)) ? subcommand(segment[i + 1]) : null;
   }
   if (first === "node") {
     i++;
     while ((segment[i] ?? "").startsWith("-")) i++;
     const path = segment[i] ?? "";
-    return path.endsWith("/dist/cli.mjs") && path.includes("claude-referee") ? subcommand(segment[i + 1]) : null;
+    return path.endsWith("/dist/cli.mjs") && NAMES.some((n) => path.includes(n)) ? subcommand(segment[i + 1]) : null;
   }
   return null;
 }
@@ -5614,7 +5615,7 @@ var receipts = {
       overrule: 'Positional: "overrule <id>" voids one decision: it is recorded in overruled.jsonl and the cached answers it used are deleted, so the next run asks again. The receipt itself is not rewritten.',
       "--out <file>": "Target file for export.",
       "--tokens": "Rows per day and command: runs, requests, cache hits, input tokens and the share of --fresh runs.",
-      "--usage": "Claude-side: claude-referee CLI calls per day and command, counted from this project's Claude Code transcripts (subagents included, each tool call once), with the size of what each call returned. Nothing from the transcripts is printed.",
+      "--usage": "Claude-side: evidence-referee CLI calls per day and command, counted from this project's Claude Code transcripts (subagents included, each tool call once), with the size of what each call returned. Nothing from the transcripts is printed.",
       "--stops": "List the Stop done-gate's shadow stops of this project, newest first, at most 20, with stats (precision and false block rate over labelled would_block stops, p95 ms, skips per reason). Excerpts only; nothing else from the store is printed.",
       "--unlabelled": "With --stops: only would_block stops without a label.",
       "--label <id>": "Mark one stop with --right (the block would have been correct) or --wrong (a false block).",

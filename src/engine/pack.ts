@@ -43,7 +43,7 @@ const NAME = /^[a-z0-9][a-z0-9-]{0,63}$/;
 
 export function bundledPackDirs(): string[] {
   const here = dirname(fileURLToPath(import.meta.url));
-  return [join(here, "packs"), join(here, "..", "packs"), join(here, "..", "..", "plugins", "claude-referee", "packs")];
+  return [join(here, "packs"), join(here, "..", "packs"), join(here, "..", "..", "plugins", "evidence-referee", "packs")];
 }
 
 export function packDirs(env: Env, bundled: readonly string[] = bundledPackDirs()): { dir: string; source: PackInfo["source"] }[] {

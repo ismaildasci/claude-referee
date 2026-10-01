@@ -37,7 +37,7 @@ test("--recorded flags a Noul that is high on every input", () => {
 });
 
 test("the generic pack lints clean, from the command line too", async () => {
-  const pack = join(dirname(fileURLToPath(import.meta.url)), "../plugins/claude-referee/packs/generic");
+  const pack = join(dirname(fileURLToPath(import.meta.url)), "../plugins/evidence-referee/packs/generic");
   const io = memoryIo({});
   assert.equal(await run(["lint-pack", pack, "--fail-on", "warnings,errors"], io, commands), 0);
   assert.equal(io.json()["verdict"], "clean");

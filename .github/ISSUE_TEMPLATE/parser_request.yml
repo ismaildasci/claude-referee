@@ -1,5 +1,5 @@
 name: Runner or linter parser request
-description: Output from a test runner or linter that claude-referee should read in code (v0.2).
+description: Output from a test runner or linter that evidence-referee should read in code (v0.2).
 labels: [parser]
 body:
   - type: input

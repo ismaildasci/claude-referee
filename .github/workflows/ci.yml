@@ -26,7 +26,7 @@ jobs:
       - run: npm test
       - run: npm run build
       - name: Committed bundle and npm copy match the source
-        run: git diff --exit-code plugins/claude-referee/dist npm
+        run: git diff --exit-code plugins/evidence-referee/dist npm
 
   bundle:
     runs-on: ubuntu-latest
@@ -38,20 +38,20 @@ jobs:
       - name: Bundle runs without node_modules on the oldest supported Node
         run: |
           tmp="$(mktemp -d)"
-          cp -R plugins/claude-referee "$tmp/"
-          cli="$tmp/claude-referee/dist/cli.mjs"
+          cp -R plugins/evidence-referee "$tmp/"
+          cli="$tmp/evidence-referee/dist/cli.mjs"
           for c in done decide judge claims verify receipts doctor eval; do
             node "$cli" "$c" --describe | node -e 'JSON.parse(require("fs").readFileSync(0, "utf8"))' || { echo "describe failed: $c"; exit 1; }
           done
-          echo 'not json' | node "$tmp/claude-referee/dist/hook.mjs" session-start
-          size=$(cat "$tmp"/claude-referee/dist/*.mjs | wc -c)
+          echo 'not json' | node "$tmp/evidence-referee/dist/hook.mjs" session-start
+          size=$(cat "$tmp"/evidence-referee/dist/*.mjs | wc -c)
           echo "bundle bytes: $size"
-          test "$(wc -c < "$tmp/claude-referee/dist/cli.mjs")" -lt 280000
-          test "$(wc -c < "$tmp/claude-referee/dist/hook.mjs")" -lt 200000
+          test "$(wc -c < "$tmp/evidence-referee/dist/cli.mjs")" -lt 280000
+          test "$(wc -c < "$tmp/evidence-referee/dist/hook.mjs")" -lt 200000
       - name: Hook start latency stays within 40 ms of a bare node at p95
         run: node scripts/hook-latency.mjs
       - name: Recorded evals score within each suite's allowance (offline, no key)
-        run: node plugins/claude-referee/dist/cli.mjs eval score --suite all --fail-on violated
+        run: node plugins/evidence-referee/dist/cli.mjs eval score --suite all --fail-on violated
 
   plugin:
     runs-on: ubuntu-latest
@@ -62,7 +62,7 @@ jobs:
           node-version: 24
       - run: npm install -g @anthropic-ai/claude-code
       - run: claude plugin validate --strict .
-      - run: claude plugin validate --strict plugins/claude-referee
+      - run: claude plugin validate --strict plugins/evidence-referee
 
   private-terms:
     runs-on: ubuntu-latest

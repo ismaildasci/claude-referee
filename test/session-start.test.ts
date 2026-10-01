@@ -11,7 +11,7 @@ import { resolveModel } from "../src/engine/config.ts";
 import { BRIEFING_LIMIT, sessionStart } from "../src/hooks/session-start.ts";
 import { tempDir } from "./helpers.ts";
 
-const pluginRoot = fileURLToPath(new URL("../plugins/claude-referee", import.meta.url));
+const pluginRoot = fileURLToPath(new URL("../plugins/evidence-referee", import.meta.url));
 
 function project(config: object = { pack: "generic", areas: [{ prefix: "", checks: ["npm test", "npx tsc --noEmit"] }] }): string {
   const root = tempDir();
@@ -107,7 +107,7 @@ test("session-start still prints the briefing when it can't write the env file o
 });
 
 test("session-start briefing fits in 600 characters with a long installed plugin path", async () => {
-  const installed = "/Users/averageusername/.claude/plugins/cache/claude-referee/claude-referee/0.1.1";
+  const installed = "/Users/averageusername/.claude/plugins/cache/evidence-referee/evidence-referee/0.1.1";
   const out = await sessionStart(hookIo(event(project())), installed);
   const text = (JSON.parse(out ?? "{}") as { hookSpecificOutput: { additionalContext: string } }).hookSpecificOutput.additionalContext;
   assert.ok(text.includes(join(installed, "dist", "cli.mjs")));

@@ -13,7 +13,7 @@ const flag = (name, fallback) => {
 };
 const runs = flag("--runs", 40);
 const budget = flag("--budget-ms", 40);
-const hook = fileURLToPath(new URL("../plugins/claude-referee/dist/hook.mjs", import.meta.url));
+const hook = fileURLToPath(new URL("../plugins/evidence-referee/dist/hook.mjs", import.meta.url));
 const home = mkdtempSync(join(tmpdir(), "hook-latency-"));
 
 const once = (args, input) => {
