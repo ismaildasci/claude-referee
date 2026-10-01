@@ -11,3 +11,9 @@ Registered 2026-10-01 before any case is sent to Jev; the git commit that first 
 **Pass.** No wrong `supported` among the not-supported cases, and at least 64% of the true claims confirmed (the English hold-out confirmed 19 of 24, 0.79, and the pass line is 15 points below it). If the share is lower, the docs get a language warning and the number is published anyway.
 
 **Limits.** The same model family writes and labels; invented text; one model version; Turkish only.
+
+## Result (2026-10-01)
+
+Of 48 cases written, 44 survived the second labeller (17 `supported`, 27 `unsupported`); rejected: `tr-f-08` (ambiguous), `tr-d-02` and `tr-a-08` (the labeller read the source as contradicting a claim the author called a paraphrase), `tr-e-06` (a true-in-the-world claim the labeller counted as supported). Recorded once, scored once (`jev-evals/claims-tr`); 12 cases were decided in code without a request (a quoted phrase or a number that isn't in the source).
+
+**The registered check passed.** No wrong `supported` among the 27 unsupported cases, and 13 of the 17 true claims confirmed (0.76, above the 0.64 line; the English hold-out confirmed 0.79). The rest: 16 `unsure` and 15 `unsupported` over all 44 cases. This is one invented set from one model family, so it shows no Turkish-specific collapse, not that Turkish is as good as English; the docs keep the "handled but not equally well" caution.

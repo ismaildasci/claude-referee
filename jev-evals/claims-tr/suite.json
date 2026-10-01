@@ -1,0 +1,1 @@
+{"command":"verify","positive":"supported","max_wrong_positive":0,"note":"Turkish claim and source cases, registered in docs/decisions/claims-tr.md before any request. Hold-out only."}
