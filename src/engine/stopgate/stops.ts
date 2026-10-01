@@ -19,6 +19,9 @@ export interface StopStats {
   readonly precision: number | null;
   readonly false_block_rate: number | null;
   readonly p95_ms: number | null;
+  readonly errors: number;
+  readonly error_rate: number | null;
+  readonly p95_all_ms: number | null;
   readonly unlabelled_would_block: number;
 }
 
@@ -101,6 +104,8 @@ export function stopStats(records: readonly StopRecord[]): StopStats {
   const right = labelledBlocks.filter((r) => r.label === "right").length;
   const wrong = labelledBlocks.filter((r) => r.label === "wrong").length;
   const times = asked.map((r) => r.ms).sort((a, b) => a - b);
+  const errors = records.filter((r) => r.skipped === "jev_error" || r.skipped === "breaker_open").length;
+  const allTimes = [...asked, ...records.filter((r) => r.skipped === "jev_error")].map((r) => r.ms).sort((a, b) => a - b);
   return {
     stops: records.length,
     skipped_by_reason: skipped,
@@ -112,6 +117,9 @@ export function stopStats(records: readonly StopRecord[]): StopStats {
     precision: labelledBlocks.length ? right / labelledBlocks.length : null,
     false_block_rate: labelledBlocks.length ? wrong / labelledBlocks.length : null,
     p95_ms: times.length ? (times[Math.ceil(0.95 * times.length) - 1] ?? null) : null,
+    errors,
+    error_rate: asked.length + errors ? errors / (asked.length + errors) : null,
+    p95_all_ms: allTimes.length ? (allTimes[Math.ceil(0.95 * allTimes.length) - 1] ?? null) : null,
     unlabelled_would_block: blocks.length - labelledBlocks.length,
   };
 }

@@ -194,3 +194,26 @@ test("appendStop prunes records older than 90 days once the file passes 2 MB", (
   appendStop(dir, rec("fresh", { ts: new Date().toISOString() }));
   assert.deepEqual(readStops(dir).map((r) => r.id), ["fresh"]);
 });
+
+test("stopStats counts Jev errors and times every attempt, so slow failures are not hidden", () => {
+  const set: StopRecord[] = [
+    rec("a1", { block: false, ms: 100 }),
+    rec("a2", { block: false, ms: 200 }),
+    rec("a3", { block: true, ms: 300 }),
+    rec("e1", { skipped: "jev_error", ms: 2000 }),
+    rec("e2", { skipped: "jev_error", ms: 1900 }),
+    rec("b1", { skipped: "breaker_open", ms: 1 }),
+    rec("n1", { skipped: "no_edits", ms: 1 }),
+  ];
+  const s = stopStats(set);
+  assert.equal(s.p95_ms, 300);
+  assert.equal(s.errors, 3);
+  assert.equal(s.error_rate, 3 / 6);
+  assert.equal(s.p95_all_ms, 2000);
+  const clean = stopStats(FIXED);
+  assert.equal(clean.errors, 0);
+  assert.equal(clean.error_rate, 0);
+  assert.equal(clean.p95_all_ms, 400);
+  assert.equal(stopStats([rec("n", { skipped: "no_edits" })]).error_rate, null);
+  assert.equal(stopStats([]).p95_all_ms, null);
+});

@@ -43,7 +43,7 @@ export const receipts: Command = {
       by_command: "Runs per command",
       rows: "With --tokens: one row per day and command. With --usage: day, command, calls, subagent_calls and result_chars",
       transcripts: "With --usage: how many transcript files were read",
-      stats: "With --stops: stops, skipped_by_reason, asked, would_block, labelled, right, wrong, precision, false_block_rate, p95_ms, unlabelled_would_block",
+      stats: "With --stops: stops, skipped_by_reason, asked, would_block, labelled, right, wrong, precision, false_block_rate, p95_ms (answered calls only), errors, error_rate (Jev errors and breaker skips over asked plus errors), p95_all_ms (answered and failed calls), unlabelled_would_block",
       stops: "With --stops: id, ts, skipped, edits, checks, would_block, claims_done, claims_verified, task_excerpt, final_excerpt, label",
       label: "With --label: the id and the label that was stored",
     },

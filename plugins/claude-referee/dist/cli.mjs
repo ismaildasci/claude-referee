@@ -3962,6 +3962,8 @@ function stopStats(records) {
   const right = labelledBlocks.filter((r) => r.label === "right").length;
   const wrong = labelledBlocks.filter((r) => r.label === "wrong").length;
   const times = asked.map((r) => r.ms).sort((a, b) => a - b);
+  const errors = records.filter((r) => r.skipped === "jev_error" || r.skipped === "breaker_open").length;
+  const allTimes = [...asked, ...records.filter((r) => r.skipped === "jev_error")].map((r) => r.ms).sort((a, b) => a - b);
   return {
     stops: records.length,
     skipped_by_reason: skipped,
@@ -3973,6 +3975,9 @@ function stopStats(records) {
     precision: labelledBlocks.length ? right / labelledBlocks.length : null,
     false_block_rate: labelledBlocks.length ? wrong / labelledBlocks.length : null,
     p95_ms: times.length ? times[Math.ceil(0.95 * times.length) - 1] ?? null : null,
+    errors,
+    error_rate: asked.length + errors ? errors / (asked.length + errors) : null,
+    p95_all_ms: allTimes.length ? allTimes[Math.ceil(0.95 * allTimes.length) - 1] ?? null : null,
     unlabelled_would_block: blocks.length - labelledBlocks.length
   };
 }
@@ -4179,7 +4184,7 @@ var receipts = {
       by_command: "Runs per command",
       rows: "With --tokens: one row per day and command. With --usage: day, command, calls, subagent_calls and result_chars",
       transcripts: "With --usage: how many transcript files were read",
-      stats: "With --stops: stops, skipped_by_reason, asked, would_block, labelled, right, wrong, precision, false_block_rate, p95_ms, unlabelled_would_block",
+      stats: "With --stops: stops, skipped_by_reason, asked, would_block, labelled, right, wrong, precision, false_block_rate, p95_ms (answered calls only), errors, error_rate (Jev errors and breaker skips over asked plus errors), p95_all_ms (answered and failed calls), unlabelled_would_block",
       stops: "With --stops: id, ts, skipped, edits, checks, would_block, claims_done, claims_verified, task_excerpt, final_excerpt, label",
       label: "With --label: the id and the label that was stored"
     },

@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Fixed
+
+- A project's `stop.gate` threshold for `claims_verified` or `blocked` could only be raised, which made the done-gate fire more, the opposite of "a project can only make a check stricter". Those two now accept only a lower value. Shadow mode only; `decideStop` now has direct tests for every threshold edge.
+
+### Added
+
+- `receipts --stops` also reports `errors`, `error_rate` and `p95_all_ms`: Jev errors and breaker skips are counted, and the p95 covers failed calls too, so a slow failure can no longer make the gate's latency figure look better.
+
 ## [0.1.4] - 2026-10-01
 
 Correction: the done-gate in `shadow` mode, `lint-pack` and `verify` v2 shipped in 0.1.3 (`git log v0.1.2..v0.1.3`), although the sections below list them under 0.1.2; the released sections were left as they are.

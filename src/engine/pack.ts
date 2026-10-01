@@ -162,3 +162,10 @@ export function threshold(pack: Pack, project: Thresholds | undefined, question:
   const override = project?.[question]?.[key];
   return typeof override === "number" && override > base ? Math.min(override, 1) : base;
 }
+
+// For a condition that holds when a value is below the threshold (a block needs claims_verified < t): a project may only lower it, which fires less.
+export function thresholdBelow(pack: Pack, project: Thresholds | undefined, question: string, key: string, fallback: number): number {
+  const base = pack.thresholds[question]?.[key] ?? fallback;
+  const override = project?.[question]?.[key];
+  return typeof override === "number" && override < base ? Math.max(override, 0) : base;
+}

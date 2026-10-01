@@ -45,7 +45,7 @@ Hooks stay off in any project without a project file. `hooks_enabled: false` in 
 |---|---|---|
 | `pack` | A pack name from the plugin or from `packs_dir` | required |
 | `areas` | Per path prefix: the check commands, evidence files (planned) and an optional pack | none |
-| `thresholds` | Per-question overrides in the same shape as the pack's `thresholds.json`, . They can only make a check stricter | the pack's |
+| `thresholds` | Per-question overrides in the same shape as the pack's `thresholds.json`. They can only make a check stricter (for `stop.gate`'s `claims_verified` and `blocked`, which block when the value is *below* the threshold, that means a lower value) | the pack's |
 | `hooks.sessionStart` | `true` or `false` | `true` |
 | `hooks.stopGate` | `off` or `shadow`; `active` is not built yet | `off` |
 | `hooks.preModelSwitch` | Read but not used: the cache guard was dropped, see [decisions](decisions/dropped.md) | `false` |

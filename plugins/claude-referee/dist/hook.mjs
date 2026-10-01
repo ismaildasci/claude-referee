@@ -922,6 +922,12 @@ function threshold(pack, project, question2, key, fallback) {
   return typeof override === "number" && override > base2 ? Math.min(override, 1) : base2;
 }
 __name(threshold, "threshold");
+function thresholdBelow(pack, project, question2, key, fallback) {
+  const base2 = pack.thresholds[question2]?.[key] ?? fallback;
+  const override = project?.[question2]?.[key];
+  return typeof override === "number" && override < base2 ? Math.max(override, 0) : base2;
+}
+__name(thresholdBelow, "thresholdBelow");
 
 // src/engine/project.ts
 import { existsSync as existsSync2, readFileSync as readFileSync2 } from "node:fs";
@@ -2854,9 +2860,9 @@ function decideStop(answers, pack, thresholds) {
   const outcome = answers["outcome"];
   if (claimsDone === null || claimsVerified === null || applies === null || outcome?.type !== "choice" || !outcome.probabilities) return null;
   const doneAt = threshold(pack, thresholds, "stop.gate", "claims_done", 0.7);
-  const verifiedAt = threshold(pack, thresholds, "stop.gate", "claims_verified", 0.5);
+  const verifiedAt = thresholdBelow(pack, thresholds, "stop.gate", "claims_verified", 0.5);
   const appliesAt = threshold(pack, thresholds, "stop.gate", "verification_applies", 0.5);
-  const blockedAt = threshold(pack, thresholds, "stop.gate", "blocked", 0.4);
+  const blockedAt = thresholdBelow(pack, thresholds, "stop.gate", "blocked", 0.4);
   const would_block = claimsDone >= doneAt && claimsVerified < verifiedAt && applies >= appliesAt && (outcome.probabilities["blocked"] ?? 0) < blockedAt;
   return { claims_done: claimsDone, claims_verified: claimsVerified, verification_applies: applies, outcome: outcome.probabilities, would_block };
 }

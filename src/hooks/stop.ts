@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 import type { Questions } from "@typesafe-ai/sdk";
 import { projectId, resolveDataDir } from "../engine/datadir.ts";
 import { isRefereeError } from "../engine/errors.ts";
-import { loadPack, packDirs, threshold, type Pack } from "../engine/pack.ts";
+import { loadPack, packDirs, threshold, thresholdBelow, type Pack } from "../engine/pack.ts";
 import { loadProject } from "../engine/project.ts";
 import { Session, type Outcome } from "../engine/session.ts";
 import { appendStop, newStopId } from "../engine/stopgate/stops.ts";
@@ -42,9 +42,9 @@ export function decideStop(answers: Readonly<Record<string, unknown>> | null, pa
   const outcome = answers["outcome"] as { type?: string; probabilities?: Record<string, number> } | undefined;
   if (claimsDone === null || claimsVerified === null || applies === null || outcome?.type !== "choice" || !outcome.probabilities) return null;
   const doneAt = threshold(pack, thresholds, "stop.gate", "claims_done", 0.7);
-  const verifiedAt = threshold(pack, thresholds, "stop.gate", "claims_verified", 0.5);
+  const verifiedAt = thresholdBelow(pack, thresholds, "stop.gate", "claims_verified", 0.5);
   const appliesAt = threshold(pack, thresholds, "stop.gate", "verification_applies", 0.5);
-  const blockedAt = threshold(pack, thresholds, "stop.gate", "blocked", 0.4);
+  const blockedAt = thresholdBelow(pack, thresholds, "stop.gate", "blocked", 0.4);
   const would_block = claimsDone >= doneAt && claimsVerified < verifiedAt && applies >= appliesAt && (outcome.probabilities["blocked"] ?? 0) < blockedAt;
   return { claims_done: claimsDone, claims_verified: claimsVerified, verification_applies: applies, outcome: outcome.probabilities, would_block };
 }

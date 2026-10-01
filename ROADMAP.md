@@ -53,7 +53,7 @@ Exit criteria: the `done` v2 and `claims` acceptance numbers hold on new hold-ou
 - **Recorded-session evals** with `claude plugin eval`, using recorded "false done" and "true done" transcripts.
 - **A recipe for the project `verify` skill.** Since Claude Code 2.1.286 Claude runs a project or user skill named `verify` before committing; the recipe is one line telling it to pipe the test output to `claude-referee done`. The plugin doesn't write that file itself.
 - **Blind spots found by replaying real turns** (an outside team replayed 73 turns and most blocked sentences were true): negative sentences ("I haven't committed") are not claims; results from subagents and results repeated from an earlier turn are marked; a truncated tool output never counts as proof.
-- **Stats that count failures.** `receipts --stops` should report an error rate and a p95 over every attempt, not only answered calls, before any `active` data is collected.
+- **Stats that count failures.** `receipts --stops` reports `error_rate` and `p95_all_ms` next to the answered-calls figures (done); the gate numbers use them.
 
 ## v0.4: measure and show
 
@@ -63,7 +63,7 @@ Exit criteria: the `done` v2 and `claims` acceptance numbers hold on new hold-ou
 
 ## v0.5: widen
 
-- **`active` done-gate**, recommended only after at least 50 labelled stops with precision of 0.8 or better, at most 5% false blocks, a p95 of 3 seconds or less, and the A/B.
+- **`active` done-gate**, recommended only after at least 50 labelled stops with precision of 0.8 or better, at most 5% false blocks, a p95 of 3 seconds or less over every Jev attempt including failed ones (`p95_all_ms`), an error rate that is reported next to it, and the A/B.
 - **A CI recipe and a GitHub Action** that run `done` on the test log of agent-opened PRs and `claims` on changed docs, and upload receipts as an artifact.
 - **Release-note claims**, only if `claims` precision held on hold-out.
 - **`judge --baseline`**, a ratchet that records existing violations once and reports only new ones.
