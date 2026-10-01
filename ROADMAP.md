@@ -48,7 +48,7 @@ Exit criteria: the `done` v2 and `claims` acceptance numbers hold on new hold-ou
 ## v0.3: the done-gate, measured on real stops
 
 - **`soft` mode** that leaves a note in the transcript without an error, next to `off`, `shadow` and `active` (done in main: a `systemMessage` warning only).
-- **Labelling.** `receipts --stops` already lists stops and `--label <id> --right|--wrong` marks them. Still to do: a weak label suggested from the user's next message (never a replacement for the human label) and a threshold suggestion only with at least 10 labels per class, with exact binomial intervals.
+- **Labelling.** `receipts --stops` already lists stops and `--label <id> --right|--wrong` marks them. A weak `right` hint from the user's next message (reported breakage or a repeated request; approval or silence suggests nothing, so it can't fake a `wrong`) and a `claims_done` threshold suggestion with exact Clopper-Pearson intervals, produced only with at least 10 human labels per class, are done in main; the suggestion can only raise the threshold.
 - **A base-rate study.** Shadow mode on two real projects for two weeks, one of them public. Kill criterion: if fewer than 2 of at least 100 stops are really a wrong "done", `active` is not recommended and the gate stays in `soft`.
 - **Recorded-session evals** with `claude plugin eval`, using recorded "false done" and "true done" transcripts.
 - **A recipe for the project `verify` skill.** Since Claude Code 2.1.286 Claude runs a project or user skill named `verify` before committing; the recipe is one line telling it to pipe the test output to `claude-referee done`. The plugin doesn't write that file itself.

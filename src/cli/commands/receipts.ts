@@ -7,7 +7,11 @@ import { dirname, resolve } from "node:path";
 import { projectId, resolveDataDir, tildify } from "../../engine/datadir.ts";
 import { RefereeError } from "../../engine/errors.ts";
 import { overruleReceipt, readReceipts, verifyChain, type Receipt } from "../../engine/receipts.ts";
+import { loadPack, packDirs, threshold } from "../../engine/pack.ts";
+import { loadProject } from "../../engine/project.ts";
+import { suggestThreshold } from "../../engine/stopgate/interval.ts";
 import { labelStop, readStops, stopStats } from "../../engine/stopgate/stops.ts";
+import { suggestForStops } from "../../engine/stopgate/weak.ts";
 import { projectTranscriptDirs, scanUsage } from "../../engine/usage.ts";
 import type { Command } from "../types.ts";
 import { str } from "../shared.ts";
@@ -49,11 +53,12 @@ export const receipts: Command = {
       rows: "With --tokens: one row per day and command. With --usage: day, command, calls, subagent_calls and result_chars",
       transcripts: "With --usage: how many transcript files were read",
       stats: "With --stops: stops, skipped_by_reason, asked, would_block, labelled, right, wrong, precision, false_block_rate, p95_ms (answered calls only), errors, error_rate (Jev errors and breaker skips over asked plus errors), p95_all_ms (answered and failed calls), unlabelled_would_block",
-      stops: "With --stops: id, ts, skipped, edits, checks, would_block, claims_done, claims_verified, task_excerpt, final_excerpt, label",
+      stops: "With --stops: id, ts, skipped, edits, checks, would_block, claims_done, claims_verified, task_excerpt, final_excerpt, label, and for an unlabelled would_block stop whose next prompt in the session transcript reports breakage or repeats the request, suggestion: {label: \"right\", reason: reported_broken or repeated_request, source: next_message}. It is a hint only: computed on read, never stored, never counted in stats or in the threshold suggestion, and the message text is never printed or kept",
+      threshold_suggestion: "With --stops: only available (true) with at least 10 human labels of each class on would_block stops (have and need are always shown). Then claims_done is checked with exact Clopper-Pearson 95% intervals: suggested is the smallest value at or above the current one at which the kept labelled stops (at least 10) have a precision lower bound of 0.8 or more, or null if none does; it never suggests lowering the threshold. overall holds the precision and false block rate intervals. Nothing is written; set it in .claude/referee.json yourself",
       label: "With --label: the id and the label that was stored",
     },
     errors: ["bad_input"],
-    effects: "Reads the data directory, and with --usage this project's Claude Code transcripts; export writes one file; --label rewrites the stops file.",
+    effects: "Reads the data directory, and with --usage this project's Claude Code transcripts; export writes one file; --label appends to labels.jsonl.",
     cost: "Free.",
   },
   options: {
@@ -112,10 +117,11 @@ export const receipts: Command = {
     if (values["stops"] === true) {
       const project = projectId(io.cwd);
       const scopedStops = readStops(dataDir).filter((r) => r.project === project && r.ts >= since);
-      const shown = (values["unlabelled"] === true ? scopedStops.filter((r) => r.decision?.would_block === true && !r.label) : scopedStops)
+      const picked = (values["unlabelled"] === true ? scopedStops.filter((r) => r.decision?.would_block === true && !r.label) : scopedStops)
         .sort((a, b) => (a.ts < b.ts ? 1 : a.ts > b.ts ? -1 : 0))
-        .slice(0, 20)
-        .map((r) => ({
+        .slice(0, 20);
+      const weak = suggestForStops(projectTranscriptDirs(io.env, io.home, io.cwd), picked.filter((r) => r.decision?.would_block === true && !r.label));
+      const shown = picked.map((r) => ({
           id: r.id,
           ts: r.ts,
           skipped: r.skipped,
@@ -127,8 +133,16 @@ export const receipts: Command = {
           task_excerpt: r.task_excerpt?.slice(0, 300),
           final_excerpt: r.final_excerpt?.slice(0, 300),
           label: r.label,
+          ...(r.label === undefined && weak.has(r.id) ? { suggestion: weak.get(r.id) } : {}),
         }));
-      return { ok: true, verdict: "stops", days, stats: stopStats(scopedStops), stops: shown, receipt: `stops-${io.now().toString(36)}` };
+      let current = 0.7;
+      try {
+        const project = loadProject(io.cwd);
+        if (project) current = threshold(loadPack(project.pack, packDirs(io.env)), project.thresholds, "stop.gate", "claims_done", 0.7);
+      } catch {
+        void 0;
+      }
+      return { ok: true, verdict: "stops", days, stats: stopStats(scopedStops), threshold_suggestion: suggestThreshold(scopedStops, current), stops: shown, receipt: `stops-${io.now().toString(36)}` };
     }
     if (usage) {
       const { transcripts, rows } = scanUsage(projectTranscriptDirs(io.env, io.home, io.cwd), since);

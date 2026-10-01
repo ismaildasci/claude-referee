@@ -201,6 +201,18 @@ function promptText(entry: Entry | null): string | null {
   return text;
 }
 
+// Every real user prompt in order with its timestamp (ISO, "" when missing); used by the weak label hint, never stored.
+export function userPrompts(text: string): { ts: string; text: string }[] {
+  const out: { ts: string; text: string }[] = [];
+  for (const line of text.split("\n")) {
+    if (!isPromptCandidate(line)) continue;
+    const entry = parseLine(line) as (Entry & { timestamp?: unknown }) | null;
+    const found = promptText(entry);
+    if (found !== null && typeof entry?.timestamp === "string") out.push({ ts: entry.timestamp, text: found });
+  }
+  return out;
+}
+
 function isPromptCandidate(line: string): boolean {
   return USER_LINE.test(line) && !TOOL_RESULT_LINE.test(line);
 }

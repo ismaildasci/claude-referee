@@ -60,6 +60,7 @@ Redaction is pattern-based. It can miss a secret in an unusual format, and it ca
 claude-referee's data directory holds:
 - **Receipts:** one line per command run: the command, pack, model, verdict, request IDs, request and cache-hit counts, input tokens, estimated cost, latency, redaction counts and a hash of the questions. Hook receipts add the Claude Code session ID. Planned: done-gate receipts will also note assertions removed from test files and new skip markers, as counts and file paths only. Receipts hold no request text.
 - **The answer cache:** Jev's answers, keyed by the pack version, the model and hashes of the question and the redacted input. Entries expire after 30 days by default. `--fresh` skips the cache.
+- **Done-gate stops and labels:** `stops.jsonl` and `labels.jsonl` (excerpts, scores, your labels). `receipts --stops` also reads your own Claude Code transcript on your machine to hint at a label from your next prompt; it keeps and prints only a fixed reason (`reported_broken` or `repeated_request`), never the prompt text, and sends nothing anywhere.
 - **Results files:** the details of verdicts longer than 1,500 characters, such as per-item scores from `judge`.
 
 When claude-referee is installed as `claude-referee@claude-referee`, the data directory is `~/.claude/plugins/data/claude-referee-claude-referee/`. Receipts are grouped under a hash of the repository path, never the path itself. `npx claude-referee doctor` shows where the directory is and how big it has grown. Uninstalling deletes it unless you add `--keep-data`.

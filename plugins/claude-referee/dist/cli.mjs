@@ -2312,7 +2312,7 @@ var cargo = {
     const lines3 = prepare(text);
     const results = [];
     const failedIds = /* @__PURE__ */ new Set();
-    const compile2 = /* @__PURE__ */ new Set();
+    const compile3 = /* @__PURE__ */ new Set();
     let passed = 0;
     let failedSum = 0;
     let ignored = 0;
@@ -2354,11 +2354,11 @@ var cargo = {
         }
         continue;
       }
-      if (CARGO_COMPILE.test(line)) compile2.add(line);
+      if (CARGO_COMPILE.test(line)) compile3.add(line);
       else if (/^error: could not compile /.test(line)) couldNotCompile = true;
       else if (/^error: test failed, to rerun pass/.test(line)) testFailedLine = true;
     }
-    const errors = compile2.size > 0 ? compile2.size : couldNotCompile ? 1 : 0;
+    const errors = compile3.size > 0 ? compile3.size : couldNotCompile ? 1 : 0;
     const failed = Math.max(failedSum, failedIds.size, failedStatus || testFailedLine ? 1 : 0);
     if (results.length === 0 && failed === 0 && errors === 0) return null;
     const summary = results.length === 0 ? null : failedFirst ?? results[results.length - 1];
@@ -3703,11 +3703,11 @@ function verifyRequest(pack, thresholds, claims2, source) {
     batchTokens = stateTokens;
   }, "flush");
   const add = /* @__PURE__ */ __name((key, q) => {
-    const tokens = estimateTokens(JSON.stringify(q));
-    if (stateTokens + tokens > STATE_TOKEN_LIMIT) throw new RefereeError("too_large", `Claim ${key} is too long.`);
-    if (batchTokens + tokens > REQUEST_TOKEN_LIMIT) flush();
+    const tokens2 = estimateTokens(JSON.stringify(q));
+    if (stateTokens + tokens2 > STATE_TOKEN_LIMIT) throw new RefereeError("too_large", `Claim ${key} is too long.`);
+    if (batchTokens + tokens2 > REQUEST_TOKEN_LIMIT) flush();
     batch[key] = q;
-    batchTokens += tokens;
+    batchTokens += tokens2;
   }, "add");
   if (asked.length > 0) add("injection", injection);
   for (const claim of asked) {
@@ -3946,13 +3946,13 @@ async function record(context, pack, list2) {
     }
   }
   const plans = todo.map((t) => t.planned);
-  const tokens = plans.reduce((sum2, p) => sum2 + estimateTokens(JSON.stringify([p.state, p.questions])), 0);
-  const usd = costUsd(session.model, tokens);
+  const tokens2 = plans.reduce((sum2, p) => sum2 + estimateTokens(JSON.stringify([p.state, p.questions])), 0);
+  const usd = costUsd(session.model, tokens2);
   if (!flags.dryRun && maxRequests !== void 0 && plans.length > maxRequests) {
     throw new RefereeError("bad_input", `Recording would send ${plans.length} requests; --max-requests is ${maxRequests}. Nothing was sent.`, { next_step: "Record fewer cases (a smaller suite or --split) or raise the cap." });
   }
   if (!flags.dryRun && maxUsd !== void 0 && usd !== null && usd > maxUsd) {
-    throw new RefereeError("bad_input", `Recording would cost about ${usd.toFixed(6)} USD (an estimate from about ${tokens} input tokens); --max-usd is ${maxUsd}. Nothing was sent.`, { next_step: "Record fewer cases or raise the cap." });
+    throw new RefereeError("bad_input", `Recording would cost about ${usd.toFixed(6)} USD (an estimate from about ${tokens2} input tokens); --max-usd is ${maxUsd}. Nothing was sent.`, { next_step: "Record fewer cases or raise the cap." });
   }
   if (flags.dryRun) return fitLine({ ...session.dryRun(plans), skipped });
   const outcomes = todo.length ? await session.run(plans, { partial: true }) : [];
@@ -4199,6 +4199,78 @@ var lintPack = {
 import { mkdirSync as mkdirSync6, writeFileSync as writeFileSync5 } from "node:fs";
 import { dirname as dirname3, resolve as resolve6 } from "node:path";
 
+// src/engine/stopgate/interval.ts
+var MIN_LABELS_PER_CLASS = 10;
+var PRECISION_TARGET = 0.8;
+function logChoose(n, k) {
+  let sum2 = 0;
+  for (let i = 1; i <= k; i++) sum2 += Math.log((n - k + i) / i);
+  return sum2;
+}
+__name(logChoose, "logChoose");
+function pmf(n, k, p) {
+  if (p <= 0) return k === 0 ? 1 : 0;
+  if (p >= 1) return k === n ? 1 : 0;
+  return Math.exp(logChoose(n, k) + k * Math.log(p) + (n - k) * Math.log1p(-p));
+}
+__name(pmf, "pmf");
+function cdf(n, x, p) {
+  let sum2 = 0;
+  for (let k = 0; k <= x; k++) sum2 += pmf(n, k, p);
+  return Math.min(1, sum2);
+}
+__name(cdf, "cdf");
+function bisect(f, target, increasing) {
+  let lo = 0;
+  let hi = 1;
+  for (let i = 0; i < 100; i++) {
+    const mid = (lo + hi) / 2;
+    if (f(mid) < target === increasing) lo = mid;
+    else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+__name(bisect, "bisect");
+function clopperPearson(x, n, confidence = 0.95) {
+  if (!Number.isInteger(x) || !Number.isInteger(n) || n < 1 || x < 0 || x > n || !(confidence > 0 && confidence < 1)) throw new RangeError("clopperPearson needs integers 0 <= x <= n, n >= 1");
+  const alpha = (1 - confidence) / 2;
+  const lower = x === 0 ? 0 : bisect((p) => 1 - cdf(n, x - 1, p), alpha, true);
+  const upper = x === n ? 1 : bisect((p) => cdf(n, x, p), alpha, false);
+  return { lower, upper };
+}
+__name(clopperPearson, "clopperPearson");
+var round = /* @__PURE__ */ __name((n) => Math.round(n * 1e3) / 1e3, "round");
+var pair = /* @__PURE__ */ __name((x, n) => {
+  const ci = clopperPearson(x, n);
+  return [round(ci.lower), round(ci.upper)];
+}, "pair");
+function suggestThreshold(records, current) {
+  const labelled = records.filter((r) => r.decision?.would_block === true && (r.label === "right" || r.label === "wrong"));
+  const right = labelled.filter((r) => r.label === "right").length;
+  const wrong = labelled.length - right;
+  const base = { need: { right: MIN_LABELS_PER_CLASS, wrong: MIN_LABELS_PER_CLASS }, have: { right, wrong }, question: "stop.gate", key: "claims_done", current };
+  if (right < MIN_LABELS_PER_CLASS || wrong < MIN_LABELS_PER_CLASS) return { ...base, available: false, suggested: null, reason: "too_few_labels" };
+  const overall = { precision: round(right / labelled.length), precision_ci95: pair(right, labelled.length), false_block_rate_ci95: pair(wrong, labelled.length) };
+  const keptAt = /* @__PURE__ */ __name((t) => {
+    const kept = labelled.filter((r) => (r.decision?.claims_done ?? 0) >= t);
+    const k = kept.filter((r) => r.label === "right").length;
+    return { n: kept.length, k };
+  }, "keptAt");
+  const meets = /* @__PURE__ */ __name((t) => {
+    const { n, k } = keptAt(t);
+    return n >= MIN_LABELS_PER_CLASS && clopperPearson(k, n).lower >= PRECISION_TARGET;
+  }, "meets");
+  const summary = /* @__PURE__ */ __name((t) => {
+    const { n, k } = keptAt(t);
+    return { labelled: n, right: k, precision: round(k / n), precision_ci95: pair(k, n) };
+  }, "summary");
+  if (meets(current)) return { ...base, available: true, suggested: current, reason: "already_meets_target", kept: summary(current), overall };
+  const candidates = [...new Set(labelled.map((r) => Math.floor((r.decision?.claims_done ?? 0) * 1e3) / 1e3))].filter((t) => t > current && t <= 1).sort((a, b) => a - b);
+  for (const t of candidates) if (meets(t)) return { ...base, available: true, suggested: t, reason: "raise_claims_done", kept: summary(t), overall };
+  return { ...base, available: true, suggested: null, reason: "no_threshold_reaches_target", overall };
+}
+__name(suggestThreshold, "suggestThreshold");
+
 // src/engine/stopgate/stops.ts
 import { appendFileSync as appendFileSync3, chmodSync, existsSync as existsSync6, mkdirSync as mkdirSync5, readFileSync as readFileSync10, renameSync, statSync as statSync4, writeFileSync as writeFileSync4 } from "node:fs";
 import { join as join10 } from "node:path";
@@ -4299,9 +4371,153 @@ function stopStats(records) {
 }
 __name(stopStats, "stopStats");
 
-// src/engine/usage.ts
-import { existsSync as existsSync7, readdirSync as readdirSync6, readFileSync as readFileSync11 } from "node:fs";
+// src/engine/stopgate/weak.ts
+import { readFileSync as readFileSync11 } from "node:fs";
 import { join as join11 } from "node:path";
+
+// src/engine/stopgate/transcript.ts
+var USER_LINE = /"type"\s*:\s*"user"/;
+var TOOL_RESULT_LINE = /"type"\s*:\s*"tool_result"/;
+function textOf(content) {
+  if (typeof content === "string") return content;
+  if (!Array.isArray(content)) return "";
+  return content.map((b) => b && b.type === "text" && typeof b.text === "string" ? b.text : "").filter(Boolean).join("\n");
+}
+__name(textOf, "textOf");
+function parseLine(line) {
+  try {
+    const value = JSON.parse(line);
+    return value && typeof value === "object" ? value : null;
+  } catch {
+    return null;
+  }
+}
+__name(parseLine, "parseLine");
+function promptText(entry) {
+  if (!entry || entry.type !== "user" || entry.isSidechain === true || entry.isMeta === true || entry.isCompactSummary === true) return null;
+  const content = entry.message?.content;
+  if (Array.isArray(content) && content.some((b) => b && b.type === "tool_result")) return null;
+  const text = textOf(content);
+  const trimmed = text.trim();
+  if (!trimmed || trimmed.startsWith("<local-command-") || trimmed.startsWith("[Request interrupted")) return null;
+  return text;
+}
+__name(promptText, "promptText");
+function userPrompts(text) {
+  const out = [];
+  for (const line of text.split("\n")) {
+    if (!isPromptCandidate(line)) continue;
+    const entry = parseLine(line);
+    const found = promptText(entry);
+    if (found !== null && typeof entry?.timestamp === "string") out.push({ ts: entry.timestamp, text: found });
+  }
+  return out;
+}
+__name(userPrompts, "userPrompts");
+function isPromptCandidate(line) {
+  return USER_LINE.test(line) && !TOOL_RESULT_LINE.test(line);
+}
+__name(isPromptCandidate, "isPromptCandidate");
+
+// src/engine/stopgate/weak.ts
+var W = String.raw`(?<![\p{L}\p{N}])`;
+var E = String.raw`(?![\p{L}\p{N}])`;
+var compile2 = /* @__PURE__ */ __name((patterns) => patterns.map((p) => new RegExp(`${W}${p}${E}`, "iu")), "compile");
+var SUBJECT = String.raw`(?:it|this|that|they|tests?|build|page|app|ci|everything|again|still|keeps?|just|now|is|are|was|were|got|goes)`;
+var SELF_NEGATED = compile2([
+  String.raw`(?:doesn'?t|does not|didn'?t|did not|isn'?t|is not|aren'?t|are not|wasn'?t|was not|won'?t|will not|still not|it'?s not)\s+(?:work|working|worked|fixed|pass|passing|passed|compile|compiling)`,
+  String.raw`(?:doesn'?t|does not|didn'?t|did not|isn'?t|is not|won'?t)\s+(?:build|building|run|running)`,
+  String.raw`(?:çalışmıyor|çalışmadı|olmadı|olmuyor|geçmiyor|aynı\s+hata|hata\s+(?:veriyor|alıyorum|çıkıyor)|(?:hâlâ|hala|yine)\s+(?:hata|aynı|olmuyor|olmadı|çalışmıyor))`
+]);
+var OUTCOME = compile2([
+  String.raw`${SUBJECT}\s+(?:broken|broke|crash(?:es|ed|ing)?|failing|fails|failed|regressed)`,
+  String.raw`(?:i\s+)?(?:got|get|getting|see|seeing|there'?s)\s+(?:an?\s+)?(?:error|exception|bug)`,
+  String.raw`(?:it|this)\s+(?:throws|threw)\s+(?:an?\s+)?(?:error|exception)`,
+  String.raw`same\s+(?:error|issue|problem|bug)`,
+  String.raw`(?:bozuk|bozuldu|patlıyor|başarısız|hata\s+var)`
+]);
+var NEGATION = new RegExp(
+  `${W}(?:no|not|nothing|never|without|none|neither|nor|anymore|longer|now|fixed|resolved|previously|earlier|before|yok|değil|değildi|artık|düzeldi|çözüldü|hatasız)${E}|n't`,
+  "iu"
+);
+var HYPOTHETICAL = new RegExp(
+  `${W}(?:if|whether|unless|when|should|would|could|might|ensure|until|eğer|ise|olursa|olsa)${E}|make sure|in case|^\\s*(?:please\\s+)?(?:fix|add|write|create|make|handle|implement|update|remove)${E}|\\bm[ıiuü]${E}`,
+  "iu"
+);
+function reportsBreakage(text) {
+  for (const sentence of text.match(/[^.!?;\n]+[.!?;\n]*/g) ?? []) {
+    if (sentence.includes("?")) continue;
+    for (const clause of sentence.split(/,|\s+(?:but|and|so|then)\s+/i)) {
+      if (HYPOTHETICAL.test(clause)) continue;
+      if (SELF_NEGATED.some((re) => re.test(clause))) return true;
+      if (!NEGATION.test(clause) && OUTCOME.some((re) => re.test(clause))) return true;
+    }
+  }
+  return false;
+}
+__name(reportsBreakage, "reportsBreakage");
+var SCAN_CHARS = 1e3;
+var MIN_TOKENS = 3;
+var REASK_JACCARD = 0.6;
+function tokens(text) {
+  return new Set((text.slice(0, SCAN_CHARS).toLowerCase().match(/[\p{L}\p{N}]+/gu) ?? []).filter((t) => t.length >= 3));
+}
+__name(tokens, "tokens");
+function classifyNext(next, previous) {
+  const head = next.slice(0, SCAN_CHARS);
+  if (reportsBreakage(head)) return "reported_broken";
+  const a = tokens(next);
+  const b = tokens(previous);
+  if (a.size < MIN_TOKENS || b.size < MIN_TOKENS) return null;
+  let shared = 0;
+  for (const t of a) if (b.has(t)) shared++;
+  return shared / (a.size + b.size - shared) >= REASK_JACCARD ? "repeated_request" : null;
+}
+__name(classifyNext, "classifyNext");
+function suggestFromTranscript(transcript, stopTs) {
+  try {
+    const prompts = userPrompts(transcript);
+    const next = prompts.find((p) => p.ts > stopTs);
+    if (!next) return null;
+    const before = prompts.filter((p) => p.ts <= stopTs);
+    const previous = before[before.length - 1]?.text ?? "";
+    const reason = classifyNext(next.text, previous);
+    return reason ? { label: "right", reason, source: "next_message" } : null;
+  } catch {
+    return null;
+  }
+}
+__name(suggestFromTranscript, "suggestFromTranscript");
+function suggestForStops(dirs, stops) {
+  const out = /* @__PURE__ */ new Map();
+  const cache = /* @__PURE__ */ new Map();
+  const load = /* @__PURE__ */ __name((session) => {
+    if (!/^[A-Za-z0-9._-]+$/.test(session)) return null;
+    if (cache.has(session)) return cache.get(session) ?? null;
+    let text = null;
+    for (const dir of dirs) {
+      try {
+        text = readFileSync11(join11(dir, `${session}.jsonl`), "utf8");
+        break;
+      } catch {
+        continue;
+      }
+    }
+    cache.set(session, text);
+    return text;
+  }, "load");
+  for (const stop of stops) {
+    const text = load(stop.session_id);
+    const found = text ? suggestFromTranscript(text, stop.ts) : null;
+    if (found) out.set(stop.id, found);
+  }
+  return out;
+}
+__name(suggestForStops, "suggestForStops");
+
+// src/engine/usage.ts
+import { existsSync as existsSync7, readdirSync as readdirSync6, readFileSync as readFileSync12 } from "node:fs";
+import { join as join12 } from "node:path";
 var SEPARATORS = /* @__PURE__ */ new Set(["&&", "||", "|", "|&", ";", "&", "\n", "(", ")"]);
 var ASSIGNMENT2 = /^[A-Za-z_][A-Za-z0-9_]*=/;
 function withoutHeredocs(command) {
@@ -4320,11 +4536,11 @@ function withoutHeredocs(command) {
 }
 __name(withoutHeredocs, "withoutHeredocs");
 function tokenize(command) {
-  const tokens = [];
+  const tokens2 = [];
   let current = "";
   let quote = null;
   const flush = /* @__PURE__ */ __name(() => {
-    if (current) tokens.push(current);
+    if (current) tokens2.push(current);
     current = "";
   }, "flush");
   for (let i = 0; i < command.length; i++) {
@@ -4342,11 +4558,11 @@ function tokenize(command) {
     const two = command.slice(i, i + 2);
     if (two === "&&" || two === "||" || two === "|&") {
       flush();
-      tokens.push(two);
+      tokens2.push(two);
       i++;
     } else if (ch === "|" || ch === ";" || ch === "&" || ch === "\n" || ch === "(" || ch === ")") {
       flush();
-      tokens.push(ch);
+      tokens2.push(ch);
     } else if (ch === " " || ch === "	") {
       flush();
     } else {
@@ -4354,7 +4570,7 @@ function tokenize(command) {
     }
   }
   flush();
-  return tokens;
+  return tokens2;
 }
 __name(tokenize, "tokenize");
 function subcommand(token) {
@@ -4400,10 +4616,10 @@ function transcriptFiles(dir) {
   if (!existsSync7(dir)) return [];
   const files = [];
   for (const entry of readdirSync6(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
-    if (entry.isFile() && entry.name.endsWith(".jsonl")) files.push({ path: join11(dir, entry.name), subagent: false });
-    const sub = join11(dir, entry.name, "subagents");
+    if (entry.isFile() && entry.name.endsWith(".jsonl")) files.push({ path: join12(dir, entry.name), subagent: false });
+    const sub = join12(dir, entry.name, "subagents");
     if (entry.isDirectory() && existsSync7(sub)) {
-      for (const name of readdirSync6(sub).filter((n) => n.endsWith(".jsonl")).sort()) files.push({ path: join11(sub, name), subagent: true });
+      for (const name of readdirSync6(sub).filter((n) => n.endsWith(".jsonl")).sort()) files.push({ path: join12(sub, name), subagent: true });
     }
   }
   return files;
@@ -4416,8 +4632,8 @@ function resultChars(content) {
 }
 __name(resultChars, "resultChars");
 function projectTranscriptDirs(env, home, cwd) {
-  const configDir = env["CLAUDE_CONFIG_DIR"]?.trim() || join11(home, ".claude");
-  return [.../* @__PURE__ */ new Set([cwd, projectRoot(cwd)])].map((p) => join11(configDir, "projects", p.replace(/[^A-Za-z0-9]/g, "-")));
+  const configDir = env["CLAUDE_CONFIG_DIR"]?.trim() || join12(home, ".claude");
+  return [.../* @__PURE__ */ new Set([cwd, projectRoot(cwd)])].map((p) => join12(configDir, "projects", p.replace(/[^A-Za-z0-9]/g, "-")));
 }
 __name(projectTranscriptDirs, "projectTranscriptDirs");
 function scanUsage(dirs, since) {
@@ -4425,7 +4641,7 @@ function scanUsage(dirs, since) {
   const calls = /* @__PURE__ */ new Map();
   const sizes = /* @__PURE__ */ new Map();
   for (const file of files) {
-    for (const line of readFileSync11(file.path, "utf8").split("\n")) {
+    for (const line of readFileSync12(file.path, "utf8").split("\n")) {
       if (!line.trim()) continue;
       let entry;
       try {
@@ -4506,11 +4722,12 @@ var receipts = {
       rows: "With --tokens: one row per day and command. With --usage: day, command, calls, subagent_calls and result_chars",
       transcripts: "With --usage: how many transcript files were read",
       stats: "With --stops: stops, skipped_by_reason, asked, would_block, labelled, right, wrong, precision, false_block_rate, p95_ms (answered calls only), errors, error_rate (Jev errors and breaker skips over asked plus errors), p95_all_ms (answered and failed calls), unlabelled_would_block",
-      stops: "With --stops: id, ts, skipped, edits, checks, would_block, claims_done, claims_verified, task_excerpt, final_excerpt, label",
+      stops: 'With --stops: id, ts, skipped, edits, checks, would_block, claims_done, claims_verified, task_excerpt, final_excerpt, label, and for an unlabelled would_block stop whose next prompt in the session transcript reports breakage or repeats the request, suggestion: {label: "right", reason: reported_broken or repeated_request, source: next_message}. It is a hint only: computed on read, never stored, never counted in stats or in the threshold suggestion, and the message text is never printed or kept',
+      threshold_suggestion: "With --stops: only available (true) with at least 10 human labels of each class on would_block stops (have and need are always shown). Then claims_done is checked with exact Clopper-Pearson 95% intervals: suggested is the smallest value at or above the current one at which the kept labelled stops (at least 10) have a precision lower bound of 0.8 or more, or null if none does; it never suggests lowering the threshold. overall holds the precision and false block rate intervals. Nothing is written; set it in .claude/referee.json yourself",
       label: "With --label: the id and the label that was stored"
     },
     errors: ["bad_input"],
-    effects: "Reads the data directory, and with --usage this project's Claude Code transcripts; export writes one file; --label rewrites the stops file.",
+    effects: "Reads the data directory, and with --usage this project's Claude Code transcripts; export writes one file; --label appends to labels.jsonl.",
     cost: "Free."
   },
   options: {
@@ -4561,15 +4778,17 @@ var receipts = {
       }
       return { ok: true, verdict: "labelled", id: labelId, label };
     }
-    const tokens = values["tokens"] === true;
+    const tokens2 = values["tokens"] === true;
     const usage2 = values["usage"] === true;
-    const days = Number(str(context, "days") ?? (tokens || usage2 ? 14 : 30));
+    const days = Number(str(context, "days") ?? (tokens2 || usage2 ? 14 : 30));
     if (!Number.isInteger(days) || days < 1 || days > 366) throw new RefereeError("bad_input", "--days must be a whole number from 1 to 366.");
     const since = new Date(io.now() - days * 864e5).toISOString();
     if (values["stops"] === true) {
       const project = projectId(io.cwd);
       const scopedStops = readStops(dataDir).filter((r) => r.project === project && r.ts >= since);
-      const shown = (values["unlabelled"] === true ? scopedStops.filter((r) => r.decision?.would_block === true && !r.label) : scopedStops).sort((a, b) => a.ts < b.ts ? 1 : a.ts > b.ts ? -1 : 0).slice(0, 20).map((r) => ({
+      const picked = (values["unlabelled"] === true ? scopedStops.filter((r) => r.decision?.would_block === true && !r.label) : scopedStops).sort((a, b) => a.ts < b.ts ? 1 : a.ts > b.ts ? -1 : 0).slice(0, 20);
+      const weak = suggestForStops(projectTranscriptDirs(io.env, io.home, io.cwd), picked.filter((r) => r.decision?.would_block === true && !r.label));
+      const shown = picked.map((r) => ({
         id: r.id,
         ts: r.ts,
         skipped: r.skipped,
@@ -4580,16 +4799,23 @@ var receipts = {
         claims_verified: r.decision?.claims_verified,
         task_excerpt: r.task_excerpt?.slice(0, 300),
         final_excerpt: r.final_excerpt?.slice(0, 300),
-        label: r.label
+        label: r.label,
+        ...r.label === void 0 && weak.has(r.id) ? { suggestion: weak.get(r.id) } : {}
       }));
-      return { ok: true, verdict: "stops", days, stats: stopStats(scopedStops), stops: shown, receipt: `stops-${io.now().toString(36)}` };
+      let current = 0.7;
+      try {
+        const project2 = loadProject(io.cwd);
+        if (project2) current = threshold(loadPack(project2.pack, packDirs(io.env)), project2.thresholds, "stop.gate", "claims_done", 0.7);
+      } catch {
+      }
+      return { ok: true, verdict: "stops", days, stats: stopStats(scopedStops), threshold_suggestion: suggestThreshold(scopedStops, current), stops: shown, receipt: `stops-${io.now().toString(36)}` };
     }
     if (usage2) {
       const { transcripts, rows } = scanUsage(projectTranscriptDirs(io.env, io.home, io.cwd), since);
       return { ok: true, verdict: "usage", days, project: projectId(io.cwd), transcripts, calls: rows.reduce((n, r) => n + r.calls, 0), rows };
     }
     const scoped = readReceipts(dataDir, values["all"] === true ? void 0 : projectId(io.cwd)).filter((r) => r.ts >= since);
-    if (tokens) {
+    if (tokens2) {
       const groups = /* @__PURE__ */ new Map();
       for (const r of scoped) {
         const key = `${r.ts.slice(0, 10)}|${r.command}`;
@@ -4652,7 +4878,7 @@ function processIo() {
 __name(processIo, "processIo");
 
 // src/cli/run.ts
-import { join as join12 } from "node:path";
+import { join as join13 } from "node:path";
 import { parseArgs } from "node:util";
 var GLOBAL_OPTIONS = {
   describe: { type: "boolean" },
@@ -4741,7 +4967,7 @@ async function run(argv, io, commands2) {
     }
     const result = await command.run({ io, flags, values: parsed.values, positionals: parsed.positionals });
     const receipt = typeof result["receipt"] === "string" ? result["receipt"] : null;
-    const detailsDir = flags.dryRun ? null : join12(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
+    const detailsDir = flags.dryRun ? null : join13(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
     io.write(render(result, { pretty, detailsDir, receipt }) + "\n");
     const verdict = result["verdict"];
     return typeof verdict === "string" && flags.failOn.includes(verdict) ? 3 : 0;
