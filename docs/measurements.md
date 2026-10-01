@@ -259,6 +259,13 @@ Registered in [done-v2-holdout2.md](decisions/done-v2-holdout2.md) before any re
 - **After the first look:** two parsers were added (Python `unittest`, `cargo clippy` with a `warnings` fact) and the four cases they changed moved to `dev`; the clippy warning case went from p 0.90 to 0.15 and the `unittest` run with skips from 0.26 to 0.74. The 41 cases that stayed have no wrong `met` (11 `met`, 4 `unsure`, 26 `missing`), as a regression check, not a pass; see [the record](decisions/done-v2-holdout2.md).
 - Related: `eval` now applies the exit-code rule the way `done` does, so a non-zero exit code is `missing` in code in both; the first hold-out and dev numbers did not change.
 
+### claims on Turkish sources
+
+Registered in [claims-tr.md](decisions/claims-tr.md) before any request. `eval record --suite claims-tr`, `jev-1.13.0`, 2026-10-01: 44 invented Turkish claim and source pairs (17 `supported`, 27 `unsupported`) of the verify-v2 kinds, from agents that did not read the repository, kept when a second agent labelled them the same (4 of 48 rejected). The instructions stay English. Cases: [cases.jsonl](../jev-evals/claims-tr/cases.jsonl). Answers: [recorded.jsonl](../jev-evals/claims-tr/recorded.jsonl).
+
+- **The registered check passed:** no wrong `supported` among 27 unsupported cases; 13 of 17 true claims confirmed (0.76; the English hold-out confirmed 19 of 24, 0.79). 12 cases were decided in code (a quote or number not in the source).
+- Limits: invented text, one model family writes and labels, one model version, Turkish only; it shows no collapse, not equality with English.
+
 ### done v2 on a fourth hold-out
 
 Registered in [done-v2-holdout4.md](decisions/done-v2-holdout4.md) before any request, with the labelling convention fixed in advance. `eval record --suite done-v2-h4`, `jev-1.13.0`, 2026-10-01: 47 invented outputs (21 `met`, 26 `missing`) from agents that did not read the repository, kept when a second agent labelled them the same. Cases: [cases.jsonl](../jev-evals/done-v2-h4/cases.jsonl) (one case later moved to `done-v2`).
