@@ -726,7 +726,7 @@ var atMost = /* @__PURE__ */ __name((value, bound) => bound - value >= -EPSILON,
 
 // src/engine/config.ts
 var KIT = "claude-referee";
-var VERSION = "0.1.3";
+var VERSION = "0.1.4";
 var DEFAULT_MODEL = "jev-1.13.0";
 var MARKETPLACE = "claude-referee";
 var DEFAULT_BASE_URL = "https://api.typesafe.ai";

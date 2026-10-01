@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-10-01
+
+Correction: the done-gate in `shadow` mode, `lint-pack` and `verify` v2 shipped in 0.1.3 (`git log v0.1.2..v0.1.3`), although the sections below list them under 0.1.2; the released sections were left as they are.
+
 ### Fixed
 
 - A timeout or abort that fires after the API's headers have arrived no longer kills the CLI and the hooks with an uncaught `AbortError` or `TimeoutError` and no output. The SDK (0.6.0) leaves that rejection behind; only those two are ignored, the command now ends with its JSON `timeout` line. Checked on Node 22 only.
