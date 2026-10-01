@@ -248,3 +248,12 @@ How it works: output from a recognised runner is parsed in code into counts, an 
 ### Hook start latency
 
 `node scripts/hook-latency.mjs`, 2026-10-01, macOS arm64, Node 25.5, 40 runs each after one warm-up, empty event on stdin, no key and no network. p95: a bare `node -e ""` 66.3 ms; `hook.mjs session-start` 93.7 ms (+27.5 ms); `hook.mjs stop` 90.8 ms (+24.5 ms). The budget (registered in the roadmap) is at most 40 ms over a bare node at p95; CI runs the same script on Linux with Node 20.3. Limits: one machine, a hook that exits early (the Stop hook with no project file, the briefing without a project), not a hook that asks Jev; the latency of a Jev call is in [Latency](#latency).
+
+### done v2 on a second hold-out
+
+Registered in [done-v2-holdout2.md](decisions/done-v2-holdout2.md) before any request. `eval record --suite done-v2-h2`, `jev-1.13.0`, 2026-10-01: 45 invented outputs written by model agents that did not read the repository, kept when a second agent labelled them the same (17 `met`, 28 `missing`; 3 of 48 rejected). Cases: [cases.jsonl](../jev-evals/done-v2-h2/cases.jsonl). Answers: [recorded.jsonl](../jev-evals/done-v2-h2/recorded.jsonl).
+
+- **The registered check failed:** 1 wrong `met` (a `cargo clippy` warning with exit code 0 under "lint is clean", p 0.90). `missing` found in 26 of 28 (0.93), `met` found in 11 of 17 (0.65); 12 `met`, 4 `unsure`, 29 `missing`.
+- Safe misses: a cut-off log, a note aimed at the judge in a passing log and a test named "all tests passed" came back `unsure`. Misses on true `met` cases: a unittest run ending `OK (skipped=3)`, interleaved parallel output and a SIGTERM after the tests finished (decided in code by the non-zero exit code; label disputed).
+- Limits: the same model family wrote and labelled the cases; invented outputs may not match real tool versions; one model version; the suite allows 1 wrong `met` only because that is what was observed.
+- Related: `eval` now applies the exit-code rule the way `done` does, so a non-zero exit code is `missing` in code in both; the first hold-out and dev numbers did not change.

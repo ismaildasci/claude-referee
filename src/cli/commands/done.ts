@@ -30,6 +30,21 @@ function factsOf(parsed: ParsedEvidence): Record<string, unknown> {
 
 export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, criteria: readonly string[], evidence: string): { planned: Planned[]; finish: (outcomes: Outcome[]) => Result } {
   const parsed = parseEvidence(evidence);
+  if (parsed.exit_code !== null && parsed.exit_code !== 0) {
+    const code = parsed.exit_code;
+    return {
+      planned: [],
+      finish: () => ({
+        ok: true,
+        verdict: "missing",
+        reason: "exit_code_nonzero",
+        trust: parsed.trust,
+        exit_code: code,
+        p: 0,
+        next_step: `The check exited with code ${code}, so nothing can be met and Jev was not asked. Fix the failure and run the check again.`,
+      }),
+    };
+  }
   const base = question(pack, "done.met");
   const questions: Questions = Object.fromEntries(criteria.map((criterion, i) => [`c${i + 1}`, { ...base, instructions: withData(base.instructions, { criterion }) }]));
   const met = threshold(pack, thresholds, "done.met", "met", 0.7);
@@ -86,22 +101,9 @@ export const done: Command = {
     if (criteria.length > 10) throw new RefereeError("bad_input", "At most 10 criteria per call.");
     const evidence = doneEvidence(await readSource(context, str(context, "evidence"), "evidence"));
     if (!evidence.trim()) throw new RefereeError("bad_input", "The evidence is empty.");
-    const exit = parseEvidence(evidence);
-    if (exit.exit_code !== null && exit.exit_code !== 0 && !context.flags.dryRun) {
-      return {
-        ok: true,
-        verdict: "missing",
-        reason: "exit_code_nonzero",
-        trust: exit.trust,
-        exit_code: exit.exit_code,
-        p: 0,
-        requests: 0,
-        cached: 0,
-        next_step: `The check exited with code ${exit.exit_code}, so nothing can be met and Jev was not asked. Fix the failure and run the check again.`,
-      };
-    }
     const { pack, project } = openPack(context);
     const { planned, finish } = doneRequest(pack, project?.thresholds, criteria, evidence);
+    if (planned.length === 0 && !context.flags.dryRun) return { ...finish([]), requests: 0, cached: 0 };
     return jevCommand(context, "done", pack, planned, finish);
   },
 };

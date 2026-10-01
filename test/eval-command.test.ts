@@ -24,7 +24,7 @@ function suite(cases: object[], config: object = { command: "done", criteria: "a
 
 const CASES = [
   { id: "pass", split: "holdout", expected: "met", evidence: "Tests: 12 passed, 12 total\nnpm test exit code: 0\n" },
-  { id: "fail", split: "holdout", expected: "missing", evidence: "Tests: 1 failed, 11 passed\nnpm test exit code: 1\n" },
+  { id: "fail", split: "holdout", expected: "missing", evidence: "Tests: 1 failed, 11 passed\n" },
 ];
 
 async function record(root: string, extra: string[] = [], answer = byEvidence) {
@@ -181,4 +181,18 @@ test("a judge suite without a question is rejected, and a yes on a no case viola
   const { out } = await score(root, ["--fail-on", "violated"]);
   assert.equal(out["verdict"], "violated");
   assert.equal(out["wrong_positive"], 1);
+});
+
+test("eval applies the exit-code rule like done: a non-zero exit code is missing in code and costs no request", async () => {
+  const root = suite([
+    { id: "green", split: "holdout", expected: "met", evidence: "Tests: 12 passed, 12 total\nnpm test exit code: 0\n" },
+    { id: "green-then-1", split: "holdout", expected: "missing", evidence: "Tests: 12 passed, 12 total\nnpm test exit code: 1\n" },
+  ]);
+  const rec = await record(root);
+  assert.equal(rec.requests, 1);
+  assert.equal(rec.out["recorded"], 1);
+  assert.equal(rec.out["skipped"], 1);
+  const { out } = await score(root);
+  assert.deepEqual(out["verdicts"], { met: 1, unsure: 0, missing: 1 });
+  assert.equal(out["wrong_positive"], 0);
 });

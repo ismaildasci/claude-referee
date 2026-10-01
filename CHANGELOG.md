@@ -11,6 +11,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- `jev-evals/done-v2-h2`: a second hold-out for `done` v2 (45 cases, registered in `docs/decisions/done-v2-holdout2.md`). It failed its registered check with one wrong `met`; the suite's allowance is that one case. `eval` now applies the non-zero exit-code rule like `done` does.
 - `scripts/hook-latency.mjs` and a CI step: a hook process must stay within 40 ms of a bare `node` at p95 (measured locally: +27.5 ms and +24.5 ms).
 - `receipts --stops` also reports `errors`, `error_rate` and `p95_all_ms`: Jev errors and breaker skips are counted, and the p95 covers failed calls too, so a slow failure can no longer make the gate's latency figure look better.
 
