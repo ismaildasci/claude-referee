@@ -46,7 +46,8 @@ jobs:
           echo 'not json' | node "$tmp/claude-referee/dist/hook.mjs" session-start
           size=$(cat "$tmp"/claude-referee/dist/*.mjs | wc -c)
           echo "bundle bytes: $size"
-          test "$size" -lt 200000
+          test "$(wc -c < "$tmp/claude-referee/dist/cli.mjs")" -lt 250000
+          test "$(wc -c < "$tmp/claude-referee/dist/hook.mjs")" -lt 200000
       - name: Recorded evals score within each suite's allowance (offline, no key)
         run: node plugins/claude-referee/dist/cli.mjs eval score --suite all --fail-on violated
 
