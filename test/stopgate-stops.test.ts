@@ -248,3 +248,14 @@ test("labelling an unknown id writes nothing", () => {
   assert.equal(labelStop(dir, "nope", "right", "2026-09-30T12:00:00.000Z"), false);
   assert.equal(existsSync(join(dir, "labels.jsonl")), false);
 });
+
+test("records written before the marks existed still read and count", () => {
+  const dir = tempDir();
+  const old = { id: "sold1", ts: "2026-10-01T10:00:00.000Z", session_id: "s", project: "p", mode: "shadow", edits: 1, checks: 0, decision: { claims_done: 0.9, claims_verified: 0.1, verification_applies: 0.9, outcome: { complete: 0.9 }, would_block: true }, ms: 10 };
+  const marked = { ...old, id: "snew1", truncated_checks: 1, subagent_calls: 2, subagent_reports: 1, stale_pass: true };
+  writeFileSync(join(dir, "stops.jsonl"), JSON.stringify(old) + "\n" + JSON.stringify(marked) + "\n");
+  const stops = readStops(dir);
+  assert.equal(stops.length, 2);
+  assert.equal(stopStats(stops).would_block, 2);
+  assert.equal(stops[1]?.stale_pass, true);
+});

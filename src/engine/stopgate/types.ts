@@ -5,6 +5,14 @@ export type CheckStatus = "passed" | "failed" | "unknown";
 export interface CheckRun {
   readonly cmd: string;
   readonly status: CheckStatus;
+  readonly truncated?: true;
+}
+
+export interface StopMarks {
+  readonly truncatedChecks: number;
+  readonly subagentCalls: number;
+  readonly subagentReports: number;
+  readonly stalePass: boolean;
 }
 
 export interface StopFacts {
@@ -13,6 +21,7 @@ export interface StopFacts {
   readonly edits: readonly string[];
   readonly checks: readonly CheckRun[];
   readonly passedCheckAfterLastEdit: boolean;
+  readonly marks: StopMarks;
 }
 
 export interface StopDecision {
@@ -34,6 +43,10 @@ export interface StopRecord {
   readonly skipped?: StopSkip;
   readonly edits: number;
   readonly checks: number;
+  readonly truncated_checks?: number;
+  readonly subagent_calls?: number;
+  readonly subagent_reports?: number;
+  readonly stale_pass?: true;
   readonly decision?: StopDecision;
   readonly ms: number;
   readonly task_excerpt?: string;

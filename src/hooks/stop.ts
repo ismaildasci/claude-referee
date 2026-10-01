@@ -84,7 +84,15 @@ export async function stopGate(io: HookIo, _pluginRoot: string): Promise<string 
     return finish("no_transcript");
   }
   const facts = analyzeTranscript(text);
-  const counts = { edits: facts.edits.length, checks: facts.checks.length };
+  const { marks } = facts;
+  const counts = {
+    edits: facts.edits.length,
+    checks: facts.checks.length,
+    ...(marks.truncatedChecks > 0 ? { truncated_checks: marks.truncatedChecks } : {}),
+    ...(marks.subagentCalls > 0 ? { subagent_calls: marks.subagentCalls } : {}),
+    ...(marks.subagentReports > 0 ? { subagent_reports: marks.subagentReports } : {}),
+    ...(marks.stalePass ? { stale_pass: true as const } : {}),
+  };
   if (facts.edits.length === 0) return finish("no_edits", counts);
   if (facts.passedCheckAfterLastEdit) return finish("check_passed_after_edit", counts);
   const finalMessage = typeof input.last_assistant_message === "string" && input.last_assistant_message.trim() ? input.last_assistant_message.slice(-2_000) : facts.finalMessage;

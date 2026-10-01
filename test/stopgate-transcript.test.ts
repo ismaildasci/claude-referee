@@ -238,7 +238,7 @@ test("a truncated tail with no trailing newline and a cut tool_result", () => {
 });
 
 test("empty and garbage input", () => {
-  const empty = { task: "", finalMessage: "", edits: [], checks: [], passedCheckAfterLastEdit: false };
+  const empty = { task: "", finalMessage: "", edits: [], checks: [], passedCheckAfterLastEdit: false, marks: { truncatedChecks: 0, subagentCalls: 0, subagentReports: 0, stalePass: false } };
   assert.deepEqual(analyzeTranscript(""), empty);
   assert.deepEqual(analyzeTranscript("\n\n\n"), empty);
   assert.deepEqual(analyzeTranscript("garbage\nmore garbage"), empty);

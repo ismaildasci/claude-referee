@@ -1,5 +1,5 @@
 // Reads a Claude Code transcript (JSON lines) and reports the current turn: edits and checks since the last real user prompt.
-// Scans backwards for that prompt and forwards from it; only content-free facts are kept, never throws.
+// Scans backwards for that prompt and forwards from it; only content-free facts are kept, never throws. Marks: truncated checks, subagent reports, a pass from the previous turn.
 
 import { parseEvidence } from "../runners/index.ts";
 import type { CheckRun, CheckStatus, StopFacts } from "./types.ts";
@@ -18,6 +18,8 @@ const FAILURE_MARKER = /\berror\b|\bfail(?:ed|ure|ures|ing)?\b|npm ERR!|✖|✗/
 const USER_LINE = /"type"\s*:\s*"user"/;
 const TOOL_RESULT_LINE = /"type"\s*:\s*"tool_result"/;
 const TOOL_USE_ID = /"tool_use_id"\s*:\s*"([^"]*)"/g;
+const SUBAGENT_TOOLS = new Set(["Agent", "Task"]);
+const TRUNCATED = [/^\s*<persisted-output>/, /\.\.\. \[\d+ (?:lines|characters) truncated\] \.\.\./, /^\s*Command did not complete within its \d+s timeout and was moved to the background/];
 
 interface Block {
   type?: unknown;
@@ -34,6 +36,7 @@ interface Entry {
   isSidechain?: unknown;
   isMeta?: unknown;
   isCompactSummary?: unknown;
+  origin?: { kind?: unknown };
   message?: { content?: unknown };
 }
 interface Pending {
@@ -41,6 +44,7 @@ interface Pending {
   silent: boolean;
   seq: number;
   status: CheckStatus;
+  truncated: boolean;
 }
 
 function withoutHeredocs(command: string): string {
@@ -198,7 +202,18 @@ function promptText(entry: Entry | null): string | null {
   const text = textOf(content);
   const trimmed = text.trim();
   if (!trimmed || trimmed.startsWith("<local-command-") || trimmed.startsWith("[Request interrupted")) return null;
+  if (isNotification(entry, trimmed)) return null;
   return text;
+}
+
+function isNotification(entry: Entry, trimmed: string): boolean {
+  return entry.origin?.kind === "task-notification" || trimmed.startsWith("<task-notification>");
+}
+
+function notificationText(entry: Entry | null): string | null {
+  if (!entry || entry.type !== "user" || entry.isSidechain === true || entry.isMeta === true) return null;
+  const text = textOf(entry.message?.content).trim();
+  return text && isNotification(entry, text) ? text : null;
 }
 
 // Every real user prompt in order with its timestamp (ISO, "" when missing); used by the weak label hint, never stored.
@@ -232,27 +247,36 @@ function firstPrompt(text: string): string {
   return "";
 }
 
-// Offset of the line after the last real prompt (0 when none exists), plus that prompt's text.
-function lastPromptEnd(text: string): { start: number; prompt: string | null } {
+// Offset of the line after the last real prompt (0 when none exists), the offset of that prompt's own line, plus its text.
+function lastPromptEnd(text: string): { start: number; lineStart: number; prompt: string | null } {
   let end = text.length;
   while (end > 0) {
     const nl = text.lastIndexOf("\n", end - 1);
     const line = text.slice(nl + 1, end);
     if (isPromptCandidate(line)) {
       const found = promptText(parseLine(line));
-      if (found !== null) return { start: end + 1, prompt: found };
+      if (found !== null) return { start: end + 1, lineStart: nl + 1, prompt: found };
     }
     end = nl;
   }
-  return { start: 0, prompt: null };
+  return { start: 0, lineStart: 0, prompt: null };
 }
 
-function resultText(content: unknown): string {
-  const text = typeof content === "string" ? content : Array.isArray(content) ? (content as Block[]).map((b) => (b && typeof b.text === "string" ? b.text : "")).join("\n") : "";
-  return text.length > RESULT_TAIL ? text.slice(-RESULT_TAIL) : text;
+function fullResultText(content: unknown): string {
+  return typeof content === "string" ? content : Array.isArray(content) ? (content as Block[]).map((b) => (b && typeof b.text === "string" ? b.text : "")).join("\n") : "";
 }
 
-function statusOf(text: string, isError: boolean, silent: boolean): CheckStatus {
+function isTruncated(text: string): boolean {
+  return TRUNCATED.some((re) => re.test(text));
+}
+
+function statusOf(full: string, isError: boolean, silent: boolean): { status: CheckStatus; truncated: boolean } {
+  const truncated = isTruncated(full);
+  const status = rawStatus(full.length > RESULT_TAIL ? full.slice(-RESULT_TAIL) : full, isError, silent);
+  return { status: truncated && status === "passed" ? "unknown" : status, truncated };
+}
+
+function rawStatus(text: string, isError: boolean, silent: boolean): CheckStatus {
   const ev = parseEvidence(text);
   const bad = ev.runners.some((r) => r.failed + r.errors > 0);
   if (isError || bad || (ev.exit_code !== null && ev.exit_code !== 0)) return "failed";
@@ -262,68 +286,97 @@ function statusOf(text: string, isError: boolean, silent: boolean): CheckStatus 
   return "unknown";
 }
 
+interface Scan {
+  edits: string[];
+  calls: Pending[];
+  finalMessage: string;
+  lastEdit: number;
+  subagentCalls: number;
+  subagentReports: number;
+}
+
+function scanTurn(text: string, from: number, to: number): Scan {
+  const out: Scan = { edits: [], calls: [], finalMessage: "", lastEdit: -1, subagentCalls: 0, subagentReports: 0 };
+  const byId = new Map<string, Pending>();
+  const seen = new Set<string>();
+  let seq = 0;
+  let pos = from;
+  while (pos < to) {
+    let end = text.indexOf("\n", pos);
+    if (end === -1 || end > to) end = to;
+    const line = text.slice(pos, end);
+    pos = end + 1;
+    if (!line.trim()) continue;
+    if (TOOL_RESULT_LINE.test(line)) {
+      let wanted = false;
+      for (const m of line.matchAll(TOOL_USE_ID)) if (byId.has(m[1] ?? "")) wanted = true;
+      if (!wanted) continue;
+      const entry = parseLine(line);
+      if (!entry || entry.isSidechain === true || !Array.isArray(entry.message?.content)) continue;
+      for (const block of entry.message.content as Block[]) {
+        const call = block && block.type === "tool_result" && typeof block.tool_use_id === "string" ? byId.get(block.tool_use_id) : undefined;
+        if (!call) continue;
+        const result = statusOf(fullResultText(block.content), block.is_error === true, call.silent);
+        call.status = result.status;
+        call.truncated = result.truncated;
+      }
+      continue;
+    }
+    if (line.includes("task-notification") && notificationText(parseLine(line)) !== null) {
+      out.subagentReports++;
+      continue;
+    }
+    if (!/"type"\s*:\s*"assistant"/.test(line)) continue;
+    const entry = parseLine(line);
+    if (!entry || entry.type !== "assistant" || entry.isSidechain === true || !Array.isArray(entry.message?.content)) continue;
+    const message = textOf(entry.message.content).trim();
+    if (message) out.finalMessage = message;
+    for (const block of entry.message.content as Block[]) {
+      if (!block || block.type !== "tool_use" || typeof block.name !== "string") continue;
+      const id = typeof block.id === "string" ? block.id : "";
+      if (id) {
+        if (seen.has(id)) continue;
+        seen.add(id);
+      }
+      if (EDIT_TOOLS.has(block.name)) {
+        const path = block.name === "NotebookEdit" ? (block.input?.notebook_path ?? block.input?.file_path) : block.input?.file_path;
+        if (typeof path === "string" && path) {
+          if (!out.edits.includes(path)) out.edits.push(path);
+          out.lastEdit = seq++;
+        }
+      } else if (SUBAGENT_TOOLS.has(block.name)) {
+        out.subagentCalls++;
+      } else if (block.name === "Bash" && typeof block.input?.command === "string") {
+        const kind = analyzeCommand(block.input.command);
+        if (!kind) continue;
+        const call: Pending = { cmd: block.input.command.slice(0, CMD_MAX), silent: kind.silent, seq: seq++, status: "unknown", truncated: false };
+        out.calls.push(call);
+        if (id) byId.set(id, call);
+      }
+    }
+  }
+  return out;
+}
+
+const passedAfterLastEdit = (scan: Scan): boolean => scan.calls.some((c) => c.seq > scan.lastEdit && c.status === "passed");
+
 export function analyzeTranscript(text: string): StopFacts {
-  const empty: StopFacts = { task: "", finalMessage: "", edits: [], checks: [], passedCheckAfterLastEdit: false };
+  const empty: StopFacts = { task: "", finalMessage: "", edits: [], checks: [], passedCheckAfterLastEdit: false, marks: { truncatedChecks: 0, subagentCalls: 0, subagentReports: 0, stalePass: false } };
   try {
     if (typeof text !== "string" || !text) return empty;
     const task = firstPrompt(text).slice(0, TASK_MAX);
-    const { start } = lastPromptEnd(text);
-    const edits: string[] = [];
-    const calls: Pending[] = [];
-    const byId = new Map<string, Pending>();
-    const seen = new Set<string>();
-    let finalMessage = "";
-    let seq = 0;
-    let lastEdit = -1;
-    let pos = start;
-    while (pos < text.length) {
-      let end = text.indexOf("\n", pos);
-      if (end === -1) end = text.length;
-      const line = text.slice(pos, end);
-      pos = end + 1;
-      if (!line.trim()) continue;
-      if (TOOL_RESULT_LINE.test(line)) {
-        let wanted = false;
-        for (const m of line.matchAll(TOOL_USE_ID)) if (byId.has(m[1] ?? "")) wanted = true;
-        if (!wanted) continue;
-        const entry = parseLine(line);
-        if (!entry || entry.isSidechain === true || !Array.isArray(entry.message?.content)) continue;
-        for (const block of entry.message.content as Block[]) {
-          const call = block && block.type === "tool_result" && typeof block.tool_use_id === "string" ? byId.get(block.tool_use_id) : undefined;
-          if (call) call.status = statusOf(resultText(block.content), block.is_error === true, call.silent);
-        }
-        continue;
-      }
-      if (!/"type"\s*:\s*"assistant"/.test(line)) continue;
-      const entry = parseLine(line);
-      if (!entry || entry.type !== "assistant" || entry.isSidechain === true || !Array.isArray(entry.message?.content)) continue;
-      const message = textOf(entry.message.content).trim();
-      if (message) finalMessage = message;
-      for (const block of entry.message.content as Block[]) {
-        if (!block || block.type !== "tool_use" || typeof block.name !== "string") continue;
-        const id = typeof block.id === "string" ? block.id : "";
-        if (id) {
-          if (seen.has(id)) continue;
-          seen.add(id);
-        }
-        if (EDIT_TOOLS.has(block.name)) {
-          const path = block.name === "NotebookEdit" ? (block.input?.notebook_path ?? block.input?.file_path) : block.input?.file_path;
-          if (typeof path === "string" && path) {
-            if (!edits.includes(path)) edits.push(path);
-            lastEdit = seq++;
-          }
-        } else if (block.name === "Bash" && typeof block.input?.command === "string") {
-          const kind = analyzeCommand(block.input.command);
-          if (!kind) continue;
-          const call: Pending = { cmd: block.input.command.slice(0, CMD_MAX), silent: kind.silent, seq: seq++, status: "unknown" };
-          calls.push(call);
-          if (id) byId.set(id, call);
-        }
-      }
+    const { start, lineStart } = lastPromptEnd(text);
+    const turn = scanTurn(text, start, text.length);
+    const passedCheckAfterLastEdit = turn.lastEdit >= 0 && passedAfterLastEdit(turn);
+    let stalePass = false;
+    if (turn.edits.length > 0 && !passedCheckAfterLastEdit && lineStart > 0) {
+      const previous = lastPromptEnd(text.slice(0, lineStart));
+      const before = scanTurn(text, previous.start, lineStart);
+      stalePass = before.lastEdit >= 0 ? passedAfterLastEdit(before) : before.calls.some((c) => c.status === "passed");
     }
-    const checks: CheckRun[] = calls.map((c) => ({ cmd: c.cmd, status: c.status }));
-    const passedCheckAfterLastEdit = lastEdit >= 0 && calls.some((c) => c.seq > lastEdit && c.status === "passed");
-    return { task, finalMessage: finalMessage.slice(-FINAL_MAX), edits, checks, passedCheckAfterLastEdit };
+    const checks: CheckRun[] = turn.calls.map((c) => ({ cmd: c.cmd, status: c.status, ...(c.truncated ? { truncated: true } : {}) }));
+    const marks = { truncatedChecks: turn.calls.filter((c) => c.truncated).length, subagentCalls: turn.subagentCalls, subagentReports: turn.subagentReports, stalePass };
+    return { task, finalMessage: turn.finalMessage.slice(-FINAL_MAX), edits: turn.edits, checks, passedCheckAfterLastEdit, marks };
   } catch {
     return empty;
   }

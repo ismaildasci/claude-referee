@@ -146,3 +146,32 @@ test("soft prints nothing when the message is verified or the gate skips", async
   assert.equal((await run({ stopGate: "soft", transcript: NO_EDITS })).printed, "");
   assert.equal((await run({ stopGate: "soft", status: 500 })).printed, "");
 });
+
+const PERSISTED = "<persisted-output>\nOutput too large (47.9KB). Full output saved to: /x/y.txt\n\nPreview (first 2KB):\n> tsc\n\n...\n</persisted-output>";
+const NOTE = { type: "user", promptSource: "system", origin: { kind: "task-notification" }, message: { role: "user", content: "<task-notification>\n<task-id>a1</task-id>\n<status>completed</status>\n<summary>Agent \"x\" finished</summary>\n</task-notification>" } };
+
+test("a truncated check does not skip the gate; the marks are recorded but never sent to Jev", async () => {
+  const transcript = lines(user("Fix it"), tool("e1", "Edit", { file_path: "src/a.ts" }), result("e1", "ok"), tool("b1", "Bash", { command: "npx tsc --noEmit" }), result("b1", PERSISTED), tool("g1", "Agent", { prompt: "review" }), result("g1", "Async agent launched successfully."), NOTE, said("Done, typecheck is clean."));
+  const r = await run({ transcript });
+  assert.equal(r.requests.length, 1);
+  const stop = r.stops[0]!;
+  assert.equal(stop.skipped, undefined);
+  assert.equal(stop.truncated_checks, 1);
+  assert.equal(stop.subagent_calls, 1);
+  assert.equal(stop.subagent_reports, 1);
+  const sent = JSON.stringify(r.requests[0]?.state);
+  assert.deepEqual((r.requests[0]?.state as { checks: unknown[] }).checks, [{ cmd: "npx tsc --noEmit", status: "unknown" }]);
+  assert.ok(!/truncated|subagent|stale/i.test(sent));
+});
+
+test("marks are recorded on skipped stops too, and absent when zero", async () => {
+  const stale = lines(user("first"), tool("e1", "Edit", { file_path: "a.ts" }), result("e1", "ok"), tool("b1", "Bash", { command: "npm test" }), result("b1", "=== 12 passed in 1s ===\nexit code: 0"), said("ok"), user("second"), tool("e2", "Edit", { file_path: "b.ts" }), result("e2", "ok"), said("done"));
+  const asked = await run({ transcript: stale });
+  assert.equal(asked.stops[0]?.stale_pass, true);
+  const plain = await run();
+  assert.equal("stale_pass" in (plain.stops[0] ?? {}), false);
+  assert.equal("truncated_checks" in (plain.stops[0] ?? {}), false);
+  const skipped = await run({ transcript: lines(user("x"), tool("g1", "Agent", { prompt: "r" }), result("g1", "launched"), said("waiting")) });
+  assert.equal(skipped.stops[0]?.skipped, "no_edits");
+  assert.equal(skipped.stops[0]?.subagent_calls, 1);
+});

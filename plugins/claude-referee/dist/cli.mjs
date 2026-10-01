@@ -4949,9 +4949,14 @@ function promptText(entry) {
   const text = textOf(content);
   const trimmed = text.trim();
   if (!trimmed || trimmed.startsWith("<local-command-") || trimmed.startsWith("[Request interrupted")) return null;
+  if (isNotification(entry, trimmed)) return null;
   return text;
 }
 __name(promptText, "promptText");
+function isNotification(entry, trimmed) {
+  return entry.origin?.kind === "task-notification" || trimmed.startsWith("<task-notification>");
+}
+__name(isNotification, "isNotification");
 function userPrompts(text) {
   const out = [];
   for (const line of text.split("\n")) {
