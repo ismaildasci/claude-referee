@@ -4,6 +4,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-10-01
+
 ### Fixed
 
 - Labelling a stop (`receipts --stops --label`) rewrote the whole `stops.jsonl`, so a stop recorded by another session at that moment could be lost. Labels are now appended to `labels.jsonl` and merged on read; labels written inline by earlier versions are still read. The size-based pruning of old stops now skips the rewrite when the file changed under it.
