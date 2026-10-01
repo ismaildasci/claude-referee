@@ -51,7 +51,7 @@ var init_dist = __esm({
       #parseResponse;
       #parsed;
       constructor(responsePromise, parseResponse) {
-        super((resolve6) => resolve6(void 0));
+        super((resolve7) => resolve7(void 0));
         this.#responsePromise = responsePromise;
         this.#parseResponse = parseResponse;
       }
@@ -143,7 +143,7 @@ var init_dist = __esm({
       const exponential = Math.min(policy.backoffInitialMs * 2 ** attempt, policy.backoffMaxMs);
       return Math.round(exponential * (1 - random() * policy.backoffJitter));
     }, "retryDelayMs");
-    sleep = /* @__PURE__ */ __name((ms, signal) => new Promise((resolve6, reject) => {
+    sleep = /* @__PURE__ */ __name((ms, signal) => new Promise((resolve7, reject) => {
       if (signal?.aborted) return reject(signal.reason);
       const onAbort = /* @__PURE__ */ __name(() => {
         clearTimeout(timer);
@@ -151,7 +151,7 @@ var init_dist = __esm({
       }, "onAbort");
       const timer = setTimeout(() => {
         signal?.removeEventListener("abort", onAbort);
-        resolve6();
+        resolve7();
       }, ms);
       signal?.addEventListener("abort", onAbort, { once: true });
     }), "sleep");
@@ -1261,12 +1261,12 @@ __name(tildify, "tildify");
 
 // src/engine/key.ts
 import { execFile } from "node:child_process";
-var runCommand = /* @__PURE__ */ __name((file, args, timeoutMs) => new Promise((resolve6) => {
+var runCommand = /* @__PURE__ */ __name((file, args, timeoutMs) => new Promise((resolve7) => {
   execFile(
     file,
     [...args],
     { timeout: timeoutMs, encoding: "utf8", windowsHide: true, maxBuffer: 64 * 1024 },
-    (error, stdout) => resolve6(error ? null : stdout)
+    (error, stdout) => resolve7(error ? null : stdout)
   );
 }), "runCommand");
 var processMemo = /* @__PURE__ */ new Map();
@@ -3690,16 +3690,134 @@ var evalCommand = {
   }
 };
 
+// src/cli/commands/lint-pack.ts
+import { existsSync as existsSync5, readFileSync as readFileSync9, readdirSync as readdirSync5 } from "node:fs";
+import { join as join9, resolve as resolve5 } from "node:path";
+
+// src/engine/lint.ts
+var OTHER = /^(?:other|none|neither|unknown|unsure|undecided|says_nothing|no_answer)$/i;
+var COUNTING = /\b(?:how many|count (?:the|how)|counting|number of|sum of|total of|average|earlier than|later than|older than|newer than|days between)\b/i;
+var COMPOUND = /\b(?:and|or|ve|veya)\b/i;
+function lintQuestions(questions, model) {
+  const out = [];
+  const add = /* @__PURE__ */ __name((rule, severity, question2, message) => out.push({ rule, severity, question: question2, message }), "add");
+  if (typeof model !== "string" || !model.trim() || /latest/i.test(model)) add("model", "warn", "(pack)", "pack.json should pin a model such as jev-1.13.0, not leave it open or use a latest alias.");
+  for (const [id, q] of Object.entries(questions)) {
+    const raw = q;
+    const text = raw.instructions?.question;
+    if (typeof text !== "string" || !text.trim()) {
+      add("instructions", "error", id, "The question has no instructions.question text.");
+      continue;
+    }
+    const type = raw.type;
+    if (type === "noul") {
+      if (COMPOUND.test(text)) add("compound", "warn", id, "The question contains and/or: split it so each Noul asks one thing.");
+      const c = raw.criteria;
+      if (typeof c?.true !== "string" || typeof c?.false !== "string") add("criteria", "error", id, "A Noul needs true and false criteria.");
+      else if (c.true.trim() === c.false.trim() || c.true.includes(c.false) || c.false.includes(c.true)) add("contradiction", "warn", id, "The true and false criteria are the same or one contains the other; state what separates them.");
+    }
+    if (type === "choice" && raw.criteria && typeof raw.criteria === "object" && !Array.isArray(raw.criteria)) {
+      const entries = Object.entries(raw.criteria);
+      if (entries.length > 255) add("options", "error", id, "A Choice takes at most 255 options.");
+      if (entries.length > 0) {
+        if (!entries.some(([name]) => OTHER.test(name))) add("other", "warn", id, "A Choice should have an other or none option, so a model with no good fit has somewhere to go.");
+        for (const [name, def] of entries) if (typeof def !== "string" || def.trim().length < 8 || def.trim() === name) add("definition", "warn", id, `Category ${name} has no definition in criteria; without one the model uses its own.`);
+      }
+    }
+    if (type === "score") {
+      const levels = raw.criteria;
+      if (!Array.isArray(levels) || levels.length < 2 || levels.length > 10) add("levels", "error", id, "A Score needs 2 to 10 levels.");
+      else if (levels.some((l) => typeof l !== "string" || !l.trim() || /^[\d.\s]+$/.test(l))) add("levels", "warn", id, "Every Score level needs a description, not only a number.");
+    }
+    if (COUNTING.test(text)) add("counting", "warn", id, "Counting, summing and date comparison belong in code, not in a question to Jev.");
+  }
+  return out;
+}
+__name(lintQuestions, "lintQuestions");
+function lintRecorded(noulByKey, minCount = 10) {
+  const out = [];
+  for (const [key, values] of Object.entries(noulByKey)) {
+    if (values.length < minCount) continue;
+    const sorted = [...values].sort((a, b) => a - b);
+    const p10 = sorted[Math.floor(sorted.length * 0.1)];
+    if (p10 >= 0.5) out.push({ rule: "recorded", severity: "warn", question: key, message: `The 10th percentile of ${values.length} recorded answers is ${p10.toFixed(2)}: this question scores high on every input and can't act as a gate.` });
+  }
+  return out;
+}
+__name(lintRecorded, "lintRecorded");
+
+// src/cli/commands/lint-pack.ts
+function readJson2(path) {
+  try {
+    return JSON.parse(readFileSync9(path, "utf8"));
+  } catch {
+    throw new RefereeError("bad_input", `Not valid JSON: ${path}`);
+  }
+}
+__name(readJson2, "readJson");
+function recordedNouls(root) {
+  const out = {};
+  if (!existsSync5(root)) throw new RefereeError("bad_input", `No evals directory: ${root}`);
+  for (const entry of readdirSync5(root, { withFileTypes: true })) {
+    const file = join9(root, entry.name, "recorded.jsonl");
+    if (!entry.isDirectory() || !existsSync5(file)) continue;
+    const latest = /* @__PURE__ */ new Map();
+    for (const line of parseRecordings(readFileSync9(file, "utf8"))) latest.set(String(line.case), line.answers);
+    for (const answers of latest.values()) {
+      for (const [key, answer] of Object.entries(answers ?? {})) {
+        const a = answer;
+        if (a?.type === "noul" && typeof a.noul === "number") (out[`${entry.name}:${key.replace(/[0-9]+$/, "").replace(/^claim:.*$/, "claim")}`] ??= []).push(a.noul);
+      }
+    }
+  }
+  return out;
+}
+__name(recordedNouls, "recordedNouls");
+var lintPack = {
+  name: "lint-pack",
+  describe: {
+    summary: "Check a pack's questions against TypeSafe's question-writing rules.",
+    inputs: {
+      "<pack dir>": "A directory with pack.json and questions/*.json.",
+      "--recorded <evals dir>": "Also flag a Noul whose recorded answers are high on every input (10th percentile at or above 0.5)."
+    },
+    outputs: {
+      verdict: "clean, warnings or errors",
+      findings: "Each with rule, severity, question and message",
+      questions: "Number of questions checked"
+    },
+    errors: ["bad_input"],
+    effects: "Reads files only; no network.",
+    cost: "Free."
+  },
+  options: { recorded: { type: "string" } },
+  async run(context) {
+    const target = context.positionals[0];
+    if (!target) throw new RefereeError("bad_input", "Give the pack directory.", { next_step: "Example: lint-pack plugins/claude-referee/packs/generic" });
+    const dir = resolve5(context.io.cwd, target);
+    if (!existsSync5(join9(dir, "pack.json"))) throw new RefereeError("bad_input", `No pack.json in ${dir}.`);
+    const meta = readJson2(join9(dir, "pack.json"));
+    const questions = {};
+    const qdir = join9(dir, "questions");
+    if (existsSync5(qdir)) for (const file of readdirSync5(qdir).filter((f) => f.endsWith(".json")).sort()) Object.assign(questions, readJson2(join9(qdir, file)));
+    const findings = lintQuestions(questions, meta.model);
+    const recorded = context.values["recorded"];
+    if (typeof recorded === "string") findings.push(...lintRecorded(recordedNouls(resolve5(context.io.cwd, recorded))));
+    const verdict = findings.some((f) => f.severity === "error") ? "errors" : findings.length ? "warnings" : "clean";
+    return { ok: true, verdict, questions: Object.keys(questions).length, findings, next_step: verdict === "clean" ? void 0 : "Fix the findings; each message says what to change." };
+  }
+};
+
 // src/cli/commands/receipts.ts
 import { mkdirSync as mkdirSync6, writeFileSync as writeFileSync5 } from "node:fs";
-import { dirname as dirname3, resolve as resolve5 } from "node:path";
+import { dirname as dirname3, resolve as resolve6 } from "node:path";
 
 // src/engine/stopgate/stops.ts
-import { appendFileSync as appendFileSync3, chmodSync, existsSync as existsSync5, mkdirSync as mkdirSync5, readFileSync as readFileSync9, renameSync, statSync as statSync4, writeFileSync as writeFileSync4 } from "node:fs";
-import { join as join9 } from "node:path";
+import { appendFileSync as appendFileSync3, chmodSync, existsSync as existsSync6, mkdirSync as mkdirSync5, readFileSync as readFileSync10, renameSync, statSync as statSync4, writeFileSync as writeFileSync4 } from "node:fs";
+import { join as join10 } from "node:path";
 var RETENTION_MS = 90 * 864e5;
 function stopsFile(dataDir) {
-  return join9(dataDir, "stops.jsonl");
+  return join10(dataDir, "stops.jsonl");
 }
 __name(stopsFile, "stopsFile");
 function parseLines(text) {
@@ -3725,8 +3843,8 @@ __name(writeAtomic, "writeAtomic");
 function readStops(dataDir) {
   const file = stopsFile(dataDir);
   try {
-    if (!existsSync5(file)) return [];
-    return parseLines(readFileSync9(file, "utf8"));
+    if (!existsSync6(file)) return [];
+    return parseLines(readFileSync10(file, "utf8"));
   } catch {
     return [];
   }
@@ -3768,8 +3886,8 @@ function stopStats(records) {
 __name(stopStats, "stopStats");
 
 // src/engine/usage.ts
-import { existsSync as existsSync6, readdirSync as readdirSync5, readFileSync as readFileSync10 } from "node:fs";
-import { join as join10 } from "node:path";
+import { existsSync as existsSync7, readdirSync as readdirSync6, readFileSync as readFileSync11 } from "node:fs";
+import { join as join11 } from "node:path";
 var SEPARATORS = /* @__PURE__ */ new Set(["&&", "||", "|", "|&", ";", "&", "\n", "(", ")"]);
 var ASSIGNMENT2 = /^[A-Za-z_][A-Za-z0-9_]*=/;
 function withoutHeredocs(command) {
@@ -3865,13 +3983,13 @@ function cliCallsIn(command) {
 }
 __name(cliCallsIn, "cliCallsIn");
 function transcriptFiles(dir) {
-  if (!existsSync6(dir)) return [];
+  if (!existsSync7(dir)) return [];
   const files = [];
-  for (const entry of readdirSync5(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
-    if (entry.isFile() && entry.name.endsWith(".jsonl")) files.push({ path: join10(dir, entry.name), subagent: false });
-    const sub = join10(dir, entry.name, "subagents");
-    if (entry.isDirectory() && existsSync6(sub)) {
-      for (const name of readdirSync5(sub).filter((n) => n.endsWith(".jsonl")).sort()) files.push({ path: join10(sub, name), subagent: true });
+  for (const entry of readdirSync6(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+    if (entry.isFile() && entry.name.endsWith(".jsonl")) files.push({ path: join11(dir, entry.name), subagent: false });
+    const sub = join11(dir, entry.name, "subagents");
+    if (entry.isDirectory() && existsSync7(sub)) {
+      for (const name of readdirSync6(sub).filter((n) => n.endsWith(".jsonl")).sort()) files.push({ path: join11(sub, name), subagent: true });
     }
   }
   return files;
@@ -3884,8 +4002,8 @@ function resultChars(content) {
 }
 __name(resultChars, "resultChars");
 function projectTranscriptDirs(env, home, cwd) {
-  const configDir = env["CLAUDE_CONFIG_DIR"]?.trim() || join10(home, ".claude");
-  return [.../* @__PURE__ */ new Set([cwd, projectRoot(cwd)])].map((p) => join10(configDir, "projects", p.replace(/[^A-Za-z0-9]/g, "-")));
+  const configDir = env["CLAUDE_CONFIG_DIR"]?.trim() || join11(home, ".claude");
+  return [.../* @__PURE__ */ new Set([cwd, projectRoot(cwd)])].map((p) => join11(configDir, "projects", p.replace(/[^A-Za-z0-9]/g, "-")));
 }
 __name(projectTranscriptDirs, "projectTranscriptDirs");
 function scanUsage(dirs, since) {
@@ -3893,7 +4011,7 @@ function scanUsage(dirs, since) {
   const calls = /* @__PURE__ */ new Map();
   const sizes = /* @__PURE__ */ new Map();
   for (const file of files) {
-    for (const line of readFileSync10(file.path, "utf8").split("\n")) {
+    for (const line of readFileSync11(file.path, "utf8").split("\n")) {
       if (!line.trim()) continue;
       let entry;
       try {
@@ -3995,7 +4113,7 @@ var receipts = {
       const out = str(context, "out");
       if (!out) throw new RefereeError("bad_input", "export needs --out <file>.");
       const all = readReceipts(dataDir);
-      const path = resolve5(io.cwd, out);
+      const path = resolve6(io.cwd, out);
       mkdirSync6(dirname3(path), { recursive: true });
       writeFileSync5(path, all.map((r) => JSON.stringify(r)).join("\n") + (all.length ? "\n" : ""));
       return { ok: true, verdict: "exported", receipts: all.length, out: tildify(path, io.home) };
@@ -4077,7 +4195,7 @@ var receipts = {
 };
 
 // src/cli/commands/index.ts
-var commands = [done, decide, judge, verify, receipts, doctor, evalCommand];
+var commands = [done, decide, judge, verify, receipts, doctor, evalCommand, lintPack];
 
 // src/cli/io.ts
 import { homedir } from "node:os";
@@ -4103,7 +4221,7 @@ function processIo() {
 __name(processIo, "processIo");
 
 // src/cli/run.ts
-import { join as join11 } from "node:path";
+import { join as join12 } from "node:path";
 import { parseArgs } from "node:util";
 var GLOBAL_OPTIONS = {
   describe: { type: "boolean" },
@@ -4192,7 +4310,7 @@ async function run(argv, io, commands2) {
     }
     const result = await command.run({ io, flags, values: parsed.values, positionals: parsed.positionals });
     const receipt = typeof result["receipt"] === "string" ? result["receipt"] : null;
-    const detailsDir = flags.dryRun ? null : join11(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
+    const detailsDir = flags.dryRun ? null : join12(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
     io.write(render(result, { pretty, detailsDir, receipt }) + "\n");
     const verdict = result["verdict"];
     return typeof verdict === "string" && flags.failOn.includes(verdict) ? 3 : 0;

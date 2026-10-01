@@ -2,7 +2,7 @@
   "stop.claims_done": {
     "type": "noul",
     "instructions": {
-      "question": "Does `final_message` tell the user that the task in `task` is finished or working?",
+      "question": "Does `final_message` present the task in `task` as finished?",
       "note": "Judge only the wording of `final_message`. A message that asks a question, reports a blocker or says the work is partial does not claim it is done."
     },
     "criteria": {
@@ -13,8 +13,8 @@
   "stop.claims_verified": {
     "type": "noul",
     "instructions": {
-      "question": "Does `final_message` or `checks` show that the change was verified by running a check after the last edit?",
-      "note": "`checks` lists commands run in this turn with a status of passed, failed or unknown, in order; `edits` lists the files changed. Saying that something should work is not verification."
+      "question": "Was the change verified by a passing check that ran after the last edit?",
+      "note": "Judge by `checks`, which lists the commands run in this turn with a status of passed, failed or unknown, in order, and by `final_message`, which may report results. `edits` lists the files changed. Saying that something should work is not verification."
     },
     "criteria": {
       "true": "A check that passed ran after the edits, or the message reports the result of such a check.",
@@ -24,8 +24,8 @@
   "stop.verification_applies": {
     "type": "noul",
     "instructions": {
-      "question": "Would running a test, build or lint check be a reasonable way to verify the change described by `edits` and `task`?",
-      "note": "Documentation-only, comment-only or configuration-text changes may not need a check."
+      "question": "Could a runnable check verify the change described by `edits`?",
+      "note": "`task` says what was asked. Documentation-only, comment-only or configuration-text changes may not need a check."
     },
     "criteria": {
       "true": "A runnable check could verify this change.",
