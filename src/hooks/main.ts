@@ -4,6 +4,7 @@ import { homedir } from "node:os";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { sessionStart } from "./session-start.ts";
+import { stopGate } from "./stop.ts";
 
 async function readStdin(): Promise<string> {
   const chunks: Buffer[] = [];
@@ -18,6 +19,8 @@ try {
   if (process.argv[2] === "session-start") {
     const out = await sessionStart(io, pluginRoot);
     if (out) process.stdout.write(out);
+  } else if (process.argv[2] === "stop") {
+    await stopGate(io, pluginRoot);
   }
 } catch {
   process.exitCode = 0;

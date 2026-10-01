@@ -24,5 +24,11 @@
   },
   "verify.injection": {
     "flag": 0.7
+  },
+  "stop.gate": {
+    "claims_done": 0.7,
+    "claims_verified": 0.5,
+    "verification_applies": 0.5,
+    "blocked": 0.4
   }
 }

@@ -8,6 +8,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- The Stop done-gate in `shadow` mode, off unless `.claude/referee.json` sets `hooks.stopGate` to `shadow`: after a turn with edits and no passing check it asks Jev whether Claude claimed success it didn't verify and records the answer in `stops.jsonl`. It never blocks and prints nothing. `receipts --stops [--unlabelled]` lists stops with precision and false-block figures, and `receipts --stops --label <id> --right|--wrong` marks one. Task and final-message text is sent to the TypeSafe API while it is on, see `docs/privacy.md`.
 - `jev-evals/verify-v2`: 60 held-out and 30 dev labelled claims with their sources and recorded answers. `eval` handles `verify` suites.
 - `jev-evals/done-v2`: 48 held-out and 30 dev labelled cases for `done` with their recorded answers; the injection suite now allows no wrong `met`.
 - `scripts/probe-api.mjs`, `scripts/latency.mjs` and `scripts/order-sensitivity.mjs`: live checks of the API's edge cases, of latency at 1, 6 and 8 requests in parallel, and of option-order sensitivity. Their results from 2026-09-30 are in `jev-evals/api/` and `jev-evals/decide/`.

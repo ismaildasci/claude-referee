@@ -3691,12 +3691,85 @@ var evalCommand = {
 };
 
 // src/cli/commands/receipts.ts
-import { mkdirSync as mkdirSync5, writeFileSync as writeFileSync4 } from "node:fs";
+import { mkdirSync as mkdirSync6, writeFileSync as writeFileSync5 } from "node:fs";
 import { dirname as dirname3, resolve as resolve5 } from "node:path";
 
-// src/engine/usage.ts
-import { existsSync as existsSync5, readdirSync as readdirSync5, readFileSync as readFileSync9 } from "node:fs";
+// src/engine/stopgate/stops.ts
+import { appendFileSync as appendFileSync3, chmodSync, existsSync as existsSync5, mkdirSync as mkdirSync5, readFileSync as readFileSync9, renameSync, statSync as statSync4, writeFileSync as writeFileSync4 } from "node:fs";
 import { join as join9 } from "node:path";
+var RETENTION_MS = 90 * 864e5;
+function stopsFile(dataDir) {
+  return join9(dataDir, "stops.jsonl");
+}
+__name(stopsFile, "stopsFile");
+function parseLines(text) {
+  const out = [];
+  for (const line of text.split("\n")) {
+    if (!line.trim()) continue;
+    try {
+      const value = JSON.parse(line);
+      if (value !== null && typeof value === "object" && !Array.isArray(value) && typeof value.id === "string") out.push(value);
+    } catch {
+      continue;
+    }
+  }
+  return out;
+}
+__name(parseLines, "parseLines");
+function writeAtomic(file, records) {
+  const tmp = `${file}.${process.pid}.tmp`;
+  writeFileSync4(tmp, records.map((r) => JSON.stringify(r)).join("\n") + (records.length ? "\n" : ""), { mode: 384 });
+  renameSync(tmp, file);
+}
+__name(writeAtomic, "writeAtomic");
+function readStops(dataDir) {
+  const file = stopsFile(dataDir);
+  try {
+    if (!existsSync5(file)) return [];
+    return parseLines(readFileSync9(file, "utf8"));
+  } catch {
+    return [];
+  }
+}
+__name(readStops, "readStops");
+function labelStop(dataDir, id, label, nowIso) {
+  const records = readStops(dataDir);
+  if (!records.some((r) => r.id === id)) return false;
+  writeAtomic(
+    stopsFile(dataDir),
+    records.map((r) => r.id === id ? { ...r, label, labelled_at: nowIso } : r)
+  );
+  return true;
+}
+__name(labelStop, "labelStop");
+function stopStats(records) {
+  const skipped = {};
+  for (const r of records) if (r.skipped) skipped[r.skipped] = (skipped[r.skipped] ?? 0) + 1;
+  const asked = records.filter((r) => r.decision !== void 0);
+  const blocks = asked.filter((r) => r.decision?.would_block === true);
+  const labelledBlocks = blocks.filter((r) => r.label !== void 0);
+  const right = labelledBlocks.filter((r) => r.label === "right").length;
+  const wrong = labelledBlocks.filter((r) => r.label === "wrong").length;
+  const times = asked.map((r) => r.ms).sort((a, b) => a - b);
+  return {
+    stops: records.length,
+    skipped_by_reason: skipped,
+    asked: asked.length,
+    would_block: blocks.length,
+    labelled: labelledBlocks.length,
+    right,
+    wrong,
+    precision: labelledBlocks.length ? right / labelledBlocks.length : null,
+    false_block_rate: labelledBlocks.length ? wrong / labelledBlocks.length : null,
+    p95_ms: times.length ? times[Math.ceil(0.95 * times.length) - 1] ?? null : null,
+    unlabelled_would_block: blocks.length - labelledBlocks.length
+  };
+}
+__name(stopStats, "stopStats");
+
+// src/engine/usage.ts
+import { existsSync as existsSync6, readdirSync as readdirSync5, readFileSync as readFileSync10 } from "node:fs";
+import { join as join10 } from "node:path";
 var SEPARATORS = /* @__PURE__ */ new Set(["&&", "||", "|", "|&", ";", "&", "\n", "(", ")"]);
 var ASSIGNMENT2 = /^[A-Za-z_][A-Za-z0-9_]*=/;
 function withoutHeredocs(command) {
@@ -3792,13 +3865,13 @@ function cliCallsIn(command) {
 }
 __name(cliCallsIn, "cliCallsIn");
 function transcriptFiles(dir) {
-  if (!existsSync5(dir)) return [];
+  if (!existsSync6(dir)) return [];
   const files = [];
   for (const entry of readdirSync5(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
-    if (entry.isFile() && entry.name.endsWith(".jsonl")) files.push({ path: join9(dir, entry.name), subagent: false });
-    const sub = join9(dir, entry.name, "subagents");
-    if (entry.isDirectory() && existsSync5(sub)) {
-      for (const name of readdirSync5(sub).filter((n) => n.endsWith(".jsonl")).sort()) files.push({ path: join9(sub, name), subagent: true });
+    if (entry.isFile() && entry.name.endsWith(".jsonl")) files.push({ path: join10(dir, entry.name), subagent: false });
+    const sub = join10(dir, entry.name, "subagents");
+    if (entry.isDirectory() && existsSync6(sub)) {
+      for (const name of readdirSync5(sub).filter((n) => n.endsWith(".jsonl")).sort()) files.push({ path: join10(sub, name), subagent: true });
     }
   }
   return files;
@@ -3811,8 +3884,8 @@ function resultChars(content) {
 }
 __name(resultChars, "resultChars");
 function projectTranscriptDirs(env, home, cwd) {
-  const configDir = env["CLAUDE_CONFIG_DIR"]?.trim() || join9(home, ".claude");
-  return [.../* @__PURE__ */ new Set([cwd, projectRoot(cwd)])].map((p) => join9(configDir, "projects", p.replace(/[^A-Za-z0-9]/g, "-")));
+  const configDir = env["CLAUDE_CONFIG_DIR"]?.trim() || join10(home, ".claude");
+  return [.../* @__PURE__ */ new Set([cwd, projectRoot(cwd)])].map((p) => join10(configDir, "projects", p.replace(/[^A-Za-z0-9]/g, "-")));
 }
 __name(projectTranscriptDirs, "projectTranscriptDirs");
 function scanUsage(dirs, since) {
@@ -3820,7 +3893,7 @@ function scanUsage(dirs, since) {
   const calls = /* @__PURE__ */ new Map();
   const sizes = /* @__PURE__ */ new Map();
   for (const file of files) {
-    for (const line of readFileSync9(file.path, "utf8").split("\n")) {
+    for (const line of readFileSync10(file.path, "utf8").split("\n")) {
       if (!line.trim()) continue;
       let entry;
       try {
@@ -3877,11 +3950,16 @@ var receipts = {
       "--out <file>": "Target file for export.",
       "--tokens": "Rows per day and command: runs, requests, cache hits, input tokens and the share of --fresh runs.",
       "--usage": "Claude-side: claude-referee CLI calls per day and command, counted from this project's Claude Code transcripts (subagents included, each tool call once), with the size of what each call returned. Nothing from the transcripts is printed.",
+      "--stops": "List the Stop done-gate's shadow stops of this project, newest first, at most 20, with stats (precision and false block rate over labelled would_block stops, p95 ms, skips per reason). Excerpts only; nothing else from the store is printed.",
+      "--unlabelled": "With --stops: only would_block stops without a label.",
+      "--label <id>": "Mark one stop with --right (the block would have been correct) or --wrong (a false block).",
+      "--right": "With --label: the would-be block was correct.",
+      "--wrong": "With --label: the would-be block was a false block.",
       "--all": "Every project instead of the current one.",
-      "--days <n>": "How many days back to include; default 30, or 14 with --tokens."
+      "--days <n>": "How many days back to include; default 30, or 14 with --tokens or --usage. With --stops it limits the listed stops and their stats."
     },
     outputs: {
-      verdict: "summary, tokens, usage or exported",
+      verdict: "summary, tokens, usage, exported, stops or labelled",
       runs: "Command runs in the window",
       requests: "Jev requests made",
       cached: "Answers served from the cache or merged with an identical request",
@@ -3889,13 +3967,27 @@ var receipts = {
       cost_usd: "Estimated cost at list price",
       by_command: "Runs per command",
       rows: "With --tokens: one row per day and command. With --usage: day, command, calls, subagent_calls and result_chars",
-      transcripts: "With --usage: how many transcript files were read"
+      transcripts: "With --usage: how many transcript files were read",
+      stats: "With --stops: stops, skipped_by_reason, asked, would_block, labelled, right, wrong, precision, false_block_rate, p95_ms, unlabelled_would_block",
+      stops: "With --stops: id, ts, skipped, edits, checks, would_block, claims_done, claims_verified, task_excerpt, final_excerpt, label",
+      label: "With --label: the id and the label that was stored"
     },
     errors: ["bad_input"],
-    effects: "Reads the data directory, and with --usage this project's Claude Code transcripts; export writes one file.",
+    effects: "Reads the data directory, and with --usage this project's Claude Code transcripts; export writes one file; --label rewrites the stops file.",
     cost: "Free."
   },
-  options: { out: { type: "string" }, tokens: { type: "boolean" }, usage: { type: "boolean" }, all: { type: "boolean" }, days: { type: "string" } },
+  options: {
+    out: { type: "string" },
+    tokens: { type: "boolean" },
+    usage: { type: "boolean" },
+    all: { type: "boolean" },
+    days: { type: "string" },
+    stops: { type: "boolean" },
+    unlabelled: { type: "boolean" },
+    label: { type: "string" },
+    right: { type: "boolean" },
+    wrong: { type: "boolean" }
+  },
   async run(context) {
     const { io, flags, values, positionals } = context;
     const dataDir = resolveDataDir(io.env, io.home, io.cwd, flags.dataDir);
@@ -3904,16 +3996,45 @@ var receipts = {
       if (!out) throw new RefereeError("bad_input", "export needs --out <file>.");
       const all = readReceipts(dataDir);
       const path = resolve5(io.cwd, out);
-      mkdirSync5(dirname3(path), { recursive: true });
-      writeFileSync4(path, all.map((r) => JSON.stringify(r)).join("\n") + (all.length ? "\n" : ""));
+      mkdirSync6(dirname3(path), { recursive: true });
+      writeFileSync5(path, all.map((r) => JSON.stringify(r)).join("\n") + (all.length ? "\n" : ""));
       return { ok: true, verdict: "exported", receipts: all.length, out: tildify(path, io.home) };
     }
     if (positionals.length > 0) throw new RefereeError("bad_input", `Unknown receipts action: ${positionals[0]}`);
+    const labelId = str(context, "label");
+    if (labelId !== void 0) {
+      const right = values["right"] === true;
+      const wrong = values["wrong"] === true;
+      if (right === wrong) throw new RefereeError("bad_input", "--label needs exactly one of --right or --wrong.", { next_step: "Run receipts --label <id> --right, or --wrong." });
+      const label = right ? "right" : "wrong";
+      if (!labelStop(dataDir, labelId, label, new Date(io.now()).toISOString())) {
+        throw new RefereeError("bad_input", "No stop with that id.", { next_step: "Run receipts --stops to list the ids." });
+      }
+      return { ok: true, verdict: "labelled", id: labelId, label };
+    }
     const tokens = values["tokens"] === true;
     const usage2 = values["usage"] === true;
     const days = Number(str(context, "days") ?? (tokens || usage2 ? 14 : 30));
     if (!Number.isInteger(days) || days < 1 || days > 366) throw new RefereeError("bad_input", "--days must be a whole number from 1 to 366.");
     const since = new Date(io.now() - days * 864e5).toISOString();
+    if (values["stops"] === true) {
+      const project = projectId(io.cwd);
+      const scopedStops = readStops(dataDir).filter((r) => r.project === project && r.ts >= since);
+      const shown = (values["unlabelled"] === true ? scopedStops.filter((r) => r.decision?.would_block === true && !r.label) : scopedStops).sort((a, b) => a.ts < b.ts ? 1 : a.ts > b.ts ? -1 : 0).slice(0, 20).map((r) => ({
+        id: r.id,
+        ts: r.ts,
+        skipped: r.skipped,
+        edits: r.edits,
+        checks: r.checks,
+        would_block: r.decision?.would_block,
+        claims_done: r.decision?.claims_done,
+        claims_verified: r.decision?.claims_verified,
+        task_excerpt: r.task_excerpt?.slice(0, 300),
+        final_excerpt: r.final_excerpt?.slice(0, 300),
+        label: r.label
+      }));
+      return { ok: true, verdict: "stops", days, stats: stopStats(scopedStops), stops: shown, receipt: `stops-${io.now().toString(36)}` };
+    }
     if (usage2) {
       const { transcripts, rows } = scanUsage(projectTranscriptDirs(io.env, io.home, io.cwd), since);
       return { ok: true, verdict: "usage", days, project: projectId(io.cwd), transcripts, calls: rows.reduce((n, r) => n + r.calls, 0), rows };
@@ -3982,7 +4103,7 @@ function processIo() {
 __name(processIo, "processIo");
 
 // src/cli/run.ts
-import { join as join10 } from "node:path";
+import { join as join11 } from "node:path";
 import { parseArgs } from "node:util";
 var GLOBAL_OPTIONS = {
   describe: { type: "boolean" },
@@ -4071,7 +4192,7 @@ async function run(argv, io, commands2) {
     }
     const result = await command.run({ io, flags, values: parsed.values, positionals: parsed.positionals });
     const receipt = typeof result["receipt"] === "string" ? result["receipt"] : null;
-    const detailsDir = flags.dryRun ? null : join10(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
+    const detailsDir = flags.dryRun ? null : join11(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
     io.write(render(result, { pretty, detailsDir, receipt }) + "\n");
     const verdict = result["verdict"];
     return typeof verdict === "string" && flags.failOn.includes(verdict) ? 3 : 0;

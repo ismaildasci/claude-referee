@@ -47,18 +47,18 @@ Hooks stay off in any project without a project file. `hooks_enabled: false` in 
 | `areas` | Per path prefix: the check commands, evidence files (v0.2) and an optional pack | none |
 | `thresholds` | Per-question overrides in the same shape as the pack's `thresholds.json`, and `cacheGuardUsd` (v0.2), the re-cache cost at which the cache guard asks. They can only make a check stricter, so `cacheGuardUsd` can only go down | the pack's; `cacheGuardUsd` 0.25 |
 | `hooks.sessionStart` | `true` or `false` | `true` |
-| `hooks.stopGate` | `off`, `shadow` or `active` (v0.2) | `off` |
+| `hooks.stopGate` | `off` or `shadow` (in `main`, not released); `active` is not built yet | `off` |
 | `hooks.preModelSwitch` | `true` or `false` (v0.2) | `false` |
 
 `areas` tells claude-referee which checks count as proof for which part of the repository. The session briefing shows only the area where the session started. A pack can ship default areas in `areas.json`; they apply only when the project file has no `areas`. From v0.2, an evidence file counts only if it changed after Claude's last edit, so a stale report is treated as no evidence.
 
-### Done-gate modes (v0.2)
+### Done-gate modes
 
 The done-gate looks at a stop only when Claude edited files and no check passed after the last edit. It then asks Jev whether Claude claimed success it didn't verify.
 
 - **`off`**: nothing runs.
-- **`shadow`**: asks Jev and writes a receipt, but never blocks. Start here. `npx claude-referee receipts --stops --label` lists the decisions so you can mark each one right or wrong.
-- **`active`**: when Jev says the claim is unverified, the stop is blocked and Claude gets a note of at most 300 characters naming the area's check command. It blocks at most three times per session, with a 60-second cool-down.
+- **`shadow`**: asks Jev and records the decision in `stops.jsonl` in the data directory, but never blocks and prints nothing. It records the turns it skipped and why (no edits, a passing check after the last edit, `stop_hook_active`, background tasks, circuit breaker open). `claude-referee receipts --stops` lists the decisions with precision and false-block figures; `--unlabelled` shows the ones to review, and `--label <id> --right` or `--wrong` marks one. The record keeps the first 200 characters of the prompt and of the final message on your machine to help you label.
+- **`active`** (not built yet): when Jev says the claim is unverified, the stop is blocked and Claude gets a note of at most 300 characters naming the area's check command. It blocks at most three times per session, with a 60-second cool-down.
 
 `active` isn't recommended until shadow mode has at least 50 labelled stops with a precision of at least 0.8 and no more than 5% false blocks. It must also let through no more false "done" claims than Claude Code's built-in `/goal`, at a lower total cost. Both modes send the data listed in [privacy](privacy.md).
 
