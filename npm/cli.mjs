@@ -702,6 +702,19 @@ var init_dist = __esm({
   }
 });
 
+// src/engine/abort-guard.ts
+function isSdkAbort(reason) {
+  return typeof reason === "object" && reason !== null && reason instanceof DOMException && (reason.name === "AbortError" || reason.name === "TimeoutError");
+}
+__name(isSdkAbort, "isSdkAbort");
+function installAbortGuard() {
+  process.on("unhandledRejection", (reason) => {
+    if (isSdkAbort(reason)) return;
+    throw reason;
+  });
+}
+__name(installAbortGuard, "installAbortGuard");
+
 // src/cli/commands/decide.ts
 import { readFileSync as readFileSync7, statSync as statSync3 } from "node:fs";
 import { resolve as resolve3 } from "node:path";
@@ -4323,4 +4336,5 @@ async function run(argv, io, commands2) {
 __name(run, "run");
 
 // src/cli/main.ts
+installAbortGuard();
 process.exitCode = await run(process.argv.slice(2), processIo(), commands);

@@ -707,6 +707,19 @@ import { homedir } from "node:os";
 import { dirname as dirname3 } from "node:path";
 import { fileURLToPath as fileURLToPath2 } from "node:url";
 
+// src/engine/abort-guard.ts
+function isSdkAbort(reason) {
+  return typeof reason === "object" && reason !== null && reason instanceof DOMException && (reason.name === "AbortError" || reason.name === "TimeoutError");
+}
+__name(isSdkAbort, "isSdkAbort");
+function installAbortGuard() {
+  process.on("unhandledRejection", (reason) => {
+    if (isSdkAbort(reason)) return;
+    throw reason;
+  });
+}
+__name(installAbortGuard, "installAbortGuard");
+
 // src/hooks/session-start.ts
 import { appendFileSync as appendFileSync2 } from "node:fs";
 import { join as join5 } from "node:path";
@@ -2892,6 +2905,7 @@ async function stopGate(io2, _pluginRoot) {
 __name(stopGate, "stopGate");
 
 // src/hooks/main.ts
+installAbortGuard();
 async function readStdin() {
   const chunks = [];
   for await (const chunk of process.stdin) chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);

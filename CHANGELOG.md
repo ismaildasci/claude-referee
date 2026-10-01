@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Fixed
+
+- A timeout or abort that fires after the API's headers have arrived no longer kills the CLI and the hooks with an uncaught `AbortError` or `TimeoutError` and no output. The SDK (0.6.0) leaves that rejection behind; only those two are ignored, the command now ends with its JSON `timeout` line. Checked on Node 22 only.
+
 ## [0.1.3] - 2026-10-01
 
 ## [0.1.2] - 2026-10-01

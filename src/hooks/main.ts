@@ -3,8 +3,11 @@
 import { homedir } from "node:os";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { installAbortGuard } from "../engine/abort-guard.ts";
 import { sessionStart } from "./session-start.ts";
 import { stopGate } from "./stop.ts";
+
+installAbortGuard();
 
 async function readStdin(): Promise<string> {
   const chunks: Buffer[] = [];
