@@ -6,7 +6,7 @@ import { dirname, join, relative, sep } from "node:path";
 import { RefereeError } from "./errors.ts";
 import type { Area, Thresholds } from "./pack.ts";
 
-export type StopGate = "off" | "shadow" | "active";
+export type StopGate = "off" | "shadow" | "soft" | "active";
 
 export interface ProjectConfig {
   readonly root: string;
@@ -75,7 +75,7 @@ export function loadProject(cwd: string): ProjectConfig | null {
     areas: checkAreas(merged.areas),
     hooks: {
       sessionStart: merged.hooks?.sessionStart !== false,
-      stopGate: gate === "shadow" || gate === "active" ? gate : "off",
+      stopGate: gate === "shadow" || gate === "soft" || gate === "active" ? gate : "off",
       preModelSwitch: merged.hooks?.preModelSwitch === true,
     },
     thresholds: typeof merged.thresholds === "object" && merged.thresholds !== null ? (merged.thresholds as Thresholds) : undefined,

@@ -47,7 +47,7 @@ Hooks stay off in any project without a project file. `hooks_enabled: false` in 
 | `areas` | Per path prefix: the check commands, evidence files (planned) and an optional pack | none |
 | `thresholds` | Per-question overrides in the same shape as the pack's `thresholds.json`. They can only make a check stricter (for `stop.gate`'s `claims_verified` and `blocked`, which block when the value is *below* the threshold, that means a lower value) | the pack's |
 | `hooks.sessionStart` | `true` or `false` | `true` |
-| `hooks.stopGate` | `off` or `shadow`; `active` is not built yet | `off` |
+| `hooks.stopGate` | `off`, `shadow` or `soft`; `active` is not built yet | `off` |
 | `hooks.preModelSwitch` | Read but not used: the cache guard was dropped, see [decisions](decisions/dropped.md) | `false` |
 
 `areas` tells claude-referee which checks count as proof for which part of the repository. The session briefing shows only the area where the session started. A pack can ship default areas in `areas.json`; they apply only when the project file has no `areas`. Planned: an evidence file will count only if it changed after Claude's last edit, so a stale report is treated as no evidence.
@@ -57,6 +57,7 @@ Hooks stay off in any project without a project file. `hooks_enabled: false` in 
 The done-gate looks at a stop only when Claude edited files and no check passed after the last edit. It then asks Jev whether Claude claimed success it didn't verify.
 
 - **`off`**: nothing runs.
+- **`soft`**: records exactly like `shadow`, and when Jev would block it also prints one `systemMessage`, a warning shown to you in the transcript. It never blocks, never sets an error exit code and gives Claude no context, so Claude's behaviour does not change. It is not recommended before labelled stops show a false-block rate you accept.
 - **`shadow`**: asks Jev and records the decision in `stops.jsonl` in the data directory (your labels go to `labels.jsonl` next to it, so labelling never rewrites the stops), but never blocks and prints nothing. It records the turns it skipped and why (no edits, a passing check after the last edit, `stop_hook_active`, background tasks, circuit breaker open). `claude-referee receipts --stops` lists the decisions with precision and false-block figures; `--unlabelled` shows the ones to review, and `--label <id> --right` or `--wrong` marks one. The record keeps the first 200 characters of the prompt and of the final message on your machine to help you label.
 - **`active`** (not built yet): when Jev says the claim is unverified, the stop is blocked and Claude gets a note of at most 300 characters naming the area's check command. It blocks at most three times per session, with a 60-second cool-down.
 

@@ -1,5 +1,6 @@
 // Stop done-gate, shadow mode: after a turn with edits and no passing check, asks Jev whether Claude claimed success it didn't verify.
-// It only records the decision (stops.jsonl); it never blocks, prints nothing and fails open. Off unless .claude/referee.json sets hooks.stopGate.
+// It records the decision (stops.jsonl) and never blocks; "soft" also returns a systemMessage JSON line (a user-visible warning), "shadow" prints nothing.
+// Fails open. Off unless .claude/referee.json sets hooks.stopGate.
 
 import { readFileSync } from "node:fs";
 import type { Questions } from "@typesafe-ai/sdk";
@@ -49,7 +50,9 @@ export function decideStop(answers: Readonly<Record<string, unknown>> | null, pa
   return { claims_done: claimsDone, claims_verified: claimsVerified, verification_applies: applies, outcome: outcome.probabilities, would_block };
 }
 
-export async function stopGate(io: HookIo, _pluginRoot: string): Promise<void> {
+export const SOFT_NOTE = "claude-referee: this turn edited files and claimed it was done, but no passing check ran after the last edit. Run the project's tests or build before trusting it.";
+
+export async function stopGate(io: HookIo, _pluginRoot: string): Promise<string | undefined> {
   const started = io.now();
   const { env } = io;
   if (env["REFEREE_HOOKS"] === "off" || /^(?:false|0|no|off)$/i.test(env["CLAUDE_PLUGIN_OPTION_HOOKS_ENABLED"]?.trim() ?? "")) return;
@@ -65,9 +68,11 @@ export async function stopGate(io: HookIo, _pluginRoot: string): Promise<void> {
   if (!project || project.hooks.stopGate === "off") return;
   const sessionId = typeof input.session_id === "string" ? input.session_id : "unknown";
   const dataDir = resolveDataDir(env, io.home, cwd);
-  const base = { id: newStopId(started), ts: new Date(started).toISOString(), session_id: sessionId, project: projectId(cwd), mode: "shadow" as const };
-  const finish = (skipped: StopSkip | undefined, rest: Partial<StopRecord> = {}) =>
+  const base = { id: newStopId(started), ts: new Date(started).toISOString(), session_id: sessionId, project: projectId(cwd), mode: project.hooks.stopGate === "soft" ? ("soft" as const) : ("shadow" as const) };
+  const finish = (skipped: StopSkip | undefined, rest: Partial<StopRecord> = {}): undefined => {
     appendStop(dataDir, { ...base, ...(skipped ? { skipped } : {}), edits: 0, checks: 0, ms: Math.max(0, io.now() - started), ...rest } as StopRecord);
+    return undefined;
+  };
 
   if (input.stop_hook_active === true) return finish("stop_hook_active");
   if (Array.isArray(input.background_tasks) && input.background_tasks.length > 0) return finish("background_tasks");
@@ -105,11 +110,13 @@ export async function stopGate(io: HookIo, _pluginRoot: string): Promise<void> {
     };
     const state = { task: facts.task, final_message: finalMessage, checks: facts.checks.map((c) => ({ cmd: c.cmd, status: c.status })), edits: [...facts.edits] };
     const [outcome] = (await session.run([{ id: "stop", state, questions }])) as Outcome[];
-    session.record({ verdict: "shadow" });
+    session.record({ verdict: base.mode });
     const decision = decideStop(outcome?.answers ?? null, pack, project.thresholds);
     if (!decision) return finish("jev_error", counts);
     finish(undefined, { ...counts, decision, task_excerpt: facts.task.slice(0, EXCERPT), final_excerpt: finalMessage.slice(0, EXCERPT) });
+    if (project.hooks.stopGate === "soft" && decision.would_block) return JSON.stringify({ systemMessage: SOFT_NOTE }) + "\n";
   } catch (error) {
-    finish(isRefereeError(error) && error.code === "breaker_open" ? "breaker_open" : "jev_error", counts);
+    return finish(isRefereeError(error) && error.code === "breaker_open" ? "breaker_open" : "jev_error", counts);
   }
+  return undefined;
 }

@@ -984,7 +984,7 @@ function loadProject(cwd) {
     areas: checkAreas(merged.areas),
     hooks: {
       sessionStart: merged.hooks?.sessionStart !== false,
-      stopGate: gate === "shadow" || gate === "active" ? gate : "off",
+      stopGate: gate === "shadow" || gate === "soft" || gate === "active" ? gate : "off",
       preModelSwitch: merged.hooks?.preModelSwitch === true
     },
     thresholds: typeof merged.thresholds === "object" && merged.thresholds !== null ? merged.thresholds : void 0
@@ -3092,6 +3092,7 @@ function decideStop(answers, pack, thresholds) {
   return { claims_done: claimsDone, claims_verified: claimsVerified, verification_applies: applies, outcome: outcome.probabilities, would_block };
 }
 __name(decideStop, "decideStop");
+var SOFT_NOTE = "claude-referee: this turn edited files and claimed it was done, but no passing check ran after the last edit. Run the project's tests or build before trusting it.";
 async function stopGate(io2, _pluginRoot) {
   const started = io2.now();
   const { env } = io2;
@@ -3108,8 +3109,11 @@ async function stopGate(io2, _pluginRoot) {
   if (!project || project.hooks.stopGate === "off") return;
   const sessionId = typeof input.session_id === "string" ? input.session_id : "unknown";
   const dataDir = resolveDataDir(env, io2.home, cwd);
-  const base2 = { id: newStopId(started), ts: new Date(started).toISOString(), session_id: sessionId, project: projectId(cwd), mode: "shadow" };
-  const finish = /* @__PURE__ */ __name((skipped, rest = {}) => appendStop(dataDir, { ...base2, ...skipped ? { skipped } : {}, edits: 0, checks: 0, ms: Math.max(0, io2.now() - started), ...rest }), "finish");
+  const base2 = { id: newStopId(started), ts: new Date(started).toISOString(), session_id: sessionId, project: projectId(cwd), mode: project.hooks.stopGate === "soft" ? "soft" : "shadow" };
+  const finish = /* @__PURE__ */ __name((skipped, rest = {}) => {
+    appendStop(dataDir, { ...base2, ...skipped ? { skipped } : {}, edits: 0, checks: 0, ms: Math.max(0, io2.now() - started), ...rest });
+    return void 0;
+  }, "finish");
   if (input.stop_hook_active === true) return finish("stop_hook_active");
   if (Array.isArray(input.background_tasks) && input.background_tasks.length > 0) return finish("background_tasks");
   if (typeof input.transcript_path !== "string") return finish("no_transcript");
@@ -3145,13 +3149,15 @@ async function stopGate(io2, _pluginRoot) {
     };
     const state = { task: facts3.task, final_message: finalMessage, checks: facts3.checks.map((c) => ({ cmd: c.cmd, status: c.status })), edits: [...facts3.edits] };
     const [outcome] = await session.run([{ id: "stop", state, questions }]);
-    session.record({ verdict: "shadow" });
+    session.record({ verdict: base2.mode });
     const decision = decideStop(outcome?.answers ?? null, pack, project.thresholds);
     if (!decision) return finish("jev_error", counts3);
     finish(void 0, { ...counts3, decision, task_excerpt: facts3.task.slice(0, EXCERPT), final_excerpt: finalMessage.slice(0, EXCERPT) });
+    if (project.hooks.stopGate === "soft" && decision.would_block) return JSON.stringify({ systemMessage: SOFT_NOTE }) + "\n";
   } catch (error) {
-    finish(isRefereeError(error) && error.code === "breaker_open" ? "breaker_open" : "jev_error", counts3);
+    return finish(isRefereeError(error) && error.code === "breaker_open" ? "breaker_open" : "jev_error", counts3);
   }
+  return void 0;
 }
 __name(stopGate, "stopGate");
 
@@ -3170,7 +3176,8 @@ try {
     const out = await sessionStart(io, pluginRoot);
     if (out) process.stdout.write(out);
   } else if (process.argv[2] === "stop") {
-    await stopGate(io, pluginRoot);
+    const out = await stopGate(io, pluginRoot);
+    if (out) process.stdout.write(out);
   }
 } catch {
   process.exitCode = 0;

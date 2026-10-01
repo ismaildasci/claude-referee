@@ -1025,7 +1025,7 @@ function loadProject(cwd) {
     areas: checkAreas(merged.areas),
     hooks: {
       sessionStart: merged.hooks?.sessionStart !== false,
-      stopGate: gate === "shadow" || gate === "active" ? gate : "off",
+      stopGate: gate === "shadow" || gate === "soft" || gate === "active" ? gate : "off",
       preModelSwitch: merged.hooks?.preModelSwitch === true
     },
     thresholds: typeof merged.thresholds === "object" && merged.thresholds !== null ? merged.thresholds : void 0

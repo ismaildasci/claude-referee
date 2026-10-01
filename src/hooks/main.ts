@@ -23,7 +23,8 @@ try {
     const out = await sessionStart(io, pluginRoot);
     if (out) process.stdout.write(out);
   } else if (process.argv[2] === "stop") {
-    await stopGate(io, pluginRoot);
+    const out = await stopGate(io, pluginRoot);
+    if (out) process.stdout.write(out);
   }
 } catch {
   process.exitCode = 0;

@@ -30,7 +30,7 @@ export interface StopRecord {
   readonly ts: string;
   readonly session_id: string;
   readonly project: string;
-  readonly mode: "shadow";
+  readonly mode: "shadow" | "soft";
   readonly skipped?: StopSkip;
   readonly edits: number;
   readonly checks: number;

@@ -38,7 +38,7 @@ async function run(options: { transcript?: string | null; stopGate?: string | nu
   try {
     const stdin = JSON.stringify({ hook_event_name: "Stop", cwd: root, session_id: "s1", transcript_path: transcript, ...(options.message ? { last_assistant_message: options.message } : {}), ...options.input });
     const returned = await stopGate({ env: { REFEREE_DATA_DIR: dataDir, TYPESAFE_API_KEY: "ts_test", REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, ...options.env }, home, now: () => Date.parse("2026-10-01T12:00:00Z"), readStdin: async () => stdin }, root);
-    return { stops: readStops(dataDir), requests: server.requests, printed: returned === undefined ? "" : "output", dataDir };
+    return { stops: readStops(dataDir), requests: server.requests, printed: returned ?? "", dataDir };
   } finally {
     await server.close();
   }
@@ -130,4 +130,19 @@ test("three Jev failures in a session open the breaker and later stops skip Jev"
   }
   assert.ok(existsSync(join(dataDir, "stops.jsonl")));
   assert.ok(readFileSync(join(dataDir, "stops.jsonl"), "utf8").length > 0);
+});
+
+test("soft: would_block returns one systemMessage line and records mode soft; no block fields", async () => {
+  const r = await run({ stopGate: "soft" });
+  const out = JSON.parse(r.printed) as Record<string, unknown>;
+  assert.deepEqual(Object.keys(out), ["systemMessage"]);
+  assert.match(String(out["systemMessage"]), /no passing check/);
+  assert.equal(r.stops[0]?.mode, "soft");
+  assert.equal(r.stops[0]?.decision?.would_block, true);
+});
+
+test("soft prints nothing when the message is verified or the gate skips", async () => {
+  assert.equal((await run({ stopGate: "soft", answer: answers(0.95, 0.9, 0.9) })).printed, "");
+  assert.equal((await run({ stopGate: "soft", transcript: NO_EDITS })).printed, "");
+  assert.equal((await run({ stopGate: "soft", status: 500 })).printed, "");
 });

@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- `hooks.stopGate: "soft"`: like `shadow`, and when Jev would block the Stop hook also prints one `systemMessage` warning (shown to the user, no block, no context for Claude). Stops are recorded with `mode: "soft"`.
 - Receipt integrity: each receipt carries `prev`, the sha256 of the previous line of its project's chain, and `receipts verify [--project-only]` reports breaks (`mismatch`, `fork` from two runs appending at once, `unreadable`); receipts written before this are counted as `unchained`. `receipts overrule <id>` records a human veto in `overruled.jsonl` and deletes the cached answers that receipt used, so the next run asks Jev again. Receipts now list the `cache_keys` they used. The chain detects edits and deletions in the middle of the history; it does not stop someone who rewrites it from the start or truncates its end.
 
 ## [0.1.6] - 2026-10-01
