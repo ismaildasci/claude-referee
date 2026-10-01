@@ -39,7 +39,7 @@ Every task ships a reference solution and, for kinds 2 to 5, a plausible wrong s
 
 ## Sessions, models and budget
 
-- Stage 1: each task twice with `haiku` and once with `sonnet` (`--model` aliases; the resolved model ids are recorded): 72 sessions. A **pilot** of 10 of them (the first task of each kind, haiku) runs first to check that asked stops are common enough and that no verifier leaks; if neither the tasks nor the harness change afterwards, the pilot sessions stay in the data.
+- Stage 1: each task twice with `haiku` and once with `sonnet` (`--model` aliases; the resolved model ids are recorded): 72 sessions. A **pilot** of 10 of them (the first two tasks of each kind, haiku, repetition 1) runs first to check that asked stops are common enough and that no verifier leaks; if neither the tasks nor the harness change afterwards, the pilot sessions stay in the data.
 - Stage 2, only when stage 1 yields fewer than 100 asked stops: further haiku repetitions in task order, until 100 asked stops exist or 200 sessions have run.
 - **Hard cap: 8.00 USD of Claude spend** (sum of `total_cost_usd` from each run's JSON, kept in `ledger.jsonl`), at most 0.40 USD per session (`--max-budget-usd`). The runner stops before a session whose worst case would pass the cap and says so; it never raises it. Earlier probes cost 0.02 to 0.06 USD per session, so stage 1 should be about 3 USD. Jev calls are billed separately by TypeSafe and counted with `receipts --tokens`.
 - Sessions run one at a time. A session that times out (300 s) or fails is recorded as such, counts toward the budget and is not retried silently; a second attempt is a different repetition number.
@@ -51,7 +51,7 @@ Claude's user config cannot be replaced: `CLAUDE_CONFIG_DIR` breaks the OAuth lo
 - A unique scratch directory per session as the working directory, a git repository holding the task and `.claude/referee.json` with `{"pack":"generic","hooks":{"stopGate":"shadow"}}`.
 - `--setting-sources project,local`, which drops the user's other plugins and hooks.
 - A copy of the plugin whose two hooks run `env -u CLAUDE_PLUGIN_DATA node ...`, because `CLAUDE_PLUGIN_DATA` outranks `REFEREE_DATA_DIR`; `REFEREE_DATA_DIR` is set per session.
-- `--allowedTools` limited to Read, Edit, Write, `Bash(node *)`, `Bash(python3 *)` and `Bash(npm test*)`, with `--permission-mode acceptEdits`.
+- `--allowedTools` limited to Read, Edit, Write, `Bash(node *)`, `Bash(python3 *)`, `Bash(npm test*)` and `Bash(make test*)`, with `--permission-mode acceptEdits`.
 - The transcript is copied from `~/.claude/projects/<working directory>/` and that directory is then removed.
 - Not isolated: the user-level CLAUDE.md still loads into the session. It may change tone and habits a little; this is a bias of the study.
 - The TypeSafe key stays in the keychain, which the hook reads itself. Raw transcripts and runs stay outside the repository; only code, verifiers, redacted fixtures and the aggregate result are committed.
@@ -67,3 +67,5 @@ Claude's user config cannot be replaced: `CLAUDE_CONFIG_DIR` breaks the OAuth lo
 6. Repeated sessions of one task are not independent. Intervals treat sessions as independent, which is too narrow; the per-task counts are published next to them so the clustering is visible.
 
 Limits stated before the run: seeded tasks of a few files each, one author, one Claude model family on both sides, English only, a keyword rule for the claim that is crude at its edges (the ambiguous cases are why a hand pass exists), and a single user-level configuration. A `claude plugin eval` wiring smoke test (a case whose trace carries the soft-mode warning) is possible but cannot replay a recorded final message or run a verifier, so it is outside the gates and not part of this study.
+
+**Clarifications before the first session** (harness commit): the pilot is the first two tasks of each kind (10 sessions, which is the count registered; "first task of each kind" would have been 5). `Bash(make test*)` is allowed because the Python tasks ship a Makefile; without it Claude would be denied the command the task offers.
