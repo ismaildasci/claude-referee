@@ -1384,7 +1384,7 @@ async function resolveEndpointKey(env, platform, runner = runCommand, memo = pro
 __name(resolveEndpointKey, "resolveEndpointKey");
 
 // src/engine/receipts.ts
-import { appendFileSync, existsSync as existsSync3, mkdirSync as mkdirSync4, readdirSync as readdirSync3, readFileSync as readFileSync5 } from "node:fs";
+import { appendFileSync, existsSync as existsSync3, mkdirSync as mkdirSync4, readdirSync as readdirSync3, readFileSync as readFileSync5, rmSync } from "node:fs";
 import { join as join7 } from "node:path";
 function newReceiptId(now, random = Math.random) {
   const tail = Math.floor(random() * 36 ** 4).toString(36).padStart(4, "0");
@@ -1395,11 +1395,19 @@ function receiptsDir(dataDir) {
   return join7(dataDir, "receipts");
 }
 __name(receiptsDir, "receiptsDir");
+function chainLines(dataDir, project) {
+  const dir = join7(receiptsDir(dataDir), project);
+  if (!existsSync3(dir)) return [];
+  return readdirSync3(dir).filter((f) => f.endsWith(".jsonl")).sort().flatMap((f) => readFileSync5(join7(dir, f), "utf8").split("\n")).filter((l) => l.trim());
+}
+__name(chainLines, "chainLines");
 function appendReceipt(dataDir, receipt) {
   try {
     const dir = join7(receiptsDir(dataDir), receipt.project);
     mkdirSync4(dir, { recursive: true });
-    appendFileSync(join7(dir, `${receipt.ts.slice(0, 7)}.jsonl`), JSON.stringify(receipt) + "\n");
+    const last = chainLines(dataDir, receipt.project).at(-1);
+    const chained = last === void 0 ? receipt : { ...receipt, prev: sha256(last) };
+    appendFileSync(join7(dir, `${receipt.ts.slice(0, 7)}.jsonl`), JSON.stringify(chained) + "\n");
     return true;
   } catch {
     return false;
@@ -1428,6 +1436,62 @@ function readReceipts(dataDir, project) {
   return out;
 }
 __name(readReceipts, "readReceipts");
+function verifyChain(dataDir, project) {
+  const root = receiptsDir(dataDir);
+  const projects = project ? [project] : existsSync3(root) ? readdirSync3(root).sort() : [];
+  let receipts2 = 0;
+  let chained = 0;
+  const breaks = [];
+  for (const p of projects) {
+    const seen = [];
+    for (const line of chainLines(dataDir, p)) {
+      receipts2 += 1;
+      let r = null;
+      try {
+        r = JSON.parse(line);
+      } catch {
+        breaks.push({ project: p, id: "?", kind: "unreadable" });
+      }
+      if (r?.prev !== void 0) {
+        chained += 1;
+        if (r.prev !== seen.at(-1)) breaks.push({ project: p, id: r.id, kind: seen.includes(r.prev) ? "fork" : "mismatch" });
+      }
+      seen.push(sha256(line));
+    }
+  }
+  return { receipts: receipts2, chained, unchained: receipts2 - chained, breaks };
+}
+__name(verifyChain, "verifyChain");
+function overrulePath(dataDir) {
+  return join7(dataDir, "overruled.jsonl");
+}
+__name(overrulePath, "overrulePath");
+function readOverruled(dataDir) {
+  try {
+    return new Set(
+      readFileSync5(overrulePath(dataDir), "utf8").split("\n").filter((l) => l.trim()).map((l) => JSON.parse(l).id)
+    );
+  } catch {
+    return /* @__PURE__ */ new Set();
+  }
+}
+__name(readOverruled, "readOverruled");
+function overruleReceipt(dataDir, id, ts) {
+  const receipt = readReceipts(dataDir).find((r) => r.id === id);
+  if (!receipt) return null;
+  mkdirSync4(dataDir, { recursive: true });
+  if (!readOverruled(dataDir).has(id)) appendFileSync(overrulePath(dataDir), JSON.stringify({ id, ts }) + "\n");
+  let dropped = 0;
+  for (const key of receipt.cache_keys ?? []) {
+    const file = join7(dataDir, "cache", `${key}.json`);
+    if (existsSync3(file)) {
+      rmSync(file, { force: true });
+      dropped += 1;
+    }
+  }
+  return { dropped };
+}
+__name(overruleReceipt, "overruleReceipt");
 
 // src/engine/redact.ts
 var STOP = [
@@ -1598,6 +1662,7 @@ var Session = class {
   unsaved = false;
   requestIds = [];
   questionHashes = /* @__PURE__ */ new Set();
+  cacheKeys = /* @__PURE__ */ new Set();
   constructor(options) {
     this.options = options;
     this.started = options.now();
@@ -1663,6 +1728,7 @@ var Session = class {
     }
     const pack = this.options.pack;
     const key = cacheKey({ pack: pack.name, packVersion: pack.version, model: this.model, questions: item.body.questions, state: item.body.state });
+    this.cacheKeys.add(key);
     if (!this.options.fresh) {
       const hit = readCache(this.dataDir, key, this.options.now(), CACHE_TTL_MS);
       if (hit) {
@@ -1730,6 +1796,7 @@ var Session = class {
       cost_usd: Number(this.cost.toFixed(8)),
       ...this.requestIds.length > 0 ? { request_ids: this.requestIds } : {},
       ...this.questionHashes.size > 0 ? { qhash: [...this.questionHashes].sort().join(",") } : {},
+      ...this.cacheKeys.size > 0 ? { cache_keys: [...this.cacheKeys].sort() } : {},
       ...this.options.fresh ? { fresh: true } : {},
       ...this.stoppedCount > 0 ? { stopped: this.stoppedCount } : {},
       ...this.replacedCount > 0 ? { replaced: this.replacedCount } : {},
@@ -4412,6 +4479,8 @@ var receipts = {
     summary: "Show totals from the local receipts, per day with --tokens, Claude-side calls with --usage, or export them.",
     inputs: {
       export: "Positional: write every receipt, all projects, to --out as JSON lines.",
+      verify: "Positional: check the hash chain of every project's receipts (add --project-only for the current one). Receipts written before chaining existed are counted as unchained.",
+      overrule: 'Positional: "overrule <id>" voids one decision: it is recorded in overruled.jsonl and the cached answers it used are deleted, so the next run asks again. The receipt itself is not rewritten.',
       "--out <file>": "Target file for export.",
       "--tokens": "Rows per day and command: runs, requests, cache hits, input tokens and the share of --fresh runs.",
       "--usage": "Claude-side: claude-referee CLI calls per day and command, counted from this project's Claude Code transcripts (subagents included, each tool call once), with the size of what each call returned. Nothing from the transcripts is printed.",
@@ -4420,11 +4489,14 @@ var receipts = {
       "--label <id>": "Mark one stop with --right (the block would have been correct) or --wrong (a false block).",
       "--right": "With --label: the would-be block was correct.",
       "--wrong": "With --label: the would-be block was a false block.",
+      "--project-only": "With verify: only this project's chain.",
       "--all": "Every project instead of the current one.",
       "--days <n>": "How many days back to include; default 30, or 14 with --tokens or --usage. With --stops it limits the listed stops and their stats."
     },
     outputs: {
-      verdict: "summary, tokens, usage, exported, stops or labelled",
+      verdict: "summary, tokens, usage, exported, stops, labelled, chain_ok, chain_broken or overruled",
+      chain: "With verify: receipts, chained, unchained and breaks (project, id, kind mismatch, fork or unreadable)",
+      dropped: "With overrule: how many cached answers were deleted",
       runs: "Command runs in the window",
       requests: "Jev requests made",
       cached: "Answers served from the cache or merged with an identical request",
@@ -4446,6 +4518,7 @@ var receipts = {
     tokens: { type: "boolean" },
     usage: { type: "boolean" },
     all: { type: "boolean" },
+    "project-only": { type: "boolean" },
     days: { type: "string" },
     stops: { type: "boolean" },
     unlabelled: { type: "boolean" },
@@ -4464,6 +4537,17 @@ var receipts = {
       mkdirSync6(dirname3(path), { recursive: true });
       writeFileSync5(path, all.map((r) => JSON.stringify(r)).join("\n") + (all.length ? "\n" : ""));
       return { ok: true, verdict: "exported", receipts: all.length, out: tildify(path, io.home) };
+    }
+    if (positionals[0] === "verify") {
+      const chain = verifyChain(dataDir, values["project-only"] === true ? projectId(io.cwd) : void 0);
+      return { ok: true, verdict: chain.breaks.length === 0 ? "chain_ok" : "chain_broken", chain };
+    }
+    if (positionals[0] === "overrule") {
+      const id = positionals[1];
+      if (!id) throw new RefereeError("bad_input", "overrule needs a receipt id.", { next_step: "Run receipts overrule <id>." });
+      const result = overruleReceipt(dataDir, id, new Date(io.now()).toISOString());
+      if (!result) throw new RefereeError("bad_input", "No receipt with that id.");
+      return { ok: true, verdict: "overruled", id, dropped: result.dropped };
     }
     if (positionals.length > 0) throw new RefereeError("bad_input", `Unknown receipts action: ${positionals[0]}`);
     const labelId = str(context, "label");

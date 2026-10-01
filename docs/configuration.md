@@ -174,6 +174,7 @@ While claude-referee is enabled, its skill listing adds at most 250 tokens to ev
 
 - **Update:** third-party marketplaces don't auto-update by default. Run `claude plugin marketplace update claude-referee`, then `claude plugin update claude-referee@claude-referee`. You can also turn on auto-update for the marketplace in `/plugin` → **Marketplaces**.
 - **Export receipts:** `npx claude-referee receipts export --out receipts.jsonl`.
+- **Check or void receipts:** `receipts verify` checks the hash chain; `receipts overrule <id>` voids one decision and deletes the cached answers it used.
 - **Uninstall:** `claude plugin uninstall claude-referee@claude-referee` deletes claude-referee's data directory, including receipts and the cache, unless you add `--keep-data`.
 
 ## Troubleshooting

@@ -722,7 +722,7 @@ __name(installAbortGuard, "installAbortGuard");
 
 // src/hooks/session-start.ts
 import { appendFileSync as appendFileSync2 } from "node:fs";
-import { join as join5 } from "node:path";
+import { join as join6 } from "node:path";
 
 // src/engine/datadir.ts
 import { execFileSync } from "node:child_process";
@@ -1001,22 +1001,65 @@ function areaFor(areas, root, cwd) {
 __name(areaFor, "areaFor");
 
 // src/engine/receipts.ts
-import { appendFileSync, existsSync as existsSync3, mkdirSync, readdirSync as readdirSync3, readFileSync as readFileSync3 } from "node:fs";
+import { appendFileSync, existsSync as existsSync3, mkdirSync as mkdirSync2, readdirSync as readdirSync3, readFileSync as readFileSync4, rmSync } from "node:fs";
+import { join as join5 } from "node:path";
+
+// src/engine/cache.ts
+import { createHash as createHash3 } from "node:crypto";
+import { mkdirSync, readFileSync as readFileSync3, writeFileSync } from "node:fs";
 import { join as join4 } from "node:path";
+function sha256(text) {
+  return createHash3("sha256").update(text).digest("hex");
+}
+__name(sha256, "sha256");
+function cacheKey(parts) {
+  return sha256(JSON.stringify([parts.pack, parts.packVersion, parts.model, parts.questions, parts.state]));
+}
+__name(cacheKey, "cacheKey");
+function readCache(dataDir, key, now, ttlMs) {
+  try {
+    const entry = JSON.parse(readFileSync3(join4(dataDir, "cache", `${key}.json`), "utf8"));
+    return now - entry.ts <= ttlMs ? entry : null;
+  } catch {
+    return null;
+  }
+}
+__name(readCache, "readCache");
+function writeCache(dataDir, key, entry) {
+  try {
+    const dir = join4(dataDir, "cache");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join4(dir, `${key}.json`), JSON.stringify(entry));
+    return true;
+  } catch {
+    return false;
+  }
+}
+__name(writeCache, "writeCache");
+
+// src/engine/receipts.ts
 function newReceiptId(now, random = Math.random) {
   const tail = Math.floor(random() * 36 ** 4).toString(36).padStart(4, "0");
   return `r${now.toString(36)}${tail}`;
 }
 __name(newReceiptId, "newReceiptId");
 function receiptsDir(dataDir) {
-  return join4(dataDir, "receipts");
+  return join5(dataDir, "receipts");
 }
 __name(receiptsDir, "receiptsDir");
+function chainLines(dataDir, project) {
+  const dir = join5(receiptsDir(dataDir), project);
+  if (!existsSync3(dir)) return [];
+  return readdirSync3(dir).filter((f) => f.endsWith(".jsonl")).sort().flatMap((f) => readFileSync4(join5(dir, f), "utf8").split("\n")).filter((l) => l.trim());
+}
+__name(chainLines, "chainLines");
 function appendReceipt(dataDir, receipt) {
   try {
-    const dir = join4(receiptsDir(dataDir), receipt.project);
-    mkdirSync(dir, { recursive: true });
-    appendFileSync(join4(dir, `${receipt.ts.slice(0, 7)}.jsonl`), JSON.stringify(receipt) + "\n");
+    const dir = join5(receiptsDir(dataDir), receipt.project);
+    mkdirSync2(dir, { recursive: true });
+    const last = chainLines(dataDir, receipt.project).at(-1);
+    const chained = last === void 0 ? receipt : { ...receipt, prev: sha256(last) };
+    appendFileSync(join5(dir, `${receipt.ts.slice(0, 7)}.jsonl`), JSON.stringify(chained) + "\n");
     return true;
   } catch {
     return false;
@@ -1058,7 +1101,7 @@ async function sessionStart(io2, pluginRoot2) {
   if (!template) return null;
   const checks = area?.checks.length ? area.checks.join("; ") : "none listed in .claude/referee.json";
   const text = fit(
-    template.replaceAll("{{pack}}", pack.name).replaceAll("{{cli}}", join5(pluginRoot2, "dist", "cli.mjs")).replaceAll("{{checks}}", checks).trim()
+    template.replaceAll("{{pack}}", pack.name).replaceAll("{{cli}}", join6(pluginRoot2, "dist", "cli.mjs")).replaceAll("{{checks}}", checks).trim()
   );
   const dataDir = resolveDataDir(env, io2.home, cwd);
   const envFile = env["CLAUDE_ENV_FILE"];
@@ -1095,14 +1138,14 @@ __name(sessionStart, "sessionStart");
 import { readFileSync as readFileSync7 } from "node:fs";
 
 // src/engine/breaker.ts
-import { mkdirSync as mkdirSync2, readFileSync as readFileSync4, writeFileSync } from "node:fs";
-import { join as join6 } from "node:path";
+import { mkdirSync as mkdirSync3, readFileSync as readFileSync5, writeFileSync as writeFileSync2 } from "node:fs";
+import { join as join7 } from "node:path";
 var LIMIT = 3;
 var STALE_MS = 24 * 60 * 60 * 1e3;
 var BREAKER_CODES = /* @__PURE__ */ new Set(["timeout", "service_unavailable", "rate_limited"]);
 function read(dataDir) {
   try {
-    const state = JSON.parse(readFileSync4(join6(dataDir, "breaker.json"), "utf8"));
+    const state = JSON.parse(readFileSync5(join7(dataDir, "breaker.json"), "utf8"));
     return state && typeof state.sessions === "object" && state.sessions !== null ? state : { sessions: {} };
   } catch {
     return { sessions: {} };
@@ -1119,46 +1162,13 @@ function recordBreaker(dataDir, sessionId, ok, now) {
   if (ok) delete state.sessions[sessionId];
   else state.sessions[sessionId] = { failures: (state.sessions[sessionId]?.failures ?? 0) + 1, ts: now };
   try {
-    mkdirSync2(dataDir, { recursive: true });
-    writeFileSync(join6(dataDir, "breaker.json"), JSON.stringify(state));
+    mkdirSync3(dataDir, { recursive: true });
+    writeFileSync2(join7(dataDir, "breaker.json"), JSON.stringify(state));
   } catch {
     return;
   }
 }
 __name(recordBreaker, "recordBreaker");
-
-// src/engine/cache.ts
-import { createHash as createHash3 } from "node:crypto";
-import { mkdirSync as mkdirSync3, readFileSync as readFileSync5, writeFileSync as writeFileSync2 } from "node:fs";
-import { join as join7 } from "node:path";
-function sha256(text) {
-  return createHash3("sha256").update(text).digest("hex");
-}
-__name(sha256, "sha256");
-function cacheKey(parts) {
-  return sha256(JSON.stringify([parts.pack, parts.packVersion, parts.model, parts.questions, parts.state]));
-}
-__name(cacheKey, "cacheKey");
-function readCache(dataDir, key, now, ttlMs) {
-  try {
-    const entry = JSON.parse(readFileSync5(join7(dataDir, "cache", `${key}.json`), "utf8"));
-    return now - entry.ts <= ttlMs ? entry : null;
-  } catch {
-    return null;
-  }
-}
-__name(readCache, "readCache");
-function writeCache(dataDir, key, entry) {
-  try {
-    const dir = join7(dataDir, "cache");
-    mkdirSync3(dir, { recursive: true });
-    writeFileSync2(join7(dir, `${key}.json`), JSON.stringify(entry));
-    return true;
-  } catch {
-    return false;
-  }
-}
-__name(writeCache, "writeCache");
 
 // src/engine/classify.ts
 var BY_NAME = {
@@ -1549,6 +1559,7 @@ var Session = class {
   unsaved = false;
   requestIds = [];
   questionHashes = /* @__PURE__ */ new Set();
+  cacheKeys = /* @__PURE__ */ new Set();
   constructor(options) {
     this.options = options;
     this.started = options.now();
@@ -1614,6 +1625,7 @@ var Session = class {
     }
     const pack = this.options.pack;
     const key = cacheKey({ pack: pack.name, packVersion: pack.version, model: this.model, questions: item.body.questions, state: item.body.state });
+    this.cacheKeys.add(key);
     if (!this.options.fresh) {
       const hit = readCache(this.dataDir, key, this.options.now(), CACHE_TTL_MS);
       if (hit) {
@@ -1681,6 +1693,7 @@ var Session = class {
       cost_usd: Number(this.cost.toFixed(8)),
       ...this.requestIds.length > 0 ? { request_ids: this.requestIds } : {},
       ...this.questionHashes.size > 0 ? { qhash: [...this.questionHashes].sort().join(",") } : {},
+      ...this.cacheKeys.size > 0 ? { cache_keys: [...this.cacheKeys].sort() } : {},
       ...this.options.fresh ? { fresh: true } : {},
       ...this.stoppedCount > 0 ? { stopped: this.stoppedCount } : {},
       ...this.replacedCount > 0 ? { replaced: this.replacedCount } : {},

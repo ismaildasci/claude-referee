@@ -6,7 +6,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { projectId, resolveDataDir, tildify } from "../../engine/datadir.ts";
 import { RefereeError } from "../../engine/errors.ts";
-import { readReceipts, type Receipt } from "../../engine/receipts.ts";
+import { overruleReceipt, readReceipts, verifyChain, type Receipt } from "../../engine/receipts.ts";
 import { labelStop, readStops, stopStats } from "../../engine/stopgate/stops.ts";
 import { projectTranscriptDirs, scanUsage } from "../../engine/usage.ts";
 import type { Command } from "../types.ts";
@@ -22,6 +22,8 @@ export const receipts: Command = {
     summary: "Show totals from the local receipts, per day with --tokens, Claude-side calls with --usage, or export them.",
     inputs: {
       export: "Positional: write every receipt, all projects, to --out as JSON lines.",
+      verify: "Positional: check the hash chain of every project's receipts (add --project-only for the current one). Receipts written before chaining existed are counted as unchained.",
+      overrule: "Positional: \"overrule <id>\" voids one decision: it is recorded in overruled.jsonl and the cached answers it used are deleted, so the next run asks again. The receipt itself is not rewritten.",
       "--out <file>": "Target file for export.",
       "--tokens": "Rows per day and command: runs, requests, cache hits, input tokens and the share of --fresh runs.",
       "--usage": "Claude-side: claude-referee CLI calls per day and command, counted from this project's Claude Code transcripts (subagents included, each tool call once), with the size of what each call returned. Nothing from the transcripts is printed.",
@@ -30,11 +32,14 @@ export const receipts: Command = {
       "--label <id>": "Mark one stop with --right (the block would have been correct) or --wrong (a false block).",
       "--right": "With --label: the would-be block was correct.",
       "--wrong": "With --label: the would-be block was a false block.",
+      "--project-only": "With verify: only this project's chain.",
       "--all": "Every project instead of the current one.",
       "--days <n>": "How many days back to include; default 30, or 14 with --tokens or --usage. With --stops it limits the listed stops and their stats.",
     },
     outputs: {
-      verdict: "summary, tokens, usage, exported, stops or labelled",
+      verdict: "summary, tokens, usage, exported, stops, labelled, chain_ok, chain_broken or overruled",
+      chain: "With verify: receipts, chained, unchained and breaks (project, id, kind mismatch, fork or unreadable)",
+      dropped: "With overrule: how many cached answers were deleted",
       runs: "Command runs in the window",
       requests: "Jev requests made",
       cached: "Answers served from the cache or merged with an identical request",
@@ -56,6 +61,7 @@ export const receipts: Command = {
     tokens: { type: "boolean" },
     usage: { type: "boolean" },
     all: { type: "boolean" },
+    "project-only": { type: "boolean" },
     days: { type: "string" },
     stops: { type: "boolean" },
     unlabelled: { type: "boolean" },
@@ -74,6 +80,17 @@ export const receipts: Command = {
       mkdirSync(dirname(path), { recursive: true });
       writeFileSync(path, all.map((r) => JSON.stringify(r)).join("\n") + (all.length ? "\n" : ""));
       return { ok: true, verdict: "exported", receipts: all.length, out: tildify(path, io.home) };
+    }
+    if (positionals[0] === "verify") {
+      const chain = verifyChain(dataDir, values["project-only"] === true ? projectId(io.cwd) : undefined);
+      return { ok: true, verdict: chain.breaks.length === 0 ? "chain_ok" : "chain_broken", chain };
+    }
+    if (positionals[0] === "overrule") {
+      const id = positionals[1];
+      if (!id) throw new RefereeError("bad_input", "overrule needs a receipt id.", { next_step: "Run receipts overrule <id>." });
+      const result = overruleReceipt(dataDir, id, new Date(io.now()).toISOString());
+      if (!result) throw new RefereeError("bad_input", "No receipt with that id.");
+      return { ok: true, verdict: "overruled", id, dropped: result.dropped };
     }
     if (positionals.length > 0) throw new RefereeError("bad_input", `Unknown receipts action: ${positionals[0]}`);
     const labelId = str(context, "label");

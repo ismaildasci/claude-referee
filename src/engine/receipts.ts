@@ -1,8 +1,10 @@
 // Local receipts: one JSON line per command run in receipts/<project>/<yyyy-mm>.jsonl.
 // A receipt holds counts, tokens, cost and time; never request text, file paths or user names.
+// Each receipt carries `prev`, the sha256 of the previous line of its project's chain; verifyChain checks it.
 
-import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
+import { sha256 } from "./cache.ts";
 
 export interface Receipt {
   readonly id: string;
@@ -19,6 +21,8 @@ export interface Receipt {
   readonly cost_usd: number;
   readonly request_ids?: readonly string[];
   readonly qhash?: string;
+  readonly cache_keys?: readonly string[];
+  readonly prev?: string;
   readonly fresh?: boolean;
   readonly stopped?: number;
   readonly replaced?: number;
@@ -39,11 +43,23 @@ export function receiptsDir(dataDir: string): string {
   return join(dataDir, "receipts");
 }
 
+function chainLines(dataDir: string, project: string): string[] {
+  const dir = join(receiptsDir(dataDir), project);
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir)
+    .filter((f) => f.endsWith(".jsonl"))
+    .sort()
+    .flatMap((f) => readFileSync(join(dir, f), "utf8").split("\n"))
+    .filter((l) => l.trim());
+}
+
 export function appendReceipt(dataDir: string, receipt: Receipt): boolean {
   try {
     const dir = join(receiptsDir(dataDir), receipt.project);
     mkdirSync(dir, { recursive: true });
-    appendFileSync(join(dir, `${receipt.ts.slice(0, 7)}.jsonl`), JSON.stringify(receipt) + "\n");
+    const last = chainLines(dataDir, receipt.project).at(-1);
+    const chained: Receipt = last === undefined ? receipt : { ...receipt, prev: sha256(last) };
+    appendFileSync(join(dir, `${receipt.ts.slice(0, 7)}.jsonl`), JSON.stringify(chained) + "\n");
     return true;
   } catch {
     return false;
@@ -70,4 +86,78 @@ export function readReceipts(dataDir: string, project?: string): Receipt[] {
     }
   }
   return out;
+}
+
+export interface ChainBreak {
+  readonly project: string;
+  readonly id: string;
+  readonly kind: "mismatch" | "fork" | "unreadable";
+}
+
+export interface ChainReport {
+  readonly receipts: number;
+  readonly chained: number;
+  readonly unchained: number;
+  readonly breaks: readonly ChainBreak[];
+}
+
+// A `fork` is a prev that matches an earlier line, which two runs appending at once produce; a `mismatch` matches nothing.
+export function verifyChain(dataDir: string, project?: string): ChainReport {
+  const root = receiptsDir(dataDir);
+  const projects = project ? [project] : existsSync(root) ? readdirSync(root).sort() : [];
+  let receipts = 0;
+  let chained = 0;
+  const breaks: ChainBreak[] = [];
+  for (const p of projects) {
+    const seen: string[] = [];
+    for (const line of chainLines(dataDir, p)) {
+      receipts += 1;
+      let r: Receipt | null = null;
+      try {
+        r = JSON.parse(line) as Receipt;
+      } catch {
+        breaks.push({ project: p, id: "?", kind: "unreadable" });
+      }
+      if (r?.prev !== undefined) {
+        chained += 1;
+        if (r.prev !== seen.at(-1)) breaks.push({ project: p, id: r.id, kind: seen.includes(r.prev) ? "fork" : "mismatch" });
+      }
+      seen.push(sha256(line));
+    }
+  }
+  return { receipts, chained, unchained: receipts - chained, breaks };
+}
+
+function overrulePath(dataDir: string): string {
+  return join(dataDir, "overruled.jsonl");
+}
+
+export function readOverruled(dataDir: string): Set<string> {
+  try {
+    return new Set(
+      readFileSync(overrulePath(dataDir), "utf8")
+        .split("\n")
+        .filter((l) => l.trim())
+        .map((l) => (JSON.parse(l) as { id: string }).id),
+    );
+  } catch {
+    return new Set();
+  }
+}
+
+// Voids a decision: records it outside the chain (receipts are never rewritten) and drops the cache entries it used.
+export function overruleReceipt(dataDir: string, id: string, ts: string): { dropped: number } | null {
+  const receipt = readReceipts(dataDir).find((r) => r.id === id);
+  if (!receipt) return null;
+  mkdirSync(dataDir, { recursive: true });
+  if (!readOverruled(dataDir).has(id)) appendFileSync(overrulePath(dataDir), JSON.stringify({ id, ts }) + "\n");
+  let dropped = 0;
+  for (const key of receipt.cache_keys ?? []) {
+    const file = join(dataDir, "cache", `${key}.json`);
+    if (existsSync(file)) {
+      rmSync(file, { force: true });
+      dropped += 1;
+    }
+  }
+  return { dropped };
 }

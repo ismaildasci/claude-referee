@@ -59,7 +59,7 @@ Exit criteria: the `done` v2 and `claims` acceptance numbers hold on new hold-ou
 
 - **A pre-registered A/B.** Four arms: no gate, a 20-line hook that runs the project's tests, Claude Code's `/goal`, and claude-referee. 12 to 20 cases plus 3 to 5 controls, a pilot to choose the number of runs, results with confidence intervals in `bench/RESULTS.md`, the plan in `bench/PREREG.md` before the first run, and the result published whichever way it goes. Costs come from transcripts, grouped by request id, with 1-hour and 5-minute cache writes priced separately and failed runs included.
 - **A local dashboard** (`npx claude-referee ui`): 127.0.0.1 only, a random token, Origin and Host checks; the labelling queue first, then overview, privacy counters and export. JSON lines stay the source of truth; SQLite is only an index and needs Node 22.13 or later.
-- **Receipt integrity.** Each receipt carries the hash of the one before it and `receipts verify` checks the chain; `receipts overrule <id>` lets a human void a decision so the cache never reuses it; an answer whose evidence hash changed is marked stale.
+- **Receipt integrity.** Each receipt carries the hash of the one before it and `receipts verify` checks the chain; `receipts overrule <id>` lets a human void a decision so the cache never reuses it (both done in main). The cache key already includes the evidence, so an answer whose evidence changed is never reused and no separate stale mark is planned.
 
 ## v0.5: widen
 

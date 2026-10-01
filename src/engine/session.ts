@@ -92,6 +92,7 @@ export class Session {
   private unsaved = false;
   private readonly requestIds: string[] = [];
   private readonly questionHashes = new Set<string>();
+  private readonly cacheKeys = new Set<string>();
 
   constructor(options: SessionOptions) {
     this.options = options;
@@ -162,6 +163,7 @@ export class Session {
     }
     const pack = this.options.pack;
     const key = cacheKey({ pack: pack.name, packVersion: pack.version, model: this.model, questions: item.body.questions, state: item.body.state });
+    this.cacheKeys.add(key);
     if (!this.options.fresh) {
       const hit = readCache(this.dataDir, key, this.options.now(), CACHE_TTL_MS);
       if (hit) {
@@ -233,6 +235,7 @@ export class Session {
       cost_usd: Number(this.cost.toFixed(8)),
       ...(this.requestIds.length > 0 ? { request_ids: this.requestIds } : {}),
       ...(this.questionHashes.size > 0 ? { qhash: [...this.questionHashes].sort().join(",") } : {}),
+      ...(this.cacheKeys.size > 0 ? { cache_keys: [...this.cacheKeys].sort() } : {}),
       ...(this.options.fresh ? { fresh: true } : {}),
       ...(this.stoppedCount > 0 ? { stopped: this.stoppedCount } : {}),
       ...(this.replacedCount > 0 ? { replaced: this.replacedCount } : {}),
