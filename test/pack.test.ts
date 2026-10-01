@@ -21,7 +21,7 @@ test("pack generic ships with the plugin and loads", () => {
   const pack = loadPack("generic", bundled);
   assert.equal(pack.version, "0.1.0");
   assert.equal(pack.model, "jev-1.13.0");
-  for (const id of ["done.met", "verify.supported", "decide.best", "decide.fit", "line.risky", "failure.env"]) {
+  for (const id of ["done.met", "verify.relation", "verify.injection", "decide.best", "decide.fit", "line.risky", "failure.env"]) {
     assert.ok(pack.questions[id], id);
     assert.ok(pack.thresholds[id], `threshold ${id}`);
   }

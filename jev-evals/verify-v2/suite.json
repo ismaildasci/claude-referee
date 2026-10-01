@@ -1,0 +1,1 @@
+{"command":"verify","positive":"supported","max_wrong_positive":0,"note":"Held-out claims for verify v2, written without access to the implementation. Dev cases (d-) are for tuning, hold-out cases (h-) only for the claim."}

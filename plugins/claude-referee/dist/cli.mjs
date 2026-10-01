@@ -3071,202 +3071,123 @@ function sweep(items, positive, thresholds) {
 }
 __name(sweep, "sweep");
 
-// src/cli/commands/eval.ts
-var LIST_LIMIT = 20;
-function readSuite(root, name) {
-  const dir = join8(root, name);
-  if (!existsSync4(join8(dir, "suite.json")) || !existsSync4(join8(dir, "cases.jsonl"))) {
-    throw new RefereeError("bad_input", `No eval suite ${name}: it needs suite.json and cases.jsonl.`, { next_step: `Look in ${root}.` });
-  }
-  let raw;
-  try {
-    raw = JSON.parse(readFileSync8(join8(dir, "suite.json"), "utf8"));
-  } catch {
-    throw new RefereeError("bad_input", `Suite ${name}: suite.json is not valid JSON.`);
-  }
-  if (typeof raw["command"] !== "string") throw new RefereeError("bad_input", `Suite ${name}: suite.json needs a command.`);
-  const config = {
-    command: raw["command"],
-    ...typeof raw["criteria"] === "string" || Array.isArray(raw["criteria"]) ? { criteria: raw["criteria"] } : {},
-    positive: typeof raw["positive"] === "string" ? raw["positive"] : "met",
-    max_wrong_positive: typeof raw["max_wrong_positive"] === "number" ? raw["max_wrong_positive"] : 0
-  };
-  const recorded = join8(dir, "recorded.jsonl");
-  return {
-    name,
-    dir,
-    config,
-    cases: parseCases(readFileSync8(join8(dir, "cases.jsonl"), "utf8")),
-    recordings: existsSync4(recorded) ? parseRecordings(readFileSync8(recorded, "utf8")) : []
-  };
+// src/engine/claims.ts
+var DASHES = /[‐-―−]/g;
+var CURLY_DOUBLE = /[“”„‟]/g;
+var CURLY_SINGLE = /[‘’‚‛]/g;
+var SPACES = /\s+/g;
+var CORE = String.raw`(?:\d{4}-\d{2}-\d{2}(?!\d)|[vV]\d+(?:\.\d+)+(?!\d)|\d+(?:\.\d+){2,}(?!\d)|0[xX][0-9a-fA-F]+|(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?(?!\d))`;
+var NUMBER_SOURCE = String.raw`(?<![\p{L}\p{N}_.])[$€£]?${CORE}(?:%|[xX](?![\p{L}\p{N}_]))?`;
+var DATE = /^\d{4}-\d{2}-\d{2}$/;
+var VERSION3 = /^v?\d+(?:\.\d+){2,}$|^v\d/;
+var ORDINAL = /^(?:st|nd|rd|th)(?![\p{L}])/iu;
+var LETTER = new RegExp("^\\p{L}", "u");
+var MAX_SMALL_INT = 10;
+function baseNormalize(text) {
+  return text.normalize("NFKC").replace(DASHES, "-").replace(CURLY_DOUBLE, '"').replace(CURLY_SINGLE, "'");
 }
-__name(readSuite, "readSuite");
-function suites(root, name) {
-  if (name !== "all") return [readSuite(root, name)];
-  if (!existsSync4(root)) return [];
-  return readdirSync4(root, { withFileTypes: true }).filter((d) => d.isDirectory() && existsSync4(join8(root, d.name, "suite.json"))).map((d) => readSuite(root, d.name)).sort((a, b) => a.name.localeCompare(b.name));
+__name(baseNormalize, "baseNormalize");
+function isWordChar(char) {
+  return char !== void 0 && /[\p{L}\p{N}]/u.test(char);
 }
-__name(suites, "suites");
-function criteriaFor(suite, item) {
-  const own = item["criteria"] ?? item["criterion"] ?? suite.config.criteria;
-  const list2 = (Array.isArray(own) ? own : [own]).filter((c) => typeof c === "string" && c.trim() !== "");
-  if (list2.length === 0) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: no criterion.`);
-  return list2;
-}
-__name(criteriaFor, "criteriaFor");
-function request(context, pack, suite, item) {
-  if (suite.config.command !== "done") throw new RefereeError("bad_input", `Suite ${suite.name} uses ${suite.config.command}; eval handles done suites for now.`);
-  const evidence = doneEvidence(typeof item["evidence"] === "string" ? item["evidence"] : "");
-  if (!evidence.trim()) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: the evidence is empty.`);
-  const { planned, finish } = doneRequest(pack, void 0, criteriaFor(suite, item), evidence);
-  const first = planned[0];
-  if (!first) throw new RefereeError("internal", "done planned no request.");
-  const redacted = redactRequest(first, context.io.home, pack.redact);
-  return { suite, item, planned: { ...first, id: `${suite.name}/${item.id}` }, finish, qhash: questionHash(first.questions), shash: stateHash(redacted.body.state) };
-}
-__name(request, "request");
-async function record(context, pack, list2) {
-  const { io, flags } = context;
-  const session = new Session({
-    command: "eval",
-    env: io.env,
-    cwd: io.cwd,
-    home: io.home,
-    platform: io.platform,
-    now: io.now,
-    pack: { name: pack.name, version: `${pack.version}+${pack.hash}`, redact: pack.redact },
-    dataDir: flags.dataDir,
-    fresh: true
-  });
-  const todo = [];
-  let skipped = 0;
-  for (const suite of list2) {
-    for (const item of suite.cases) {
-      const req = request(context, pack, suite, item);
-      if (!flags.fresh && findRecording(suite.recordings, { case: item.id, qhash: req.qhash, shash: req.shash, model: session.model }).status === "ok") skipped += 1;
-      else todo.push(req);
+__name(isWordChar, "isWordChar");
+function stripEmphasis(text) {
+  let out = "";
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    if (char === "*") continue;
+    if (char === "_") {
+      let end = i;
+      while (text[end + 1] === "_") end++;
+      const edge = !isWordChar(text[i - 1]) || !isWordChar(text[end + 1]);
+      if (!edge) out += text.slice(i, end + 1);
+      i = end;
+      continue;
     }
+    out += char;
   }
-  if (flags.dryRun) return fitLine({ ...session.dryRun(todo.map((t) => t.planned)), skipped });
-  const outcomes = todo.length ? await session.run(todo.map((t) => t.planned), { partial: true }) : [];
-  const failed = [];
-  let recorded = 0;
-  todo.forEach((req, i) => {
-    const outcome = outcomes[i];
-    if (!outcome?.answers) {
-      failed.push(req.planned.id);
-      return;
+  return out;
+}
+__name(stripEmphasis, "stripEmphasis");
+function normalizeForQuote(text) {
+  return stripEmphasis(baseNormalize(text)).replace(SPACES, " ").trim().toLowerCase();
+}
+__name(normalizeForQuote, "normalizeForQuote");
+function extractQuotes(claim) {
+  const found = /* @__PURE__ */ new Set();
+  let open = null;
+  let start = 0;
+  for (let i = 0; i < claim.length; i++) {
+    const char = claim[i];
+    if (open === null) {
+      if (char === '"' || char === "“" || char === "„" || char === "‟" || char === "`") {
+        open = char;
+        start = i + 1;
+      }
+      continue;
     }
-    const line = {
-      suite: req.suite.name,
-      case: req.item.id,
-      split: req.item.split,
-      model: session.model,
-      pack: `${pack.name}@${pack.version}`,
-      qhash: req.qhash,
-      shash: req.shash,
-      answers: outcome.answers,
-      recorded_at: new Date(io.now()).toISOString()
-    };
-    appendFileSync2(join8(req.suite.dir, "recorded.jsonl"), JSON.stringify(line) + "\n");
-    recorded += 1;
-  });
-  const receipt = session.record({ verdict: failed.length ? "partial" : "recorded" });
-  return reorder({
-    ok: true,
-    verdict: failed.length ? "partial" : "recorded",
-    suites: list2.map((s) => s.name),
-    recorded,
-    skipped,
-    ...failed.length ? { failed: failed.slice(0, LIST_LIMIT) } : {},
-    ...session.stats(),
-    next_step: failed.length ? "Run the same command again; recorded cases are skipped." : void 0,
-    receipt: receipt.id
-  });
-}
-__name(record, "record");
-function scoreSuite(context, pack, suite, model, split, sweepSpec) {
-  const items = suite.cases.filter((c) => !split || c.split === split).map((item) => {
-    const req = request(context, pack, suite, item);
-    const found = findRecording(suite.recordings, { case: item.id, qhash: req.qhash, shash: req.shash, model });
-    if (found.status !== "ok") {
-      const why = found.status === "missing" ? `no recording for ${model}` : "the question text or input changed since it was recorded";
-      throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: ${why}.`, { next_step: `Run eval record --suite ${suite.name} with a key.` });
-    }
-    const result = req.finish([{ id: "done", answers: found.line.answers, stopped: [], cached: true }]);
-    return { id: item.id, split: item.split, expected: item.expected, verdict: String(result["verdict"]), p: Number(result["p"]) };
-  });
-  const m = metrics(items, suite.config.positive);
-  const swept = sweepSpec ? sweep(items, suite.config.positive, parseSweep(sweepSpec)) : null;
-  return {
-    suite: suite.name,
-    verdict: m.wrong_positive > suite.config.max_wrong_positive ? "violated" : "pass",
-    ...m,
-    max_wrong_positive: suite.config.max_wrong_positive,
-    ...swept ? { sweep: swept.rows.map((r) => [r.t, r.precision, r.recall, r.wrong_positive]), suggested: swept.suggested, ...swept.reason ? { sweep_note: swept.reason } : {} } : {}
-  };
-}
-__name(scoreSuite, "scoreSuite");
-function score2(context, pack, list2, all) {
-  const model = resolveModel(context.io.env);
-  const split = str(context, "split");
-  if (split !== void 0 && split !== "dev" && split !== "holdout") throw new RefereeError("bad_input", '--split takes "dev" or "holdout".');
-  const scored = (all ? list2.filter((s) => s.recordings.length > 0) : list2).map((s) => scoreSuite(context, pack, s, model, split, str(context, "sweep")));
-  const verdict = scored.some((s) => s["verdict"] === "violated") ? "violated" : "pass";
-  if (!all && scored[0]) {
-    const { suite, verdict: v, ...rest } = scored[0];
-    return { ok: true, verdict: v, suite, model, ...split ? { split } : {}, ...rest };
+    const closes = open === "`" ? char === "`" : char === '"' || char === "”";
+    if (!closes) continue;
+    const text = claim.slice(start, i).trim();
+    if (text.length >= 3) found.add(text);
+    open = null;
   }
-  return {
-    ok: true,
-    verdict,
-    model,
-    suites: scored.map((s) => ({ suite: s["suite"], verdict: s["verdict"], cases: s["cases"], wrong_positive: s["wrong_positive"], max_wrong_positive: s["max_wrong_positive"] }))
-  };
+  return [...found];
 }
-__name(score2, "score");
-var evalCommand = {
-  name: "eval",
-  describe: {
-    summary: "Record Jev's answers for an eval suite once, then score them offline.",
-    inputs: {
-      "record | score": "Positional action.",
-      "--suite <name|all>": "A directory under the evals dir with suite.json, cases.jsonl and, once recorded, recorded.jsonl. 'all' takes every suite; score then skips suites without recordings.",
-      "--evals-dir <dir>": "Where the suites live; default jev-evals in the current directory.",
-      "--split <dev|holdout>": "score: only cases from this split.",
-      "--sweep <from:to:step>": "score: precision, recall and wrong positives per threshold; suggests one only with at least 10 cases per class.",
-      "--fresh": "record: record every case again, even ones already recorded for this question text, input and model."
-    },
-    outputs: {
-      verdict: "record: recorded or partial; score: pass, or violated when wrong positives exceed the suite's max_wrong_positive",
-      recorded: "record: cases recorded now",
-      skipped: "record: cases already recorded",
-      verdicts: "score: count per verdict",
-      precision: "score: share of positive verdicts that were right",
-      recall: "score: share of expected positives found",
-      automation: "score: share of cases with a definite verdict",
-      wrong_positive: "score: positive verdicts that should not be; the kill criterion"
-    },
-    errors: [...JEV_ERRORS],
-    effects: "record sends each unrecorded case to the TypeSafe API and appends to recorded.jsonl; score reads files only.",
-    cost: "record: one Jev request per case not yet recorded. score: free and offline."
-  },
-  options: { suite: { type: "string" }, split: { type: "string" }, sweep: { type: "string" }, "evals-dir": { type: "string" } },
-  async run(context) {
-    const action = context.positionals[0];
-    if (action !== "record" && action !== "score") throw new RefereeError("bad_input", "eval needs an action: record or score.", { next_step: "Example: eval score --suite injection" });
-    const name = str(context, "suite");
-    if (!name) throw new RefereeError("bad_input", "Give --suite <name|all>.");
-    const root = resolve4(context.io.cwd, str(context, "evals-dir") ?? "jev-evals");
-    const list2 = suites(root, name);
-    const { pack } = openPack(context);
-    return action === "record" ? record(context, pack, list2) : score2(context, pack, list2, name === "all");
+__name(extractQuotes, "extractQuotes");
+function numberKey(token) {
+  let t = token.toLowerCase().replace(/^[$€£]/, "");
+  if (/^0x/.test(t)) return t;
+  t = t.replace(/[%x]$/, "");
+  if (DATE.test(t)) return t;
+  if (VERSION3.test(t)) return t.replace(/^v/, "");
+  const [whole = "", frac = ""] = t.replace(/,/g, "").split(".");
+  const intPart = whole.replace(/^0+(?=\d)/, "");
+  const fracPart = frac.replace(/0+$/, "");
+  return fracPart ? `${intPart}.${fracPart}` : intPart;
+}
+__name(numberKey, "numberKey");
+function isIgnoredSmallInteger(token, after) {
+  if (!/^\d+$/.test(token) || Number(token) > MAX_SMALL_INT) return false;
+  return !LETTER.test(after) || ORDINAL.test(after);
+}
+__name(isIgnoredSmallInteger, "isIgnoredSmallInteger");
+function extractNumbers(text) {
+  const found = /* @__PURE__ */ new Set();
+  for (const match of text.matchAll(new RegExp(NUMBER_SOURCE, "gu"))) {
+    const token = match[0];
+    const after = text.slice(match.index + token.length, match.index + token.length + 3);
+    if (!isIgnoredSmallInteger(token, after)) found.add(token);
   }
-};
+  return [...found];
+}
+__name(extractNumbers, "extractNumbers");
+function sourceNumberKeys(source) {
+  const keys = /* @__PURE__ */ new Set();
+  for (const match of source.matchAll(new RegExp(NUMBER_SOURCE, "gu"))) keys.add(numberKey(match[0]));
+  return keys;
+}
+__name(sourceNumberKeys, "sourceNumberKeys");
+function checkClaim(claim, source) {
+  const quotes = extractQuotes(claim);
+  const numbers = extractNumbers(baseNormalize(claim));
+  let quotesMissing = [];
+  if (quotes.length > 0) {
+    const haystack = normalizeForQuote(source);
+    quotesMissing = quotes.filter((quote) => !haystack.includes(normalizeForQuote(quote)));
+  }
+  let numbersMissing = [];
+  if (numbers.length > 0) {
+    const keys = sourceNumberKeys(baseNormalize(source));
+    numbersMissing = numbers.filter((token) => !keys.has(numberKey(token)));
+  }
+  return { quotes, quotes_missing: quotesMissing, numbers, numbers_missing: numbersMissing };
+}
+__name(checkClaim, "checkClaim");
 
 // src/cli/commands/judge.ts
 var MAX_ITEMS = 500;
-var LIST_LIMIT2 = 20;
+var LIST_LIMIT = 20;
 function parseItems(text) {
   const trimmed = text.trim();
   const toItem = /* @__PURE__ */ __name((value, i) => {
@@ -3382,14 +3303,390 @@ var judge = {
           yes,
           no,
           review,
-          ...flagged.length ? { flagged: flagged.slice(0, LIST_LIMIT2) } : {},
-          ...reviewIds.length ? { review_ids: reviewIds.slice(0, LIST_LIMIT2) } : {},
+          ...flagged.length ? { flagged: flagged.slice(0, LIST_LIMIT) } : {},
+          ...reviewIds.length ? { review_ids: reviewIds.slice(0, LIST_LIMIT) } : {},
           ...stopped.length ? { stopped } : {},
-          ...unanswered.length ? { unanswered: unanswered.slice(0, LIST_LIMIT2), next_step: "Some items got no answer; run judge again on those items." } : {}
+          ...unanswered.length ? { unanswered: unanswered.slice(0, LIST_LIMIT), next_step: "Some items got no answer; run judge again on those items." } : {}
         };
       },
       { batch: true }
     );
+  }
+};
+
+// src/cli/commands/verify.ts
+var RELATIONS = ["supports", "contradicts", "says_nothing"];
+function probabilities(answer) {
+  const a = answer;
+  return a?.type === "choice" && a.probabilities ? a.probabilities : null;
+}
+__name(probabilities, "probabilities");
+function verifyRequest(pack, thresholds, claims, source) {
+  const relation = question(pack, "verify.relation");
+  const injection = question(pack, "verify.injection");
+  const baseCriteria = relation.criteria ?? {};
+  const ordered = /* @__PURE__ */ __name((reverse) => Object.fromEntries(reverse ? Object.entries(baseCriteria).reverse() : Object.entries(baseCriteria)), "ordered");
+  const state = { source };
+  const stateTokens = estimateTokens(JSON.stringify(state));
+  if (stateTokens > STATE_TOKEN_LIMIT) throw new RefereeError("too_large", "The source is too large for one Jev request.", { next_step: "Pass the relevant section of the source." });
+  const checks = new Map(claims.map((c) => [c.id, checkClaim(c.text, source)]));
+  const asked = claims.filter((c) => {
+    const k = checks.get(c.id);
+    return k !== void 0 && k.quotes_missing.length === 0 && k.numbers_missing.length === 0;
+  });
+  const planned = [];
+  let batch = {};
+  let batchTokens = stateTokens;
+  const flush = /* @__PURE__ */ __name(() => {
+    if (Object.keys(batch).length) planned.push({ id: `part${planned.length + 1}`, state, questions: batch });
+    batch = {};
+    batchTokens = stateTokens;
+  }, "flush");
+  const add = /* @__PURE__ */ __name((key, q) => {
+    const tokens = estimateTokens(JSON.stringify(q));
+    if (stateTokens + tokens > STATE_TOKEN_LIMIT) throw new RefereeError("too_large", `Claim ${key} is too long.`);
+    if (batchTokens + tokens > REQUEST_TOKEN_LIMIT) flush();
+    batch[key] = q;
+    batchTokens += tokens;
+  }, "add");
+  if (asked.length > 0) add("injection", injection);
+  for (const claim of asked) {
+    for (const [suffix, reverse] of [["a", false], ["b", true]]) {
+      add(`claim:${claim.id}:${suffix}`, { ...relation, criteria: ordered(reverse), instructions: withData(relation.instructions, { claim: claim.text }) });
+    }
+  }
+  flush();
+  const supportsAt = threshold(pack, thresholds, "verify.relation", "supports", 0.8);
+  const contradictsAt = threshold(pack, thresholds, "verify.relation", "contradicts", 0.5);
+  const silentAt = threshold(pack, thresholds, "verify.relation", "says_nothing", 0.5);
+  const flagAt = threshold(pack, thresholds, "verify.injection", "flag", 0.7);
+  const finish = /* @__PURE__ */ __name((outcomes) => {
+    const answers = Object.assign({}, ...outcomes.map((o) => o.answers ?? {}));
+    const inj = answers["injection"];
+    const injected = inj?.type === "noul" && typeof inj.noul === "number" && inj.noul >= flagAt;
+    let supported = 0;
+    const unsupported = [];
+    const contradicted = [];
+    const saysNothing = [];
+    const unsure = [];
+    const unanswered = [];
+    const reasons = {};
+    const listed = {};
+    for (const claim of claims) {
+      const k = checks.get(claim.id);
+      if (k && k.quotes_missing.length > 0) {
+        const onlyCode = k.quotes_missing.every((q) => claim.text.includes(`\`${q}\``) && !claim.text.includes(`"${q}"`));
+        (onlyCode ? unsure : unsupported).push(claim.id);
+        reasons[claim.id] = onlyCode ? "identifier_not_in_source" : "quote_not_in_source";
+        continue;
+      }
+      if (k && k.numbers_missing.length > 0) {
+        unsure.push(claim.id);
+        reasons[claim.id] = "number_not_in_source";
+        continue;
+      }
+      const a = probabilities(answers[`claim:${claim.id}:a`]);
+      const b = probabilities(answers[`claim:${claim.id}:b`]);
+      if (!a || !b) {
+        unanswered.push(claim.id);
+        continue;
+      }
+      const mean = Object.fromEntries(RELATIONS.map((r) => [r, ((a[r] ?? 0) + (b[r] ?? 0)) / 2]));
+      const lead = /* @__PURE__ */ __name((p) => RELATIONS.reduce((best, r) => (p[r] ?? 0) > (p[best] ?? 0) ? r : best, "supports"), "lead");
+      const agree = lead(a) === lead(b);
+      if (agree && mean.supports >= supportsAt) {
+        if (injected) {
+          unsure.push(claim.id);
+          reasons[claim.id] = "source_has_instruction_for_judge";
+          listed[claim.id] = mean.supports;
+        } else supported += 1;
+        continue;
+      }
+      listed[claim.id] = mean.supports;
+      if (agree && mean.contradicts >= contradictsAt) {
+        contradicted.push(claim.id);
+        unsupported.push(claim.id);
+        reasons[claim.id] = "contradicted";
+      } else if (agree && mean.says_nothing >= silentAt) {
+        saysNothing.push(claim.id);
+        reasons[claim.id] = "says_nothing";
+      } else {
+        unsure.push(claim.id);
+        reasons[claim.id] = agree ? "between_bands" : "orders_disagree";
+      }
+    }
+    const notSupported = unsupported.length > 0;
+    const verdict = notSupported ? "unsupported" : unsure.length || saysNothing.length || unanswered.length ? "unsure" : "supported";
+    return {
+      ok: true,
+      verdict,
+      claims: claims.length,
+      supported,
+      ...unsupported.length ? { unsupported } : {},
+      ...contradicted.length ? { contradicted } : {},
+      ...saysNothing.length ? { says_nothing: saysNothing } : {},
+      ...unsure.length ? { unsure } : {},
+      ...unanswered.length ? { unanswered } : {},
+      ...injected ? { source_injection: true } : {},
+      ...Object.keys(reasons).length ? { reasons } : {},
+      ...Object.keys(listed).length ? { p: listed } : {},
+      next_step: verdict === "supported" ? void 0 : saysNothing.length && !notSupported && !unsure.length ? "The source is silent on the listed claims: add the passage that supports them, don't reword the claims." : "Fix or drop contradicted claims, add the source passage for silent ones, and check numbers that are not in the source with a script."
+    };
+  }, "finish");
+  return { planned, finish };
+}
+__name(verifyRequest, "verifyRequest");
+var MAX_CLAIMS = 100;
+var verify = {
+  name: "verify",
+  describe: {
+    summary: "Check claims against a source text.",
+    inputs: {
+      "--source <file|->": "The text the claims must be supported by. '-' reads stdin.",
+      "--claim <text>": "A claim; repeat for several.",
+      "--claims <file>": "Claims as a JSON array of strings or {id, text}, JSON lines, or plain lines. Max 100."
+    },
+    outputs: {
+      verdict: "supported when every claim is, unsupported when any is contradicted or puts text in double quotes that isn't in the source, unsure otherwise (silent, a backticked name or a number not in the source, no answer)",
+      claims: "Number of claims checked",
+      supported: "Number of supported claims",
+      unsupported: "Ids of contradicted claims and claims that quote text not in the source",
+      contradicted: "Ids of claims the source contradicts",
+      says_nothing: "Ids of claims the source is silent on: add the passage, don't reword",
+      reasons: "Why each non-supported claim is listed, by id",
+      source_injection: "True when the source has a line aimed at the judge; supported claims then become unsure",
+      unsure: "Ids of claims between the bands",
+      unanswered: "Ids of claims with no answer because of an API error or the 90-second deadline",
+      p: "Probability of support for each unsupported or unsure claim, by id"
+    },
+    errors: [...JEV_ERRORS],
+    effects: JEV_EFFECTS,
+    cost: `${JEV_COST} verify asks all claims about one source in one request when they fit, two three-way questions per claim and one injection check; claims with a quote or number missing from the source are decided in code.`
+  },
+  options: { source: { type: "string" }, claim: { type: "string", multiple: true }, claims: { type: "string" } },
+  async run(context) {
+    const claimsFile = str(context, "claims");
+    const inline = list(context, "claim");
+    if (claimsFile && inline.length) throw new RefereeError("bad_input", "Use --claim or --claims, not both.");
+    if (claimsFile === "-" && (str(context, "source") ?? "-") === "-") throw new RefereeError("bad_input", "Only one of --source and --claims can read stdin.");
+    const claims = (claimsFile ? parseItems(await readSource(context, claimsFile, "claims")) : inline.map((text, i) => ({ id: String(i + 1), text }))).filter(
+      (c) => c.text.trim()
+    );
+    if (claims.length === 0) throw new RefereeError("bad_input", "Give at least one --claim or a --claims file.");
+    if (claims.length > MAX_CLAIMS) throw new RefereeError("too_large", `At most ${MAX_CLAIMS} claims per call.`);
+    const source = stripAnsi(await readSource(context, str(context, "source"), "source"));
+    const { pack, project } = openPack(context);
+    const { planned, finish } = verifyRequest(pack, project?.thresholds, claims, source);
+    return jevCommand(context, "verify", pack, planned, finish, { partial: true });
+  }
+};
+
+// src/cli/commands/eval.ts
+var LIST_LIMIT2 = 20;
+function readSuite(root, name) {
+  const dir = join8(root, name);
+  if (!existsSync4(join8(dir, "suite.json")) || !existsSync4(join8(dir, "cases.jsonl"))) {
+    throw new RefereeError("bad_input", `No eval suite ${name}: it needs suite.json and cases.jsonl.`, { next_step: `Look in ${root}.` });
+  }
+  let raw;
+  try {
+    raw = JSON.parse(readFileSync8(join8(dir, "suite.json"), "utf8"));
+  } catch {
+    throw new RefereeError("bad_input", `Suite ${name}: suite.json is not valid JSON.`);
+  }
+  if (typeof raw["command"] !== "string") throw new RefereeError("bad_input", `Suite ${name}: suite.json needs a command.`);
+  const config = {
+    command: raw["command"],
+    ...typeof raw["criteria"] === "string" || Array.isArray(raw["criteria"]) ? { criteria: raw["criteria"] } : {},
+    positive: typeof raw["positive"] === "string" ? raw["positive"] : "met",
+    max_wrong_positive: typeof raw["max_wrong_positive"] === "number" ? raw["max_wrong_positive"] : 0
+  };
+  const recorded = join8(dir, "recorded.jsonl");
+  return {
+    name,
+    dir,
+    config,
+    cases: parseCases(readFileSync8(join8(dir, "cases.jsonl"), "utf8")),
+    recordings: existsSync4(recorded) ? parseRecordings(readFileSync8(recorded, "utf8")) : []
+  };
+}
+__name(readSuite, "readSuite");
+function suites(root, name) {
+  if (name !== "all") return [readSuite(root, name)];
+  if (!existsSync4(root)) return [];
+  return readdirSync4(root, { withFileTypes: true }).filter((d) => d.isDirectory() && existsSync4(join8(root, d.name, "suite.json"))).map((d) => readSuite(root, d.name)).sort((a, b) => a.name.localeCompare(b.name));
+}
+__name(suites, "suites");
+function criteriaFor(suite, item) {
+  const own = item["criteria"] ?? item["criterion"] ?? suite.config.criteria;
+  const list2 = (Array.isArray(own) ? own : [own]).filter((c) => typeof c === "string" && c.trim() !== "");
+  if (list2.length === 0) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: no criterion.`);
+  return list2;
+}
+__name(criteriaFor, "criteriaFor");
+function request(context, pack, suite, item) {
+  const command = suite.config.command;
+  if (command !== "done" && command !== "verify") throw new RefereeError("bad_input", `Suite ${suite.name} uses ${command}; eval handles done and verify suites for now.`);
+  let planned;
+  let finish;
+  if (command === "done") {
+    const evidence = doneEvidence(typeof item["evidence"] === "string" ? item["evidence"] : "");
+    if (!evidence.trim()) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: the evidence is empty.`);
+    ({ planned, finish } = doneRequest(pack, void 0, criteriaFor(suite, item), evidence));
+  } else {
+    const claim = typeof item["claim"] === "string" ? item["claim"] : "";
+    const source = typeof item["source"] === "string" ? item["source"] : "";
+    if (!claim.trim() || !source.trim()) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: a verify case needs a claim and a source.`);
+    ({ planned, finish } = verifyRequest(pack, void 0, [{ id: "1", text: claim }], source));
+  }
+  const first = planned[0];
+  if (!first) return { suite, item, planned: null, finish, qhash: "code", shash: "code" };
+  const redacted = redactRequest(first, context.io.home, pack.redact);
+  return { suite, item, planned: { ...first, id: `${suite.name}/${item.id}` }, finish, qhash: questionHash(first.questions), shash: stateHash(redacted.body.state) };
+}
+__name(request, "request");
+async function record(context, pack, list2) {
+  const { io, flags } = context;
+  const session = new Session({
+    command: "eval",
+    env: io.env,
+    cwd: io.cwd,
+    home: io.home,
+    platform: io.platform,
+    now: io.now,
+    pack: { name: pack.name, version: `${pack.version}+${pack.hash}`, redact: pack.redact },
+    dataDir: flags.dataDir,
+    fresh: true
+  });
+  const todo = [];
+  let skipped = 0;
+  for (const suite of list2) {
+    for (const item of suite.cases) {
+      const req = request(context, pack, suite, item);
+      if (req.planned === null) skipped += 1;
+      else if (!flags.fresh && findRecording(suite.recordings, { case: item.id, qhash: req.qhash, shash: req.shash, model: session.model }).status === "ok") skipped += 1;
+      else todo.push(req);
+    }
+  }
+  const plans = todo.map((t) => t.planned);
+  if (flags.dryRun) return fitLine({ ...session.dryRun(plans), skipped });
+  const outcomes = todo.length ? await session.run(plans, { partial: true }) : [];
+  const failed = [];
+  let recorded = 0;
+  todo.forEach((req, i) => {
+    const outcome = outcomes[i];
+    if (!outcome?.answers) {
+      failed.push(req.planned?.id ?? req.item.id);
+      return;
+    }
+    const line = {
+      suite: req.suite.name,
+      case: req.item.id,
+      split: req.item.split,
+      model: session.model,
+      pack: `${pack.name}@${pack.version}`,
+      qhash: req.qhash,
+      shash: req.shash,
+      answers: outcome.answers,
+      recorded_at: new Date(io.now()).toISOString()
+    };
+    appendFileSync2(join8(req.suite.dir, "recorded.jsonl"), JSON.stringify(line) + "\n");
+    recorded += 1;
+  });
+  const receipt = session.record({ verdict: failed.length ? "partial" : "recorded" });
+  return reorder({
+    ok: true,
+    verdict: failed.length ? "partial" : "recorded",
+    suites: list2.map((s) => s.name),
+    recorded,
+    skipped,
+    ...failed.length ? { failed: failed.slice(0, LIST_LIMIT2) } : {},
+    ...session.stats(),
+    next_step: failed.length ? "Run the same command again; recorded cases are skipped." : void 0,
+    receipt: receipt.id
+  });
+}
+__name(record, "record");
+function scoreSuite(context, pack, suite, model, split, sweepSpec) {
+  const items = suite.cases.filter((c) => !split || c.split === split).map((item) => {
+    const req = request(context, pack, suite, item);
+    if (req.planned === null) {
+      const decided = req.finish([]);
+      return { id: item.id, split: item.split, expected: item.expected, verdict: String(decided["verdict"]), p: Number.NaN };
+    }
+    const found = findRecording(suite.recordings, { case: item.id, qhash: req.qhash, shash: req.shash, model });
+    if (found.status !== "ok") {
+      const why = found.status === "missing" ? `no recording for ${model}` : "the question text or input changed since it was recorded";
+      throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: ${why}.`, { next_step: `Run eval record --suite ${suite.name} with a key.` });
+    }
+    const result = req.finish([{ id: req.planned.id, answers: found.line.answers, stopped: [], cached: true }]);
+    return { id: item.id, split: item.split, expected: item.expected, verdict: String(result["verdict"]), p: Number(result["p"]) };
+  });
+  const m = metrics(items, suite.config.positive);
+  const swept = sweepSpec ? sweep(items, suite.config.positive, parseSweep(sweepSpec)) : null;
+  return {
+    suite: suite.name,
+    verdict: m.wrong_positive > suite.config.max_wrong_positive ? "violated" : "pass",
+    ...m,
+    max_wrong_positive: suite.config.max_wrong_positive,
+    ...swept ? { sweep: swept.rows.map((r) => [r.t, r.precision, r.recall, r.wrong_positive]), suggested: swept.suggested, ...swept.reason ? { sweep_note: swept.reason } : {} } : {}
+  };
+}
+__name(scoreSuite, "scoreSuite");
+function score2(context, pack, list2, all) {
+  const model = resolveModel(context.io.env);
+  const split = str(context, "split");
+  if (split !== void 0 && split !== "dev" && split !== "holdout") throw new RefereeError("bad_input", '--split takes "dev" or "holdout".');
+  const scored = (all ? list2.filter((s) => s.recordings.length > 0) : list2).map((s) => scoreSuite(context, pack, s, model, split, str(context, "sweep")));
+  const verdict = scored.some((s) => s["verdict"] === "violated") ? "violated" : "pass";
+  if (!all && scored[0]) {
+    const { suite, verdict: v, ...rest } = scored[0];
+    return { ok: true, verdict: v, suite, model, ...split ? { split } : {}, ...rest };
+  }
+  return {
+    ok: true,
+    verdict,
+    model,
+    suites: scored.map((s) => ({ suite: s["suite"], verdict: s["verdict"], cases: s["cases"], wrong_positive: s["wrong_positive"], max_wrong_positive: s["max_wrong_positive"] }))
+  };
+}
+__name(score2, "score");
+var evalCommand = {
+  name: "eval",
+  describe: {
+    summary: "Record Jev's answers for an eval suite once, then score them offline.",
+    inputs: {
+      "record | score": "Positional action.",
+      "--suite <name|all>": "A directory under the evals dir with suite.json, cases.jsonl and, once recorded, recorded.jsonl. 'all' takes every suite; score then skips suites without recordings.",
+      "--evals-dir <dir>": "Where the suites live; default jev-evals in the current directory.",
+      "--split <dev|holdout>": "score: only cases from this split.",
+      "--sweep <from:to:step>": "score: precision, recall and wrong positives per threshold; suggests one only with at least 10 cases per class.",
+      "--fresh": "record: record every case again, even ones already recorded for this question text, input and model."
+    },
+    outputs: {
+      verdict: "record: recorded or partial; score: pass, or violated when wrong positives exceed the suite's max_wrong_positive",
+      recorded: "record: cases recorded now",
+      skipped: "record: cases already recorded",
+      verdicts: "score: count per verdict",
+      precision: "score: share of positive verdicts that were right",
+      recall: "score: share of expected positives found",
+      automation: "score: share of cases with a definite verdict",
+      wrong_positive: "score: positive verdicts that should not be; the kill criterion"
+    },
+    errors: [...JEV_ERRORS],
+    effects: "record sends each unrecorded case to the TypeSafe API and appends to recorded.jsonl; score reads files only.",
+    cost: "record: one Jev request per case not yet recorded. score: free and offline."
+  },
+  options: { suite: { type: "string" }, split: { type: "string" }, sweep: { type: "string" }, "evals-dir": { type: "string" } },
+  async run(context) {
+    const action = context.positionals[0];
+    if (action !== "record" && action !== "score") throw new RefereeError("bad_input", "eval needs an action: record or score.", { next_step: "Example: eval score --suite injection" });
+    const name = str(context, "suite");
+    if (!name) throw new RefereeError("bad_input", "Give --suite <name|all>.");
+    const root = resolve4(context.io.cwd, str(context, "evals-dir") ?? "jev-evals");
+    const list2 = suites(root, name);
+    const { pack } = openPack(context);
+    return action === "record" ? record(context, pack, list2) : score2(context, pack, list2, name === "all");
   }
 };
 
@@ -3655,103 +3952,6 @@ var receipts = {
       cost_usd: sum(scoped, "cost_usd"),
       by_command: byCommand
     };
-  }
-};
-
-// src/cli/commands/verify.ts
-var MAX_CLAIMS = 100;
-var verify = {
-  name: "verify",
-  describe: {
-    summary: "Check claims against a source text.",
-    inputs: {
-      "--source <file|->": "The text the claims must be supported by. '-' reads stdin.",
-      "--claim <text>": "A claim; repeat for several.",
-      "--claims <file>": "Claims as a JSON array of strings or {id, text}, JSON lines, or plain lines. Max 100."
-    },
-    outputs: {
-      verdict: "supported when every claim is, unsupported when any is, unsure otherwise (including claims with no answer)",
-      claims: "Number of claims checked",
-      supported: "Number of supported claims",
-      unsupported: "Ids of unsupported claims",
-      unsure: "Ids of claims between the bands",
-      unanswered: "Ids of claims with no answer because of an API error or the 90-second deadline",
-      p: "Probability of support for each unsupported or unsure claim, by id"
-    },
-    errors: [...JEV_ERRORS],
-    effects: JEV_EFFECTS,
-    cost: `${JEV_COST} verify asks all claims about one source in one request when they fit.`
-  },
-  options: { source: { type: "string" }, claim: { type: "string", multiple: true }, claims: { type: "string" } },
-  async run(context) {
-    const claimsFile = str(context, "claims");
-    const inline = list(context, "claim");
-    if (claimsFile && inline.length) throw new RefereeError("bad_input", "Use --claim or --claims, not both.");
-    if (claimsFile === "-" && (str(context, "source") ?? "-") === "-") throw new RefereeError("bad_input", "Only one of --source and --claims can read stdin.");
-    const claims = (claimsFile ? parseItems(await readSource(context, claimsFile, "claims")) : inline.map((text, i) => ({ id: String(i + 1), text }))).filter(
-      (c) => c.text.trim()
-    );
-    if (claims.length === 0) throw new RefereeError("bad_input", "Give at least one --claim or a --claims file.");
-    if (claims.length > MAX_CLAIMS) throw new RefereeError("too_large", `At most ${MAX_CLAIMS} claims per call.`);
-    const source = stripAnsi(await readSource(context, str(context, "source"), "source"));
-    const { pack, project } = openPack(context);
-    const base = question(pack, "verify.supported");
-    const state = { source };
-    const stateTokens = estimateTokens(JSON.stringify(state));
-    if (stateTokens > STATE_TOKEN_LIMIT) throw new RefereeError("too_large", "The source is too large for one Jev request.", { next_step: "Pass the relevant section of the source." });
-    const planned = [];
-    let batch = {};
-    let batchTokens = stateTokens;
-    const flush = /* @__PURE__ */ __name(() => {
-      if (Object.keys(batch).length) planned.push({ id: `part${planned.length + 1}`, state, questions: batch });
-      batch = {};
-      batchTokens = stateTokens;
-    }, "flush");
-    for (const claim of claims) {
-      const q = { ...base, instructions: withData(base.instructions, { claim: claim.text }) };
-      const tokens = estimateTokens(JSON.stringify(q));
-      if (stateTokens + tokens > STATE_TOKEN_LIMIT) throw new RefereeError("too_large", `Claim ${claim.id} is too long.`);
-      if (batchTokens + tokens > REQUEST_TOKEN_LIMIT) flush();
-      batch[`claim:${claim.id}`] = q;
-      batchTokens += tokens;
-    }
-    flush();
-    const supportedAt = threshold(pack, project?.thresholds, "verify.supported", "supported", 0.9);
-    const unsupportedAt = threshold(pack, project?.thresholds, "verify.supported", "unsupported", 0.1);
-    return jevCommand(context, "verify", pack, planned, (outcomes) => {
-      const answers = Object.assign({}, ...outcomes.map((o) => o.answers ?? {}));
-      let supported = 0;
-      const unsupported = [];
-      const unsure = [];
-      const unanswered = [];
-      const listed = {};
-      for (const claim of claims) {
-        const answer = answers[`claim:${claim.id}`];
-        if (!answer) {
-          unanswered.push(claim.id);
-          continue;
-        }
-        const p = answer.type === "noul" && typeof answer.noul === "number" ? answer.noul : 0.5;
-        if (p >= supportedAt) {
-          supported += 1;
-          continue;
-        }
-        (p <= unsupportedAt ? unsupported : unsure).push(claim.id);
-        listed[claim.id] = p;
-      }
-      const verdict = unsupported.length ? "unsupported" : unsure.length || unanswered.length ? "unsure" : "supported";
-      return {
-        ok: true,
-        verdict,
-        claims: claims.length,
-        supported,
-        ...unsupported.length ? { unsupported } : {},
-        ...unsure.length ? { unsure } : {},
-        ...unanswered.length ? { unanswered } : {},
-        ...Object.keys(listed).length ? { p: listed } : {},
-        next_step: verdict === "supported" ? void 0 : "Fix or drop the listed claims, or cite the part of the source that supports them."
-      };
-    }, { partial: true });
   }
 };
 

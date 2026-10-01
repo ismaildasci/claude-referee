@@ -12,6 +12,7 @@ import { Session, questionHash, redactRequest, stateHash, type Outcome, type Pla
 import type { Command, Context } from "../types.ts";
 import { JEV_ERRORS, fitLine, openPack, reorder, str } from "../shared.ts";
 import { doneEvidence, doneRequest } from "./done.ts";
+import { verifyRequest } from "./verify.ts";
 
 interface SuiteConfig {
   readonly command: string;
@@ -31,7 +32,7 @@ interface Suite {
 interface CaseRequest {
   readonly suite: Suite;
   readonly item: EvalCase;
-  readonly planned: Planned;
+  readonly planned: Planned | null;
   readonly finish: (outcomes: Outcome[]) => Result;
   readonly qhash: string;
   readonly shash: string;
@@ -84,12 +85,22 @@ function criteriaFor(suite: Suite, item: EvalCase): string[] {
 }
 
 function request(context: Context, pack: Pack, suite: Suite, item: EvalCase): CaseRequest {
-  if (suite.config.command !== "done") throw new RefereeError("bad_input", `Suite ${suite.name} uses ${suite.config.command}; eval handles done suites for now.`);
-  const evidence = doneEvidence(typeof item["evidence"] === "string" ? item["evidence"] : "");
-  if (!evidence.trim()) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: the evidence is empty.`);
-  const { planned, finish } = doneRequest(pack, undefined, criteriaFor(suite, item), evidence);
+  const command = suite.config.command;
+  if (command !== "done" && command !== "verify") throw new RefereeError("bad_input", `Suite ${suite.name} uses ${command}; eval handles done and verify suites for now.`);
+  let planned: Planned[];
+  let finish: (outcomes: Outcome[]) => Result;
+  if (command === "done") {
+    const evidence = doneEvidence(typeof item["evidence"] === "string" ? item["evidence"] : "");
+    if (!evidence.trim()) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: the evidence is empty.`);
+    ({ planned, finish } = doneRequest(pack, undefined, criteriaFor(suite, item), evidence));
+  } else {
+    const claim = typeof item["claim"] === "string" ? item["claim"] : "";
+    const source = typeof item["source"] === "string" ? item["source"] : "";
+    if (!claim.trim() || !source.trim()) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: a verify case needs a claim and a source.`);
+    ({ planned, finish } = verifyRequest(pack, undefined, [{ id: "1", text: claim }], source));
+  }
   const first = planned[0];
-  if (!first) throw new RefereeError("internal", "done planned no request.");
+  if (!first) return { suite, item, planned: null, finish, qhash: "code", shash: "code" };
   const redacted = redactRequest(first, context.io.home, pack.redact);
   return { suite, item, planned: { ...first, id: `${suite.name}/${item.id}` }, finish, qhash: questionHash(first.questions), shash: stateHash(redacted.body.state) };
 }
@@ -112,18 +123,20 @@ async function record(context: Context, pack: Pack, list: readonly Suite[]): Pro
   for (const suite of list) {
     for (const item of suite.cases) {
       const req = request(context, pack, suite, item);
-      if (!flags.fresh && findRecording(suite.recordings, { case: item.id, qhash: req.qhash, shash: req.shash, model: session.model }).status === "ok") skipped += 1;
+      if (req.planned === null) skipped += 1;
+      else if (!flags.fresh && findRecording(suite.recordings, { case: item.id, qhash: req.qhash, shash: req.shash, model: session.model }).status === "ok") skipped += 1;
       else todo.push(req);
     }
   }
-  if (flags.dryRun) return fitLine({ ...session.dryRun(todo.map((t) => t.planned)), skipped });
-  const outcomes = todo.length ? await session.run(todo.map((t) => t.planned), { partial: true }) : [];
+  const plans = todo.map((t) => t.planned as Planned);
+  if (flags.dryRun) return fitLine({ ...session.dryRun(plans), skipped });
+  const outcomes = todo.length ? await session.run(plans, { partial: true }) : [];
   const failed: string[] = [];
   let recorded = 0;
   todo.forEach((req, i) => {
     const outcome = outcomes[i];
     if (!outcome?.answers) {
-      failed.push(req.planned.id);
+      failed.push(req.planned?.id ?? req.item.id);
       return;
     }
     const line = {
@@ -159,12 +172,16 @@ function scoreSuite(context: Context, pack: Pack, suite: Suite, model: string, s
     .filter((c) => !split || c.split === split)
     .map((item) => {
       const req = request(context, pack, suite, item);
+      if (req.planned === null) {
+        const decided = req.finish([]);
+        return { id: item.id, split: item.split, expected: item.expected, verdict: String(decided["verdict"]), p: Number.NaN };
+      }
       const found = findRecording(suite.recordings, { case: item.id, qhash: req.qhash, shash: req.shash, model });
       if (found.status !== "ok") {
         const why = found.status === "missing" ? `no recording for ${model}` : "the question text or input changed since it was recorded";
         throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: ${why}.`, { next_step: `Run eval record --suite ${suite.name} with a key.` });
       }
-      const result = req.finish([{ id: "done", answers: found.line.answers as Outcome["answers"], stopped: [], cached: true }]);
+      const result = req.finish([{ id: req.planned.id, answers: found.line.answers as Outcome["answers"], stopped: [], cached: true }]);
       return { id: item.id, split: item.split, expected: item.expected, verdict: String(result["verdict"]), p: Number(result["p"]) };
     });
   const m = metrics(items, suite.config.positive);

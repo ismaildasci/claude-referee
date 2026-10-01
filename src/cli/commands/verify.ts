@@ -1,14 +1,151 @@
-// verify: checks claims against a source text. The source is the state; each claim is a Noul in the same request,
-// split into more requests only when the claims don't fit one.
+// verify: checks claims against a source text. Quotes and numbers are matched in code first; what is left gets two
+// three-way Choice questions per claim (supports, contradicts, says nothing; both option orders) plus one injection check on the source.
 
 import type { Questions } from "@typesafe-ai/sdk";
+import { checkClaim } from "../../engine/claims.ts";
 import { REQUEST_TOKEN_LIMIT, STATE_TOKEN_LIMIT, estimateTokens } from "../../engine/config.ts";
 import { RefereeError } from "../../engine/errors.ts";
-import { threshold } from "../../engine/pack.ts";
-import type { Planned } from "../../engine/session.ts";
+import { threshold, type Pack, type Thresholds } from "../../engine/pack.ts";
+import type { Outcome, Planned } from "../../engine/session.ts";
+import type { Result } from "../../engine/output.ts";
 import type { Command } from "../types.ts";
 import { JEV_COST, JEV_EFFECTS, JEV_ERRORS, jevCommand, list, openPack, question, readSource, str, stripAnsi, withData } from "../shared.ts";
 import { parseItems } from "./judge.ts";
+
+type Relation = "supports" | "contradicts" | "says_nothing";
+const RELATIONS: readonly Relation[] = ["supports", "contradicts", "says_nothing"];
+
+export interface Claim {
+  readonly id: string;
+  readonly text: string;
+}
+
+function probabilities(answer: unknown): Record<string, number> | null {
+  const a = answer as { type?: string; probabilities?: Record<string, number> } | undefined;
+  return a?.type === "choice" && a.probabilities ? a.probabilities : null;
+}
+
+export function verifyRequest(pack: Pack, thresholds: Thresholds | undefined, claims: readonly Claim[], source: string): { planned: Planned[]; finish: (outcomes: Outcome[]) => Result } {
+  const relation = question(pack, "verify.relation");
+  const injection = question(pack, "verify.injection");
+  const baseCriteria = (relation as { criteria?: Record<string, string> }).criteria ?? {};
+  const ordered = (reverse: boolean) => Object.fromEntries(reverse ? Object.entries(baseCriteria).reverse() : Object.entries(baseCriteria));
+  const state = { source };
+  const stateTokens = estimateTokens(JSON.stringify(state));
+  if (stateTokens > STATE_TOKEN_LIMIT) throw new RefereeError("too_large", "The source is too large for one Jev request.", { next_step: "Pass the relevant section of the source." });
+  const checks = new Map(claims.map((c) => [c.id, checkClaim(c.text, source)]));
+  const asked = claims.filter((c) => {
+    const k = checks.get(c.id);
+    return k !== undefined && k.quotes_missing.length === 0 && k.numbers_missing.length === 0;
+  });
+
+  const planned: Planned[] = [];
+  let batch: Questions = {};
+  let batchTokens = stateTokens;
+  const flush = () => {
+    if (Object.keys(batch).length) planned.push({ id: `part${planned.length + 1}`, state, questions: batch });
+    batch = {};
+    batchTokens = stateTokens;
+  };
+  const add = (key: string, q: Questions[string]) => {
+    const tokens = estimateTokens(JSON.stringify(q));
+    if (stateTokens + tokens > STATE_TOKEN_LIMIT) throw new RefereeError("too_large", `Claim ${key} is too long.`);
+    if (batchTokens + tokens > REQUEST_TOKEN_LIMIT) flush();
+    batch[key] = q;
+    batchTokens += tokens;
+  };
+  if (asked.length > 0) add("injection", injection as Questions[string]);
+  for (const claim of asked) {
+    for (const [suffix, reverse] of [["a", false], ["b", true]] as const) {
+      add(`claim:${claim.id}:${suffix}`, { ...relation, criteria: ordered(reverse), instructions: withData(relation.instructions, { claim: claim.text }) } as Questions[string]);
+    }
+  }
+  flush();
+  const supportsAt = threshold(pack, thresholds, "verify.relation", "supports", 0.8);
+  const contradictsAt = threshold(pack, thresholds, "verify.relation", "contradicts", 0.5);
+  const silentAt = threshold(pack, thresholds, "verify.relation", "says_nothing", 0.5);
+  const flagAt = threshold(pack, thresholds, "verify.injection", "flag", 0.7);
+
+  const finish = (outcomes: Outcome[]): Result => {
+    const answers = Object.assign({}, ...outcomes.map((o) => o.answers ?? {})) as Record<string, unknown>;
+    const inj = answers["injection"] as { type?: string; noul?: number } | undefined;
+    const injected = inj?.type === "noul" && typeof inj.noul === "number" && inj.noul >= flagAt;
+    let supported = 0;
+    const unsupported: string[] = [];
+    const contradicted: string[] = [];
+    const saysNothing: string[] = [];
+    const unsure: string[] = [];
+    const unanswered: string[] = [];
+    const reasons: Record<string, string> = {};
+    const listed: Record<string, number> = {};
+    for (const claim of claims) {
+      const k = checks.get(claim.id);
+      if (k && k.quotes_missing.length > 0) {
+        const onlyCode = k.quotes_missing.every((q) => claim.text.includes(`\`${q}\``) && !claim.text.includes(`"${q}"`));
+        (onlyCode ? unsure : unsupported).push(claim.id);
+        reasons[claim.id] = onlyCode ? "identifier_not_in_source" : "quote_not_in_source";
+        continue;
+      }
+      if (k && k.numbers_missing.length > 0) {
+        unsure.push(claim.id);
+        reasons[claim.id] = "number_not_in_source";
+        continue;
+      }
+      const a = probabilities(answers[`claim:${claim.id}:a`]);
+      const b = probabilities(answers[`claim:${claim.id}:b`]);
+      if (!a || !b) {
+        unanswered.push(claim.id);
+        continue;
+      }
+      const mean = Object.fromEntries(RELATIONS.map((r) => [r, ((a[r] ?? 0) + (b[r] ?? 0)) / 2])) as Record<Relation, number>;
+      const lead = (p: Record<string, number>) => RELATIONS.reduce((best, r) => ((p[r] ?? 0) > (p[best] ?? 0) ? r : best), "supports" as Relation);
+      const agree = lead(a) === lead(b);
+      if (agree && mean.supports >= supportsAt) {
+        if (injected) {
+          unsure.push(claim.id);
+          reasons[claim.id] = "source_has_instruction_for_judge";
+          listed[claim.id] = mean.supports;
+        } else supported += 1;
+        continue;
+      }
+      listed[claim.id] = mean.supports;
+      if (agree && mean.contradicts >= contradictsAt) {
+        contradicted.push(claim.id);
+        unsupported.push(claim.id);
+        reasons[claim.id] = "contradicted";
+      } else if (agree && mean.says_nothing >= silentAt) {
+        saysNothing.push(claim.id);
+        reasons[claim.id] = "says_nothing";
+      } else {
+        unsure.push(claim.id);
+        reasons[claim.id] = agree ? "between_bands" : "orders_disagree";
+      }
+    }
+    const notSupported = unsupported.length > 0;
+    const verdict = notSupported ? "unsupported" : unsure.length || saysNothing.length || unanswered.length ? "unsure" : "supported";
+    return {
+      ok: true,
+      verdict,
+      claims: claims.length,
+      supported,
+      ...(unsupported.length ? { unsupported } : {}),
+      ...(contradicted.length ? { contradicted } : {}),
+      ...(saysNothing.length ? { says_nothing: saysNothing } : {}),
+      ...(unsure.length ? { unsure } : {}),
+      ...(unanswered.length ? { unanswered } : {}),
+      ...(injected ? { source_injection: true } : {}),
+      ...(Object.keys(reasons).length ? { reasons } : {}),
+      ...(Object.keys(listed).length ? { p: listed } : {}),
+      next_step:
+        verdict === "supported"
+          ? undefined
+          : saysNothing.length && !notSupported && !unsure.length
+            ? "The source is silent on the listed claims: add the passage that supports them, don't reword the claims."
+            : "Fix or drop contradicted claims, add the source passage for silent ones, and check numbers that are not in the source with a script.",
+    };
+  };
+  return { planned, finish };
+}
 
 const MAX_CLAIMS = 100;
 
@@ -22,17 +159,21 @@ export const verify: Command = {
       "--claims <file>": "Claims as a JSON array of strings or {id, text}, JSON lines, or plain lines. Max 100.",
     },
     outputs: {
-      verdict: "supported when every claim is, unsupported when any is, unsure otherwise (including claims with no answer)",
+      verdict: "supported when every claim is, unsupported when any is contradicted or puts text in double quotes that isn't in the source, unsure otherwise (silent, a backticked name or a number not in the source, no answer)",
       claims: "Number of claims checked",
       supported: "Number of supported claims",
-      unsupported: "Ids of unsupported claims",
+      unsupported: "Ids of contradicted claims and claims that quote text not in the source",
+      contradicted: "Ids of claims the source contradicts",
+      says_nothing: "Ids of claims the source is silent on: add the passage, don't reword",
+      reasons: "Why each non-supported claim is listed, by id",
+      source_injection: "True when the source has a line aimed at the judge; supported claims then become unsure",
       unsure: "Ids of claims between the bands",
       unanswered: "Ids of claims with no answer because of an API error or the 90-second deadline",
       p: "Probability of support for each unsupported or unsure claim, by id",
     },
     errors: [...JEV_ERRORS],
     effects: JEV_EFFECTS,
-    cost: `${JEV_COST} verify asks all claims about one source in one request when they fit.`,
+    cost: `${JEV_COST} verify asks all claims about one source in one request when they fit, two three-way questions per claim and one injection check; claims with a quote or number missing from the source are decided in code.`,
   },
   options: { source: { type: "string" }, claim: { type: "string", multiple: true }, claims: { type: "string" } },
   async run(context) {
@@ -47,64 +188,7 @@ export const verify: Command = {
     if (claims.length > MAX_CLAIMS) throw new RefereeError("too_large", `At most ${MAX_CLAIMS} claims per call.`);
     const source = stripAnsi(await readSource(context, str(context, "source"), "source"));
     const { pack, project } = openPack(context);
-    const base = question(pack, "verify.supported");
-    const state = { source };
-    const stateTokens = estimateTokens(JSON.stringify(state));
-    if (stateTokens > STATE_TOKEN_LIMIT) throw new RefereeError("too_large", "The source is too large for one Jev request.", { next_step: "Pass the relevant section of the source." });
-
-    const planned: Planned[] = [];
-    let batch: Questions = {};
-    let batchTokens = stateTokens;
-    const flush = () => {
-      if (Object.keys(batch).length) planned.push({ id: `part${planned.length + 1}`, state, questions: batch });
-      batch = {};
-      batchTokens = stateTokens;
-    };
-    for (const claim of claims) {
-      const q = { ...base, instructions: withData(base.instructions, { claim: claim.text }) } as Questions[string];
-      const tokens = estimateTokens(JSON.stringify(q));
-      if (stateTokens + tokens > STATE_TOKEN_LIMIT) throw new RefereeError("too_large", `Claim ${claim.id} is too long.`);
-      if (batchTokens + tokens > REQUEST_TOKEN_LIMIT) flush();
-      batch[`claim:${claim.id}`] = q;
-      batchTokens += tokens;
-    }
-    flush();
-    const supportedAt = threshold(pack, project?.thresholds, "verify.supported", "supported", 0.9);
-    const unsupportedAt = threshold(pack, project?.thresholds, "verify.supported", "unsupported", 0.1);
-
-    return jevCommand(context, "verify", pack, planned, (outcomes) => {
-      const answers = Object.assign({}, ...outcomes.map((o) => o.answers ?? {})) as Record<string, { type: string; noul?: number }>;
-      let supported = 0;
-      const unsupported: string[] = [];
-      const unsure: string[] = [];
-      const unanswered: string[] = [];
-      const listed: Record<string, number> = {};
-      for (const claim of claims) {
-        const answer = answers[`claim:${claim.id}`];
-        if (!answer) {
-          unanswered.push(claim.id);
-          continue;
-        }
-        const p = answer.type === "noul" && typeof answer.noul === "number" ? answer.noul : 0.5;
-        if (p >= supportedAt) {
-          supported += 1;
-          continue;
-        }
-        (p <= unsupportedAt ? unsupported : unsure).push(claim.id);
-        listed[claim.id] = p;
-      }
-      const verdict = unsupported.length ? "unsupported" : unsure.length || unanswered.length ? "unsure" : "supported";
-      return {
-        ok: true,
-        verdict,
-        claims: claims.length,
-        supported,
-        ...(unsupported.length ? { unsupported } : {}),
-        ...(unsure.length ? { unsure } : {}),
-        ...(unanswered.length ? { unanswered } : {}),
-        ...(Object.keys(listed).length ? { p: listed } : {}),
-        next_step: verdict === "supported" ? undefined : "Fix or drop the listed claims, or cite the part of the source that supports them.",
-      };
-    }, { partial: true });
+    const { planned, finish } = verifyRequest(pack, project?.thresholds, claims, source);
+    return jevCommand(context, "verify", pack, planned, finish, { partial: true });
   },
 };

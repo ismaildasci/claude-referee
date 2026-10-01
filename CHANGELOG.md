@@ -8,6 +8,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- `jev-evals/verify-v2`: 60 held-out and 30 dev labelled claims with their sources and recorded answers. `eval` handles `verify` suites.
 - `jev-evals/done-v2`: 48 held-out and 30 dev labelled cases for `done` with their recorded answers; the injection suite now allows no wrong `met`.
 - `scripts/probe-api.mjs`, `scripts/latency.mjs` and `scripts/order-sensitivity.mjs`: live checks of the API's edge cases, of latency at 1, 6 and 8 requests in parallel, and of option-order sensitivity. Their results from 2026-09-30 are in `jev-evals/api/` and `jev-evals/decide/`.
 - `jev-evals/decide`: a public set of 20 decisions with 4 options each.
@@ -18,6 +19,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
+- `verify` matches quotes and numbers against the source in code first, asks Jev two three-way questions per claim (supports, contradicts, says nothing; both option orders) and one injection check on the source. The result lists `contradicted`, `says_nothing` and `reasons`; a source with a line aimed at the judge can't return `supported` (`source_injection`). On 60 held-out claims it has no wrong `supported` but confirms fewer true claims than before (19 of 24 against 22 of 24) and returns `unsure` more often.
 - `done` parses recognised runner output in code (pytest, Ruff, Jest, Vitest, Mocha, ESLint, tsc, node:test, go test, cargo test, dotnet test, PHPUnit, RSpec) and sends only counts, the exit code, its label and the failing test names to Jev. Output that isn't recognised is sent as text and can never return `met`; it returns `unsure` with `trust: unparsed`. The result now has `trust`, `exit_code` and `runners`. The `done.met` note changed, so recorded answers were re-recorded.
 - Probabilities in the JSON output are now rounded down to two decimals instead of to nearest, so 0.895 shows as 0.89 and a printed 0.90 means at least 0.90. `_usd` fields keep six decimals.
 

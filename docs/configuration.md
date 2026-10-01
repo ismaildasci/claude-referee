@@ -142,7 +142,7 @@ The matching entry in `thresholds.json`:
 { "done.met": { "met": 0.7, "missing": 0.5 } }
 ```
 
-Where the bundled numbers come from: `done.met`'s 0.7 and 0.5 were chosen on 25 cases in the earlier private kit, so they're in-sample, with no hold-out yet. The 0.9 bands for `verify.supported` and `judge` follow the kit's rule of acting only at 0.90 or above. `line.risky` and `failure.env` have no eval yet.
+Where the bundled numbers come from: `done.met`'s 0.7 and 0.5 were chosen on 25 cases in the earlier private kit, so they're in-sample, with no hold-out yet. `verify.relation` (supports 0.8, contradicts and says nothing 0.5) and `verify.injection` (0.7) were set by hand and checked once on 60 held-out claims, not tuned. The 0.9 bands for `judge` follow the kit's rule of acting only at 0.90 or above. `line.risky` and `failure.env` have no eval yet.
 
 `cheatsheet/session.md` may use three placeholders: `{{pack}}`, `{{cli}}` (the absolute path of the bundled CLI) and `{{checks}}` (the area's check commands). The briefing is capped at 800 characters.
 
@@ -157,7 +157,7 @@ Where the bundled numbers come from: `done.met`'s 0.7 and 0.5 were chosen on 25 
 
 Packs are data only; claude-referee never runs code from a pack.
 
-The `generic` pack has these questions: `done.met`, `verify.supported`, `decide.best`, `decide.fit`, and for `judge`, `line.risky` and `failure.env`.
+The `generic` pack has these questions: `done.met`, `verify.relation`, `verify.injection`, `decide.best`, `decide.fit`, and for `judge`, `line.risky` and `failure.env`.
 
 The `generic` pack ships with the plugin. Your team's packs can live in a private repository. To use them:
 1. Point `packs_dir` at that repository.
