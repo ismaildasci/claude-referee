@@ -8,12 +8,12 @@ import type { Questions } from "@typesafe-ai/sdk";
 import { atLeast } from "../../engine/compare.ts";
 import { REQUEST_TOKEN_LIMIT, STATE_TOKEN_LIMIT, estimateTokens } from "../../engine/config.ts";
 import { RefereeError } from "../../engine/errors.ts";
-import { threshold } from "../../engine/pack.ts";
+import { threshold, type Pack, type Thresholds } from "../../engine/pack.ts";
 import type { Outcome, Planned } from "../../engine/session.ts";
 import type { Command, Context } from "../types.ts";
 import { JEV_COST, JEV_EFFECTS, JEV_ERRORS, jevCommand, openPack, question, readSource, str } from "../shared.ts";
 
-interface Option {
+export interface Option {
   readonly name: string;
   readonly text: string;
 }
@@ -24,7 +24,7 @@ interface Micro {
   readonly bad: boolean;
 }
 
-interface Input {
+export interface Input {
   readonly decision: string;
   readonly context: string | undefined;
   readonly files: readonly string[];
@@ -36,7 +36,7 @@ const NAME = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,39}$/;
 const FILE_LIMIT = 100_000;
 const FILES_LIMIT = 200_000;
 
-function parseInput(text: string): Input {
+export function parseInput(text: string): Input {
   let raw: Record<string, unknown>;
   try {
     raw = JSON.parse(text) as Record<string, unknown>;
@@ -101,6 +101,56 @@ function argmax(p: Readonly<Record<string, number>>): string {
   return Object.entries(p).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "";
 }
 
+export interface DecidePlan {
+  readonly planned: Planned[];
+  readonly perOption: boolean;
+  readonly summarize: (byId: ReadonlyMap<string, Outcome["answers"]>) => { mean: Record<string, number>; lean: string; verdict: "clear" | "weak" | "tie"; disagree: boolean };
+}
+
+export function planDecide(pack: Pack, thresholds: Thresholds | undefined, state: Record<string, unknown>, options: readonly Option[], ablation?: "reversed"): DecidePlan {
+  const best = question(pack, "decide.best");
+  const ask = (list: readonly Option[]): Questions => ({ best: { ...best, criteria: Object.fromEntries(list.map((o) => [o.name, o.text])) } as Questions[string] });
+  const stateTokens = estimateTokens(JSON.stringify(state));
+  const questionTokens = estimateTokens(JSON.stringify(ask(options)));
+  const perOption = stateTokens + questionTokens > Math.min(STATE_TOKEN_LIMIT, REQUEST_TOKEN_LIMIT);
+  const fit = question(pack, "decide.fit");
+  const planned: Planned[] = perOption
+    ? options.map((o) => ({ id: `fit:${o.name}`, state: { ...state, option: o.text }, questions: { fit } }))
+    : [
+        { id: "written", state: state as Planned["state"], questions: ask(options) },
+        ...(ablation === "reversed" ? [] : [{ id: "reversed", state: state as Planned["state"], questions: ask([...options].reverse()) }]),
+      ];
+  const qid = perOption ? "decide.fit" : "decide.best";
+  const clearAt = threshold(pack, thresholds, qid, "clear", 0.85);
+  const margin = threshold(pack, thresholds, qid, "margin", 0.1);
+  const summarize: DecidePlan["summarize"] = (byId) => {
+    const mean: Record<string, number> = {};
+    let disagree = false;
+    if (perOption) {
+      for (const o of options) {
+        const answer = byId.get(`fit:${o.name}`)?.["fit"];
+        const levels = Array.isArray(fit.criteria) ? fit.criteria.length : 5;
+        mean[o.name] = answer?.type === "score" ? answer.score / Math.max(levels - 1, 1) : 0;
+      }
+    } else {
+      const probs = (id: string): Record<string, number> => {
+        const answer = byId.get(id)?.["best"];
+        return answer?.type === "choice" ? { ...(answer.probabilities as Record<string, number>) } : {};
+      };
+      const written = probs("written");
+      const reversed = ablation === "reversed" ? written : probs("reversed");
+      for (const o of options) mean[o.name] = ((written[o.name] ?? 0) + (reversed[o.name] ?? 0)) / 2;
+      disagree = argmax(written) !== argmax(reversed);
+    }
+    const ranked = Object.entries(mean).sort((a, b) => b[1] - a[1]);
+    const [lean = "", p1 = 0] = ranked[0] ?? [];
+    const p2 = ranked[1]?.[1] ?? 0;
+    const verdict = !disagree && atLeast(p1, clearAt) && atLeast(p1 - p2, margin) ? "clear" : !disagree && atLeast(p1 - p2, margin) ? "weak" : "tie";
+    return { mean, lean, verdict, disagree };
+  };
+  return { planned, perOption, summarize };
+}
+
 export const decide: Command = {
   name: "decide",
   describe: {
@@ -139,17 +189,9 @@ export const decide: Command = {
     const stateTokens = estimateTokens(JSON.stringify(state));
     if (stateTokens > STATE_TOKEN_LIMIT) throw new RefereeError("too_large", "The context is too large for one Jev request.", { next_step: "Trim context or context_files." });
 
-    const best = question(pack, "decide.best");
-    const ask = (options: readonly Option[]): Questions => ({ best: { ...best, criteria: Object.fromEntries(options.map((o) => [o.name, o.text])) } as Questions[string] });
-    const questionTokens = estimateTokens(JSON.stringify(ask(input.options)));
-    const perOption = stateTokens + questionTokens > Math.min(STATE_TOKEN_LIMIT, REQUEST_TOKEN_LIMIT);
-    const fit = question(pack, "decide.fit");
-    const planned: Planned[] = perOption
-      ? input.options.map((o) => ({ id: `fit:${o.name}`, state: { ...state, option: o.text }, questions: { fit } }))
-      : [
-          { id: "written", state, questions: ask(input.options) },
-          { id: "reversed", state, questions: ask([...input.options].reverse()) },
-        ];
+    const plan = planDecide(pack, project?.thresholds, state, input.options);
+    const { perOption } = plan;
+    const planned: Planned[] = [...plan.planned];
     const packMicro: Micro[] = Object.entries(pack.questions)
       .filter(([id, q]) => id.startsWith("decide.micro.") && q.type === "noul")
       .map(([id]) => ({ id: id.slice("decide.micro.".length), question: "", bad: (pack.thresholds[id]?.["bad"] ?? 0) >= 1 }));
@@ -160,34 +202,9 @@ export const decide: Command = {
       );
       for (const o of input.options) planned.push({ id: `micro:${o.name}`, state: { ...state, option: o.text }, questions: micro });
     }
-    const qid = perOption ? "decide.fit" : "decide.best";
-    const clearAt = threshold(pack, project?.thresholds, qid, "clear", 0.85);
-    const margin = threshold(pack, project?.thresholds, qid, "margin", 0.1);
-
     return jevCommand(context, "decide", pack, planned, (outcomes: Outcome[]) => {
       const byId = new Map(outcomes.map((o) => [o.id, o.answers]));
-      const mean: Record<string, number> = {};
-      let disagree = false;
-      if (perOption) {
-        for (const o of input.options) {
-          const answer = byId.get(`fit:${o.name}`)?.["fit"];
-          const levels = Array.isArray(fit.criteria) ? fit.criteria.length : 5;
-          mean[o.name] = answer?.type === "score" ? answer.score / Math.max(levels - 1, 1) : 0;
-        }
-      } else {
-        const probs = (id: string): Record<string, number> => {
-          const answer = byId.get(id)?.["best"];
-          return answer?.type === "choice" ? { ...(answer.probabilities as Record<string, number>) } : {};
-        };
-        const written = probs("written");
-        const reversed = probs("reversed");
-        for (const o of input.options) mean[o.name] = ((written[o.name] ?? 0) + (reversed[o.name] ?? 0)) / 2;
-        disagree = argmax(written) !== argmax(reversed);
-      }
-      const ranked = Object.entries(mean).sort((a, b) => b[1] - a[1]);
-      const [lean = "", p1 = 0] = ranked[0] ?? [];
-      const p2 = ranked[1]?.[1] ?? 0;
-      const verdict = !disagree && atLeast(p1, clearAt) && atLeast(p1 - p2, margin) ? "clear" : !disagree && atLeast(p1 - p2, margin) ? "weak" : "tie";
+      const { mean, lean, verdict, disagree } = plan.summarize(byId);
       const flags = input.options.flatMap((o) =>
         micros.flatMap((m) => {
           const answer = byId.get(`micro:${o.name}`)?.[m.id];
