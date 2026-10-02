@@ -1,0 +1,51 @@
+{
+ "rule": "tracked-todo-v1",
+ "seed": "20261002",
+ "cases": [
+  {
+   "id": "d-pytest",
+   "repo": "pytest-dev/pytest",
+   "sha": "2887015cade4757385308e7a7d8083557fc637e2",
+   "pathPattern": "^src/",
+   "tracked": 4,
+   "untracked": 26,
+   "n_items": 30,
+   "n_tracked": 4,
+   "items_sha256": "eb646c6cef2a91868975518fc5767aef12090cc04151e19a83c42b1d01c2dbde"
+  },
+  {
+   "id": "d-babel",
+   "repo": "babel/babel",
+   "sha": "7c1dcfac003791a7fee733ed13851a5cac1ccf1c",
+   "pathPattern": "^packages/[^/]+/src/",
+   "tracked": 12,
+   "untracked": 36,
+   "n_items": 48,
+   "n_tracked": 12,
+   "items_sha256": "8dbfe9bb1bd11a14e2eab58a6e8906ea1cd93af04d424c167cbd3b043b2e9d0a"
+  },
+  {
+   "id": "d-node",
+   "repo": "nodejs/node",
+   "sha": "cfb6aa17494167f2358fb54890c99d76c2c25beb",
+   "pathPattern": "^lib/",
+   "tracked": 20,
+   "untracked": 30,
+   "n_items": 50,
+   "n_tracked": 20,
+   "items_sha256": "d3aa2ac74a0d84a35df70e2a8c41be87a4019b31a1d1552858d54fccaa2e2f5c"
+  },
+  {
+   "id": "d-sklearn",
+   "repo": "scikit-learn/scikit-learn",
+   "sha": "2cc5fc9856675eb112bbd6640404027195741710",
+   "pathPattern": "^sklearn/",
+   "tracked": 24,
+   "untracked": 36,
+   "n_items": 60,
+   "n_tracked": 24,
+   "items_sha256": "46f1d7bffc02401bdd084fce2912acafd308b9b086953c1beefc8c35b5205df1"
+  }
+ ],
+ "hash": "91c9293ee37871ece754f5a2fbad59d878c88289d0c7a349dc8f6decbcab5680"
+}

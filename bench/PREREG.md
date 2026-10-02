@@ -1,4 +1,183 @@
-# A/B pre-registration: four arms, wrong "done" and cost per correct task
+# A/B pre-registration: delegation, Claude alone or Claude with claude-referee's judge
+
+Registered 2026-10-02, in the commit that adds this text, before any pilot or main session was run. It replaces the four-arm registration, which is kept unchanged in [Appendix A](#appendix-a-superseded-four-arm-registration-archived) and marked superseded; the reason is in [D1](#d1-why-the-four-arm-study-was-replaced). The only data that exists when this is registered is the 4-session harness dry run of the old design (see [README.md](README.md)); no session of the new design has run. Results go in `bench/RESULTS.md`, whichever way they fall. Later changes go only in [Amendments to this registration](#amendments-to-this-registration), with the date and whether any data had been seen.
+
+## D1. Why the four-arm study was replaced
+
+The old study asked whether anything that watches the end of a turn lowers wrong "done". Its premise was that the Stop gate separates a right "done" from a wrong one. The later measurements say it does not: the hard-task study found 15 wrong "done" in 74 usable sessions but the gate blocked 51 of the 53 correct ones, and the base-rate study found 1 wrong "done" in 100 asked stops ([measurements](../docs/measurements.md), [design](../docs/decisions/session-hard-tasks.md); both on synthetic ground truth). A gate that blocks nearly everything cannot be told apart from one that blocks nothing by a rate of wrong "done" alone, so a four-arm comparison would mostly have measured what blocking everything costs. The Stop gate is therefore not the thing this A/B tests. What the repository can offer that is measurable and cheaper is delegation: `judge` applies one yes/no rule to many items, and the skill claims it pays off "from about 20 items that aren't in context yet", a figure that is modelled and not measured ([skill](../plugins/claude-referee/skills/jev/SKILL.md)). This study measures that claim, and nothing else, once, on a deliberately small pilot.
+
+## D2. Question and hypotheses
+
+**Question.** When a task needs one rule applied to many items, does Claude spend fewer tokens and less money, at no lower accuracy, if it hands the per-item judgement to claude-referee's judge (Jev) than if it reads and judges every item itself?
+
+- **H1 (cost, primary):** the combined cost (Claude plus Jev, USD per case) of the `delegate` arm is lower than that of the `alone` arm. The primary outcome is fixed in [D6](#d6-outcomes-and-primary-outcome).
+- **H2 (accuracy, a gate):** the `delegate` arm is not worse than `alone` by more than 0.10 in recall and not worse by more than 0.10 in precision, against the labels of [D4](#d4-cases-items-and-labels).
+- **Secondary, reported, none decides:** Claude tokens by kind, Claude-only USD, Jev USD and tokens, wall time, turns and tool calls, delegation compliance (did the delegate arm call the judge on every chunk), whether the `alone` arm solved the task with a script instead of reading, the judge's `review`, `unanswered` and `stopped` counts.
+
+This is one model, one task rule, four public repositories and a rule whose labels are built by a script. It does not say what delegation does for other rules, models or repository sizes (see [D13](#d13-limits)).
+
+## D3. Arms and their exact configuration
+
+Both arms run the same model, the same tools, the same work-tree layout and the same project settings sources. Configuration is in `bench/arms.mjs` (`DELEGATION_ARMS`) and tested in `test/bench-delegation.test.ts`, which also checks that the prompt text below is the text the code builds.
+
+Common to every session: `claude -p <prompt> --setting-sources project,local --permission-mode acceptEdits --allowedTools "Read,Edit,Write,Bash(node *),Bash(python3 *),Bash(npm test*),Bash(make test*)" --model haiku --output-format json --max-budget-usd 0.40`, a fresh git repository in a unique work directory (committed as "starter"), `REFEREE_DATA_DIR` set per session, `CLAUDE_PLUGIN_DATA` and `CLAUDE_CONFIG_DIR` unset, 600 s timeout. Haiku (alias `haiku`, resolved id recorded per session) is the cheapest current model and is the worker in both arms.
+
+Work tree of both arms: `items.jsonl`, one line per item, `{"id", "text"}`, nothing else (no label, no file name, no line number). Both arms are told to write `findings.json`, a JSON array of the ids they judge tracked; that file is what is scored.
+
+**Task text (both arms)**, with `N` the item count and `REPO` the repository's `owner/name`:
+
+> items.jsonl in this directory has N lines. Each line is a JSON object {"id", "text"}: one TODO, FIXME, XXX or HACK comment line taken from the source of REPO. An item is tracked when its text holds an issue or pull request number (#123, gh-123, issue 123, PR 123), a URL starting with http:// or https://, a name or version in parentheses right after the marker (TODO(name), FIXME(1.11)), or an @name after it (TODO @name). Any other item is untracked. Write findings.json in this directory: a JSON array of the ids of all tracked items, for example ["n001","n007"]. Then reply with one sentence saying how many tracked items you found. Answer in English.
+
+| Arm | Extra files in the work tree | Plugin | Suffix appended to the task text |
+|---|---|---|---|
+| `alone` | none | not loaded, no `.claude/referee.json` | ` Decide for each item yourself.` |
+| `delegate` | `chunks/c01.jsonl`, `c02.jsonl`, ... (the same lines, at most 20 per file, in order), `.claude/referee.json` = `{"pack":"bench-todo","hooks":{"sessionStart":false,"stopGate":"off"}}` | copy of `plugins/claude-referee` loaded with `--plugin-dir`, with the pack `bench/pack/bench-todo` copied into its `packs/`; its hooks are inert (both hooks off) | see below |
+
+**Delegate suffix** (appended to the task text; `PLUGIN` is the absolute path of the plugin copy in the out directory):
+
+> Do not decide the items yourself. The directory chunks/ holds the same items in files of at most 20 lines. For each chunk file run `node PLUGIN/dist/cli.mjs judge --question todo.tracked --items chunks/<file>`; it prints one JSON line. The ids in its "flagged" list are the tracked items; ids in "review_ids", "unanswered" or "stopped" are not tracked and you must not decide them yourself. Combine the flagged ids of all chunks into findings.json. Your reply also gives the totals of flagged, review_ids, unanswered and stopped ids.
+
+Why these choices:
+
+- **Chunks of 20.** `judge` lists at most the first 20 flagged ids ([source](../src/cli/commands/judge.ts), `LIST_LIMIT`); a chunk of 20 items can never lose a flagged id. The chunk files are prepared by the harness and are not Claude's work, which favours neither arm's cost: they are small files Claude only passes by name.
+- **Items given in a file to both arms.** Extraction is mechanical and is not what is under test; leaving it to Claude would add grep-strategy variance that swamps the per-item judgement cost. Both arms start from the same `items.jsonl`.
+- **The rule is stated in full to the `alone` arm and encoded literally in the pack question** (`bench/pack/bench-todo/questions/judge.json`, `todo.tracked`, auto band 0.9, `lint-pack` clean). Recall and precision therefore measure how well each arm applies a stated rule, not whether they guess it. Nothing in the pack was tuned on any case; `todo.tracked` has not been measured before this study.
+- **`review`, `unanswered` and `stopped` items count as not found** (the 0.9 band is never loosened). Their numbers are reported per arm. The `alone` arm has no such band.
+- **`alone` may use any allowed tool, scripts included.** Delegation is compared with what Claude does when left alone, not with a forced line-by-line read. The share of `alone` sessions whose findings came from a script (a `Bash` call running `node` or `python3` before `findings.json` was written) is reported; if it is most of them, that is a result about how cheap this rule is to solve mechanically and is stated as such.
+- **Intention to treat.** A delegate session that did not call the judge on every chunk stays in the data as it ended; compliance is reported.
+- **Not a gate test.** The Stop gate and the other hooks are off in both arms.
+
+## D4. Cases, items and labels
+
+Four public repositories, each pinned by the full commit SHA. A case is one repository and one path pattern, so cases are clusters; repeated sessions of one case are not independent.
+
+- **Pinned hash (SHA-256 over the JSON of the 4 case entries in `bench/cases-delegation.json`):** `91c9293ee37871ece754f5a2fbad59d878c88289d0c7a349dc8f6decbcab5680` (amendment 2). `test/bench-delegation.test.ts` fails if this line and the file disagree. The old four-arm file `bench/cases.json` and its hash `f7e255bc...` are untouched.
+- **Cases:** `d-pytest` (pytest-dev/pytest `2887015c...`, `src/`), `d-babel` (babel/babel `7c1dcfac...`, `packages/*/src/`), `d-node` (nodejs/node `cfb6aa17...`, `lib/`), `d-sklearn` (scikit-learn/scikit-learn `2cc5fc98...`, `sklearn/`); full SHAs are in the file. Repositories were chosen because they are large public projects with many TODO comments; the choice was made by counting marker lines in shallow clones of eighteen candidate repositories (on 2026-10-02) and keeping four with enough items of both kinds (several others had almost no tracked items or almost no markers at all). This selection saw counts of marker lines and of tracked and untracked items, not any session outcome. Before registration the labeller was also inspected on sampled item texts with their tracked or untracked labels (a scratch script printing them), which led to amendment 2; no session outcome was seen.
+- **Items.** Every source line (`.js .mjs .cjs .ts .py`) under the case's path pattern with a `TODO`, `FIXME`, `XXX` or `HACK` word after a comment opener (`//`, `/*`, `*`, `#`, `<!--`) on the same line, excluding paths with `test`, `tests`, `__tests__`, `fixtures`, `node_modules`, `dist`, `vendor`, `third_party` or `__snapshots__`. The item text is the trimmed line, cut at 400 characters.
+- **Labels, built by code only (`bench/delegation-items.mjs`, `TRACKED_RULE`).** An item is *tracked* (the positive class) when its text matches any of: `#` plus 1 to 6 digits; `gh`, `GH`, `issue`, `issues`, `pull` or `PR` followed by an optional space or hyphen, an optional `#` and 1 to 6 digits; `http://` or `https://`; a marker immediately followed by a parenthesised word, name or version, with no space before the parenthesis (`TODO(name)`, `FIXME(1.11)`); a marker followed by `@name`. Every other item is untracked. **No human has reviewed any label.** Where the rule and a reader's judgement differ (for example `TODO(1.11)` is tracked by the rule though the parenthesis is a version, not an owner), the rule wins and the disagreement is a limit, not an error.
+- **Enrichment.** In the raw repositories most marker lines are untracked in three of the four cases and tracked in the fourth, so each case keeps a seeded sample of both strata (tracked and untracked), taken by SHA-256 of `seed:file:line`, seed `20261002`, with caps per case in the file (`d-pytest` 4 tracked and 26 untracked, `d-babel` 12 and 36, `d-node` 20 and 30, `d-sklearn` 24 and 36). The set is 188 items, 60 of them tracked (prevalence 0.32). Precision on this set is not precision on a raw repository; the baseline "flag everything" (precision 0.32, recall 1.00) is printed next to every result.
+- **Fetch.** The harness fetches each repository at its SHA into the out directory at run time and refuses to start if the label hash of a case differs from the file. Repository contents and item texts are never committed.
+- **Credential-shaped text.** The judge refuses items that look like credentials (`stopped`). Counts are an outcome; if the pilot shows a stopped item, it is reported and stays an unfound item for the `delegate` arm.
+
+## D5. Sessions, randomisation, sample size
+
+- **Unit.** The session; the cluster for inference is the case.
+- **PILOT.** 4 cases, 2 repetitions, 2 arms: **16 sessions**, one at a time, never retried, cost recorded even when a session fails. **This is an explicitly underpowered pilot. It cannot support a claim about cost or accuracy**; four clusters give a cluster-bootstrap interval that is not interpretable and at most a handful of positives per case. Its job is to show that the harness works, how large the effect and the variance look, and whether the main run is worth its cost. It is reported in full as a pilot, and its sessions are never part of the main data.
+- **Randomisation.** Block = one case and one repetition, with both arms back to back. Blocks are run in a seeded random order (seed 20261002, `mulberry32`, Fisher-Yates); the arm order inside a block alternates, `alone` first when `(repetition + case index)` is even, so each arm is first equally often.
+- **Main run, set by the pilot by this rule only.** Let `r_i` be, for case `i`, the natural log of (mean combined cost of its `delegate` sessions over mean combined cost of its `alone` sessions) in the pilot, and `s` their sample standard deviation. The number of cases needed to detect a 20 percent cost reduction with a paired design at two-sided alpha 0.05 and power 0.80 is `K = ceil(((1.960 + 0.842) * s / ln(0.8))^2)`, at least 4. The main run uses 2 repetitions per case.
+  - **Stop, no main run (the pilot is the result):** more than a quarter of the pilot sessions of either arm are `run_failed` or have no usable `findings.json`; or the pilot's point estimate of recall or of precision for `delegate` is more than 0.10 below that of `alone`; or the pilot's combined cost ratio (total `delegate` over total `alone`) is 1.00 or more; or `K` cannot be computed.
+  - **Otherwise** run the main stage on `K` cases (the 4 pinned cases and, when `K` is above 4, `K - 4` more cases of the same kind). Additional cases are specified, pinned by SHA and hashed as an amendment before the first main session. If `K` is above 12 the main run uses 12 and reports the cost outcome as underpowered with its minimum detectable ratio.
+  - A 20 percent reduction is a registered effect size of interest, not an estimate: nothing about it is known before the pilot.
+- **Cost caps (list price USD, never raised):** dry run 1, pilot 4, main 15; 0.40 per session. The runner stops before a session whose worst case would pass the cap. Jev's own spend is billed by TypeSafe, is small (judge pricing is about 0.042 USD per million input tokens), is recorded per session from the receipts, and is outside these caps; it is reported in full.
+- **Dry run (before the pilot, not data):** exactly 2 sessions, case `d-pytest`, one per arm, model `haiku`, with the real judge. Its purpose is to prove the harness end to end, including that the key is reachable from a Claude subprocess. Its real spend and numbers go in the README and nowhere in the analysis.
+
+## D6. Outcomes and primary outcome
+
+All outcomes are computed from files the harness writes (`ground.json` per session) and from Claude Code's transcript, never from what Claude says about itself.
+
+**Primary outcome: combined cost per case, in USD.** For a session, `combined = Claude USD (from the transcript, priced per D7) + Jev USD (from the session's receipts)`. For an arm, the total over its sessions. The headline is the ratio `total combined delegate / total combined alone`, with a cluster bootstrap over cases (10,000 resamples, seed 11, percentile 95%) as the interval. Claude-only USD and Claude tokens are computed the same way and published with equal prominence in the same table, together with Jev USD as its own column, so a reader can take any of the three. The hypothesis H1 text names Claude tokens and cost; the primary outcome adds Jev's bill because the person who delegates pays it, and a result that left it out would favour the `delegate` arm.
+
+**Accuracy (gate, H2), all against the labels of D4:**
+
+- *Found* is an id in `findings.json` that is a tracked item (true positive); an id that is untracked is a false positive; a tracked id not in the file is a false negative. Ids not in `items.jsonl` and duplicates are counted as invalid and dropped; a missing or unparsable `findings.json` is an empty finding set and is counted.
+- **Precision** = TP / (TP + FP), **recall** = TP / (TP + FN), pooled over all sessions of the arm, with the exact **Clopper-Pearson 95% interval**; **F1** from the pooled counts, no interval. Per-case tables are printed beside the pooled figures.
+- **Difference (delegate minus alone)** for recall and for precision with the **Newcombe hybrid-score 95% interval** (method 10), and as sensitivity a **cluster bootstrap over cases** (same settings as above).
+- **Gate:** the `delegate` arm passes H2 only if the lower 95% bound of its recall minus `alone`'s recall is above -0.10 **and** the lower bound of its precision minus `alone`'s is above -0.10. In the pilot the gate is reported and is expected to fail for lack of data; the pilot decision uses the point estimates (D5).
+- **Claim rule.** A cost reduction is claimed only in the main run, only when the combined-cost ratio has a bootstrap interval entirely below 1 **and** the gate passes. Anything else is reported as not shown, with the interval.
+
+**Other outcomes:**
+
+- **Tokens and cost of Claude:** per D7; tokens in five kinds (input, output, cache read, cache write 5-minute, cache write 1-hour), per session and per arm.
+- **Jev cost:** `cost_usd`, `input_tokens`, `requests` and `cached` summed from the receipts under the session's data directory (what `receipts --tokens` totals), as its own column and inside the combined figure.
+- **Wall time:** `duration_ms` from the CLI's result JSON, per session, median per arm, with the paired per-case difference.
+- **Turns and tool calls:** `num_turns`, and the number of `Read`, `Write`, `Edit` and `Bash` tool calls counted from the transcript.
+- **Compliance of `delegate`:** number of `judge` calls, number of chunk files, and the share of sessions that called the judge on every chunk. **Judge counts:** `yes`, `no`, `review`, `unanswered` and `stopped`, summed from the judge's output lines in the transcript.
+- **Script use in `alone`:** as in D3.
+
+## D7. Cost accounting
+
+The accountant is the existing `bench/cost.mjs` with `bench/pricing.mjs`, unchanged and tested in `test/bench-cost.test.ts`.
+
+- **Grouping.** One API request appears in the transcript as one line per content block with the same `requestId`; lines are grouped by `requestId` (else `message.id`), each usage field taking its largest value over the group. Subagent (sidechain) lines and extra transcript files are read too.
+- **Cache writes priced apart.** `ephemeral_5m_input_tokens` at the 5-minute rate and `ephemeral_1h_input_tokens` at the 1-hour rate; a total with no split is priced as 5-minute writes and flagged. In the old dry run every cache write was a 1-hour write, so a flat rate would have been wrong.
+- **Rates** from [platform.claude.com/docs/en/about-claude/pricing](https://platform.claude.com/docs/en/about-claude/pricing), fetched 2026-10-02 (Haiku 4.5: input 1, 5-minute write 1.25, 1-hour write 2, cache read 0.10, output 5 USD per million tokens). An unknown model id throws instead of pricing at zero. Prices are not updated retroactively.
+- **Three lines per arm, never merged without being shown separately:** transcript-priced Claude USD; the CLI's own `total_cost_usd` with the gap to it; Jev USD from receipts.
+- **Failed sessions are included.** Priced from whatever reached the transcript, else the CLI total, else the 0.40 cap.
+- **Jev is not asked to price itself.** Receipts are written by the CLI from the API's usage; this is the same source `receipts --tokens` reports.
+
+## D8. Stop rules
+
+- The caps of D5 never rise. The harness stops and the cause is investigated when three or more sessions of a stage are `run_failed` in a row (login, rate limit, credit, model unavailable), when the judge returns `no_api_key`, `auth_failed` or `rate_limited` in a session, or when a pinned hash (cases, plugin bundle, pack) differs from `manifest.json`. A fix is written under Amendments; affected sessions stay in the data.
+- No arm configuration, prompt, case or threshold changes after the pilot's first session. A change is an amendment and sessions run under the old configuration are reported separately.
+- The pilot rule of D5 decides whether the main run starts.
+- A transcript that mentions the labels, `ground.json`, or a path outside the work tree (the plugin copy excepted; relative `..` paths count) is `leaked` and excluded for both arms of that block, where a block is the pair of sessions of one case and repetition; labels are never written to disk, only rebuilt in memory from the items (amendment 3).
+
+## D9. What counts as a negative result
+
+All of these are published in `bench/RESULTS.md` and the repository's README does not claim more than they show.
+
+- **No cost saving:** the combined-cost ratio is 1.00 or more, or its interval includes 1. Reported with the Claude-only and Claude-token ratios, which may disagree with the combined one.
+- **Accuracy lost:** the gate of D6 fails in the main run, or the pilot stop rule fires on the point estimates. A cost saving with lost accuracy is reported as a cost without benefit and is not a result for delegation.
+- **Delegation did not happen:** fewer than 80 percent of `delegate` sessions called the judge on every chunk; the ratio is then about what Claude did with a skill in reach, and is labelled so.
+- **The `alone` arm solved the task by script in most sessions:** reported as a finding that for a mechanical rule delegation has nothing to save; not hidden by dropping those sessions.
+- **Pilot only:** a pilot that ends in "stop" is a result, not a failure, and is published with its numbers. A pilot never supports a claim about cost.
+- A result in claude-referee's favour is reported with the same intervals and caveats.
+
+## D10. Analysis plan
+
+Fixed before the data. Nothing is tuned after the data is read.
+
+1. Counts: sessions per arm and case, failed, leaked, with and without `findings.json`, with and without judge calls.
+2. D6 accuracy tables, pooled and per case, with the baseline "flag everything".
+3. D6 cost table: Claude USD, Claude tokens by kind, Jev USD, combined USD, per arm and as ratios with their bootstrap intervals; per-case ratios beside them.
+4. Wall time, turns, tool calls, compliance, judge counts, script use.
+5. The output of `node bench/delegation-run.mjs report` is quoted in `RESULTS.md` in full; raw `ground.json`, transcripts and receipts stay outside the repository, and only aggregate tables are committed.
+
+## D11. Jev forks, with receipts
+
+Forks went through `decide` (two option orders each) from the main checkout, bar p of at least 0.90 with both orders agreeing. Neither reached the bar, a neutral fact was added once, and the second answer was also weak; the conservative option was taken and is marked so. Each option was stated in its strongest form.
+
+| Fork | Options | First ask | After a neutral fact | Taken |
+|---|---|---|---|---|
+| Primary cost outcome | Claude USD only, combined Claude plus Jev USD, Claude tokens | receipt `rmur7ons5mrk1`: combined 0.655, Claude USD 0.34, tokens 0; weak, orders agreed | receipt `rmur7ov26vnyl`: combined 0.57, Claude USD 0.43, tokens 0; weak, orders agreed | Combined USD (Jev's lean, and the option that cannot favour the arm that incurs the extra bill); the other two published beside it. p below 0.90 |
+| Accuracy gate | precision and recall each, F1 only, recall only | receipt `rmur7p5u6m2fe`: both 0.63, F1 0.07, recall 0.30; weak, orders agreed | receipt `rmur7pbu13dc7`: both 0.56, F1 0.22, recall 0.21; weak, orders agreed | Precision and recall each against -0.10 (Jev's lean, and the stricter of the three). p below 0.90 |
+
+The neutral facts added were that all candidate quantities are published whichever is chosen, and, for the first fork, the expected size of the judge bill (one to three percent of a session) and, for the second, that the pilot cannot establish non-inferiority at this size. Forks taken without Jev, each on the conservative option: not-found for `review` and `unanswered` items; the intention-to-treat treatment of non-compliant sessions; the item caps and enrichment of D4; the pilot size of 4 cases and 2 repetitions; a 20 percent reduction as the effect of interest.
+
+## D12. Pinned files
+
+`bench/cases-delegation.json` (hash above), `bench/pack/bench-todo` (its files are copied into the plugin copy, and `manifest.json` records the SHA-256 of `questions/judge.json` and of `plugins/claude-referee/dist/cli.mjs` for the run), `bench/arms.mjs`, `bench/delegation-items.mjs`. The study does not run if the case hash, the pack hash or the CLI bundle hash differs from the one recorded when the first session ran.
+
+## D13. Limits
+
+- One rule, which a regular expression decides exactly: the study measures the cost of delegating a stated rule, not the accuracy of judgement on a rule that needs interpretation. If a script solves it for free, `alone` can win on cost by construction; that is a finding about this rule.
+- The labels are the rule's output, not a person's opinion; no human reviewed them. The rule and the pack question can disagree with common sense at the edges (version numbers as owners, `#` followed by digits in a non-issue context).
+- 30 to 60 items per case is a small "many". The skill's break-even of about 20 items is modelled; per-call overhead may dominate at these sizes, which is a result, not an error.
+- Enriched strata (188 items, 32 percent tracked). Precision is not raw-repository precision.
+- One worker model (Haiku 4.5), which may behave differently from larger models; one judge model version, recorded per receipt.
+- Items from public repositories could be in a model's training data; this does not help with a rule stated in the prompt.
+- The user-level `CLAUDE.md` loads in every session and cannot be isolated; login, rate limits and cache state are shared across arms. Arm order alternates, which does not remove them.
+- Cost is list price; a subscription login is billed in quota, not USD.
+- Sessions of a case are not independent; the pooled Clopper-Pearson and Newcombe intervals are too narrow and the cluster bootstrap with 4 cases is too coarse; both are printed.
+- The judge lists at most 20 flagged ids per call; a chunk size of 20 removes the issue for this study and is a property of this protocol, not of delegation in general.
+
+## Amendments to this registration
+
+Made on 2026-10-02, before any session of the new design:
+
+1. **Supersession.** This registration replaces the four-arm registration of the same date (Appendix A). No four-arm pilot or main session was ever run; the only data is the harness dry run of 4 sessions, whose results stay in the README as harness evidence. The four-arm harness files remain in the repository so that the archived text still describes something that runs; their registered hashes are unchanged: `bench/cases.json` still has SHA-256 `f7e255bc...` over its 20 task entries (the line in Appendix A is verbatim and still checked by `test/bench-stats-plan.test.ts`). The new case set has a different, new hash (D4). `bench/arms.mjs` now exports both `ARMS` (the four arms of Appendix A) and `DELEGATION_ARMS` (`alone`, `delegate`); the old exports are unchanged.
+
+2. **Label rule made literal, case hash re-pinned.** The first draft of `owner_paren` allowed whitespace between the marker and the parenthesis (`TODO (later)` was tracked), which the question text ("right after the marker") does not say. The pattern now requires the parenthesis to follow the marker directly, the 4 cases were rebuilt (item counts unchanged: 188 items, 60 tracked) and the hash of D4 changed from `c2716756...` to `91c9293e...`. Made in the same session as the registration, before the harness ran on any case and before any session; the first hash was never used by a run.
+
+3. **Leak rule made literal.** The harness first flagged only the literal strings `out/labels` and `ground.json` and dropped only the leaked session, leaving its partner arm in. It now flags tool inputs that resolve outside the work tree (including relative `..` paths), writes no label file, and excludes both sessions of a (case, rep) block as D8 states. Made before any pilot session; no data had been seen.
+
+---
+
+# Appendix A. Superseded four-arm registration (archived)
+
+**Superseded on 2026-10-02 by the registration above, before any session of it ran, because the Stop gate does not separate a right "done" from a wrong one, so a four-arm comparison would have measured the cost of blocking everything (reason in D1). The text below is the earlier registration, unchanged except that its title is demoted from H1 and this note was added; its pinned hashes, thresholds and sample sizes are historical and nothing is run under them.**
+
+## Archived title: A/B pre-registration: four arms, wrong "done" and cost per correct task
 
 Registered 2026-10-02, in the commit that adds this file, before any pilot or full session was run. The only sessions run so far are the 4 harness dry-run sessions in [README.md](README.md#dry-run); they are not data. Results go in `bench/RESULTS.md`, whichever way they fall. Later changes go only in [Amendments](#amendments), with the date and whether any data had been seen.
 
@@ -187,3 +366,4 @@ Made before any registered data (only the 4-session dry run exists):
 2. **Test-hook strata.** The hook acts on 7 of 16 cases; P1 per stratum is registered (section 10, 5a) and H1b is interpreted on the visible-test stratum.
 3. **Stop-block counting.** Claude Code records an exit-2 Stop block in `hookErrors` with `preventedContinuation` false, so `stop_hook_blocks` counts summaries with either signal.
 4. **C1 on both bases.** See section 10, item 4.
+5. **Superseded (2026-10-02, before any session of the four-arm design).** The whole registration above is replaced by the delegation registration at the top of this file. Nothing in it was changed; no hash above was altered.

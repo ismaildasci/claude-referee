@@ -111,7 +111,7 @@ export function parseRun(stdout) {
   return result && typeof result === "object" ? result : null;
 }
 
-function runClaude({ claude, prompt, cwd, model, plugin, dataDir, perSessionUsd, timeoutMs, extraEnv }) {
+export function runClaude({ claude, prompt, cwd, model, plugin, dataDir, perSessionUsd, timeoutMs, extraEnv }) {
   const args = ["-p", prompt, "--setting-sources", "project,local", "--permission-mode", "acceptEdits", "--allowedTools", ALLOWED_TOOLS, "--model", model, "--output-format", "json", "--max-budget-usd", String(perSessionUsd)];
   if (plugin) args.splice(2, 0, "--plugin-dir", plugin);
   const env = { ...process.env, REFEREE_DATA_DIR: dataDir, ...extraEnv };
