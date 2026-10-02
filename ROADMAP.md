@@ -66,7 +66,7 @@ Exit criteria: the `done` v2 and `claims` acceptance numbers hold on new hold-ou
 ## v0.5: widen
 
 - **`active` done-gate**, recommended only after at least 50 labelled stops with precision of 0.8 or better, at most 5% false blocks, a p95 of 3 seconds or less over every Jev attempt including failed ones (`p95_all_ms`), an error rate that is reported next to it, and the A/B.
-- **A CI recipe and a GitHub Action** that run `done` on the test log of agent-opened PRs and `claims` on changed docs, and upload receipts as an artifact.
+- **A CI recipe and a GitHub Action** that run `done` on the test log of agent-opened PRs and `claims` on changed docs, and upload receipts as an artifact. Built, unreleased: `action.yml`, `action/run.sh`, `docs/recipes/github-action.md`; not yet exercised on a hosted runner.
 - **Release-note claims**, only if `claims` precision held on hold-out.
 - **`judge --baseline`**, a ratchet that records existing violations once and reports only new ones.
 - **The community plugin marketplace**, after the A/B.
