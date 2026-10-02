@@ -67,6 +67,10 @@ When claude-referee is installed as `claude-referee@claude-referee`, the data di
 
 claude-referee never writes your API key anywhere: not to `CLAUDE_ENV_FILE`, receipts, the cache, tool output or project files.
 
+## The dashboard
+
+`npx claude-referee ui` serves a page from your own machine on 127.0.0.1 behind a random token. It makes no network call out, loads nothing from other hosts and sends no telemetry. It shows stop excerpts, so keep the URL it prints to yourself; the threats and defences are in [docs/decisions/ui-security.md](decisions/ui-security.md).
+
 ## Retention
 
 TypeSafe's [privacy policy](https://typesafe.ai/legal/privacy-policy) (updated November 19, 2025) says TypeSafe won't train or fine-tune models on your input. Its [data processing addendum](https://typesafe.ai/legal/data-processing) (updated April 24, 2026) keeps customer personal data "for as long as necessary", with no fixed period. Zero data retention is available to enterprise customers; see TypeSafe's [legal page](https://docs.typesafe.ai/legal.md). Check the current versions before you rely on them.
