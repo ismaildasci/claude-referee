@@ -313,6 +313,10 @@ Registered in [claims-tr.md](decisions/claims-tr.md) before any request. `eval r
 - **The registered check passed:** no wrong `supported` among 27 unsupported cases; 13 of 17 true claims confirmed (0.76; the English hold-out confirmed 19 of 24, 0.79). 12 cases were decided in code (a quote or number not in the source).
 - Limits: invented text, one model family writes and labels, one model version, Turkish only; it shows no collapse, not equality with English.
 
+### done v2 under the split bar
+
+[done v2 under the split bar](measurements-done-bar-split.md) (post hoc rescoring of hold-outs 2 to 6 and the real-log sample by evidence class; not a pass).
+
 ### done v2 on a sixth hold-out
 
 Registered in [done-v2-holdout6.md](decisions/done-v2-holdout6.md) before any case was written, same bars as the fourth and fifth, with a separate second labeller this time. `eval record --suite done-v2-h6` and `done-v2-h6p`, `jev-1.13.0`, 2026-10-01. Main set: 53 invented outputs (22 `met`, 31 `missing`) in about 40 tools that have no parser (`crystal spec`, `gleam test`, Pester, `bats`, `ginkgo`, `karma`, `elm-test`, `staticcheck`, `semgrep`, `ktlint`, `hugo`, `mkdocs`, `astro`, `nuxt`, `ant`, `conftest`, and others) plus adversarial cases; 63 of 63 written cases got the same label from both processes and 2 were dropped on a re-read. Cases: [done-v2-h6](../jev-evals/done-v2-h6/cases.jsonl), [done-v2-h6p](../jev-evals/done-v2-h6p/cases.jsonl). Answers: `recorded.jsonl` in each.
