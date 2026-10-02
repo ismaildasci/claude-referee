@@ -1,0 +1,6 @@
+{
+  "name": "bench-todo",
+  "version": "0.1.0",
+  "model": "jev-1.13.0",
+  "description": "Benchmark pack for the delegation A/B: one yes/no rule over TODO comment lines. Not shipped with the plugin."
+}

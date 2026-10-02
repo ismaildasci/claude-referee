@@ -1,0 +1,13 @@
+{
+  "todo.tracked": {
+    "type": "noul",
+    "instructions": {
+      "question": "Does this marker comment line carry a tracking reference?",
+      "note": "`item` is one source line with a TODO, FIXME, XXX or HACK comment. Judge only the text of the line."
+    },
+    "criteria": {
+      "true": "The line holds an issue or pull request number (#123, gh-123, issue 123, PR 123), a URL starting with http:// or https://, or a name or version in parentheses right after the marker (TODO(name), FIXME(1.11)), or an @name after it (TODO @name).",
+      "false": "The line holds none of these: it is a plain note, even if it describes a concrete task or names a file, function or person elsewhere in the sentence."
+    }
+  }
+}
