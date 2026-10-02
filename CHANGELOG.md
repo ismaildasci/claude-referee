@@ -22,6 +22,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- `scripts/session-study/replay-note.mjs`, an offline replay of a code-only Stop note (edits, no counted passing check, keyword success claim) over recorded study sessions; result in [docs/decisions/stop-code-note.md](docs/decisions/stop-code-note.md): not adopted, no mode built.
 - Added [a decision record on Claude Mods](docs/decisions/claude-mods.md) (Claude Code 2.1.287): what a pane, band or status line can do, how a mod gets data, the security model, and a comparison with the planned localhost dashboard. Decision: wait; no mod is built yet (Jev tie, p 0.55 against 0.45, below the 0.90 bar).
 - Registered a real-log hold-out for `done` v2 with metrics that do not conflict with the safety rule (wrong `met` 0, parsed coverage, `met` recall among parsed logs only); `done` v2 stays "not measured" on the old bar ([registration](docs/decisions/done-v2-real-logs.md)).
 - Added `scripts/real-ci/` (fetch real GitHub Actions step logs with `gh`, label, score) and the sample: 229 cases from 94 repositories in 13 language buckets, after the registered 8-per-bucket selection and the ambiguous and silent-`met` drops ([results](docs/measurements-real-logs.md)).
