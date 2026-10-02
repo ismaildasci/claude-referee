@@ -1,0 +1,4 @@
+{
+ "command": "decide",
+ "note": "The 39 close-call decisions of decide-close with one author-written best option each (expected), written before any answer was recorded. Several options are defensible in these cases, so a label is one author's judgement; the metric is leader agreement plus the verdict mix, with no pass or fail threshold. Splits alternate by file order and carry no tuning."
+}
