@@ -57,6 +57,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - `eval score` fails on a recorded decide line that lacks an answer for an order instead of scoring it as a tie, and recordings are matched by their `ablation`: `eval record --ablation reversed` no longer writes a line (it needs the full recording and records nothing), so it cannot shadow the two-order recording.
 - Redaction: Telegram bot tokens in the Bot API URL form (`.../bot<id>:<secret>/getMe`) now stop a request. The token pattern requires the `AA` secret prefix, so numeric strings like `20260101:...` no longer stop; Hugging Face tokens need a digit, so long identifiers such as `hf_getUserSessionToken...` no longer stop.
+- Added a weekly canary workflow that installs the plugin with the latest and the pinned Claude Code in an isolated config dir, and a local `scripts/canary-install.mjs` (also run by `npm run ci:local` when `claude` exists).
+- Added docs/decisions/name-canary.md with the detection scope and the unexecuted `evidence-referee` fallback plan.
 
 ## [0.1.6] - 2026-10-01
 
