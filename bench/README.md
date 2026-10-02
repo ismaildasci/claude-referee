@@ -1,8 +1,21 @@
 # bench: the pre-registered A/B
 
-Harness for the four-arm A/B in [PREREG.md](PREREG.md): no gate, a 20-line test hook, Claude Code's `/goal`, and claude-referee in `soft` mode. The plan is registered before the first pilot session and the result goes in `RESULTS.md` whichever way it falls. **Nothing has been run beyond a 4-session dry run.**
+The registered A/B in [PREREG.md](PREREG.md) is a two-arm **delegation** study: when a task applies one rule to many items, does Claude spend less if it hands the per-item judgement to claude-referee's judge (`delegate`) than if it reads and judges every item itself (`alone`), at no lower accuracy. It runs on four public repositories pinned by commit SHA, with labels built by a script (no human review), as an explicit **pilot** of 16 sessions that is underpowered for any cost claim. The plan is registered before the first pilot session and the result goes in `RESULTS.md` whichever way it falls. **The pilot has not run; only a 2-session dry run of the new design (section "Dry run, delegation") and the 4-session dry run of the old design exist.**
 
-## Files
+The earlier four-arm registration (no gate, a 20-line test hook, `/goal`, claude-referee in `soft` mode) is superseded and archived as Appendix A of PREREG.md: the Stop gate does not separate a right "done" from a wrong one, so that design would have measured the cost of blocking everything. Its harness files are kept and still run.
+
+## Files (delegation study)
+
+| File | What it is |
+|---|---|
+| `PREREG.md` | The registered plan (top), the amendments, and the archived four-arm registration (Appendix A) |
+| `cases-delegation.json` | The 4 cases: repository, commit, path pattern, strata caps, counts and the label hash; no item texts |
+| `snapshot-delegation.mjs`, `delegation-items.mjs` | The one-off that wrote the file, and the fetch, extraction and label rule |
+| `pack/bench-todo` | A data-only pack with the one question `todo.tracked`, copied into the delegate arm's plugin copy |
+| `arms.mjs` | `DELEGATION_ARMS` (`alone`, `delegate`: files, prompt text) next to the archived `ARMS` |
+| `delegation-session.mjs`, `delegation-run.mjs` | One session (work tree, `claude -p`, transcript, receipts, scoring) and the command line |
+
+## Files (archived four-arm study)
 
 | File | What it is |
 |---|---|
@@ -20,7 +33,7 @@ Harness for the four-arm A/B in [PREREG.md](PREREG.md): no gate, a 20-line test 
 
 Tests: `test/bench-cost.test.ts`, `test/bench-stats-plan.test.ts`, `test/bench-session.test.ts` (run by `npm test`; the session tests use a stub `claude`).
 
-## Use
+## Use (archived four-arm study)
 
 Raw runs go to a directory outside the repository (`--out`). Each step is resumable: a session with a `ground.json` is never rerun, and its spend is in `ledger.jsonl` before anything else can fail.
 
