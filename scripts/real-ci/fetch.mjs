@@ -4,7 +4,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { buildEvidence, classify, criterionOf, sha256, splitSegments, stripTransport, wrapperTool } from "./lib.mjs";
+import { buildEvidence, classify, criterionOf, refineTool, sha256, splitSegments, stripTransport, wrapperTool } from "./lib.mjs";
 
 const args = process.argv.slice(2);
 const flag = (name, fallback) => (args.includes(`--${name}`) ? args[args.indexOf(`--${name}`) + 1] : fallback);
@@ -153,7 +153,7 @@ function processRepo(meta, bucket) {
           step_name: step.name,
           purpose: kind.purpose,
           criterion: criterionOf(kind.purpose),
-          tool: wrapperTool(evidence.text, kind.tool),
+          tool: wrapperTool(evidence.text, refineTool(kind.tool, evidence.text)),
           conclusion: step.conclusion,
           failed: stepFailed,
           exit_code: evidence.exit,
@@ -185,9 +185,10 @@ for (const lang of LANGS) {
   }
 }
 
-const all = readdirSync(join(OUT, "repos")).flatMap((f) => readJson(join(OUT, "repos", f)).cases);
+const pickedFiles = readdirSync(join(OUT, "repos")).filter((f) => picked.has(readJson(join(OUT, "repos", f)).repo));
+const all = pickedFiles.flatMap((f) => readJson(join(OUT, "repos", f)).cases);
 const dropped = {};
-for (const f of readdirSync(join(OUT, "repos"))) for (const [k, v] of Object.entries(readJson(join(OUT, "repos", f)).dropped)) dropped[k] = (dropped[k] ?? 0) + v;
+for (const f of pickedFiles) for (const [k, v] of Object.entries(readJson(join(OUT, "repos", f)).dropped)) dropped[k] = (dropped[k] ?? 0) + v;
 writeFileSync(join(OUT, "cases-raw.jsonl"), `${all.map((c) => JSON.stringify(c)).join("\n")}\n`);
 writeFileSync(join(OUT, "stats.json"), JSON.stringify({ ...stats, accepted, dropped, repos: new Set(all.map((c) => c.repo)).size, cases: all.length, failed_cases: all.filter((c) => c.failed).length, calls }, null, 1));
 console.error(JSON.stringify({ accepted, repos: new Set(all.map((c) => c.repo)).size, cases: all.length, failed: all.filter((c) => c.failed).length, dropped }));

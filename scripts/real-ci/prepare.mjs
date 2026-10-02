@@ -7,12 +7,13 @@ import { doneEvidence, doneRequest } from "../../src/cli/commands/done.ts";
 import { redact } from "../../src/engine/redact.ts";
 import { loadPack, packDirs } from "../../src/engine/pack.ts";
 import { parseEvidence } from "../../src/engine/runners/index.ts";
+import { refineTool } from "./lib.mjs";
 
 const dir = process.argv[2];
 if (!dir) throw new Error("usage: prepare.mjs DIR");
 const raw = readFileSync(join(dir, "cases-raw.jsonl"), "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
 const pack = loadPack("generic", packDirs(process.env));
-const report = { raw: raw.length, redaction_stopped: 0, stopped_kinds: {}, kept: 0, code_check_violations: [] };
+const report = { raw: raw.length, redaction_stopped: 0, stopped_kinds: {}, kept: 0, code_checked: 0, code_check_violations: [] };
 const kept = [];
 for (const c of raw) {
   const clipped = doneEvidence(c.evidence);
@@ -26,12 +27,14 @@ for (const c of raw) {
   const native = clipped.replace(/\nexit code: -?\d+$/, "");
   const nativeParsed = parseEvidence(native);
   if (!c.failed && nativeParsed.trust === "unparsed") {
+    report.code_checked += 1;
     const { finish } = doneRequest(pack, undefined, [c.criterion], native);
     const verdict = finish([{ id: "done", answers: { c1: { type: "noul", noul: 1 } }, stopped: [], cached: false }]).verdict;
     if (verdict === "met") report.code_check_violations.push(c.id);
   }
   kept.push({
     ...c,
+    tool: refineTool(c.tool, c.evidence),
     chars_cut: Math.max(0, c.evidence.length - 14_000),
     trust: parsed.trust,
     parsed: parsed.runners.length > 0,

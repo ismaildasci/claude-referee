@@ -146,6 +146,33 @@ export function buildEvidence(segment) {
   return { text: `${body.join("\n").replace(/\n+$/, "")}\nexit code: ${nonZero ?? 0}`, exit: nonZero ?? 0 };
 }
 
+const NOISE = /^(?:Node(?:\.js)? \d+ (?:actions )?(?:is|are) (?:being )?deprecated|Note: Using configuration file |\$ )/i;
+
+// True when the step printed nothing of its own after the run header: only the command echo, the shell and env block,
+// npm "> " and yarn "$ " echo lines, runner deprecation notices, a PHPStan config note and the exit line. Such evidence is indistinguishable from a no-op.
+export function silentOutput(text) {
+  const lines = text.replace(/\x1b\[[0-9;]*m/g, "").split("\n");
+  const shell = lines.findIndex((l) => /^\s*shell:/.test(l));
+  if (shell < 0) return false;
+  let i = shell + 1;
+  while (i < lines.length && (/^(?:env|with):\s*$/.test(lines[i]) || /^ {2,}[\w.-]+: /.test(lines[i]))) i += 1;
+  return lines.slice(i).every((l) => l.trim() === "" || /^exit code: -?\d+$/.test(l) || l.startsWith("> ") || NOISE.test(l));
+}
+
+const RAN_NOT_CLEAN = /skipped|pending|xfail|warning|deprecat|\bFAIL|ignored|zero tests|no tests? (?:were )?found|no test files|\b0 tests|not every test|issues found|no test count|printed no result|reported no tests/i;
+const NOT_RUN = /^(?:Only (?:install|adds|runs|ran|echoes|prints|reads|generates|sets|composer|apt|mozconfig|rollup|CMake|policy)|Build only|Step only|Database setup|Test binary only|Coverage report|Linter self-test|Ran the ruff formatter|--fix-only|--show-bin-path|Prettier formatting)|no (?:lint|linter|tests?|build)\b[^,;]*\b(?:ran|run|executed)\b/i;
+
+// For an expected-missing case, from the labeller's reason: "ran_not_clean" if the check ran and its output shows a skip,
+// warning, zero tests or a failure; "not_run" if the step only mentions the tool (install, echo, configure, other check).
+export const negativeKind = (why) => (RAN_NOT_CLEAN.test(why) && !NOT_RUN.test(why) ? "ran_not_clean" : "not_run");
+
+// The classifier groups phpcs, phpstan and php-cs-fixer in one class; the tool field names the one the command line runs.
+export function refineTool(tool, text) {
+  if (tool !== "phpcs") return tool;
+  const first = text.split("\n", 1)[0];
+  return /phpstan/i.test(first) ? "phpstan" : /php-cs-fixer/i.test(first) ? "php-cs-fixer" : "phpcs";
+}
+
 export function wrapperTool(text, tool) {
   const m = /^> (?:\S+@\S+ )?(?:\S+ )?(.+)$/m.exec(text.split("\n").filter((l) => l.startsWith("> ")).join("\n"));
   return m && /^(npm|pnpm|yarn|bun|make)\b/.test(tool) ? `${tool} -> ${m[1].trim().split(/\s+/).slice(0, 2).join(" ")}` : tool;

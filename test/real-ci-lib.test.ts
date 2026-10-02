@@ -2,7 +2,11 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { buildEvidence, classify, clopperPearson, kappa, splitSegments, stripTransport, upperOneSided } from "../scripts/real-ci/lib.mjs";
+import { execFileSync } from "node:child_process";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { buildEvidence, classify, clopperPearson, kappa, negativeKind, refineTool, silentOutput, splitSegments, stripTransport, upperOneSided } from "../scripts/real-ci/lib.mjs";
 
 const LOG = [
   "2026-09-14T01:24:01.2027120Z Current runner version: '2.337.0'",
@@ -69,4 +73,70 @@ test("exact intervals", () => {
 test("kappa of perfect and chance agreement", () => {
   assert.equal(kappa([["met", "met"], ["missing", "missing"]]), 1);
   assert.equal(kappa([["met", "missing"], ["missing", "met"]]), -1);
+});
+
+const HEAD = "$ poetry run isort --check .\n\u001b[36;1mpoetry run isort --check .\u001b[0m\nshell: /usr/bin/bash -e {0}\nenv:\n  PYTHONUNBUFFERED: 1\n";
+
+test("silent output: only echo, env block, npm and yarn echo lines, notices and the exit line", () => {
+  assert.equal(silentOutput(`${HEAD}exit code: 0`), true);
+  assert.equal(silentOutput("$ npm run lint\nshell: bash\n\n> pkg@1.0.0 lint\n> eslint ./src/**\nexit code: 0"), true);
+  assert.equal(silentOutput("$ pnpm lint\nshell: bash\nenv:\n  HUSKY: 0\n$ eslint src\nexit code: 0"), true);
+  assert.equal(silentOutput("$ eslint .\nshell: bash\nNode 20 is being deprecated. This workflow is running with Node 24.\nexit code: 0"), true);
+  assert.equal(silentOutput("$ vendor/bin/phpstan\nshell: bash\nNote: Using configuration file /x/phpstan.neon.\nexit code: 0"), true);
+});
+
+test("silent output: real output or no shell header is not silent", () => {
+  assert.equal(silentOutput(`${HEAD}Skipped 1 files\nexit code: 0`), false);
+  assert.equal(silentOutput("$ ruff check\nshell: bash\nAll checks passed!\nexit code: 0"), false);
+  assert.equal(silentOutput("$ make\nexit code: 0"), false);
+});
+
+test("tool field names phpstan and php-cs-fixer instead of phpcs; other tools are unchanged", () => {
+  assert.equal(refineTool("phpcs", "$ vendor/bin/phpstan analyze\nshell: bash"), "phpstan");
+  assert.equal(refineTool("phpcs", "$ vendor/bin/php-cs-fixer fix --dry-run"), "php-cs-fixer");
+  assert.equal(refineTool("phpcs", "$ vendor/bin/phpcs src"), "phpcs");
+  assert.equal(refineTool("eslint", "$ vendor/bin/phpstan"), "eslint");
+});
+
+test("negative kind separates checks that ran from steps that only mention the tool", () => {
+  assert.equal(negativeKind("6 tests skipped out of 412"), "ran_not_clean");
+  assert.equal(negativeKind("ESLint reported 459 warnings"), "ran_not_clean");
+  assert.equal(negativeKind("Only package has no test files; zero tests ran"), "ran_not_clean");
+  assert.equal(negativeKind("Only installs ruff; the linter never ran"), "not_run");
+  assert.equal(negativeKind("Build only; checkstyle and spotless explicitly skipped, no lint ran"), "not_run");
+  assert.equal(negativeKind("Only echoes a problem matcher; no tests executed"), "not_run");
+});
+
+const jsonl = (rows: object[]) => `${rows.map((r) => JSON.stringify(r)).join("\n")}\n`;
+const run = (script: string, ...args: string[]) => execFileSync(process.execPath, [join(import.meta.dirname, "..", "scripts", "real-ci", script), ...args], { encoding: "utf8", env: { ...process.env, PATH: "/nonexistent" } });
+
+test("fetch aggregation keeps only repositories the registered selection accepts (8 per bucket, star order)", () => {
+  const out = mkdtempSync(join(tmpdir(), "real-ci-fetch-"));
+  for (const dir of ["lists", "repos"]) mkdirSync(join(out, dir));
+  const langs = ["JavaScript", "TypeScript", "Python", "Go", "Rust", "Java", "Ruby", "PHP", "C#", "C++", "C", "Swift", "Kotlin"];
+  for (const lang of langs) writeFileSync(join(out, "lists", `${lang.replace(/\W/g, "_")}.json`), "[]");
+  const names = Array.from({ length: 9 }, (_, i) => `o/js${i}`);
+  writeFileSync(join(out, "lists", "JavaScript.json"), JSON.stringify(names.map((fullName) => ({ fullName, stargazersCount: 1 }))));
+  const record = (repo: string) => ({ repo, bucket: "JavaScript", license: null, stars: 1, cases: [{ id: `rl-${repo}`, repo, failed: false }], inspectedRuns: [], dropped: {}, topup: true });
+  for (const repo of [...names, "o/cached-but-not-listed"]) writeFileSync(join(out, "repos", `${repo.replace("/", "__")}.json`), JSON.stringify(record(repo)));
+  run("fetch.mjs", "--out", out, "--topup");
+  const ids = readFileSync(join(out, "cases-raw.jsonl"), "utf8").split("\n").filter(Boolean).map((l) => (JSON.parse(l) as { repo: string }).repo);
+  assert.equal(ids.length, 8);
+  assert.ok(!ids.includes("o/js8") && !ids.includes("o/cached-but-not-listed"));
+});
+
+test("assemble drops a met label on silent output as ambiguous and keeps a silent missing label", () => {
+  const dir = mkdtempSync(join(tmpdir(), "real-ci-asm-"));
+  const base = { repo: "o/r", purpose: "lint", criterion: "lint is clean", tool: "isort", failed: false };
+  writeFileSync(join(dir, "cases-screened.jsonl"), jsonl([
+    { ...base, id: "rl-silentmet", evidence: `${HEAD}exit code: 0` },
+    { ...base, id: "rl-silentmissing", evidence: `${HEAD}exit code: 0` },
+    { ...base, id: "rl-printed", evidence: "$ ruff\nshell: bash\nAll checks passed!\nexit code: 0" },
+  ]));
+  writeFileSync(join(dir, "labels1.jsonl"), jsonl([{ id: "rl-silentmet", label: "met" }, { id: "rl-silentmissing", label: "missing" }, { id: "rl-printed", label: "met" }]));
+  run("assemble.mjs", dir, join(dir, "suite"));
+  const report = JSON.parse(readFileSync(join(dir, "assemble.json"), "utf8")) as { silent_met: { id: string }[]; kept: number };
+  assert.deepEqual(report.silent_met.map((r) => r.id), ["rl-silentmet"]);
+  const kept = readFileSync(join(dir, "kept.jsonl"), "utf8").split("\n").filter(Boolean).map((l) => (JSON.parse(l) as { id: string }).id);
+  assert.deepEqual(kept, ["rl-silentmissing", "rl-printed"]);
 });

@@ -5,6 +5,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { doneEvidence, doneRequest } from "../../src/cli/commands/done.ts";
 import { loadPack, packDirs } from "../../src/engine/pack.ts";
+import { negativeKind } from "./lib.mjs";
 
 const [dir, root, out] = process.argv.slice(2);
 if (!dir || !root || !out) throw new Error("usage: analyze.mjs DIR SUITE_ROOT OUT_DIR");
@@ -12,6 +13,7 @@ const lines = (file) => readFileSync(file, "utf8").split("\n").filter(Boolean).m
 const kept = lines(join(dir, "kept.jsonl"));
 const recordedFile = join(root, "done-v2-real", "recorded.jsonl");
 const recordings = existsSync(recordedFile) ? lines(recordedFile) : [];
+const whys = new Map(lines(join(dir, "labels1.jsonl")).map((r) => [r.id, r.why ?? ""]));
 const pack = loadPack("generic", packDirs(process.env));
 const table = [];
 for (const c of kept) {
@@ -28,7 +30,7 @@ for (const c of kept) {
     purpose: c.purpose, criterion: c.criterion, tool: c.tool, conclusion: c.conclusion, exit_code: c.exit_code,
     evidence_sha256: c.evidence_sha256, chars: c.chars, chars_cut: c.chars_cut,
     parsed: c.parsed, trust: c.trust, runners: c.runners,
-    label1: c.label1, label2: c.label2, expected: c.expected,
+    label1: c.label1, label2: c.label2, expected: c.expected, negative_kind: c.expected === "missing" && !c.failed ? negativeKind(whys.get(c.id) ?? "") : null,
     code_decided: planned.length === 0, met_reachable: certain === "met", verdict: result.verdict, p: planned.length === 0 ? null : result.p ?? null, reason: result.reason ?? null,
   });
 }
