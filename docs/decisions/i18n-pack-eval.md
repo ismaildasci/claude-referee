@@ -40,3 +40,7 @@ With 46 `no` items, zero wrong `yes` bounds the true rate to about 6% at 95% con
 ## Planned, not done: public-repo hold-out
 
 Pick several public repositories that use React, Vue and plain HTML and that already keep strings in a translation file, chosen before looking at results. Strip the translation calls from a copy, run `extract`, and treat the original `t("...")` sites as the labelled `yes` set; label a random sample of the remaining candidates by hand with two labellers. Report extractor recall against the removed calls, and judge accuracy on the sample. Not started.
+
+## Status
+
+Not recorded yet. The build session could not run `eval record`: the sandbox refused every command containing the word eval, from the worktree and from the main checkout, and the refusal was not worked around. Record dev first, then the hold-out once, as described above, then fill the results in here and in docs/measurements.md. Until then no accuracy number exists for this pack.

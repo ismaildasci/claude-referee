@@ -165,6 +165,8 @@ Packs are data only; claude-referee never runs code from a pack.
 
 The `generic` pack has these questions: `done.met`, `verify.relation`, `verify.injection`, `decide.best`, `decide.fit`, and for `judge`, `line.risky` and `failure.env`.
 
+The `i18n` pack extends `generic` and adds `string.translatable` for `judge`: see [the i18n recipe](recipes/i18n.md).
+
 The `generic` pack ships with the plugin. Your team's packs can live in a private repository. To use them:
 1. Point `packs_dir` at that repository.
 2. Name the pack in `.claude/referee.json`.
