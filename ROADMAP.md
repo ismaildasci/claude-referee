@@ -6,6 +6,33 @@ Items marked **help wanted** are good places to start, and most need no TypeSafe
 
 What it is not: a model router, a context compactor or a general code reviewer. It doesn't replace Claude Code's `/verify` (which runs your app) or `/goal` (a Stop hook that reads only the conversation); it reads the evidence itself and records the decision. What was dropped or postponed, and why, is in [docs/decisions/dropped.md](docs/decisions/dropped.md).
 
+## Status at 2026-10-02
+
+Four words, used the same way everywhere below. **Done**: in a release (a tag exists) or in main with tests. **Measured**: a dated row in [docs/measurements.md](docs/measurements.md) with a count and a scope. **Open**: planned, with the missing piece named. **Blocked**: waiting on something only the maintainer can do. Latest release: v0.1.6 (tag `v0.1.6`, commit 5cc24b1, GitHub release 2026-10-01). 63 commits in main since then are unreleased, among them 13 not yet on GitHub. Stop gate studies ran in `shadow` mode, so "blocked" in this file and in the measurements means "would have blocked" (`would_block`); nothing was actually stopped. The name is `claude-referee`: the rename to `evidence-referee` was reverted (2af0ad0, [record](docs/decisions/rename-reverted.md)).
+
+| Item | State | Evidence |
+|---|---|---|
+| Commands `done`, `decide`, `judge`, `claims` (alias `verify`), receipts, redaction, session note | done, v0.1.0 to v0.1.6 | tags `v0.1.0` to `v0.1.6`; `claims` rename 35df4b1 |
+| Stop gate `shadow` and `soft` modes | done (`shadow` v0.1.3, bc59e45; `soft` in main, 2f75cee) | `soft` is unreleased |
+| `active` stop gate | open, not recommended | kill criterion fired on 100 asked stops (1 wrong done); hard study: precision 0.215, false blocks 0.962 ([measurements](docs/measurements.md#the-stop-gate-on-hard-tasks-wrong-done-study), ab575a0) |
+| Stop gate on self-generated easy tasks | measured | 119 sessions, 100 asked, 1 wrong done, all blocked (3c9a38f) |
+| Stop gate on hard tasks | measured | 76 sessions, 72 asked, 15 wrong dones in 74 usable (0.203), recall 14 of 15, precision 14 of 65, `claims_verified` AUC 0.398 (3729b08, ab575a0); 7.88 USD of the 8.00 cap |
+| Stop gate on real projects | not measured | no real shadow data; every number above is synthetic ground truth, not human labels |
+| `done` v2 parsers and caps | done, measured, not passed | six invented hold-outs, none passed ([measurements](docs/measurements.md#done-v2-on-a-sixth-hold-out), 34006e7); `done` v2 stays "not measured" |
+| `done` v2 `met` recall | open question for the maintainer | `met` found in 0.50 of expected cases on hold-outs 5 and 6, `all tests pass` in 1 of 11; the cost of widening is a wrong `met`, so the current rule keeps `unsure` over a guess. Decide whether low recall is acceptable or more parsers (each from real output) are worth the work |
+| `eval` for every command, decide suites, `--ablation context\|reversed` | done in main | f79e861; `jev-evals/decide-best` recorded on `jev-1.13.0`: leader agreement 16 of 39, verdicts 0 clear, 25 weak, 14 tie, 12 order disagreements ([record](docs/decisions/decide-eval-metric.md)) |
+| More labelled decide cases by someone other than the author | open, help wanted | all 39 labels are one author's judgement |
+| Stop regression suites `stop-sessions`, `stop-study`, `stop-hard` | done in main, pin plumbing, not rates | 77b2fa9, a1bc7f2; `eval score --suite all` passes |
+| Local dashboard `ui` | done in main | 4a78a02; open: Windows launcher, a second browser |
+| GitHub Action and CI recipe | built, not exercised on a hosted runner | 324470a, `action.yml`; unreleased |
+| `judge --baseline` | done in main | c61a919 |
+| Receipt chain, `receipts verify`, `receipts overrule` | done in main | e689e28 |
+| A/B bench (cost per task) | harness and pre-registration done, not run | 1fac7e4, ccca0b1; [bench/RESULTS.md](bench/RESULTS.md) says "Not run"; needs the maintainer's go and the Jev key |
+| Release 0.2.0 | not cut; needs the maintainer's explicit go | version is 0.1.6 in `package.json`, `npm/package.json` and `plugin.json`; no `v0.2.0` tag |
+| npm publish | blocked until 2026-10-03 14:22 UTC, then needs the maintainer's one-time code | account is read-only after a recovery code was used as an OTP; no workflow publishes |
+| Push of the 13 local commits | blocked | GitHub push protection (GH013) flags the Stripe-looking test fixture at `test/redact.test.ts:48` in 9e151eb and `:49` in 93d51fe; remote CI is red on the older `dist/cli.mjs` size limit that edbb46b fixes |
+| `claims` precision for release notes, community marketplace, 1.0 | open | each waits on a measurement named in its section below |
+
 ## v0.1: the commands and the session note (released)
 
 - `done`, `decide`, `judge` and `verify`, each with `--describe`, `--dry-run` and `--fail-on`
@@ -28,6 +55,8 @@ Released in 0.1.4:
 - The PHPUnit `Tests:` line is no longer read as a jest summary; `judge` and `decide` no longer let float arithmetic move a value that sits exactly on a band.
 - CI scans the whole git history with a pinned gitleaks.
 - A weekly job compares TypeSafe's `models.md`, `api.md` and `llms.txt` with recorded hashes (the rate limits changed once without an announcement we could find).
+
+Released in 0.1.5 and 0.1.6: labels appended instead of rewriting `stops.jsonl`, `met` capped at `unsure` for skipped tests and for logs that say no tests ran, more runner parsers, the `claims` name, hold-outs 2 to 6 (see the [changelog](CHANGELOG.md)).
 
 Still open:
 

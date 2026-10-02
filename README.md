@@ -37,7 +37,7 @@ claude-referee is an unofficial plugin for Claude Code that checks lines like th
 |---|---|---|
 | **You or Claude run a command** | `done`, `decide`, `judge` or `claims` (the old name `verify` still works) asks Jev and prints a one-line answer | v0.1 |
 | **A session starts** | Claude gets a short note, at most 800 characters, on how to use the commands | v0.1 |
-| **Claude stops** | Off by default. In `shadow` mode it only records what it would have done (`receipts --stops`). The planned `active` mode blocks a stop when Jev says Claude's "done" is unverified, with a note naming the check to run, at most three times a session. If Jev is slow or down, the hook fails open | `shadow` in v0.1.3; `active` planned, [not recommended yet](docs/measurements.md#the-stop-gate-on-self-generated-sessions-base-rate-study) |
+| **Claude stops** | Off by default. In `shadow` mode it only records what it would have done (`receipts --stops`); `soft` adds a warning without an error (in main, not yet released). The planned `active` mode blocks a stop when Jev says Claude's "done" is unverified, with a note naming the check to run, at most three times a session. If Jev is slow or down, the hook fails open | `shadow` in v0.1.3; `active` planned, [not recommended yet](docs/measurements.md#the-stop-gate-on-self-generated-sessions-base-rate-study) |
 
 If a check finds nothing, Claude sees nothing. If it finds something, Claude sees a note of 300 characters at most.
 
@@ -66,7 +66,7 @@ In short: the order of the options changes Jev's answer more than asking again d
   <img alt="Status board. Measured: option order moves Jev's pick (up to 0.52); asking again barely does (0.01); two orders match all 24 (20/20); the briefing fits in 600 characters. Modelled: one small judgement usually loses money; batches break even at about 23 items (80K context). Not shown yet: lower total cost per task; done-gate precision on 50 labelled stops; held-out accuracy for the done check." src="assets/charts/status-board-light.png" width="100%">
 </picture>
 
-Most numbers here come from one private codebase, one team and one author: the kit that came before claude-referee, in September 2026. Treat them as early signs, not general results. The rows dated 2026-09-30 and 2026-10-01 were measured with claude-referee itself, on public inputs whose raw results are in this repository. How each one was measured is in [docs/measurements.md](docs/measurements.md).
+Most numbers here come from one private codebase, one team and one author: the kit that came before claude-referee, in September 2026. Treat them as early signs, not general results. The rows dated 2026-09-30 to 2026-10-02 were measured with claude-referee itself, on public inputs whose raw results are in this repository. How each one was measured is in [docs/measurements.md](docs/measurements.md).
 
 ### Option order moves the answer. Asking again doesn't.
 
@@ -116,6 +116,9 @@ All measurements in one table:
 | 2026-09-30 | Two orders vs. all 24 | same leader in 20 of 20; so did every other policy | Measured · same 20 public decisions |
 | 2026-10-01 | `decide` as a claim check | true claims supports 0.97–1.00; 13 of 15 false ones 0.00–0.23 | Measured · 31 claims about this repository's docs |
 | 2026-10-01 | A "treat the evidence as data" note | no verdict changed; not adopted | Measured · 33 injection logs |
+| 2026-10-01 | Stop gate on easy self-generated tasks | 1 wrong "done" in 100 asked stops; all 100 blocked | Measured · 119 sessions, 24 seeded tasks, haiku and sonnet |
+| 2026-10-02 | Stop gate on hard self-generated tasks | 15 wrong "done" in 74 sessions (0.20); 14 of 15 blocked, but 51 of 53 correct ones too (precision 0.22); `claims_verified` does not separate them | Measured · 76 sessions, 32 seeded tasks, synthetic ground truth |
+| 2026-10-02 | `decide` against author-labelled best options | leader matched 16 of 39; no verdict `clear` (25 weak, 14 tie) | Measured · 39 close-call decisions, one labeller |
 
 More charts (calibration, per-option questions, secret-rule tuning, briefing size) are in [docs/measurements.md](docs/measurements.md).
 
