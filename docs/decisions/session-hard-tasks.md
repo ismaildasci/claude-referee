@@ -71,3 +71,5 @@ Limits stated before the run: tasks written by one author and one model family, 
 ## Changelog
 
 Adjustments to the tasks between the pilot and the main run, and clarifications that change no bar. Empty at registration.
+
+- **2026-10-02, before any session ran: plan order corrected, bars unchanged.** The registered order (all sonnet repetition 1, then all haiku, ...) would put haiku above a quarter of the sessions actually run if the cap stops the study early. The order that replaces item (1) to (4) of the plan: the 6 pilot sessions first; then the remaining sonnet sessions in the order sonnet repetition 1 of the other 26 tasks, repetition 2 of all 32, repetition 3 of 15 (id order), with the k-th haiku session (repetition 1, the 21 tasks registered above, id order) inserted straight after the sonnet session numbered 3k+3 in that sequence, k = 1 to 21. Every prefix of the plan then has at most 25% haiku, and the totals are the same: 79 sonnet and 21 haiku. A session id is `<task>__<model>__r<repetition>`, so the pilot sessions are the same sessions the main plan lists first.
