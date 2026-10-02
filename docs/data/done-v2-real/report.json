@@ -11,7 +11,7 @@
    }
   },
   "after_topup": {
-   "repos_without_cases": 395,
+   "repos_without_cases": 187,
    "accepted": {
     "JavaScript": 8,
     "TypeScript": 8,
@@ -28,26 +28,33 @@
     "Kotlin": 2
    },
    "dropped": {
+    "segment_mismatch": 835,
+    "log_expired": 36,
+    "multi_purpose": 25
+   },
+   "repos": 98,
+   "cases": 251,
+   "failed_cases": 30,
+   "dropped_all_inspected_repos": {
     "segment_mismatch": 2429,
     "log_expired": 161,
     "multi_purpose": 26
    },
-   "repos": 103,
-   "cases": 263,
-   "failed_cases": 30
+   "note": "aggregation is restricted to the repositories the registered selection accepts (at most 8 per bucket, in star order); a first aggregation read every cached repository and held 5 extra repositories with 12 cases (see docs/measurements-real-logs.md, Deviations)"
   }
  },
  "prepare": {
-  "raw": 263,
+  "raw": 251,
   "redaction_stopped": 0,
   "stopped_kinds": {},
-  "kept": 263,
+  "kept": 251,
+  "code_checked": 151,
   "code_check_violations": []
  },
  "labelling": {
-  "screened": 263,
+  "screened": 251,
   "failed_steps": 30,
-  "succeeded_steps": 233,
+  "succeeded_steps": 221,
   "unlabelled": [],
   "ambiguous": [
    {
@@ -86,15 +93,92 @@
     "l2": null
    }
   ],
+  "silent_met": [
+   {
+    "id": "rl-5ed8b254",
+    "l1": "met",
+    "l2": null
+   },
+   {
+    "id": "rl-8c4037c3",
+    "l1": "met",
+    "l2": "met"
+   },
+   {
+    "id": "rl-d201e48c",
+    "l1": "met",
+    "l2": null
+   },
+   {
+    "id": "rl-a9875243",
+    "l1": "met",
+    "l2": null
+   },
+   {
+    "id": "rl-0972d4d9",
+    "l1": "met",
+    "l2": "met"
+   },
+   {
+    "id": "rl-9ccde7e7",
+    "l1": "met",
+    "l2": "met"
+   },
+   {
+    "id": "rl-85ba82f1",
+    "l1": "met",
+    "l2": null
+   },
+   {
+    "id": "rl-5590bfec",
+    "l1": "met",
+    "l2": null
+   },
+   {
+    "id": "rl-46003ff0",
+    "l1": "met",
+    "l2": null
+   },
+   {
+    "id": "rl-6579b932",
+    "l1": "met",
+    "l2": "met"
+   },
+   {
+    "id": "rl-11b85fc9",
+    "l1": "met",
+    "l2": null
+   },
+   {
+    "id": "rl-491ca055",
+    "l1": "met",
+    "l2": "met"
+   },
+   {
+    "id": "rl-6ab844fa",
+    "l1": "met",
+    "l2": "met"
+   },
+   {
+    "id": "rl-17ef487c",
+    "l1": "met",
+    "l2": "met"
+   },
+   {
+    "id": "rl-8471d730",
+    "l1": "met",
+    "l2": null
+   }
+  ],
   "disagreed": [],
-  "kept": 256,
+  "kept": 229,
   "expected": {
-   "met": 149,
-   "missing": 107
+   "met": 123,
+   "missing": 106
   },
-  "label2_n": 70,
-  "agreement": 0.9857142857142858,
-  "kappa": 0.9663299663299665,
-  "pairs": 70
+  "label2_n": 67,
+  "agreement": 0.9850746268656716,
+  "kappa": 0.9656938044034817,
+  "pairs": 67
  }
 }

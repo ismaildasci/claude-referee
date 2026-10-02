@@ -14,25 +14,11 @@
   "repos": 6
  },
  {
-  "tool": "go build",
-  "purpose": "build",
-  "cases": 7,
-  "expected_met": 7,
-  "repos": 3
- },
- {
   "tool": "dotnet build",
   "purpose": "build",
   "cases": 6,
   "expected_met": 6,
   "repos": 5
- },
- {
-  "tool": "npm build -> build",
-  "purpose": "build",
-  "cases": 7,
-  "expected_met": 5,
-  "repos": 6
  },
  {
   "tool": "swift test",
@@ -49,9 +35,9 @@
   "repos": 5
  },
  {
-  "tool": "phpcs",
-  "purpose": "lint",
-  "cases": 8,
+  "tool": "npm build -> build",
+  "purpose": "build",
+  "cases": 6,
   "expected_met": 4,
   "repos": 5
  },
@@ -61,13 +47,6 @@
   "cases": 6,
   "expected_met": 4,
   "repos": 3
- },
- {
-  "tool": "npm lint -> lint",
-  "purpose": "lint",
-  "cases": 5,
-  "expected_met": 4,
-  "repos": 5
  },
  {
   "tool": "npm build",
@@ -84,11 +63,11 @@
   "repos": 7
  },
  {
-  "tool": "rubocop",
+  "tool": "phpstan",
   "purpose": "lint",
   "cases": 5,
   "expected_met": 3,
-  "repos": 5
+  "repos": 4
  },
  {
   "tool": "pre-commit",
@@ -112,6 +91,13 @@
   "repos": 4
  },
  {
+  "tool": "rubocop",
+  "purpose": "lint",
+  "cases": 4,
+  "expected_met": 2,
+  "repos": 4
+ },
+ {
   "tool": "maven build",
   "purpose": "build",
   "cases": 3,
@@ -129,13 +115,6 @@
   "tool": "ruff",
   "purpose": "lint",
   "cases": 6,
-  "expected_met": 1,
-  "repos": 3
- },
- {
-  "tool": "flake8",
-  "purpose": "lint",
-  "cases": 3,
   "expected_met": 1,
   "repos": 3
  },
@@ -168,13 +147,6 @@
   "repos": 1
  },
  {
-  "tool": "isort",
-  "purpose": "lint",
-  "cases": 1,
-  "expected_met": 1,
-  "repos": 1
- },
- {
   "tool": "maven test",
   "purpose": "test",
   "cases": 1,
@@ -196,13 +168,6 @@
   "repos": 1
  },
  {
-  "tool": "eslint",
-  "purpose": "lint",
-  "cases": 1,
-  "expected_met": 1,
-  "repos": 1
- },
- {
   "tool": "hadolint",
   "purpose": "lint",
   "cases": 1,
@@ -211,6 +176,13 @@
  },
  {
   "tool": "npm build -> /home/runner/_work/firecrawl/firecrawl/apps/js-sdk/firecrawl",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "go build",
   "purpose": "build",
   "cases": 1,
   "expected_met": 1,
@@ -240,9 +212,9 @@
  {
   "tool": "shellcheck",
   "purpose": "lint",
-  "cases": 6,
+  "cases": 5,
   "expected_met": 0,
-  "repos": 5
+  "repos": 4
  },
  {
   "tool": "phpunit",
@@ -266,6 +238,13 @@
   "repos": 2
  },
  {
+  "tool": "flake8",
+  "purpose": "lint",
+  "cases": 2,
+  "expected_met": 0,
+  "repos": 2
+ },
+ {
   "tool": "vitest",
   "purpose": "test",
   "cases": 1,
@@ -275,6 +254,20 @@
  {
   "tool": "node --test",
   "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "phpcs",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "php-cs-fixer",
+  "purpose": "lint",
   "cases": 1,
   "expected_met": 0,
   "repos": 1
@@ -303,6 +296,13 @@
  {
   "tool": "npm test -> test-e2e",
   "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "npm lint -> lint",
+  "purpose": "lint",
   "cases": 1,
   "expected_met": 0,
   "repos": 1
