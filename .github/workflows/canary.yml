@@ -1,0 +1,51 @@
+name: Canary
+
+on:
+  schedule:
+    - cron: "43 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # latest tracks new releases; update the pin when a newer version is known good.
+        claude: [latest, 2.1.287]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Install Claude Code
+        env:
+          CLAUDE_VERSION: ${{ matrix.claude }}
+        run: npm install -g "@anthropic-ai/claude-code@${CLAUDE_VERSION}"
+      - name: Marketplace add and plugin install in an isolated config dir
+        run: node scripts/canary-install.mjs
+
+  report:
+    needs: install
+    if: ${{ failure() && github.repository == 'ismaildasci/claude-referee' }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Open or update the single tracking issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title="Canary: Claude Code install check failing"
+          body="The scheduled canary failed: $RUN_URL. See docs/decisions/name-canary.md for the fallback plan."
+          number="$(gh issue list --state open --search "\"$title\" in:title" --json number,title --jq "[.[] | select(.title == \"$title\")][0].number // empty")"
+          if [ -n "$number" ]; then
+            gh issue comment "$number" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi

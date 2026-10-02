@@ -30,7 +30,10 @@ step "plugin validation"
 node scripts/validate-plugin.mjs
 node scripts/validate-plugin.mjs --self-test
 
-step "private terms"; bash scripts/check-no-private.sh
+step "install canary (offline, only when a claude binary exists)"
+if command -v claude >/dev/null; then rc=0; node scripts/canary-install.mjs || rc=$?; test "$rc" -eq 0 -o "$rc" -eq 2; else echo "claude not installed here; the canary workflow covers it"; fi
+
+step "private terms";bash scripts/check-no-private.sh
 step "secrets in git history (gitleaks, when installed)"
 if command -v gitleaks >/dev/null; then gitleaks git --redact --no-banner . 2>&1 | tail -1; test "${PIPESTATUS[0]}" -eq 0; else echo "gitleaks not installed here; CI runs it"; fi
 printf '\nci-local: all steps passed\n'
