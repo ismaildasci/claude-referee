@@ -1,0 +1,55 @@
+# Local dashboard: security design
+
+Status: implemented for `claude-referee ui` (ROADMAP v0.4). Written alongside the code; `test/ui.test.ts` covers the Host, Origin, token, XSS, traversal, label and shutdown rules below. The request timeouts and the launcher file modes are not covered by a test.
+
+The dashboard shows and edits data that holds excerpts of the user's prompts and Claude's messages (`stops.jsonl`), so it is built as if a hostile web page and a hostile local user were both trying to read it.
+
+## What it is
+
+A Node `http` server started by `claude-referee ui`, with no new runtime dependency. The page is vanilla HTML, CSS and JavaScript served from strings in `src/ui/page.ts`, so the existing bundle carries it. It shows the current project only (the directory `ui` was started in).
+
+| View | Source |
+|---|---|
+| Labelling queue | unlabelled `would_block` stops, with the weak next-message hint shown and never applied |
+| Overview | receipt totals of the last 30 days, stop stats with Clopper-Pearson intervals, whether a `claims_done` suggestion is available |
+| Privacy | what is stored and how big, counts, what would be sent to TypeSafe and when |
+| Export | receipts, stops or labels of this project as JSON lines |
+
+JSON lines stay the source of truth. Labels are written only through the existing `labelStop` function, which appends to `labels.jsonl`.
+
+## Threats and answers
+
+| Threat | Answer |
+|---|---|
+| Network exposure | The server binds `127.0.0.1` only (never `localhost`, `0.0.0.0` or `::`), on a random free port unless `--port` is given. Nothing is listened on IPv6. |
+| DNS rebinding: a hostile site resolves its name to 127.0.0.1 and talks to the port | Every request, the page shell included, must carry `Host: 127.0.0.1:<port>` exactly; anything else gets 403. A rebound name always sends its own name in `Host`. The token is a second line: the attacker's page never learns it. |
+| CSRF: another site makes the browser send a request | There is no cookie or ambient credential; the token must be sent in a custom header (`X-Referee-Token`), which a cross-site page cannot add without a CORS preflight, and there is no CORS. API requests with an `Origin` other than `http://127.0.0.1:<port>` get 403, `Origin: null` included. `POST` requires an `Origin` and `Content-Type: application/json`. A `Sec-Fetch-Site` other than `same-origin` on an API request gets 403. |
+| Other local users on the same machine (loopback is shared) | The token is 128 bits from `crypto.randomBytes`, compared in constant time over SHA-256 digests. It is printed once to the terminal that started the server. The browser is opened through a launcher file in a fresh `mkdtemp` directory (mode 0700, file 0600) so the token never appears in a process argument list; the file is removed after 20 seconds and on shutdown. Anyone who can read the owner's terminal or files already has the data. Guessing needs about 2^127 tries, and the server stops with the process. |
+| Token leakage in URLs, logs, referrers | The token travels in the URL fragment (`/#t=...`), which browsers never send to a server or in `Referer`; it is not a query parameter and a token in a query string is rejected. The page copies it into a variable, removes it from the address bar with `history.replaceState` and never stores it in `localStorage` or cookies. The server keeps no access log and never prints a request URL. `Referrer-Policy: no-referrer`, `Cache-Control: no-store`. Residual: the first history entry may be recorded by the browser before the script strips it; it is useless after the server stops. |
+| XSS from stored excerpts (they hold anything Claude or the user ever wrote) | Excerpts are returned only as `application/json` with `X-Content-Type-Options: nosniff`, and the page builds every node with `createElement` and `textContent`; it never uses `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval` or `new Function` (a test greps the served script). The CSP is `default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'`, with no inline script or style, so an injected tag would not run even if it got in. |
+| Path traversal in export | Export takes `kind` from the allow-list `receipts`, `stops`, `labels` and nothing else; the server rebuilds the body from its own readers, so no request value ever reaches a file path. Static routes are exact string matches (`/`, `/app.js`, `/app.css`); `..`, encoded dots and double slashes end in 400 or 404. The download filename is fixed. |
+| Cross-origin reads and framing | No `Access-Control-Allow-*` header on any response and `OPTIONS` is refused. `Cross-Origin-Resource-Policy: same-origin`, `Cross-Origin-Opener-Policy: same-origin`, `X-Frame-Options: DENY` and `frame-ancestors 'none'`. |
+| A mislabel by a drive-by request | A label needs the token, an `Origin` match, a JSON body of at most 2 KiB and an id of a `would_block` stop of this project; the label is `right` or `wrong`. The weak hint is shown, never applied. |
+| Slow or oversized requests | Body cap of 2 KiB, 10 s request timeout, 5 s header timeout. |
+| Data leaving the machine | The server makes no outbound call, loads no external font, script or image, and sends no telemetry. Opening the browser is the only process it starts, and only without `--no-open`. |
+
+Out of scope: a compromised browser or browser extension, an attacker with the user's account, and the user pasting the URL into a chat. The URL is a credential for as long as the server runs; the command says so.
+
+## Decisions
+
+Each went through `claude-referee decide` (both option orders, acceptance bar p >= 0.90, both orders agreeing).
+
+- **Export scope: this project only** over all projects. Jev p 1.00 for `project_only`, 0.00 for `all_projects`, both orders agree (receipts `rmuqan3s7apq5`, a fresh run of 2 requests, and `rmuqanah66qfu`, the same input replayed from the cache). The CLI's `receipts export` still exports every project; the dashboard is stricter because stops carry excerpts.
+- **Opening the browser: a 0600 launcher file in a 0700 temp directory**, over pasting a token by hand and over passing the URL as an argument. Jev p 0.90 (rounded down by the output) for `temp_launcher`, 0.09 for `paste_token`, 0.00 for `argv_open`, both orders agree (receipt `rmuqan78n06qi`; the output floors to two places, so p is in [0.90, 0.91), at the bar). `--no-open` skips it, and only macOS (`open`) and Linux (`xdg-open`) are launched; elsewhere the URL is just printed.
+
+Taken without Jev because the task fixed them: the fragment-plus-header token, `Host` and `Origin` allow-lists with no CORS, the strict CSP, `textContent` rendering and `labelStop` for writes.
+
+## SQLite: not added
+
+The roadmap allows SQLite as an index, and it needs Node 22.13 or later while the package supports 20.3. It is not justified by measurement. On 2026-10-02 (Node 25.5, macOS), reading and aggregating 20,000 receipts (5.0 MB) plus 1,500 stops (2.5 MB, over the 2 MB rotation size) from JSON lines took 18.5 to 34 ms per full read, three runs, the same readers the dashboard uses. The dashboard re-reads on each request. Revisit only if a real data directory makes a view take longer than about 250 ms.
+
+## Not done
+
+- No login, no cookie session, no multi-user mode: the token is the session.
+- No write action other than labels; overruling receipts or editing thresholds stays in the CLI.
+- Windows is not covered: the server works wherever Node does, but the launcher is not implemented there.
