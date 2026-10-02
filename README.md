@@ -211,6 +211,8 @@ npm test 2>&1 | npx claude-referee done --criteria "all tests pass" --evidence -
 
 # Run one yes/no rule over many items: here, every added line of a diff.
 git diff -U0 --no-ext-diff | grep '^+[^+]' | npx claude-referee judge --question line.risky --items -
+# Adopting a rule on old code: record today's findings once, then report only new ones.
+# See docs/judge-baseline.md for --baseline <file> and --baseline-write.
 
 # Pick between options. The referee reads the context files itself.
 npx claude-referee decide <<'EOF'
