@@ -35,8 +35,9 @@ The done-gate has no preview. While it's on, in shadow mode too, it sends what t
 A request that contains any of these is not sent at all:
 
 - AWS access keys
-- GitHub, Slack, Anthropic, OpenAI and TypeSafe API tokens
-- JWTs and private key blocks
+- GitHub, GitLab, Slack (tokens and webhook URLs), Anthropic, OpenAI and TypeSafe API tokens
+- Stripe live keys, npm, PyPI, Hugging Face, SendGrid and Google API keys, Telegram bot tokens, Azure storage account keys and Docker registry auth entries (which formats and why: [decision record](decisions/redaction-patterns.md))
+- JWTs and private key blocks (PEM, OpenSSH, PGP, PuTTY)
 - Credentials in connection strings (`://user:password@`)
 - Assignments whose names contain KEY, TOKEN, SECRET or PASSWORD, when the value looks like a secret rather than a type name, a translation key, a pagination token, an SSH algorithm name or another identifier
 

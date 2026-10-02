@@ -23,6 +23,50 @@ const STOPS: ReadonlyArray<readonly [string, string]> = [
   ["secret_assignment", "API_KEY=Xk9f2.Qz7Lm4Rt8Wp3"],
 ];
 
+const b = (...parts: string[]) => parts.join("");
+const A36 = "aB3dE6gH9jK2mN5pQ8sT1vW4yZ7cF0hJ3lM6";
+const MORE_STOPS: ReadonlyArray<readonly [string, string]> = [
+  ["private_key", b("-----BEGIN PGP ", "PRIVATE KEY BLOCK-----")],
+  ["private_key", b("PuTTY-User-", "Key-File-3: ssh-ed25519")],
+  ["slack_token", b("xapp", "-1-A0123456789-1234567890123-", "abcdef0123456789")],
+  ["slack_token", b("xoxe", ".xoxp-1-Mi0yLTEyMzQ1Njc4OTA")],
+  ["slack_webhook", b("https://hooks.slack", ".com/services/", "T01234567/B01234567/", "abcdefghij0123456789ABCD")],
+  ["gitlab_token", b("glp", "at-", "aB3dE6gH9jK2mN5pQ8sT")],
+  ["stripe_key", b("sk_", "live_", "aB3dE6gH9jK2mN5pQ8sT1vW4")],
+  ["stripe_key", b("rk_", "live_", "aB3dE6gH9jK2mN5pQ8sT1vW4")],
+  ["npm_token", b("npm", "_", A36)],
+  ["pypi_token", b("pypi", "-AgEIcHlwaS5vcmc", A36, A36.slice(0, 20))],
+  ["google_api_key", b("AI", "za", "SyA1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6Q")],
+  ["huggingface_token", b("hf", "_", A36)],
+  ["sendgrid_key", b("S", "G.", "aB3dE6gH9jK2mN5pQ8sT1v", ".", A36, A36.slice(0, 7))],
+  ["telegram_bot_token", b("123456789", ":", "AAFaB3dE6gH9jK2mN5pQ8sT1vW4yZ7cF0hJ")],
+  ["azure_storage_key", b("DefaultEndpointsProtocol=https;AccountName=demo;Account", "Key=", A36, A36, A36.slice(0, 14), "==")],
+  ["docker_auth", b('{"auths": {"registry.example.com": {"au', 'th": "ZGVtb3VzZXI6ZGVtb3Bhc3N3b3Jk"}}}')],
+];
+
+const MORE_KEEP = [
+  b("sk_test_", "aB3dE6gH9jK2mN5pQ8sT1vW4"),
+  "sk_live_",
+  "pk_live_aB3dE6gH9jK2mN5pQ8sT1vW4",
+  "npm_config_registry",
+  "npm_aB3dE6gH9jK2mN5pQ8sT",
+  "pypi-upload-token-docs",
+  "hf_hub_download(repo_id)",
+  "hf_aB3dE6gH9jK",
+  "AIzaShort",
+  "SG.sendgrid.docs",
+  "glpat-",
+  "12:30:45",
+  "1234567890:short",
+  "AccountKey=<your key>",
+  "hooks.slack.com/services/T/B/x",
+  "xapp-notes",
+  "-----BEGIN PGP PUBLIC KEY BLOCK-----",
+  "-----BEGIN CERTIFICATE-----",
+  '{"auths": {"registry.example.com": {"auth": ""}}}',
+  '{"auth": "ZGVtb3VzZXI6ZGVtb3Bhc3N3b3Jk"}',
+];
+
 const NEAR_MISSES = ["AKIA123", "sk-short", "https://example.com/path", "git clone git@github.com:owner/repo.git", "xoxb-12"];
 
 const KEEP = [
@@ -52,6 +96,17 @@ test("redact stops every credential pattern", () => {
       `${kind} not stopped: ${JSON.stringify(result.stopped)}`,
     );
   }
+});
+
+test("redact stops the additional vendor credential formats", () => {
+  for (const [kind, text] of MORE_STOPS) {
+    const result = redact({ evidence: `see ${text} end` });
+    assert.ok(result.stopped.some((s) => s.kind === kind), `${kind} not stopped: ${JSON.stringify(result.stopped)}`);
+  }
+});
+
+test("redact keeps look-alikes of the additional formats", () => {
+  for (const text of MORE_KEEP) assert.deepEqual(redact({ evidence: text }).stopped, [], `stopped: ${text}`);
 });
 
 test("redact lets near misses and known false-positive classes through", () => {
