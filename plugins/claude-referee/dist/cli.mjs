@@ -1689,7 +1689,7 @@ var Session = class {
     const stops = prepared.flatMap((p) => p.stops);
     if (stops.length > 0) throw stopError(stops);
     const bodies = prepared.map((p) => ({ id: p.planned.id, model: this.model, ...p.body }));
-    const estTokens = bodies.reduce((sum2, b) => sum2 + estimateTokens(JSON.stringify(b)), 0);
+    const estTokens = bodies.reduce((sum3, b) => sum3 + estimateTokens(JSON.stringify(b)), 0);
     return { ok: true, verdict: "would_send", dry_run: true, requests: bodies.length, est_tokens: estTokens, replaced: this.replacedCount, sent: bodies };
   }
   async run(planned, options = {}) {
@@ -3564,9 +3564,9 @@ var nextest = {
       }
       const st = NX_STATUS.exec(line);
       if (st) {
-        const label = st[1];
-        if (NX_FAIL_LABEL.test(label)) failing.add(st[2]);
-        else if (NX_CAVEAT_LABEL.test(label) || label.startsWith("TRY ")) caveat = true;
+        const label2 = st[1];
+        if (NX_FAIL_LABEL.test(label2)) failing.add(st[2]);
+        else if (NX_CAVEAT_LABEL.test(label2) || label2.startsWith("TRY ")) caveat = true;
         continue;
       }
       const g2 = NX_GENERATED.exec(line);
@@ -4634,16 +4634,16 @@ var judge = {
             const answer = outcome.answers[id];
             const p = answer?.type === "noul" ? answer.noul : 0.5;
             const band = auto[id] ?? 0.9;
-            const label = ids.length > 1 ? `${outcome.id}/${id}` : outcome.id;
+            const label2 = ids.length > 1 ? `${outcome.id}/${id}` : outcome.id;
             if (atLeast(p, band)) {
               yes += 1;
-              flagged.push(label);
-              hits.push({ question: id, hash: itemHash(id, items[index]?.text ?? ""), label });
+              flagged.push(label2);
+              hits.push({ question: id, hash: itemHash(id, items[index]?.text ?? ""), label: label2 });
             } else if (atMost(p, 1 - band)) {
               no += 1;
             } else {
               review += 1;
-              reviewIds.push(label);
+              reviewIds.push(label2);
             }
           }
         }
@@ -5124,7 +5124,7 @@ async function record(context, pack, list2) {
     }
   }
   const plans = todo.flatMap((t) => t.planned);
-  const tokens2 = plans.reduce((sum2, p) => sum2 + estimateTokens(JSON.stringify([p.state, p.questions])), 0);
+  const tokens2 = plans.reduce((sum3, p) => sum3 + estimateTokens(JSON.stringify([p.state, p.questions])), 0);
   const usd = costUsd(session.model, tokens2);
   if (!flags.dryRun && maxRequests !== void 0 && plans.length > maxRequests) {
     throw new RefereeError("bad_input", `Recording would send ${plans.length} requests; --max-requests is ${maxRequests}. Nothing was sent.`, { next_step: "Record fewer cases (a smaller suite or --split) or raise the cap." });
@@ -5416,9 +5416,9 @@ import { dirname as dirname4, resolve as resolve7 } from "node:path";
 var MIN_LABELS_PER_CLASS = 10;
 var PRECISION_TARGET = 0.8;
 function logChoose(n, k) {
-  let sum2 = 0;
-  for (let i = 1; i <= k; i++) sum2 += Math.log((n - k + i) / i);
-  return sum2;
+  let sum3 = 0;
+  for (let i = 1; i <= k; i++) sum3 += Math.log((n - k + i) / i);
+  return sum3;
 }
 __name(logChoose, "logChoose");
 function pmf(n, k, p) {
@@ -5428,9 +5428,9 @@ function pmf(n, k, p) {
 }
 __name(pmf, "pmf");
 function cdf(n, x, p) {
-  let sum2 = 0;
-  for (let k = 0; k <= x; k++) sum2 += pmf(n, k, p);
-  return Math.min(1, sum2);
+  let sum3 = 0;
+  for (let k = 0; k <= x; k++) sum3 += pmf(n, k, p);
+  return Math.min(1, sum3);
 }
 __name(cdf, "cdf");
 function bisect(f, target, increasing) {
@@ -5544,10 +5544,10 @@ function readStops(dataDir) {
   }
 }
 __name(readStops, "readStops");
-function labelStop(dataDir, id, label, nowIso) {
+function labelStop(dataDir, id, label2, nowIso) {
   if (!readStops(dataDir).some((r) => r.id === id)) return false;
   try {
-    appendFileSync3(labelsFile(dataDir), JSON.stringify({ id, label, labelled_at: nowIso }) + "\n", { mode: 384 });
+    appendFileSync3(labelsFile(dataDir), JSON.stringify({ id, label: label2, labelled_at: nowIso }) + "\n", { mode: 384 });
   } catch {
     return false;
   }
@@ -5940,11 +5940,11 @@ var receipts = {
       const right = values["right"] === true;
       const wrong = values["wrong"] === true;
       if (right === wrong) throw new RefereeError("bad_input", "--label needs exactly one of --right or --wrong.", { next_step: "Run receipts --label <id> --right, or --wrong." });
-      const label = right ? "right" : "wrong";
-      if (!labelStop(dataDir, labelId, label, new Date(io.now()).toISOString())) {
+      const label2 = right ? "right" : "wrong";
+      if (!labelStop(dataDir, labelId, label2, new Date(io.now()).toISOString())) {
         throw new RefereeError("bad_input", "No stop with that id.", { next_step: "Run receipts --stops to list the ids." });
       }
-      return { ok: true, verdict: "labelled", id: labelId, label };
+      return { ok: true, verdict: "labelled", id: labelId, label: label2 };
     }
     const tokens2 = values["tokens"] === true;
     const usage2 = values["usage"] === true;
@@ -6019,8 +6019,638 @@ var receipts = {
   }
 };
 
+// src/cli/commands/ui.ts
+import { spawn } from "node:child_process";
+import { mkdtempSync, rmSync as rmSync2, writeFileSync as writeFileSync7 } from "node:fs";
+import { tmpdir } from "node:os";
+import { join as join14 } from "node:path";
+
+// src/ui/server.ts
+import { createHash as createHash5, randomBytes, timingSafeEqual } from "node:crypto";
+import { createServer } from "node:http";
+
+// src/ui/api.ts
+import { existsSync as existsSync9, statSync as statSync5 } from "node:fs";
+import { join as join13 } from "node:path";
+var EXPORT_KINDS = ["receipts", "stops", "labels"];
+var DAY_MS = 864e5;
+var WINDOW_DAYS = 30;
+var QUEUE_LIMIT = 50;
+var EXCERPT_CHARS = 2e3;
+var STOP_ID = /^[A-Za-z0-9_-]{1,40}$/;
+function projectStops(ctx) {
+  const project = projectId(ctx.cwd);
+  return readStops(ctx.dataDir).filter((r) => r.project === project);
+}
+__name(projectStops, "projectStops");
+function interval(x, n) {
+  if (n < 1) return null;
+  const ci = clopperPearson(x, n);
+  return [ci.lower, ci.upper];
+}
+__name(interval, "interval");
+function queue(ctx) {
+  const unlabelled = projectStops(ctx).filter((r) => r.decision?.would_block === true && r.label === void 0).sort((a, b) => a.ts < b.ts ? 1 : a.ts > b.ts ? -1 : 0);
+  const picked = unlabelled.slice(0, QUEUE_LIMIT);
+  const hints = suggestForStops(projectTranscriptDirs(ctx.env, ctx.home, ctx.cwd), picked);
+  return {
+    total: unlabelled.length,
+    stops: picked.map((r) => ({
+      id: r.id,
+      ts: r.ts,
+      edits: r.edits,
+      checks: r.checks,
+      claims_done: r.decision?.claims_done ?? null,
+      claims_verified: r.decision?.claims_verified ?? null,
+      task_excerpt: r.task_excerpt?.slice(0, EXCERPT_CHARS) ?? "",
+      final_excerpt: r.final_excerpt?.slice(0, EXCERPT_CHARS) ?? "",
+      suggestion: hints.get(r.id) ?? null
+    }))
+  };
+}
+__name(queue, "queue");
+function label(ctx, id, value) {
+  if (typeof id !== "string" || !STOP_ID.test(id) || value !== "right" && value !== "wrong") return "bad_input";
+  const stop = projectStops(ctx).find((r) => r.id === id);
+  if (!stop || stop.decision?.would_block !== true) return "not_found";
+  return labelStop(ctx.dataDir, id, value, new Date(ctx.now()).toISOString()) ? "ok" : "not_found";
+}
+__name(label, "label");
+function sum2(receipts2, key) {
+  return receipts2.reduce((total, r) => total + (r[key] ?? 0), 0);
+}
+__name(sum2, "sum");
+function overview(ctx) {
+  const since = new Date(ctx.now() - WINDOW_DAYS * DAY_MS).toISOString();
+  const project = projectId(ctx.cwd);
+  const receipts2 = readReceipts(ctx.dataDir, project).filter((r) => r.ts >= since);
+  const byCommand = {};
+  for (const r of receipts2) byCommand[r.command] = (byCommand[r.command] ?? 0) + 1;
+  const stops = projectStops(ctx).filter((r) => r.ts >= since);
+  const stats = stopStats(stops);
+  let current = 0.7;
+  try {
+    const config = loadProject(ctx.cwd);
+    if (config) current = threshold(loadPack(config.pack, packDirs(ctx.env)), config.thresholds, "stop.gate", "claims_done", 0.7);
+  } catch {
+  }
+  return {
+    days: WINDOW_DAYS,
+    receipts: {
+      runs: receipts2.length,
+      requests: sum2(receipts2, "requests"),
+      cached: sum2(receipts2, "cached"),
+      input_tokens: sum2(receipts2, "input_tokens"),
+      cost_usd: sum2(receipts2, "cost_usd"),
+      by_command: byCommand
+    },
+    stops: { ...stats, precision_ci95: interval(stats.right, stats.labelled), false_block_rate_ci95: interval(stats.wrong, stats.labelled) },
+    threshold_suggestion: suggestThreshold(stops, current)
+  };
+}
+__name(overview, "overview");
+var SENT = [
+  { when: "Every call that asks Jev", what: "The pack's question text and the input it asks about, redacted first" },
+  { when: "done", what: "Your criterion and the output you pipe in; recognised runner output is parsed in code and only counts, exit code and failing test names go out" },
+  { when: "decide", what: "The decision, inline context, option texts and context_files contents, asked in two option orders" },
+  { when: "judge, claims and verify", what: "The items, claims and source text you pass in" },
+  { when: "Done-gate in shadow or soft mode", what: "Prompt start (1,500 chars), final message end (2,000 chars), check commands with pass/fail and edited file paths" },
+  { when: "This dashboard", what: "Nothing: no network call leaves this process, no telemetry, no external fonts or scripts" }
+];
+function fileInfo(dataDir, name) {
+  const path = join13(dataDir, name);
+  if (!existsSync9(path)) return null;
+  try {
+    const st = statSync5(path);
+    return { name, bytes: st.isDirectory() ? dirSize(path) : st.size };
+  } catch {
+    return null;
+  }
+}
+__name(fileInfo, "fileInfo");
+function privacy(ctx) {
+  const project = projectId(ctx.cwd);
+  const stops = readStops(ctx.dataDir);
+  const stored = ["receipts", "cache", "results", "stops.jsonl", "labels.jsonl", "overruled.jsonl"].flatMap((n) => fileInfo(ctx.dataDir, n) ?? []);
+  return {
+    data_dir: tildify(ctx.dataDir, ctx.home),
+    total_bytes: dirSize(ctx.dataDir),
+    stored,
+    counts: {
+      receipts_this_project: readReceipts(ctx.dataDir, project).length,
+      receipts_all_projects: readReceipts(ctx.dataDir).length,
+      stops_this_project: stops.filter((r) => r.project === project).length,
+      stops_all_projects: stops.length,
+      labelled_this_project: stops.filter((r) => r.project === project && r.label !== void 0).length
+    },
+    stores_text: [
+      { name: "stops.jsonl", holds: "Prompt and final-message excerpts of done-gate stops, scores, your labels" },
+      { name: "receipts", holds: "Counts, tokens, cost, latency and hashes per run; no request text" },
+      { name: "cache", holds: "Jev's answers keyed by hashes; expires after 30 days" }
+    ],
+    would_be_sent: SENT
+  };
+}
+__name(privacy, "privacy");
+function exportKind(ctx, kind) {
+  if (typeof kind !== "string" || !EXPORT_KINDS.includes(kind)) return null;
+  const project = projectId(ctx.cwd);
+  const rows = kind === "receipts" ? readReceipts(ctx.dataDir, project) : kind === "stops" ? projectStops(ctx) : projectStops(ctx).flatMap((r) => r.label !== void 0 ? [{ id: r.id, label: r.label, labelled_at: r.labelled_at }] : []);
+  return { filename: `claude-referee-${kind}.jsonl`, body: rows.map((r) => JSON.stringify(r)).join("\n") + (rows.length ? "\n" : "") };
+}
+__name(exportKind, "exportKind");
+
+// src/ui/page.ts
+var INDEX_HTML = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="light dark">
+<title>claude-referee</title>
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header>
+<h1>claude-referee</h1>
+<nav aria-label="Sections" id="tabs" role="tablist"></nav>
+</header>
+<main id="main" tabindex="-1"></main>
+<p id="status" role="status" aria-live="polite" class="status"></p>
+<script src="/app.js"></script>
+</body>
+</html>
+`;
+var APP_CSS = `:root{--bg:#fbfbfa;--fg:#1c1c1a;--muted:#5e5e59;--line:#d9d9d3;--card:#fff;--accent:#1f5fbf;--ok:#1b7a3d;--bad:#b3261e;--focus:#1f5fbf}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#ecece8;--muted:#a3a39c;--line:#363633;--card:#1e1e1c;--accent:#7aa7f0;--ok:#6fcf8f;--bad:#f08a82;--focus:#7aa7f0}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 24px;padding:16px;border-bottom:1px solid var(--line)}
+h1{font-size:18px;margin:0}
+h2{font-size:16px;margin:24px 0 8px}
+main{max-width:860px;margin:0 auto;padding:16px}
+main:focus{outline:none}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{background:none;border:1px solid transparent;border-radius:6px;color:var(--muted);font:inherit;padding:4px 12px;cursor:pointer}
+nav button[aria-selected=true]{color:var(--fg);border-color:var(--line);background:var(--card)}
+button{font:inherit}
+button.act{background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px 14px;cursor:pointer}
+button.act:hover{border-color:var(--accent)}
+button.right{border-color:var(--ok)}
+button.wrong{border-color:var(--bad)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.skip{position:absolute;left:-999px}
+.skip:focus{left:8px;top:8px;background:var(--card);padding:4px 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;margin:12px 0}
+.meta{color:var(--muted);font-size:14px;margin:0 0 8px}
+.label{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin:12px 0 4px}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:0;max-height:240px;overflow:auto;font:14px/1.45 ui-monospace,Menlo,Consolas,monospace}
+.hint{border-left:3px solid var(--accent);padding:4px 12px;margin:12px 0;color:var(--muted)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+td.n{font-variant-numeric:tabular-nums}
+.status{max-width:860px;margin:0 auto;padding:0 16px 24px;color:var(--muted);min-height:1.5em}
+kbd{font:13px ui-monospace,Menlo,monospace;border:1px solid var(--line);border-radius:4px;padding:0 5px;background:var(--bg)}
+@media (max-width:520px){main{padding:12px}button.act{flex:1 1 100%}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+`;
+var APP_JS = `(function () {
+"use strict";
+var params = new URLSearchParams(location.hash.slice(1));
+var token = params.get("t") || "";
+history.replaceState(null, "", location.pathname);
+
+var main = document.getElementById("main");
+var statusEl = document.getElementById("status");
+var tabsEl = document.getElementById("tabs");
+var TABS = [["queue", "Labelling queue"], ["overview", "Overview"], ["privacy", "Privacy"], ["export", "Export"]];
+var current = "queue";
+var items = [];
+var index = 0;
+
+function el(tag, text, cls) {
+  var node = document.createElement(tag);
+  if (text !== undefined && text !== null) node.textContent = String(text);
+  if (cls) node.className = cls;
+  return node;
+}
+function add(parent) {
+  for (var i = 1; i < arguments.length; i++) parent.appendChild(arguments[i]);
+  return parent;
+}
+function say(text) { statusEl.textContent = text; }
+function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+function pct(v) { return v === null || v === undefined ? "n/a" : (Math.round(v * 1000) / 10) + "%"; }
+function ci(pair) { return pair ? "[" + pct(pair[0]) + ", " + pct(pair[1]) + "]" : "n/a"; }
+function bytes(n) { return n < 1024 ? n + " B" : n < 1048576 ? (n / 1024).toFixed(1) + " KiB" : (n / 1048576).toFixed(1) + " MiB"; }
+
+function request(path, init) {
+  init = init || {};
+  var headers = { "X-Referee-Token": token };
+  if (init.body) headers["Content-Type"] = "application/json";
+  return fetch(path, { method: init.method || "GET", headers: headers, body: init.body, credentials: "omit", cache: "no-store", referrer: "", referrerPolicy: "no-referrer" }).then(function (res) {
+    if (res.status === 401) throw new Error("The session token is missing or wrong. Open the URL printed in the terminal again.");
+    if (!res.ok) throw new Error("Request failed (" + res.status + ").");
+    return res;
+  });
+}
+function getJson(path) { return request(path).then(function (r) { return r.json(); }); }
+function fail(error) { clear(main); add(main, el("p", error.message)); say(""); }
+
+function table(head, rows) {
+  var t = el("table");
+  var thead = el("thead");
+  var hr = el("tr");
+  head.forEach(function (h) { var th = el("th", h); th.scope = "col"; hr.appendChild(th); });
+  add(t, add(thead, hr));
+  var body = el("tbody");
+  rows.forEach(function (r) {
+    var tr = el("tr");
+    r.forEach(function (c, i) { tr.appendChild(el("td", c, i > 0 ? "n" : "")); });
+    body.appendChild(tr);
+  });
+  return add(t, body);
+}
+
+function renderTabs() {
+  clear(tabsEl);
+  TABS.forEach(function (t) {
+    var b = el("button", t[1]);
+    b.type = "button";
+    b.setAttribute("role", "tab");
+    b.setAttribute("aria-selected", t[0] === current ? "true" : "false");
+    b.addEventListener("click", function () { show(t[0]); });
+    tabsEl.appendChild(b);
+  });
+}
+
+function show(name) {
+  current = name;
+  renderTabs();
+  say("");
+  clear(main);
+  add(main, el("p", "Loading"));
+  if (name === "queue") return getJson("/api/queue").then(function (d) { items = d.stops; index = 0; renderQueue(d.total); }).catch(fail);
+  if (name === "overview") return getJson("/api/overview").then(renderOverview).catch(fail);
+  if (name === "privacy") return getJson("/api/privacy").then(renderPrivacy).catch(fail);
+  renderExport();
+}
+
+function renderQueue(total) {
+  clear(main);
+  add(main, el("h2", "Unlabelled stops the gate would have blocked: " + items.length + (total > items.length ? " shown of " + total : "")));
+  if (items.length === 0) {
+    add(main, el("p", "Nothing to label."));
+    return;
+  }
+  if (index >= items.length) index = items.length - 1;
+  if (index < 0) index = 0;
+  var s = items[index];
+  var card = el("section", null, "card");
+  card.tabIndex = -1;
+  card.setAttribute("aria-label", "Stop " + (index + 1) + " of " + items.length);
+  add(card, el("p", "Stop " + (index + 1) + " of " + items.length + " - " + s.ts + " - " + s.edits + " edits, " + s.checks + " checks - done score " + (s.claims_done === null ? "n/a" : s.claims_done.toFixed(2)), "meta"));
+  add(card, el("p", "Task (start of the prompt)", "label"), el("pre", s.task_excerpt || "(none stored)"));
+  add(card, el("p", "Claude's final message (end)", "label"), el("pre", s.final_excerpt || "(none stored)"));
+  if (s.suggestion) {
+    var why = s.suggestion.reason === "reported_broken" ? "the next message reports something broken" : "the next message repeats the request";
+    add(card, el("p", "Hint, not applied: " + why + ", which would suggest that blocking was right. Decide for yourself.", "hint"));
+  }
+  var row = el("div", null, "row");
+  var right = el("button", "Right: the block was correct (R)", "act right");
+  var wrong = el("button", "Wrong: a false block (W)", "act wrong");
+  var skip = el("button", "Skip (S)", "act");
+  var back = el("button", "Back (B)", "act");
+  [right, wrong, skip, back].forEach(function (b) { b.type = "button"; });
+  right.addEventListener("click", function () { labelCurrent("right"); });
+  wrong.addEventListener("click", function () { labelCurrent("wrong"); });
+  skip.addEventListener("click", function () { move(1); });
+  back.addEventListener("click", function () { move(-1); });
+  add(row, right, wrong, skip, back);
+  add(card, row);
+  add(main, card);
+  add(main, el("p", "Keys: R right, W wrong, S or Right arrow skip, B or Left arrow back.", "meta"));
+  card.focus();
+}
+
+function move(step) {
+  if (items.length === 0) return;
+  index = (index + step + items.length) % items.length;
+  renderQueue(items.length);
+}
+
+var busy = false;
+function labelCurrent(value) {
+  if (busy || current !== "queue" || items.length === 0) return;
+  var s = items[index];
+  busy = true;
+  request("/api/label", { method: "POST", body: JSON.stringify({ id: s.id, label: value }) }).then(function () {
+    items.splice(index, 1);
+    say("Stop labelled " + value + ". " + items.length + " left in this view.");
+    renderQueue(items.length);
+  }).catch(function (e) { say(e.message); }).then(function () { busy = false; });
+}
+
+document.addEventListener("keydown", function (e) {
+  if (e.ctrlKey || e.metaKey || e.altKey || current !== "queue") return;
+  var k = e.key.toLowerCase();
+  if (k === "r") labelCurrent("right");
+  else if (k === "w") labelCurrent("wrong");
+  else if (k === "s" || e.key === "ArrowRight") move(1);
+  else if (k === "b" || e.key === "ArrowLeft") move(-1);
+  else return;
+  e.preventDefault();
+});
+
+function renderOverview(d) {
+  clear(main);
+  var r = d.receipts;
+  var s = d.stops;
+  add(main, el("h2", "Receipts, last " + d.days + " days, this project"));
+  add(main, table(["Runs", "Requests", "Cache hits", "Input tokens", "Cost (USD)"], [[r.runs, r.requests, r.cached, r.input_tokens, r.cost_usd.toFixed(4)]]));
+  var cmds = Object.keys(r.by_command).sort();
+  if (cmds.length) add(main, table(["Command", "Runs"], cmds.map(function (c) { return [c, r.by_command[c]]; })));
+  add(main, el("h2", "Done-gate stops"));
+  add(main, table(["Measure", "Value", "95% interval"], [
+    ["Stops", s.stops, ""],
+    ["Asked Jev", s.asked, ""],
+    ["Would block", s.would_block, ""],
+    ["Labelled (of would block)", s.labelled, ""],
+    ["Right / wrong", s.right + " / " + s.wrong, ""],
+    ["Precision", pct(s.precision), ci(s.precision_ci95)],
+    ["False block rate", pct(s.false_block_rate), ci(s.false_block_rate_ci95)],
+    ["p95 latency, answered (ms)", s.p95_ms === null ? "n/a" : s.p95_ms, ""],
+    ["Error rate", pct(s.error_rate), ""],
+    ["Unlabelled would block", s.unlabelled_would_block, ""]
+  ]));
+  var t = d.threshold_suggestion;
+  add(main, el("h2", "Threshold suggestion"));
+  var line = t.available
+    ? (t.suggested === null ? "Enough labels, but no claims_done value reaches the precision target." : "Suggested claims_done: " + t.suggested + " (now " + t.current + "). Nothing is written; set it in .claude/referee.json yourself.")
+    : "Not available yet: " + t.have.right + " right and " + t.have.wrong + " wrong labels, at least " + t.need.right + " of each needed. It can only suggest raising the threshold.";
+  add(main, el("p", line));
+  say("");
+}
+
+function renderPrivacy(d) {
+  clear(main);
+  add(main, el("h2", "What is stored"));
+  add(main, el("p", d.data_dir + " - " + bytes(d.total_bytes) + " in total", "meta"));
+  add(main, table(["Item", "Size"], d.stored.map(function (f) { return [f.name, bytes(f.bytes)]; })));
+  add(main, table(["Count", "Value"], [
+    ["Receipts, this project", d.counts.receipts_this_project],
+    ["Receipts, all projects", d.counts.receipts_all_projects],
+    ["Stops, this project", d.counts.stops_this_project],
+    ["Stops, all projects", d.counts.stops_all_projects],
+    ["Labelled stops, this project", d.counts.labelled_this_project]
+  ]));
+  add(main, table(["File", "Holds"], d.stores_text.map(function (x) { return [x.name, x.holds]; })));
+  add(main, el("h2", "What would be sent to TypeSafe, and when"));
+  add(main, table(["When", "What"], d.would_be_sent.map(function (x) { return [x.when, x.what]; })));
+  say("");
+}
+
+function renderExport() {
+  clear(main);
+  add(main, el("h2", "Export, this project"));
+  add(main, el("p", "Downloads JSON lines. Stops include prompt and message excerpts, so treat the file like the data directory itself."));
+  var row = el("div", null, "row");
+  [["receipts", "Receipts"], ["stops", "Stops with excerpts"], ["labels", "Labels only"]].forEach(function (k) {
+    var b = el("button", k[1], "act");
+    b.type = "button";
+    b.addEventListener("click", function () { download(k[0]); });
+    row.appendChild(b);
+  });
+  add(main, row);
+}
+
+function download(kind) {
+  request("/api/export?kind=" + encodeURIComponent(kind)).then(function (r) { return r.blob(); }).then(function (blob) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "claude-referee-" + kind + ".jsonl";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    say("Exported " + kind + ".");
+  }).catch(function (e) { say(e.message); });
+}
+
+if (!token) {
+  renderTabs();
+  clear(main);
+  add(main, el("p", "No session token. Open the URL printed in the terminal by claude-referee ui."));
+} else {
+  show("queue");
+}
+})();
+`;
+
+// src/ui/server.ts
+var TOKEN_HEADER = "x-referee-token";
+var MAX_BODY = 2048;
+var CSP = "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
+function digest(value) {
+  return createHash5("sha256").update(value).digest();
+}
+__name(digest, "digest");
+function baseHeaders(type) {
+  return {
+    "Content-Type": type,
+    "Cache-Control": "no-store",
+    "Content-Security-Policy": CSP,
+    "Referrer-Policy": "no-referrer",
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Cross-Origin-Resource-Policy": "same-origin",
+    "Cross-Origin-Opener-Policy": "same-origin",
+    "Permissions-Policy": "geolocation=(), camera=(), microphone=()"
+  };
+}
+__name(baseHeaders, "baseHeaders");
+function send(res, status, type, body, extra = {}) {
+  res.writeHead(status, { ...baseHeaders(type), ...extra });
+  res.end(body);
+}
+__name(send, "send");
+function json(res, status, value) {
+  send(res, status, "application/json; charset=utf-8", JSON.stringify(value));
+}
+__name(json, "json");
+function readBody(req) {
+  return new Promise((resolve8) => {
+    const chunks = [];
+    let size = 0;
+    req.on("data", (chunk) => {
+      size += chunk.length;
+      if (size > MAX_BODY) {
+        chunks.length = 0;
+        resolve8(null);
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on("end", () => resolve8(Buffer.concat(chunks).toString("utf8")));
+    req.on("error", () => resolve8(null));
+  });
+}
+__name(readBody, "readBody");
+async function startUi(ctx, requestedPort = 0) {
+  const token = randomBytes(16).toString("hex");
+  const tokenDigest = digest(token);
+  let allowedHost = "";
+  let allowedOrigin = "";
+  const tokenOk = /* @__PURE__ */ __name((req) => {
+    const given = req.headers[TOKEN_HEADER];
+    return typeof given === "string" && given.length > 0 && timingSafeEqual(digest(given), tokenDigest);
+  }, "tokenOk");
+  const handle = /* @__PURE__ */ __name(async (req, res) => {
+    if (req.headers.host !== allowedHost) return json(res, 403, { error: "bad_host" });
+    if (req.method !== "GET" && req.method !== "POST") return json(res, 405, { error: "method_not_allowed" });
+    if (!req.url || !req.url.startsWith("/") || req.url.startsWith("//")) return json(res, 400, { error: "bad_request" });
+    const url = new URL(req.url, allowedOrigin);
+    const route = url.pathname;
+    if (req.method === "GET" && route === "/") return send(res, 200, "text/html; charset=utf-8", INDEX_HTML);
+    if (req.method === "GET" && route === "/app.js") return send(res, 200, "text/javascript; charset=utf-8", APP_JS);
+    if (req.method === "GET" && route === "/app.css") return send(res, 200, "text/css; charset=utf-8", APP_CSS);
+    if (!route.startsWith("/api/")) return json(res, 404, { error: "not_found" });
+    const origin = req.headers.origin;
+    if (origin !== void 0 && origin !== allowedOrigin) return json(res, 403, { error: "bad_origin" });
+    const site = req.headers["sec-fetch-site"];
+    if (site !== void 0 && site !== "same-origin") return json(res, 403, { error: "bad_origin" });
+    if (req.method === "POST" && origin === void 0) return json(res, 403, { error: "bad_origin" });
+    if (!tokenOk(req)) return json(res, 401, { error: "bad_token" });
+    if (req.method === "GET") {
+      if (route === "/api/queue") return json(res, 200, queue(ctx));
+      if (route === "/api/overview") return json(res, 200, overview(ctx));
+      if (route === "/api/privacy") return json(res, 200, privacy(ctx));
+      if (route === "/api/export") {
+        const out = exportKind(ctx, url.searchParams.get("kind"));
+        if (!out) return json(res, 400, { error: "bad_kind" });
+        return send(res, 200, "application/x-ndjson; charset=utf-8", out.body, { "Content-Disposition": `attachment; filename="${out.filename}"` });
+      }
+      return json(res, 404, { error: "not_found" });
+    }
+    if (route !== "/api/label") return json(res, 404, { error: "not_found" });
+    if (!(req.headers["content-type"] ?? "").toLowerCase().startsWith("application/json")) return json(res, 415, { error: "bad_content_type" });
+    const raw = await readBody(req);
+    if (raw === null) {
+      res.once("finish", () => req.destroy());
+      return send(res, 413, "application/json; charset=utf-8", JSON.stringify({ error: "too_large" }), { Connection: "close" });
+    }
+    let body;
+    try {
+      body = JSON.parse(raw);
+    } catch {
+      return json(res, 400, { error: "bad_json" });
+    }
+    if (body === null || typeof body !== "object") return json(res, 400, { error: "bad_json" });
+    const result = label(ctx, body.id, body.label);
+    if (result === "ok") return json(res, 200, { ok: true, id: body.id, label: body.label });
+    return json(res, result === "bad_input" ? 400 : 404, { error: result });
+  }, "handle");
+  const server = createServer((req, res) => {
+    handle(req, res).catch(() => {
+      if (!res.headersSent) json(res, 500, { error: "internal" });
+      else res.end();
+    });
+  });
+  server.requestTimeout = 1e4;
+  server.headersTimeout = 5e3;
+  server.keepAliveTimeout = 2e3;
+  await new Promise((resolve8, reject) => {
+    server.once("error", (error) => {
+      reject(new RefereeError("bad_input", error.code === "EADDRINUSE" ? "That port is already in use." : `Could not start the server: ${error.code ?? "error"}`, { next_step: "Omit --port to take a random free port." }));
+    });
+    server.listen(requestedPort, "127.0.0.1", resolve8);
+  });
+  const port = server.address().port;
+  allowedHost = `127.0.0.1:${port}`;
+  allowedOrigin = `http://${allowedHost}`;
+  return {
+    token,
+    port,
+    origin: allowedOrigin,
+    urlWithToken: `${allowedOrigin}/#t=${token}`,
+    close: /* @__PURE__ */ __name(() => new Promise((resolve8) => {
+      server.close(() => resolve8());
+      server.closeAllConnections();
+    }), "close")
+  };
+}
+__name(startUi, "startUi");
+
+// src/cli/commands/ui.ts
+var LAUNCHER_LIFETIME_MS = 2e4;
+function openLauncher(url, platform) {
+  const opener = platform === "darwin" ? "open" : platform === "linux" ? "xdg-open" : null;
+  if (!opener) return null;
+  const dir = mkdtempSync(join14(tmpdir(), "referee-ui-"));
+  const file = join14(dir, "open.html");
+  const cleanup = /* @__PURE__ */ __name(() => rmSync2(dir, { recursive: true, force: true }), "cleanup");
+  try {
+    writeFileSync7(file, `<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${url}"><title>claude-referee</title>
+`, { mode: 384 });
+    const child = spawn(opener, [file], { detached: true, stdio: "ignore" });
+    child.on("error", () => void 0);
+    child.unref();
+  } catch {
+    cleanup();
+    return null;
+  }
+  setTimeout(cleanup, LAUNCHER_LIFETIME_MS).unref();
+  return cleanup;
+}
+__name(openLauncher, "openLauncher");
+var ui = {
+  name: "ui",
+  describe: {
+    summary: "Start a local dashboard (127.0.0.1, random token): labelling queue, overview, privacy counters and export.",
+    inputs: {
+      "--port <n>": "Listen on this port; default is a random free one.",
+      "--no-open": "Print the URL only; don't open a browser."
+    },
+    outputs: {
+      verdict: "listening (printed once, with url) and closed (after Ctrl-C or SIGTERM)",
+      url: "http://127.0.0.1:<port>/#t=<token>; the token is in the fragment, so it is never sent to the server or in a Referer. It is printed once; anyone with it can read this project's stops and label them until the server stops"
+    },
+    errors: ["bad_input"],
+    effects: "Listens on 127.0.0.1 only. Reads the data directory; a label click appends to labels.jsonl. No network calls out, no telemetry. Opening the browser writes a 0600 launcher file in a private temp directory and removes it after 20 seconds.",
+    cost: "Free."
+  },
+  options: {
+    port: { type: "string" },
+    "no-open": { type: "boolean" }
+  },
+  async run(context) {
+    const { io, flags, values } = context;
+    const rawPort = str(context, "port");
+    const port = rawPort === void 0 ? 0 : Number(rawPort);
+    if (!Number.isInteger(port) || port < 0 || port > 65535) throw new RefereeError("bad_input", "--port must be a whole number from 0 to 65535.");
+    const server = await startUi({ dataDir: resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), cwd: io.cwd, home: io.home, env: io.env, now: io.now }, port);
+    const cleanup = values["no-open"] === true ? null : openLauncher(server.urlWithToken, io.platform);
+    io.write(JSON.stringify({ ok: true, verdict: "listening", url: server.urlWithToken, opened: cleanup !== null, next_step: "Stop with Ctrl-C." }, null, flags.pretty ? 2 : 0) + "\n");
+    await new Promise((resolve8) => {
+      const signals = ["SIGINT", "SIGTERM", "SIGHUP"];
+      const done2 = /* @__PURE__ */ __name(() => {
+        for (const s of signals) process.removeListener(s, done2);
+        resolve8();
+      }, "done");
+      for (const s of signals) process.once(s, done2);
+    });
+    cleanup?.();
+    await server.close();
+    return { ok: true, verdict: "closed" };
+  }
+};
+
 // src/cli/commands/index.ts
-var commands = [done, decide, judge, claims, verify, receipts, doctor, evalCommand, lintPack];
+var commands = [done, decide, judge, claims, verify, receipts, doctor, evalCommand, lintPack, ui];
 
 // src/cli/io.ts
 import { homedir } from "node:os";
@@ -6046,7 +6676,7 @@ function processIo() {
 __name(processIo, "processIo");
 
 // src/cli/run.ts
-import { join as join13 } from "node:path";
+import { join as join15 } from "node:path";
 import { parseArgs } from "node:util";
 var GLOBAL_OPTIONS = {
   describe: { type: "boolean" },
@@ -6135,7 +6765,7 @@ async function run(argv, io, commands2) {
     }
     const result = await command.run({ io, flags, values: parsed.values, positionals: parsed.positionals });
     const receipt = typeof result["receipt"] === "string" ? result["receipt"] : null;
-    const detailsDir = flags.dryRun ? null : join13(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
+    const detailsDir = flags.dryRun ? null : join15(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
     io.write(render(result, { pretty, detailsDir, receipt }) + "\n");
     const verdict = result["verdict"];
     return typeof verdict === "string" && flags.failOn.includes(verdict) ? 3 : 0;
