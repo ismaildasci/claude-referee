@@ -1501,10 +1501,21 @@ __name(overruleReceipt, "overruleReceipt");
 
 // src/engine/redact.ts
 var STOP = [
-  { kind: "private_key", regex: /-----BEGIN (?:[A-Z0-9]+ )*PRIVATE KEY-----/ },
+  { kind: "private_key", regex: /-----BEGIN (?:[A-Z0-9]+ )*PRIVATE KEY(?: BLOCK)?-----|\bPuTTY-User-Key-File-\d:/ },
   { kind: "aws_access_key", regex: /\b(?:AKIA|ASIA)[0-9A-Z]{16}\b/ },
   { kind: "github_token", regex: /\b(?:gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{22,})/ },
-  { kind: "slack_token", regex: /\bxox[abposr]-[A-Za-z0-9-]{10,}/ },
+  { kind: "slack_token", regex: /\b(?:xox[abposre]-[A-Za-z0-9-]{10,}|xapp-\d-[A-Za-z0-9-]{10,})/ },
+  { kind: "slack_webhook", regex: /\bhooks\.slack\.com\/services\/T[A-Z0-9]{8,}\/B[A-Z0-9]{8,}\/[A-Za-z0-9]{20,}/ },
+  { kind: "gitlab_token", regex: /\bglpat-[A-Za-z0-9_-]{20,}/ },
+  { kind: "stripe_key", regex: /\b(?:sk|rk)_live_[A-Za-z0-9]{20,}/ },
+  { kind: "npm_token", regex: /\bnpm_[A-Za-z0-9]{36}\b/ },
+  { kind: "pypi_token", regex: /\bpypi-AgEIcHlwaS5vcmc[A-Za-z0-9_-]{50,}/ },
+  { kind: "google_api_key", regex: /\bAIza[A-Za-z0-9_-]{35}(?![A-Za-z0-9_-])/ },
+  { kind: "huggingface_token", regex: /\bhf_(?=[A-Za-z0-9]*\d)[A-Za-z0-9]{34,}\b/ },
+  { kind: "sendgrid_key", regex: /\bSG\.[A-Za-z0-9_-]{22}\.[A-Za-z0-9_-]{43}(?![A-Za-z0-9_-])/ },
+  { kind: "telegram_bot_token", regex: /(?:(?<![A-Za-z0-9_:])|(?<=\bbot))\d{8,10}:AA[A-Za-z0-9_-]{33}(?![A-Za-z0-9_-])/ },
+  { kind: "azure_storage_key", regex: /\bAccountKey=[A-Za-z0-9+/]{86}==/ },
+  { kind: "docker_auth", regex: /"auths"\s*:\s*\{[^}]*"auth"\s*:\s*"[A-Za-z0-9+/]{16,}={0,2}"/ },
   { kind: "anthropic_key", regex: /\bsk-ant-[A-Za-z0-9_-]{20,}/ },
   { kind: "openai_key", regex: /\bsk-(?!ant-)(?:proj-|svcacct-|admin-)?[A-Za-z0-9_-]{20,}/ },
   { kind: "typesafe_key", regex: /\bapikey_[0-9a-f]{16,}_[0-9a-f]{16,}/i },

@@ -39,10 +39,16 @@ All notable changes to this project are documented here. The format follows [Kee
 - `eval` now handles `decide` suites. `eval record` asks both option orders per case; `eval score` reports leader agreement with the labelled best option, the clear/weak/tie mix, order disagreements and agreement per verdict as raw counts, with no precision, recall or pass/fail threshold. Metric choice and first numbers: [docs/decisions/decide-eval-metric.md](docs/decisions/decide-eval-metric.md).
 - `eval record` and `eval score` take `--ablation context|reversed` for decide suites: `context` leaves the context text out of the request, `reversed` asks the written order only (rescored from the same recording, no request).
 - New suite `jev-evals/decide-best`: the 39 close-call decisions with one author-written best option each, recorded against `jev-1.13.0`.
+- More credential formats stop a request before it is sent: Stripe live keys (`sk_live_`, `rk_live_`), npm, PyPI, Hugging Face, SendGrid, Google API and GitLab tokens, Telegram bot tokens, Azure storage `AccountKey=` values, Docker `auths` entries, Slack webhook URLs and `xapp-`/`xoxe` tokens, and PGP and PuTTY private key blocks. Test and publishable Stripe keys are kept. Each format has stop and keep fixtures; which formats were added, why, and which were left out (Twilio, Mailgun, Discord) is in `docs/decisions/redaction-patterns.md`.
+
+### Documentation
+
+- `docs/decisions/decide-policy.md`: `decide` keeps two separate requests (written and reversed order) for 2 to 6 options. One request with two questions and balanced rotations were not adopted: no measured benefit beyond noise, and nothing measured for other than 4 options. Jev decide: keep two requests 0.99, both orders agreeing.
 
 ### Fixed
 
 - `eval score` fails on a recorded decide line that lacks an answer for an order instead of scoring it as a tie, and recordings are matched by their `ablation`: `eval record --ablation reversed` no longer writes a line (it needs the full recording and records nothing), so it cannot shadow the two-order recording.
+- Redaction: Telegram bot tokens in the Bot API URL form (`.../bot<id>:<secret>/getMe`) now stop a request. The token pattern requires the `AA` secret prefix, so numeric strings like `20260101:...` no longer stop; Hugging Face tokens need a digit, so long identifiers such as `hf_getUserSessionToken...` no longer stop.
 
 ## [0.1.6] - 2026-10-01
 
