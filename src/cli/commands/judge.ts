@@ -72,7 +72,7 @@ export const judge: Command = {
       "--items <file|->": "A JSON array of strings or {id, text}, JSON lines, or plain lines (id = line number). Max 500 items.",
       "--context <text>": "Optional shared context for every item, e.g. the file name.",
       "--baseline <file>": "Compare with a recorded baseline: only findings not in it count. The file holds hashes of question id plus whitespace-normalised item text with a count, no text, ids or paths, so it is safe to commit (e.g. .claude/referee-baseline.json). A moved line stays known, an edited line is new, the Nth+1 copy of a line recorded N times is new.",
-      "--baseline-write": "With --baseline: record the current yes answers into the file (replacing it) instead of comparing. Verdict is recorded; review and unanswered items are not recorded.",
+      "--baseline-write": "With --baseline: record the current yes answers into the file instead of comparing. Entries for the questions asked are replaced; entries for other questions in the file are kept (unless the file was recorded with another pack, which is replaced whole). Verdict is recorded; review and unanswered items are not recorded.",
     },
     outputs: {
       verdict: "flagged when any answer is yes, review when some are unsure or unanswered, clear otherwise; with --baseline only new yes answers count, so --fail-on flagged fails on new findings only; recorded with --baseline-write",
@@ -119,7 +119,7 @@ export const judge: Command = {
     }
     const shared = str(context, "context");
     const planned: Planned[] = items.map((item) => ({ id: item.id, state: { item: clip(item.text, 4_000, 4_000), ...(shared ? { context: shared } : {}) }, questions }));
-    if (previous && previous.pack !== pack.name) {
+    if (previous && !writing && previous.pack !== pack.name) {
       throw new RefereeError("bad_input", `The baseline was recorded with pack ${previous.pack}, this run uses ${pack.name}.`, { next_step: "Use the same pack, or record the baseline again with --baseline-write." });
     }
     const auto = Object.fromEntries(ids.map((id) => [id, threshold(pack, project?.thresholds, id, "auto", 0.9)]));
@@ -168,7 +168,9 @@ export const judge: Command = {
         let shown = flagged;
         let newYes = yes;
         if (baselinePath && writing) {
-          const next = buildBaseline(pack.name, hits);
+          const built = buildBaseline(pack.name, hits);
+          const kept = previous && previous.pack === pack.name ? Object.entries(previous.entries).filter(([q]) => !ids.includes(q)) : [];
+          const next = { ...built, entries: { ...Object.fromEntries(kept), ...built.entries } };
           const diff = previous ? split(previous, ids, hits) : null;
           writeBaseline(baselinePath, next);
           Object.assign(extra, { recorded: yes }, diff ? { added: diff.fresh.filter(Boolean).length, dropped: diff.gone } : {});

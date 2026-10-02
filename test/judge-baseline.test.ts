@@ -96,3 +96,27 @@ test("baseline errors: missing file, write without file, bad version, other pack
   writeFileSync(join(cwd, "base.json"), JSON.stringify({ version: 1, pack: "other", entries: {} }));
   assert.match(String((await call([], "x\n", cwd)).out["message"]), /pack other/);
 });
+
+test("baseline-write over another pack's file re-records it instead of failing", async () => {
+  const cwd = tempDir();
+  writeFileSync(join(cwd, "base.json"), JSON.stringify({ version: 1, pack: "other", entries: { "x.q": { [itemHash("x.q", "a")]: 1 } } }));
+  const { code, out } = await record(cwd, "rm -rf $A\n");
+  assert.equal(code, 0);
+  assert.equal(out["verdict"], "recorded");
+  const baseline = parseBaseline(readFileSync(join(cwd, "base.json"), "utf8"));
+  assert.notEqual(baseline.pack, "other");
+  assert.deepEqual(Object.keys(baseline.entries), ["line.risky"]);
+});
+
+test("baseline-write with a question subset keeps the other questions' entries", async () => {
+  const cwd = tempDir();
+  await judge(["--question", "failure.env", "--baseline", "base.json", "--baseline-write"], "rm -rf $A\n", cwd);
+  await record(cwd, "rm -rf $A\n");
+  const before = parseBaseline(readFileSync(join(cwd, "base.json"), "utf8"));
+  assert.deepEqual(Object.keys(before.entries).sort(), ["failure.env", "line.risky"]);
+  const { out } = await record(cwd, "rm -rf $B\n");
+  assert.deepEqual([out["recorded"], out["added"], out["dropped"]], [1, 1, 1]);
+  const after = parseBaseline(readFileSync(join(cwd, "base.json"), "utf8"));
+  assert.deepEqual(after.entries["failure.env"], before.entries["failure.env"]);
+  assert.deepEqual(after.entries["line.risky"], { [itemHash("line.risky", "rm -rf $B")]: 1 });
+});
