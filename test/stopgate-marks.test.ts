@@ -152,3 +152,43 @@ test("marks never turn a turn into a skip: no mark changes passedCheckAfterLastE
   assert.equal(f.passedCheckAfterLastEdit, false);
   assert.deepEqual(f.marks, { truncatedChecks: 0, subagentCalls: 1, subagentReports: 1, stalePass: true });
 });
+
+// Denials seen in real transcripts: "This command requires approval" (toolDenialKind user-rejected), compound-command and classifier denials.
+test("a permission-denied command is denied: not a pass, not a fail", () => {
+  const f = analyzeTranscript(new T().user("go").edit("/a.py").tool("Bash", { command: "python -m pytest" }, "This command requires approval", true, "Error: This command requires approval").say("done").text());
+  assert.deepEqual(f.checks, [{ cmd: "python -m pytest", status: "denied" }]);
+  assert.equal(f.passedCheckAfterLastEdit, false);
+});
+
+test("every real denial text is denied, and a denial never makes the stop skip", () => {
+  const texts = [
+    "This command requires approval",
+    "This Bash command contains multiple operations. The following part requires approval: python test_flat.py",
+    "This Bash command contains multiple operations. The following parts require approval: git add titles.py, git commit -m x",
+    "Newline followed by # inside a quoted argument can hide arguments from path validation",
+    "Permission for this action was denied by the Claude Code auto mode classifier. Reason: Blocked by classifier.",
+    "Permission for this command was denied by a built-in Claude Code safety check, not by the user.",
+    "The user doesn't want to proceed with this tool use. The tool use was rejected",
+    "PreToolUse:Bash hook error: [npx block-no-verify@1.1.2]: BLOCKED: --no-verify flag is not allowed",
+  ];
+  for (const t of texts) {
+    const f = analyzeTranscript(new T().user("go").edit("/a.ts").bash("npm test", t, true).text());
+    assert.equal(f.checks[0]?.status, "denied", t);
+    assert.equal(f.passedCheckAfterLastEdit, false, t);
+  }
+});
+
+test("the structured denial kind marks a denial even with an unseen text", () => {
+  const f = analyzeTranscript(new T().user("go").edit("/a.ts").tool("Bash", { command: "npm test" }, "Nope", true, undefined).text());
+  assert.equal(f.checks[0]?.status, "failed");
+  const t = new T().user("go").edit("/a.ts");
+  t.lines.push(JSON.stringify({ type: "user", isSidechain: false, toolDenialKind: "permission-rule", message: { role: "user", content: [{ type: "tool_result", tool_use_id: "toolu_9", content: "Nope", is_error: true }] } }));
+  t.lines.splice(t.lines.length - 1, 0, JSON.stringify({ type: "assistant", isSidechain: false, message: { role: "assistant", content: [{ type: "tool_use", id: "toolu_9", name: "Bash", input: { command: "npm test" } }] } }));
+  assert.equal(analyzeTranscript(t.text()).checks[0]?.status, "denied");
+});
+
+test("a real failure that merely mentions approval stays failed, and an earlier pass still counts", () => {
+  const f = analyzeTranscript(new T().user("go").edit("/a.ts").bash("npm test", "Exit code 1\nError: needs approval of the PR\nTests: 1 failed, 1 total", true).bash("npm run lint", "Exit code 0", false).bash("npm test", "This command requires approval", true).text());
+  assert.deepEqual(f.checks.map((c) => c.status), ["failed", "passed", "denied"]);
+  assert.equal(f.passedCheckAfterLastEdit, true);
+});

@@ -1,6 +1,7 @@
 // Shared types of the Stop done-gate (shadow mode): facts read from a transcript, Jev's decision and the stored stop record.
 
-export type CheckStatus = "passed" | "failed" | "unknown";
+export type CheckStatus = "passed" | "failed" | "unknown" | "denied";
+// denied: Claude Code refused the command before running it (permission or hook denial); never a pass, never a fail.
 
 export interface CheckRun {
   readonly cmd: string;

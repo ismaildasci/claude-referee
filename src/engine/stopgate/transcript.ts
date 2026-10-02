@@ -37,6 +37,7 @@ interface Entry {
   isMeta?: unknown;
   isCompactSummary?: unknown;
   origin?: { kind?: unknown };
+  toolDenialKind?: unknown;
   message?: { content?: unknown };
 }
 interface Pending {
@@ -270,7 +271,24 @@ function isTruncated(text: string): boolean {
   return TRUNCATED.some((re) => re.test(text));
 }
 
-function statusOf(full: string, isError: boolean, silent: boolean): { status: CheckStatus; truncated: boolean } {
+// Texts Claude Code returns when it refuses a tool call before running it (seen in real transcripts, anchored at the start).
+const DENIAL_TEXT = [
+  /^This command requires approval/,
+  /^This Bash command contains multiple operations\. The following parts? require/,
+  /^Newline followed by # inside a quoted argument/,
+  /^Permission for this (?:action|command) was denied/,
+  /^The user doesn't want to (?:proceed with this tool use|take this action right now)/,
+  /^PreToolUse:\w+ hook error/,
+  /^\S+ is temporarily unavailable, so auto mode cannot determine/,
+];
+
+function isDenied(full: string, isError: boolean, denialKind: unknown): boolean {
+  if (!isError) return false;
+  return (typeof denialKind === "string" && denialKind !== "") || DENIAL_TEXT.some((re) => re.test(full.trimStart()));
+}
+
+function statusOf(full: string, isError: boolean, silent: boolean, denialKind?: unknown): { status: CheckStatus; truncated: boolean } {
+  if (isDenied(full, isError, denialKind)) return { status: "denied", truncated: false };
   const truncated = isTruncated(full);
   const status = rawStatus(full.length > RESULT_TAIL ? full.slice(-RESULT_TAIL) : full, isError, silent);
   return { status: truncated && status === "passed" ? "unknown" : status, truncated };
@@ -316,7 +334,7 @@ function scanTurn(text: string, from: number, to: number): Scan {
       for (const block of entry.message.content as Block[]) {
         const call = block && block.type === "tool_result" && typeof block.tool_use_id === "string" ? byId.get(block.tool_use_id) : undefined;
         if (!call) continue;
-        const result = statusOf(fullResultText(block.content), block.is_error === true, call.silent);
+        const result = statusOf(fullResultText(block.content), block.is_error === true, call.silent, entry.toolDenialKind);
         call.status = result.status;
         call.truncated = result.truncated;
       }

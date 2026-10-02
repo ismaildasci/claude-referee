@@ -21,6 +21,6 @@ a2 trusts unparsed output, which the injection rule forbids for `done`. b lets J
 
 **Decision.** Conservative option: change nothing in the gate logic. a2 and b are effectively rejected (0.01); a1 stays open as a separate call because it is the only change that does not trust unparsed text, and it helps 4 of 99. The gate is documented as a claim-without-counted-check detector, not a correctness detector.
 
-**Not decided here.** The denied-command mislabel (a permission denial reported as `failed`) is small and verified, but it does not change Jev's answers (`claims_verified` 0.03-0.04 becomes 0.04-0.06, all still blocked). It can be fixed under any option.
+**Not decided here.** The denied-command mislabel (a permission denial reported as `failed`) is small and verified, but it does not change Jev's answers (`claims_verified` 0.03-0.04 becomes 0.04-0.06, all still blocked). It can be fixed under any option. Fixed afterwards: such a result is now its own status `denied` (see the changelog), still never a pass; no recorded Stop eval case contained a denial, so no recorded answer changed.
 
 **Limits.** Replays use about 330 Jev requests on fitted rules; one wrong "done"; "exit 0" is inferred from `is_error == false`; same model family writes and labels; one Jev model version. The `jev-evals/stop-study` allowances are unchanged.
