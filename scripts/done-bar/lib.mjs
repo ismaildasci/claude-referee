@@ -1,4 +1,5 @@
 // Pure helpers of the split done-v2 bar (docs/decisions/done-bar-split.md): classes, clusters, per-class metrics, repository split, dev backlog.
+// A cluster merges same-step rows (exit line ignored, label in the key) and takes its best class; the split is per language bucket, even positions dev.
 // No network and no log text; tested in test/done-bar.test.ts.
 
 import { createHash } from "node:crypto";
@@ -12,12 +13,10 @@ const sha = (text) => createHash("sha256").update(text).digest("hex");
 
 export const classOfTrust = (trust) => (trust === "parsed" ? "R" : trust === "exit_code" ? "E" : "U");
 
-// Same step logged with and without its exit code line: identical key. The expected label is part of the key so a label conflict never merges.
 export const clusterKey = (evidence, expected) => sha(`${expected}\n${evidence.replace(EXIT_LINE, "").split("\n").map((l) => l.trimEnd()).filter(Boolean).join("\n").trim()}`);
 
 const rank = (c) => CLASSES.indexOf(c);
 
-// Merges rows with the same cluster key; the cluster takes the best class of its members (R before E before U).
 export function clusters(rows) {
   const map = new Map();
   for (const r of rows) {
@@ -31,7 +30,6 @@ export function clusters(rows) {
 
 const ratio = (k, n) => ({ k, n, p: n ? k / n : null, ...clopperPearson(k, n) });
 
-// Rows: { cls, expected, code_decided, status ("ok" | "stale" | "missing" | "code"), verdict, cluster }. Only sent rows with a usable answer are scored.
 export function scoreClass(rows) {
   const sent = rows.filter((r) => !r.code_decided && r.status === "ok");
   const cs = clusters(sent);
@@ -54,7 +52,6 @@ export function scoreClass(rows) {
   };
 }
 
-// A cluster whose members differ in class is counted once, in its best class.
 export function scoreByClass(rows) {
   const best = new Map();
   for (const r of rows) if (!best.has(r.cluster) || rank(r.cls) < rank(best.get(r.cluster))) best.set(r.cluster, r.cls);
@@ -64,7 +61,6 @@ export function scoreByClass(rows) {
   return out;
 }
 
-// The registered bar over a scored table: wrong met 0 in every class, missing recall 0.9 pooled, R met recall 0.9 only at n >= 30, E report only, U coverage only.
 export function verdictOfBar(score) {
   const wrong = Object.fromEntries(CLASSES.map((c) => [c, score[c].wrong_met.k]));
   const r = score.R.met_recall;
@@ -79,7 +75,6 @@ export function verdictOfBar(score) {
   };
 }
 
-// Repository split: per language bucket, repositories ordered by sha256(seed:repo); even positions dev, odd positions hold-out.
 export function splitRepos(repos, seed = SEED) {
   const byLang = new Map();
   for (const r of repos) byLang.set(r.language, [...(byLang.get(r.language) ?? []), r.repo]);
@@ -92,7 +87,6 @@ export function splitRepos(repos, seed = SEED) {
 
 export const holdoutHash = (ids) => sha([...ids].sort().join("\n"));
 
-// Unparsed cases by tool label, ranked by expected-met, then cases, then repositories (the ranking of scripts/real-ci/analyze.mjs).
 export function backlogOf(rows) {
   const by = {};
   for (const r of rows.filter((x) => !x.parsed)) {
