@@ -1,18 +1,18 @@
 # A recipe for the project `verify` skill
 
-Claude Code can run a skill named `verify` right before it commits. This page gives a ready `SKILL.md` that makes that step a `evidence-referee done` check on your test output. The plugin does not write the file into your project; you copy it yourself.
+Claude Code can run a skill named `verify` right before it commits. This page gives a ready `SKILL.md` that makes that step a `claude-referee done` check on your test output. The plugin does not write the file into your project; you copy it yourself.
 
 ## Install
 
 ```sh
 mkdir -p .claude/skills/verify
-curl -fsSL https://raw.githubusercontent.com/ismaildasci/evidence-referee/main/docs/recipes/verify/SKILL.md -o .claude/skills/verify/SKILL.md
+curl -fsSL https://raw.githubusercontent.com/ismaildasci/claude-referee/main/docs/recipes/verify/SKILL.md -o .claude/skills/verify/SKILL.md
 ```
 
-Or copy [docs/recipes/verify/SKILL.md](recipes/verify/SKILL.md) by hand, into `.claude/skills/verify/` in a project or `~/.claude/skills/verify/` for all projects. Then change the test command in step 1 to your own. The recipe needs `evidence-referee` available through `npx` and a TypeSafe key (see [configuration](configuration.md#the-api-key)).
+Or copy [docs/recipes/verify/SKILL.md](recipes/verify/SKILL.md) by hand, into `.claude/skills/verify/` in a project or `~/.claude/skills/verify/` for all projects. Then change the test command in step 1 to your own. The recipe needs `claude-referee` available through `npx` and a TypeSafe key (see [configuration](configuration.md#the-api-key)).
 
 > [!WARNING]
-> **Not on npm yet.** Until the package is published (early October 2026), `npx evidence-referee` fails with a 404, and the recipe as written produces no verdict. Use the alias from the [README install note](../README.md#install) and replace `npx evidence-referee` with `evidence-referee` in your copy. The recipe tells Claude to report a missing verdict instead of committing or looping.
+> **Not on npm yet.** Until the package is published (early October 2026), `npx claude-referee` fails with a 404, and the recipe as written produces no verdict. Use the alias from the [README install note](../README.md#install) and replace `npx claude-referee` with `claude-referee` in your copy. The recipe tells Claude to report a missing verdict instead of committing or looping.
 
 ## What Claude Code does with it
 

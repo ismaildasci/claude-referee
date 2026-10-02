@@ -1,6 +1,6 @@
 {
-  "name": "evidence-referee",
-  "displayName": "evidence-referee (unofficial)",
+  "name": "claude-referee",
+  "displayName": "claude-referee (unofficial)",
   "version": "0.1.6",
   "description": "Checks \"done\" claims and small judgement calls with TypeSafe Jev, and keeps local receipts. Unofficial; not affiliated with Anthropic or TypeSafe.",
   "author": {
@@ -8,8 +8,8 @@
     "email": "hello@ismaildasci.com",
     "url": "https://github.com/ismaildasci"
   },
-  "homepage": "https://github.com/ismaildasci/evidence-referee",
-  "repository": "https://github.com/ismaildasci/evidence-referee",
+  "homepage": "https://github.com/ismaildasci/claude-referee",
+  "repository": "https://github.com/ismaildasci/claude-referee",
   "license": "MIT",
   "keywords": [
     "claude-code",
@@ -35,7 +35,7 @@
     "hooks_enabled": {
       "type": "boolean",
       "title": "Enable hooks",
-      "description": "Turn off to silence every evidence-referee hook, whatever the project file says.",
+      "description": "Turn off to silence every claude-referee hook, whatever the project file says.",
       "default": true
     },
     "model": {

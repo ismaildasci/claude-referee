@@ -32,7 +32,7 @@ function apiKey() {
 }
 
 const jsonl = (path) => readFileSync(path, "utf8").split("\n").map((l) => l.trim()).filter(Boolean);
-const loadBest = () => JSON.parse(readFileSync("plugins/evidence-referee/packs/generic/questions/decide.json", "utf8"))["decide.best"];
+const loadBest = () => JSON.parse(readFileSync("plugins/claude-referee/packs/generic/questions/decide.json", "utf8"))["decide.best"];
 const makeQuestion = (best) => (opts) => ({ ...best, criteria: Object.fromEntries(opts.map((o) => [o.name, o.text])) });
 
 let key;

@@ -1,6 +1,6 @@
-# Contributing to evidence-referee
+# Contributing to claude-referee
 
-Thanks for helping. evidence-referee is small on purpose: every check has to earn its place with a measurement, and every number in the docs says whether it was measured or modelled. Contributions that keep it that way are the most welcome.
+Thanks for helping. claude-referee is small on purpose: every check has to earn its place with a measurement, and every number in the docs says whether it was measured or modelled. Contributions that keep it that way are the most welcome.
 
 You don't need a TypeSafe API key. Tests run offline against a local fake of the Jev API, and CI never calls Jev.
 
@@ -10,8 +10,8 @@ You don't need a TypeSafe API key. Tests run offline against a local fake of the
 - No global tools. Everything is in `devDependencies`.
 
 ```bash
-git clone https://github.com/ismaildasci/evidence-referee
-cd evidence-referee
+git clone https://github.com/ismaildasci/claude-referee
+cd claude-referee
 npm ci
 npm run check    # typecheck, tests, build
 ```
@@ -19,7 +19,7 @@ npm run check    # typecheck, tests, build
 To try your build inside Claude Code:
 
 ```bash
-claude --plugin-dir plugins/evidence-referee
+claude --plugin-dir plugins/claude-referee
 ```
 
 ## How the code is laid out
@@ -29,14 +29,14 @@ claude --plugin-dir plugins/evidence-referee
 | `src/engine/` | Shared logic: key lookup, data directory, redaction, cache, the Jev client, packs and project files |
 | `src/cli/` | The CLI runner and one file per command in `src/cli/commands/` |
 | `src/hooks/` | Hook entry points; v0.1 has the SessionStart briefing |
-| `plugins/evidence-referee/` | What users install: the manifest, the committed bundle in `dist/`, `hooks/`, `skills/` and `packs/` |
+| `plugins/claude-referee/` | What users install: the manifest, the committed bundle in `dist/`, `hooks/`, `skills/` and `packs/` |
 | `test/` | `node:test` suites; `test/fake-jev.ts` stands in for the API |
 | `scripts/` | The build and the private-terms check |
 | `assets/` | README, manifesto and social preview images, and the demo tape; see `assets/README.md` |
 
 ## The bundle is committed
 
-`plugins/evidence-referee/dist/` is built from `src/` and committed, so installs never need `node_modules`. After changing anything under `src/`, run `npm run build` and commit `dist/` in the same commit. CI rebuilds it and fails if the result differs.
+`plugins/claude-referee/dist/` is built from `src/` and committed, so installs never need `node_modules`. After changing anything under `src/`, run `npm run build` and commit `dist/` in the same commit. CI rebuilds it and fails if the result differs.
 
 ## Code style
 
@@ -55,7 +55,7 @@ claude --plugin-dir plugins/evidence-referee
 ## Packs
 
 Questions and thresholds live in packs, not in code. A new pack or question:
-1. goes under `plugins/evidence-referee/packs/<name>/`, laid out as in [docs/configuration.md](docs/configuration.md#packs);
+1. goes under `plugins/claude-referee/packs/<name>/`, laid out as in [docs/configuration.md](docs/configuration.md#packs);
 2. follows TypeSafe's question rules: one atomic question, criteria that say what yes and no mean, facts in the state rather than in the question;
 3. says in the pull request how its thresholds were chosen. "Not tuned yet" is an honest answer and a fine start.
 

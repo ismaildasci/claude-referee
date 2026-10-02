@@ -1,5 +1,5 @@
 name: Bug report
-description: Something evidence-referee did that it shouldn't, or didn't do that it should.
+description: Something claude-referee did that it shouldn't, or didn't do that it should.
 labels: [bug]
 body:
   - type: markdown
@@ -10,7 +10,7 @@ body:
     id: what
     attributes:
       label: What happened
-      description: The command or hook, what you expected and what you got. Paste the JSON line evidence-referee printed.
+      description: The command or hook, what you expected and what you got. Paste the JSON line claude-referee printed.
     validations:
       required: true
   - type: textarea
@@ -24,7 +24,7 @@ body:
     id: doctor
     attributes:
       label: doctor output
-      description: The output of `npx evidence-referee doctor`. It never contains the key.
+      description: The output of `npx claude-referee doctor`. It never contains the key.
       render: json
     validations:
       required: true

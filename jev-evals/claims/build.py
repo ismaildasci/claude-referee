@@ -16,7 +16,7 @@ E = {
     "order": ("docs/measurements.md", lines("docs/measurements.md", 7, 22)),
     "gate_modes": ("docs/configuration.md", lines("docs/configuration.md", 55, 63)),
     "privacy_sent": ("docs/privacy.md", lines("docs/privacy.md", 9, 16)),
-    "core_limits": ("plugins/evidence-referee/skills/jev/references/core.md", lines("plugins/evidence-referee/skills/jev/references/core.md", 14, 24)),
+    "core_limits": ("plugins/claude-referee/skills/jev/references/core.md", lines("plugins/claude-referee/skills/jev/references/core.md", 14, 24)),
     "injection": ("docs/measurements.md", section("docs/measurements.md", "## Instructions inside the evidence", "## Not measured yet")),
 }
 

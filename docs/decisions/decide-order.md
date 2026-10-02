@@ -128,7 +128,7 @@ Registered files (their content at that commit defines the measurement):
 - `scripts/k3-calibration.mjs`, `scripts/k3-calibration.d.mts`
 - `jev-evals/decide-close/k3-cutoffs.json`, `jev-evals/decide-close/k3-power.json`
 - `test/order-analysis.test.ts`
-- `plugins/evidence-referee/packs/generic/questions/decide.json` (the `decide.best` question that is asked; this record does not change it)
+- `plugins/claude-referee/packs/generic/questions/decide.json` (the `decide.best` question that is asked; this record does not change it)
 - `jev-evals/decide-close/cases.jsonl`
 - `jev-evals/decide-close/cands-r1.jsonl`, `jev-evals/decide-close/cands-r2.jsonl`
 - `jev-evals/decide-close/screen-r1.json`, `jev-evals/decide-close/screen-r2.json`

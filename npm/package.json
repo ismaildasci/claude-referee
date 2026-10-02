@@ -1,15 +1,15 @@
 {
-  "name": "evidence-referee",
+  "name": "claude-referee",
   "version": "0.1.6",
   "description": "Unofficial CLI that checks \"done\" claims and small judgement calls with TypeSafe Jev, and keeps local receipts. The Claude Code plugin of the same name bundles it.",
   "license": "MIT",
   "author": "İsmail Daşcı <hello@ismaildasci.com> (https://github.com/ismaildasci)",
-  "homepage": "https://github.com/ismaildasci/evidence-referee#readme",
+  "homepage": "https://github.com/ismaildasci/claude-referee#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ismaildasci/evidence-referee.git"
+    "url": "git+https://github.com/ismaildasci/claude-referee.git"
   },
-  "bugs": "https://github.com/ismaildasci/evidence-referee/issues",
+  "bugs": "https://github.com/ismaildasci/claude-referee/issues",
   "keywords": [
     "claude-code",
     "claude-code-plugin",
@@ -20,7 +20,7 @@
   ],
   "type": "module",
   "bin": {
-    "evidence-referee": "cli.mjs"
+    "claude-referee": "cli.mjs"
   },
   "files": [
     "cli.mjs",

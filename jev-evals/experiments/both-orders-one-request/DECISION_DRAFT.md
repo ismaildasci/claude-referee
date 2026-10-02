@@ -15,7 +15,7 @@ Status: Pre-registered in the scratchpad before any fresh request; results in RE
   - E: existing two-request answers from the 24-order run (the draws whose order is the written / the reversed order), one draw each.
   - T1, T2: fresh two-request path, rounds 1 and 2: two separate requests (`best` question each) sent in parallel, as the CLI does.
   - P1, P2, P3: fresh one-request variant, rounds 1 to 3.
-  - CLI: one fresh end-to-end `node plugins/evidence-referee/dist/cli.mjs decide --fresh --data-dir <scratch>` run per decision (validates that the T arm of the script is what the CLI does).
+  - CLI: one fresh end-to-end `node plugins/claude-referee/dist/cli.mjs decide --fresh --data-dir <scratch>` run per decision (validates that the T arm of the script is what the CLI does).
 - Order of work: decisions run one at a time (concurrency 1 across decisions) so latency is not confounded by rate limits. Within a round, the arm run first alternates by decision index (round 1: pair first on even index, two-request first on odd; round 2 reversed). Round 3 is pair only. Planned requests: 117 + 117 + 39 + 78 = 351; hard stop at 550 including retries.
 - Probabilities are the API's own (two decimals). All numbers are produced by `analyze.mjs`, never by eye. All comparisons use unrounded values.
 
@@ -62,4 +62,4 @@ That the all-orders mean is ground truth; anything about non-close decisions, ot
 
 - `run.mjs` retry loop was fixed (a recursive retry could ignore the 5-attempt bound) and one counted warm-up request (written order of the first case, excluded from analysis) was added so connection setup does not land on the first pair observation. Both are mechanics, not criteria. The analysis script and every threshold are unchanged; sha256 values in `PREREG.sha256` (second block) were taken before the first request.
 - Before registering the final hash, `analyze.mjs` was smoke-tested on the existing (already seen) data of `order-2026-10-01.json` (arm E as the two-request arms, its stored pair as the pair arm). That showed the pair arm flagging order disagreement in 7 of 39 decisions against 12 of 39 for the separate requests, which is the C2 rate component failing on seen data. No threshold was changed after seeing it.
-- Verdict thresholds checked in `plugins/evidence-referee/packs/generic/thresholds.json`: decide.best clear 0.85, margin 0.1, the values used.
+- Verdict thresholds checked in `plugins/claude-referee/packs/generic/thresholds.json`: decide.best clear 0.85, margin 0.1, the values used.

@@ -1,4 +1,4 @@
---- plugins/evidence-referee/packs/generic/questions/done.json	2026-10-01 10:13:46
+--- plugins/claude-referee/packs/generic/questions/done.json	2026-10-01 10:13:46
 +++ <scratchpad>/done-v2-met-misses/packs/donenote/questions/done.json	2026-10-01 13:52:15
 @@ -3,11 +3,11 @@
      "type": "noul",

@@ -4,7 +4,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, write
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 const E = dirname(fileURLToPath(import.meta.url));
-const CLI = "<repo>/plugins/evidence-referee/dist/cli.mjs";
+const CLI = "<repo>/plugins/claude-referee/dist/cli.mjs";
 const CAP = 540;
 const V = {
   "risky-base": { pack: "base", cases: "risky", mode: "judge", q: "line.risky" },

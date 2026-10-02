@@ -27,7 +27,7 @@ const EXCERPT = 200;
 
 export { decideStop };
 
-export const SOFT_NOTE = "evidence-referee: this turn edited files and claimed it was done, but no passing check ran after the last edit. Run the project's tests or build before trusting it.";
+export const SOFT_NOTE = "claude-referee: this turn edited files and claimed it was done, but no passing check ran after the last edit. Run the project's tests or build before trusting it.";
 
 export async function stopGate(io: HookIo, _pluginRoot: string): Promise<string | undefined> {
   const started = io.now();

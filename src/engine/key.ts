@@ -63,7 +63,7 @@ export function validateKey(raw: string, source: KeySource): string {
 }
 
 export function noKeyNextStep(platform: NodeJS.Platform): string {
-  const hooks = "Hooks can also use /plugin configure evidence-referee or claude plugin configure evidence-referee --values-stdin (Claude Code 2.1.285+).";
+  const hooks = "Hooks can also use /plugin configure claude-referee or claude plugin configure claude-referee --values-stdin (Claude Code 2.1.285+).";
   if (platform === "darwin") {
     return `Store the key in the Keychain: security add-generic-password -a "$USER" -s TYPESAFE_API_KEY -w (it prompts for the key). ${hooks}`;
   }

@@ -1,17 +1,17 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/manifesto-dark.png">
-    <img alt="Evidence over eloquence (güzel söz değil, kanıt): evidence-referee manifestosu, sarı bir hakem kartıyla." src="assets/manifesto-light.png" width="100%">
+    <img alt="Evidence over eloquence (güzel söz değil, kanıt): claude-referee manifestosu, sarı bir hakem kartıyla." src="assets/manifesto-light.png" width="100%">
   </picture>
 </p>
 
 # Güzel söz değil, kanıt
 
-*evidence-referee manifestosu*
+*claude-referee manifestosu*
 
 Kodlama ajanları iyi yazar. "Tüm testler geçti. Bitti." akıcı tek bir satırdır ve yazması hiçbir şeye mal olmaz. Doğrulaması bir test koşusuna mal olur; yanlışsa biri bunu sonra fark eder.
 
-evidence-referee küçük bir bahis. Bir ajanın oturum içinde verdiği kararların çoğu dar ve denetlenebilir sorulardır: gerçekten bitti mi, hangi seçenek kurallarımıza uyuyor, bu satıra bakmak gerekir mi? Yargı için yapılmış, düz yazı yerine olasılık döndüren bir model bu kararları büyük modelin üstünden alabilir; ucuza ve makbuzuyla.
+claude-referee küçük bir bahis. Bir ajanın oturum içinde verdiği kararların çoğu dar ve denetlenebilir sorulardır: gerçekten bitti mi, hangi seçenek kurallarımıza uyuyor, bu satıra bakmak gerekir mi? Yargı için yapılmış, düz yazı yerine olasılık döndüren bir model bu kararları büyük modelin üstünden alabilir; ucuza ve makbuzuyla.
 
 Bu bir bahis, henüz bir sonuç değil. Sonucu öğrenene kadar kendimize koyduğumuz kurallar şunlar.
 
@@ -51,4 +51,4 @@ Dar sorulara olasılıklarla cevap verir ve eşiklerinin altında kalan durumlar
 
 Büyük kararları Claude verir. Küçük kararları hakem verir ve gerekçesini gösterir.
 
-*4. ve 5. kuralın arkasındaki ölçümler [docs/measurements.md](docs/measurements.md) sayfasında (İngilizce). evidence-referee bağımsız bir projedir; Anthropic ya da TypeSafe ile bağlantısı yoktur.*
+*4. ve 5. kuralın arkasındaki ölçümler [docs/measurements.md](docs/measurements.md) sayfasında (İngilizce). claude-referee bağımsız bir projedir; Anthropic ya da TypeSafe ile bağlantısı yoktur.*

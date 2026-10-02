@@ -8,7 +8,7 @@ let count = 0;
 const key = execFileSync("security", ["find-generic-password", "-s", "TYPESAFE_API_KEY", "-w"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
 const sel = JSON.parse(readFileSync(D + "selection.json", "utf8"));
 const L = (p) => readFileSync(p, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
-const best = JSON.parse(readFileSync("plugins/evidence-referee/packs/generic/questions/decide.json", "utf8"))["decide.best"];
+const best = JSON.parse(readFileSync("plugins/claude-referee/packs/generic/questions/decide.json", "utf8"))["decide.best"];
 const log = (o) => appendFileSync(D + "live.jsonl", JSON.stringify(o) + "\n");
 async function ask(state, questions) {
   if (count >= CAP) throw new Error("cap");
@@ -44,7 +44,7 @@ const done = L("jev-evals/done-v2/cases-dev.jsonl"), rec = L("jev-evals/done-v2/
 const seen = new Set(); const b2 = [];
 for (const r of rec.map((r) => ({ case: r.case, p: r.answers.c1.noul, dist: Math.min(Math.abs(r.answers.c1.noul - 0.7), Math.abs(r.answers.c1.noul - 0.5)) })).sort((a, b) => a.dist - b.dist || a.case.localeCompare(b.case))) { if (!seen.has(r.case) && b2.length < 4) { seen.add(r.case); b2.push(r); } }
 writeFileSync(D + "selection-b2.json", JSON.stringify(b2));
-const cli = (args, input) => JSON.parse(execFileSync("node", ["plugins/evidence-referee/dist/cli.mjs", ...args, "--fresh", "--data-dir", D + "data"], { input, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] }));
+const cli = (args, input) => JSON.parse(execFileSync("node", ["plugins/claude-referee/dist/cli.mjs", ...args, "--fresh", "--data-dir", D + "data"], { input, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] }));
 for (let r = 0; r < 5; r++) for (const s of b2) {
   const c = done.find((x) => x.id === s.case);
   if (count >= CAP) break; count++;

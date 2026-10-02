@@ -1,4 +1,4 @@
-// Claude-side usage: evidence-referee (and its former name claude-referee) CLI calls counted from Claude Code's session transcripts, subagents included.
+// Claude-side usage: claude-referee CLI calls counted from Claude Code's session transcripts, subagents included.
 // A call counts only in command position, each tool call once; nothing from the transcripts is echoed back.
 
 import { existsSync, readdirSync, readFileSync } from "node:fs";
@@ -70,9 +70,6 @@ function tokenize(command: string): string[] {
   return tokens;
 }
 
-// Transcripts written before the rename still contain the old name.
-const NAMES: readonly string[] = ["evidence-referee", "claude-referee"];
-
 function subcommand(token: string | undefined): string {
   return token && /^[a-z][a-z-]*$/.test(token) ? token : "other";
 }
@@ -81,18 +78,18 @@ function callIn(segment: readonly string[]): string | null {
   let i = 0;
   while (i < segment.length && (ASSIGNMENT.test(segment[i] ?? "") || ["{", "time", "exec", "command", "env"].includes(segment[i] ?? ""))) i++;
   const first = segment[i];
-  if (first !== undefined && NAMES.includes(first)) return subcommand(segment[i + 1]);
+  if (first === "claude-referee") return subcommand(segment[i + 1]);
   if (first === "npx") {
     i++;
     while ((segment[i] ?? "").startsWith("-")) i += segment[i] === "--package" || segment[i] === "-p" ? 2 : 1;
     const name = segment[i] ?? "";
-    return NAMES.some((n) => name === n || name.startsWith(`${n}@`)) ? subcommand(segment[i + 1]) : null;
+    return name === "claude-referee" || name.startsWith("claude-referee@") ? subcommand(segment[i + 1]) : null;
   }
   if (first === "node") {
     i++;
     while ((segment[i] ?? "").startsWith("-")) i++;
     const path = segment[i] ?? "";
-    return path.endsWith("/dist/cli.mjs") && NAMES.some((n) => path.includes(n)) ? subcommand(segment[i + 1]) : null;
+    return path.endsWith("/dist/cli.mjs") && path.includes("claude-referee") ? subcommand(segment[i + 1]) : null;
   }
   return null;
 }

@@ -1,17 +1,17 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/manifesto-dark.png">
-    <img alt="Evidence over eloquence: the evidence-referee manifesto, with a yellow referee's card." src="assets/manifesto-light.png" width="100%">
+    <img alt="Evidence over eloquence: the claude-referee manifesto, with a yellow referee's card." src="assets/manifesto-light.png" width="100%">
   </picture>
 </p>
 
 # Evidence over eloquence
 
-*The evidence-referee manifesto*
+*The claude-referee manifesto*
 
 Coding agents write well. "All tests pass. Done." is one fluent line, and it costs nothing to write. Checking it costs a test run, and if it's wrong, someone finds out later.
 
-evidence-referee is a small bet. Many of the calls an agent makes in a session are narrow, checkable questions: is it really done, which option fits our rules, does this line need a look? A model built for judgement, one that answers with probabilities instead of prose, might take those calls off the big model's plate, cheaply and with receipts.
+claude-referee is a small bet. Many of the calls an agent makes in a session are narrow, checkable questions: is it really done, which option fits our rules, does this line need a look? A model built for judgement, one that answers with probabilities instead of prose, might take those calls off the big model's plate, cheaply and with receipts.
 
 It's a bet, not a result. These are the rules we hold ourselves to while we find out.
 
@@ -51,4 +51,4 @@ It answers narrow questions with probabilities and stays out of the way below it
 
 Claude makes the big calls. The referee makes the small ones, and shows its work.
 
-*The measurements behind rules 4 and 5 are in [docs/measurements.md](docs/measurements.md). evidence-referee is an independent project, not affiliated with Anthropic or TypeSafe.*
+*The measurements behind rules 4 and 5 are in [docs/measurements.md](docs/measurements.md). claude-referee is an independent project, not affiliated with Anthropic or TypeSafe.*

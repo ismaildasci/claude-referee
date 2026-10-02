@@ -11,14 +11,14 @@ The README, manifesto and social preview images. Every image comes in a light an
 | `social-preview.png` | GitHub social preview (1280 × 640) |
 | `logo/mark.svg` | The mark: a referee's yellow card. `logo/avatar.svg` and `logo/avatar-512.png` put it on a dark square |
 
-The mark, the wordmark and the colours may be used to link to or write about evidence-referee. Please don't use them in a way that suggests your project is evidence-referee or is endorsed by it.
+The mark, the wordmark and the colours may be used to link to or write about claude-referee. Please don't use them in a way that suggests your project is claude-referee or is endorsed by it.
 
 ## Demo GIF
 
 `demo.tape` records a terminal demo with [VHS](https://github.com/charmbracelet/vhs): run `vhs assets/demo.tape` from the repository root. Keep the GIF under 2 MB (`gifsicle -O3` if needed).
 
 Before recording:
-- `npx evidence-referee` must run, and `TYPESAFE_API_KEY` must be exported in the shell that runs `vhs`. The recorded shell inherits it, so the key is never typed or shown.
+- `npx claude-referee` must run, and `TYPESAFE_API_KEY` must be exported in the shell that runs `vhs`. The recorded shell inherits it, so the key is never typed or shown.
 - Run it inside a Rust project with cargo-nextest and a `decision.json` for `decide`, for example:
 
   ```json

@@ -113,7 +113,7 @@ export async function jevCommand(
     const outcomes = await session.run(planned, options);
     const result = finish(outcomes, session);
     const receipt = session.record(typeof result["verdict"] === "string" ? { verdict: result["verdict"] } : {});
-    if (!session.saved()) io.warn("[evidence-referee] Could not write to the data directory; this run was not cached or logged.\n");
+    if (!session.saved()) io.warn("[claude-referee] Could not write to the data directory; this run was not cached or logged.\n");
     if (flags.verbose) io.warn(JSON.stringify({ requests: receipt.requests, cached: receipt.cached, input_tokens: receipt.input_tokens, cost_usd: receipt.cost_usd, model: receipt.model, ms: receipt.ms }) + "\n");
     return reorder({ ...result, ...session.stats(), receipt: receipt.id });
   } catch (error) {

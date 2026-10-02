@@ -66,7 +66,7 @@ export function prepare({ out, repoRoot }) {
   }
   const plugin = join(out, "plugin");
   if (!existsSync(plugin)) {
-    cpSync(join(repoRoot, "plugins/evidence-referee"), plugin, { recursive: true });
+    cpSync(join(repoRoot, "plugins/claude-referee"), plugin, { recursive: true });
     const hooksPath = join(plugin, "hooks/hooks.json");
     const hooks = JSON.parse(readFileSync(hooksPath, "utf8"));
     for (const groups of Object.values(hooks.hooks)) for (const group of groups) for (const hook of group.hooks) {

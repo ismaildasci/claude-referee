@@ -8,7 +8,7 @@ const RAW = `${S}/raw.jsonl`;
 const MODEL = "jev-1.13.0";
 const CAP = 470;
 const key = process.env.TYPESAFE_API_KEY?.trim() || execFileSync("security", ["find-generic-password", "-s", "TYPESAFE_API_KEY", "-w"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
-const best = JSON.parse(readFileSync("plugins/evidence-referee/packs/generic/questions/decide.json", "utf8"))["decide.best"];
+const best = JSON.parse(readFileSync("plugins/claude-referee/packs/generic/questions/decide.json", "utf8"))["decide.best"];
 const q = (opts) => ({ ...best, criteria: Object.fromEntries(opts.map((o) => [o.name, o.text])) });
 const cases = readFileSync("jev-evals/decide-close/cases.jsonl", "utf8").split("\n").filter((l) => l.trim()).map((l) => JSON.parse(l));
 const done = new Set(existsSync(RAW) ? readFileSync(RAW, "utf8").split("\n").filter(Boolean).map((l) => { const r = JSON.parse(l); return `${r.id}|${r.round}|${r.arm}`; }) : []);

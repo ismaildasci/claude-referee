@@ -11,24 +11,24 @@ clean_env() { env -u TYPESAFE_API_KEY -u EVAL_TYPESAFE_API_KEY -u TYPESAFE_API_K
 step "typecheck"; npm run typecheck --silent
 step "tests without a key, under a foreign HOME"; clean_env npm test --silent 2>&1 | grep -E "^ℹ (tests|pass|fail)"; test "${PIPESTATUS[0]}" -eq 0
 step "build, then the committed bundle and npm copy must match"; npm run build --silent >/dev/null
-git diff --exit-code HEAD -- plugins/evidence-referee/dist npm >/dev/null || { echo "bundle or npm copy differs from HEAD: commit the rebuilt files"; exit 1; }
+git diff --exit-code HEAD -- plugins/claude-referee/dist npm >/dev/null || { echo "bundle or npm copy differs from HEAD: commit the rebuilt files"; exit 1; }
 
 step "bundle runs without node_modules"
-tmp="$(mktemp -d)"; cp -R plugins/evidence-referee "$tmp/"; cli="$tmp/evidence-referee/dist/cli.mjs"
+tmp="$(mktemp -d)"; cp -R plugins/claude-referee "$tmp/"; cli="$tmp/claude-referee/dist/cli.mjs"
 for c in done decide judge claims verify receipts doctor eval; do
   clean_env node "$cli" "$c" --describe | node -e 'JSON.parse(require("fs").readFileSync(0, "utf8"))' || { echo "describe failed: $c"; exit 1; }
 done
-echo 'not json' | clean_env node "$tmp/evidence-referee/dist/hook.mjs" session-start
-echo '{}' | clean_env node "$tmp/evidence-referee/dist/hook.mjs" stop
-test "$(wc -c < "$tmp/evidence-referee/dist/cli.mjs")" -lt 280000
-test "$(wc -c < "$tmp/evidence-referee/dist/hook.mjs")" -lt 200000
+echo 'not json' | clean_env node "$tmp/claude-referee/dist/hook.mjs" session-start
+echo '{}' | clean_env node "$tmp/claude-referee/dist/hook.mjs" stop
+test "$(wc -c < "$tmp/claude-referee/dist/cli.mjs")" -lt 280000
+test "$(wc -c < "$tmp/claude-referee/dist/hook.mjs")" -lt 200000
 
 step "recorded evals score offline with CI's HOME"
-env -u TYPESAFE_API_KEY -u EVAL_TYPESAFE_API_KEY -u TYPESAFE_API_KEY_CMD HOME=/home/runner node plugins/evidence-referee/dist/cli.mjs eval score --suite all --fail-on violated | cut -c1-200
+env -u TYPESAFE_API_KEY -u EVAL_TYPESAFE_API_KEY -u TYPESAFE_API_KEY_CMD HOME=/home/runner node plugins/claude-referee/dist/cli.mjs eval score --suite all --fail-on violated | cut -c1-200
 
 step "plugin validation"
-claude plugin validate --strict . | tail -1
-claude plugin validate --strict plugins/evidence-referee | tail -1
+node scripts/validate-plugin.mjs
+node scripts/validate-plugin.mjs --self-test
 
 step "private terms"; bash scripts/check-no-private.sh
 step "secrets in git history (gitleaks, when installed)"

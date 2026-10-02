@@ -1,5 +1,5 @@
 {
-  "description": "evidence-referee: a short local briefing at session start, and an opt-in Stop check that only records its decision. Both act only in projects with .claude/referee.json.",
+  "description": "claude-referee: a short local briefing at session start, and an opt-in Stop check that only records its decision. Both act only in projects with .claude/referee.json.",
   "hooks": {
     "SessionStart": [
       {

@@ -1,8 +1,8 @@
 {
-  "name": "evidence-referee-workspace",
+  "name": "claude-referee-workspace",
   "version": "0.1.6",
   "private": true,
-  "description": "Source, tests and build for the evidence-referee Claude Code plugin.",
+  "description": "Source, tests and build for the claude-referee Claude Code plugin.",
   "license": "MIT",
   "type": "module",
   "engines": {

@@ -1,9 +1,9 @@
 ---
 name: jev
-description: Hand small, checkable judgements to TypeSafe Jev through the evidence-referee CLI instead of judging them yourself. done checks test or lint output against criteria, decide scores 2-6 options against context files, judge runs one yes/no rule over many items, claims (old name verify) checks claims against a source. Use when a check's output decides "done", or when 20+ items need the same rule.
+description: Hand small, checkable judgements to TypeSafe Jev through the claude-referee CLI instead of judging them yourself. done checks test or lint output against criteria, decide scores 2-6 options against context files, judge runs one yes/no rule over many items, claims (old name verify) checks claims against a source. Use when a check's output decides "done", or when 20+ items need the same rule.
 ---
 
-# evidence-referee
+# claude-referee
 
 The CLI is `node "${CLAUDE_PLUGIN_ROOT}/dist/cli.mjs" <command>`. Every command prints one JSON line: `ok`, `verdict`, a few numbers, a `next_step` when there is one, and a `receipt`. `--describe` prints a command's contract. `--dry-run` shows the redacted request without sending it.
 

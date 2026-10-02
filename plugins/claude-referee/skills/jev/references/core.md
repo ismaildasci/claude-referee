@@ -25,7 +25,7 @@ Source: https://docs.typesafe.ai/primitives.md
   - An unknown model name gets a 400 with `Unknown model: <name>`.
   - `state: null` and a `null` Score level get a 422.
 
-Sources: https://docs.typesafe.ai/models.md, https://docs.typesafe.ai/api.md, https://docs.typesafe.ai/primitives/choice.md, https://docs.typesafe.ai/primitives/score.md; the live probe: https://github.com/ismaildasci/evidence-referee/blob/main/docs/measurements.md#measured-with-evidence-referee-itself
+Sources: https://docs.typesafe.ai/models.md, https://docs.typesafe.ai/api.md, https://docs.typesafe.ai/primitives/choice.md, https://docs.typesafe.ai/primitives/score.md; the live probe: https://github.com/ismaildasci/claude-referee/blob/main/docs/measurements.md#measured-with-claude-referee-itself
 
 ## Data handling
 
@@ -42,7 +42,7 @@ Leads, not general results. The first two come from one private codebase in Sept
 
 - Reordering a Choice's options moved one option's probability by up to 0.52 (0.20 on average) across 20 decisions. Asking the same request again moved it by at most 0.01.
 - The written order plus its reverse found the same leader as all 24 orders in 20 of 20 decisions; the written order alone in 18 of 20.
-- On evidence-referee's own public set of 20 decisions (2026-09-30; 19 with a leader at 0.9 or more), reordering moved one option's probability by up to 0.13, and asking the same request again by up to 0.04.
+- On claude-referee's own public set of 20 decisions (2026-09-30; 19 with a leader at 0.9 or more), reordering moved one option's probability by up to 0.13, and asking the same request again by up to 0.04.
 
 ## Writing TypeSafe code
 

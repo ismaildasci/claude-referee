@@ -1,4 +1,4 @@
-# evidence-referee demo for VHS (https://github.com/charmbracelet/vhs): vhs assets/demo.tape -> assets/demo.gif
+# claude-referee demo for VHS (https://github.com/charmbracelet/vhs): vhs assets/demo.tape -> assets/demo.gif
 # Prerequisites and the decision.json it expects are in assets/README.md. Never put the key in this file.
 
 Output assets/demo.gif
@@ -20,22 +20,22 @@ Enter
 Show
 Sleep 500ms
 
-Type "npx evidence-referee doctor"
+Type "npx claude-referee doctor"
 Sleep 500ms
 Enter
 Sleep 3s
 
-Type `cargo nextest run 2>&1 | npx evidence-referee done --criteria "all tests pass" --evidence -`
+Type `cargo nextest run 2>&1 | npx claude-referee done --criteria "all tests pass" --evidence -`
 Sleep 500ms
 Enter
 Sleep 5s
 
-Type "npx evidence-referee decide < decision.json"
+Type "npx claude-referee decide < decision.json"
 Sleep 500ms
 Enter
 Sleep 4s
 
-Type "npx evidence-referee receipts --tokens --days 7"
+Type "npx claude-referee receipts --tokens --days 7"
 Sleep 500ms
 Enter
 Sleep 4s
