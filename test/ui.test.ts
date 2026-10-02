@@ -305,3 +305,9 @@ test("ui validates --port and reports a port in use", async () => {
     await s.ui.close();
   }
 });
+
+test("queue render never auto-focuses a label button", () => {
+  assert.doesNotMatch(APP_JS, /\b(right|wrong|skip|back)\.focus\(\)/);
+  assert.match(APP_JS, /card\.tabIndex = -1/);
+  assert.match(APP_JS, /card\.focus\(\)/);
+});

@@ -152,6 +152,7 @@ function renderQueue(total) {
   if (index < 0) index = 0;
   var s = items[index];
   var card = el("section", null, "card");
+  card.tabIndex = -1;
   card.setAttribute("aria-label", "Stop " + (index + 1) + " of " + items.length);
   add(card, el("p", "Stop " + (index + 1) + " of " + items.length + " - " + s.ts + " - " + s.edits + " edits, " + s.checks + " checks - done score " + (s.claims_done === null ? "n/a" : s.claims_done.toFixed(2)), "meta"));
   add(card, el("p", "Task (start of the prompt)", "label"), el("pre", s.task_excerpt || "(none stored)"));
@@ -174,7 +175,7 @@ function renderQueue(total) {
   add(card, row);
   add(main, card);
   add(main, el("p", "Keys: R right, W wrong, S or Right arrow skip, B or Left arrow back.", "meta"));
-  right.focus();
+  card.focus();
 }
 
 function move(step) {
