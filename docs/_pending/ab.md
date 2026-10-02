@@ -17,7 +17,7 @@ Replace the bullet with wording like:
 
 ## Notes for the integrator
 
-- `check-no-private.sh` could not be run in this worktree: `.private-terms` is gitignored and copying it from the main checkout was denied by the auto-mode classifier. Run it from the main checkout after merging.
+- `check-no-private.sh` could not be run in this worktree: `.private-terms` is gitignored and copying it from the main checkout was part of a command the auto-mode classifier denied and was not retried (exit 2, "no terms configured"). Run it from the main checkout after merging.
 - The Jev forks (primary-outcome reading, cost denominator, hook guard) were taken conservatively without receipts because running the CLI from the main checkout was denied; PREREG section 14 lists them and says they can go to Jev before the pilot and be recorded as an amendment.
 - `bench/cases.json` is a frozen copy of 20 `scripts/session-study` tasks; do not regenerate it after registration (its SHA-256 is quoted in PREREG and checked by `test/bench-stats-plan.test.ts`).
 - `bench/stats.mjs` imports `src/engine/stopgate/interval.ts` directly (Node 22.18 or later type stripping, like the tests and `scripts/session-study/cli.mjs`); it is not part of the bundle.

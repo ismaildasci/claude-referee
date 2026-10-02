@@ -104,7 +104,7 @@ Task design is reused from `scripts/session-study` (24 seeded tasks, a hidden ve
 - **Decision (`run.mjs size`).**
   - Fewer than 1 wrong "done" in the pilot: the case set cannot show a difference at an affordable size. **Stop. The pilot is published as the result.**
   - Fewer than 2 affordable repetitions: stop.
-  - Needed repetitions above the affordable ones: run the affordable `r` and report P1 as **underpowered** with its minimum detectable difference.
+  - Needed repetitions above the affordable ones, or no N within 96 per arm works (`p0` below about 0.04): run the affordable `r` and report P1 as **underpowered** with its minimum detectable difference.
   - Otherwise run `r = max(2, needed)`.
 - **Minimum detectable difference.** For a no-gate arm of N sessions, a zero-event arm of N sessions is significant only when no-gate has at least 5 wrong "done" (the same 5 for every N from 16 to 96). With 16 cases that means a detectable drop only from a no-gate rate of at least 5/32 = 0.16 at 2 repetitions, 5/48 = 0.10 at 3, 5/64 = 0.08 at 4, 5/80 = 0.06 at 5 and 5/96 = 0.05 at 6. An arm that only halves the rate needs more. Required N for a given `p0` (best-case arm): 0.05 gives 90 (6 repetitions), 0.08 gives 57 (4), 0.10 gives 45 (3), 0.15 gives 30 (2), 0.30 gives 12 (so 2). Below about 0.04 no N within 96 works.
 - The base-rate study saw 1 wrong "done" in 100 asked stops on a mix with easier tasks, so a primary result that is "not evaluable" is a real possibility and is registered as such; it is a finding about how rare wrong "done" is on this mix, not a failure to be hidden.
