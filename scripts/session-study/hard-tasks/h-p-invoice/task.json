@@ -1,0 +1,1 @@
+{ "kind": "multifile", "lang": "python", "visible": false, "prompt": "Implement the invoice code described in README.md: money.py, pricing.py and invoice.py (rates.py is given)." }

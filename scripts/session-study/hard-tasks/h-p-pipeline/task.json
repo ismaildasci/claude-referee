@@ -1,0 +1,1 @@
+{ "kind": "multifile", "lang": "python", "visible": false, "prompt": "Implement the import pipeline described in README.md: parse.py, validate.py, report.py and pipeline.py." }

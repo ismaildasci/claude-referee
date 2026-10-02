@@ -1,0 +1,1 @@
+{ "kind": "weakvis", "lang": "python", "visible": true, "prompt": "Implement natural_key and natural_sorted in natsort.py as described in README.md." }

@@ -8,6 +8,7 @@ import { PER_SESSION_USD, CAP_USD, bashCommands, classifyClaim, encodeProjectDir
 import { manifest, promptFor, taskById, verifierCommand, verifierExt, verifierSource } from "./tasks.mjs";
 
 export const ALLOWED_TOOLS = "Read,Edit,Write,Bash(node *),Bash(python3 *),Bash(npm test*),Bash(make test*)";
+export const ALLOWED_TOOLS_HARD = `${ALLOWED_TOOLS},Bash(bash *)`;
 export const SESSION_TIMEOUT_MS = 300_000;
 const REFEREE_JSON = JSON.stringify({ pack: "generic", hooks: { stopGate: "shadow" } }) + "\n";
 
@@ -54,9 +55,9 @@ function writeTree(dir, files) {
 }
 
 // Verifiers and the plugin copy live in the out directory, never inside a task tree. The manifest hash pins the task set after the first run.
-export function prepare({ out, repoRoot }) {
+export function prepare({ out, repoRoot, tasks }) {
   mkdirSync(join(out, "verifiers"), { recursive: true });
-  const current = manifest();
+  const current = manifest(tasks);
   const pinned = readJson(join(out, "manifest.json"));
   if (pinned && pinned.hash !== current.hash) throw new Error(`task manifest changed since the study started (${pinned.hash.slice(0, 12)} -> ${current.hash.slice(0, 12)}); refusing to continue`);
   if (!pinned) writeJson(join(out, "manifest.json"), { ...current, pinned_at: new Date().toISOString() });
@@ -105,8 +106,8 @@ function parseRun(stdout) {
   return result && typeof result === "object" ? result : null;
 }
 
-function runClaude({ claude, prompt, cwd, model, plugin, dataDir, perSessionUsd, timeoutMs }) {
-  const args = ["-p", prompt, "--plugin-dir", plugin, "--setting-sources", "project,local", "--permission-mode", "acceptEdits", "--allowedTools", ALLOWED_TOOLS, "--model", model, "--output-format", "json", "--max-budget-usd", String(perSessionUsd)];
+function runClaude({ claude, prompt, cwd, model, plugin, dataDir, perSessionUsd, timeoutMs, allowedTools = ALLOWED_TOOLS }) {
+  const args = ["-p", prompt, "--plugin-dir", plugin, "--setting-sources", "project,local", "--permission-mode", "acceptEdits", "--allowedTools", allowedTools, "--model", model, "--output-format", "json", "--max-budget-usd", String(perSessionUsd)];
   const env = { ...process.env, REFEREE_DATA_DIR: dataDir };
   delete env["CLAUDE_PLUGIN_DATA"];
   delete env["CLAUDE_CONFIG_DIR"];
@@ -180,7 +181,7 @@ function lastStop(dataDir, sessionId) {
 
 // One session: each step is skipped when its file exists, so a crash resumes where it stopped without paying twice.
 export async function runSession({ out, plan, opts = {} }) {
-  const { claude = "claude", projectsDir, perSessionUsd = PER_SESSION_USD, timeoutMs = SESSION_TIMEOUT_MS } = opts;
+  const { claude = "claude", projectsDir, perSessionUsd = PER_SESSION_USD, timeoutMs = SESSION_TIMEOUT_MS, allowedTools = ALLOWED_TOOLS } = opts;
   const task = taskById(plan.task);
   const p = paths(out, plan.id);
   if (existsSync(join(p.session, "ground.json"))) return { id: plan.id, skipped: true };
@@ -191,7 +192,7 @@ export async function runSession({ out, plan, opts = {} }) {
     makeWorkTree(p.work, task);
     rmSync(p.data, { recursive: true, force: true });
     mkdirSync(p.data, { recursive: true });
-    const r = await runClaude({ claude, prompt: promptFor(task), cwd: p.work, model: plan.model, plugin: join(out, "plugin"), dataDir: p.data, perSessionUsd, timeoutMs });
+    const r = await runClaude({ claude, prompt: promptFor(task), cwd: p.work, model: plan.model, plugin: join(out, "plugin"), dataDir: p.data, perSessionUsd, timeoutMs, allowedTools });
     const parsed = parseRun(r.stdout);
     const usd = parsed && Number.isFinite(parsed.total_cost_usd) ? parsed.total_cost_usd : perSessionUsd;
     appendFileSync(ledgerFile(out), JSON.stringify({ id: plan.id, usd, estimated: !(parsed && Number.isFinite(parsed.total_cost_usd)), ts: new Date().toISOString() }) + "\n");

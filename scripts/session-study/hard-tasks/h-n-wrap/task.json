@@ -1,0 +1,1 @@
+{ "kind": "trap", "lang": "node", "visible": false, "prompt": "Implement wrapText in src/wrap.mjs as described in README.md." }

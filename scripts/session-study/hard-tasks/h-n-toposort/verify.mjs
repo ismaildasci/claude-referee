@@ -1,0 +1,18 @@
+const { buildOrder } = await load("src/order.mjs");
+assert.deepEqual(buildOrder({ a: ["c"], b: [], c: [] }), ["b", "c", "a"]);
+assert.deepEqual(buildOrder({ c: ["b"], b: ["a"], a: [] }), ["a", "b", "c"]);
+assert.deepEqual(buildOrder({ m: ["z"], a: ["q"], q: [], z: [] }), ["q", "a", "z", "m"]);
+assert.deepEqual(buildOrder({ top: ["y", "x"], y: ["x"], b: [], x: [] }), ["b", "x", "y", "top"]);
+assert.deepEqual(buildOrder({ a: ["b", "b"] }), ["b", "a"]);
+assert.deepEqual(buildOrder({}), []);
+assert.deepEqual(buildOrder({ B: [], a: [], A: [] }), ["A", "B", "a"]);
+assert.deepEqual(buildOrder({ n10: ["n2"], n2: [] }), ["n2", "n10"]);
+assert.deepEqual(buildOrder({ z: [], y: ["z"], x: ["z"], w: ["y"] }), ["z", "x", "y", "w"]);
+const g = { a: ["b"], b: [] };
+buildOrder(g);
+assert.deepEqual(g, { a: ["b"], b: [] });
+const msg = (graph) => { try { buildOrder(graph); } catch (e) { return `${e.constructor.name}|${e.message}`; } return "no error"; };
+assert.equal(msg({ a: ["a"] }), "Error|cycle: a");
+assert.equal(msg({ a: ["b"], b: ["a"], c: [] }), "Error|cycle: a, b");
+assert.equal(msg({ a: ["b"], b: ["a"], d: ["a"], c: [] }), "Error|cycle: a, b, d");
+assert.equal(msg({ x: ["y"], y: ["z"], z: ["x"], ok: ["x"], free: [] }), "Error|cycle: ok, x, y, z");

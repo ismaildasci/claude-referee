@@ -1,0 +1,1 @@
+{ "kind": "hidden", "lang": "shell", "visible": false, "prompt": "Write the shell script vsort.sh described in README.md (it is run as `bash vsort.sh`)." }

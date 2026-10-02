@@ -1,0 +1,6 @@
+{
+  "port": 8080,
+  "tags": ["prod"],
+  "db": { "host": "db.internal", "options": { "ssl": true } },
+  "features": { "legacy": null }
+}

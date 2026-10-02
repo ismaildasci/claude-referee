@@ -1,0 +1,1 @@
+{ "kind": "multifile", "lang": "node", "visible": false, "prompt": "Implement the configuration loader described in README.md: loadConfig in src/index.mjs, with its helpers in src/merge.mjs and src/env.mjs." }

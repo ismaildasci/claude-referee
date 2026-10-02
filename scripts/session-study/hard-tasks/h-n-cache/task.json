@@ -1,0 +1,1 @@
+{ "kind": "multifile", "lang": "node", "visible": false, "prompt": "Add the caching described in README.md: implement TtlCache in src/cache.mjs and use it in src/api.mjs." }

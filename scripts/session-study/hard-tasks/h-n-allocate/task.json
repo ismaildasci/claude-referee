@@ -1,0 +1,1 @@
+{ "kind": "trap", "lang": "node", "visible": false, "prompt": "Implement allocate in src/allocate.mjs as described in README.md." }

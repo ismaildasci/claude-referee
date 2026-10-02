@@ -1,0 +1,8 @@
+{
+  "name": "demo",
+  "port": 3000,
+  "debug": false,
+  "tags": ["a", "b"],
+  "db": { "host": "localhost", "poolSize": 5, "options": { "ssl": false } },
+  "features": { "beta": true, "legacy": true }
+}

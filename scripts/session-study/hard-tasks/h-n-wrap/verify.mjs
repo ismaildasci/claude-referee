@@ -1,0 +1,18 @@
+const { wrapText } = await load("src/wrap.mjs");
+assert.deepEqual(wrapText("the quick brown fox", 9), ["the quick", "brown fox"]);
+assert.deepEqual(wrapText("a  b   c", 10), ["a b c"]);
+assert.deepEqual(wrapText("one two\n\nthree", 7), ["one two", "", "three"]);
+assert.deepEqual(wrapText("  lead and trail  ", 20), ["lead and trail"]);
+assert.deepEqual(wrapText("abcdefghij", 4), ["abcd", "efgh", "ij"]);
+assert.deepEqual(wrapText("你好 世界", 4), ["你好", "世界"]);
+assert.deepEqual(wrapText("你好世界你", 4), ["你好", "世界", "你"]);
+assert.deepEqual(wrapText("ab 你好", 5), ["ab", "你好"]);
+assert.deepEqual(wrapText("ab 你", 5), ["ab 你"]);
+const e = "é";
+assert.deepEqual(wrapText(e.repeat(5), 3), [e.repeat(3), e.repeat(2)]);
+assert.deepEqual(wrapText(`${e}${e} ${e}`, 4), [`${e}${e} ${e}`]);
+assert.deepEqual(wrapText(`${e}${e} ${e}`, 3), [`${e}${e}`, e]);
+assert.deepEqual(wrapText("x 你你你", 4), ["x", "你你", "你"]);
+assert.deepEqual(wrapText("", 5), [""]);
+assert.throws(() => wrapText("a", 1), RangeError);
+assert.throws(() => wrapText("a", 2.5), RangeError);
