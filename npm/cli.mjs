@@ -51,7 +51,7 @@ var init_dist = __esm({
       #parseResponse;
       #parsed;
       constructor(responsePromise, parseResponse) {
-        super((resolve7) => resolve7(void 0));
+        super((resolve8) => resolve8(void 0));
         this.#responsePromise = responsePromise;
         this.#parseResponse = parseResponse;
       }
@@ -143,7 +143,7 @@ var init_dist = __esm({
       const exponential = Math.min(policy.backoffInitialMs * 2 ** attempt, policy.backoffMaxMs);
       return Math.round(exponential * (1 - random() * policy.backoffJitter));
     }, "retryDelayMs");
-    sleep = /* @__PURE__ */ __name((ms, signal) => new Promise((resolve7, reject) => {
+    sleep = /* @__PURE__ */ __name((ms, signal) => new Promise((resolve8, reject) => {
       if (signal?.aborted) return reject(signal.reason);
       const onAbort = /* @__PURE__ */ __name(() => {
         clearTimeout(timer);
@@ -151,7 +151,7 @@ var init_dist = __esm({
       }, "onAbort");
       const timer = setTimeout(() => {
         signal?.removeEventListener("abort", onAbort);
-        resolve7();
+        resolve8();
       }, ms);
       signal?.addEventListener("abort", onAbort, { once: true });
     }), "sleep");
@@ -1285,12 +1285,12 @@ __name(tildify, "tildify");
 
 // src/engine/key.ts
 import { execFile } from "node:child_process";
-var runCommand = /* @__PURE__ */ __name((file, args, timeoutMs) => new Promise((resolve7) => {
+var runCommand = /* @__PURE__ */ __name((file, args, timeoutMs) => new Promise((resolve8) => {
   execFile(
     file,
     [...args],
     { timeout: timeoutMs, encoding: "utf8", windowsHide: true, maxBuffer: 64 * 1024 },
-    (error, stdout) => resolve7(error ? null : stdout)
+    (error, stdout) => resolve8(error ? null : stdout)
   );
 }), "runCommand");
 var processMemo = /* @__PURE__ */ new Map();
@@ -3885,8 +3885,8 @@ var done = {
 };
 
 // src/cli/commands/eval.ts
-import { appendFileSync as appendFileSync2, existsSync as existsSync4, readdirSync as readdirSync4, readFileSync as readFileSync8 } from "node:fs";
-import { join as join8, resolve as resolve4, sep as sep2 } from "node:path";
+import { appendFileSync as appendFileSync2, existsSync as existsSync5, readdirSync as readdirSync4, readFileSync as readFileSync9 } from "node:fs";
+import { join as join8, resolve as resolve5, sep as sep2 } from "node:path";
 
 // src/engine/stopgate/decide.ts
 function question2(pack, id) {
@@ -4298,13 +4298,13 @@ function parseCases(text) {
     } catch {
       throw new RefereeError("bad_input", `Eval case line ${i + 1} is not valid JSON.`);
     }
-    const { id, split, expected } = raw;
+    const { id, split: split2, expected } = raw;
     if (typeof id !== "string" || !id) throw new RefereeError("bad_input", `Eval case line ${i + 1} needs an id.`);
     if (seen.has(id)) throw new RefereeError("bad_input", `Eval case id ${id} appears twice.`);
-    if (split !== "dev" && split !== "holdout") throw new RefereeError("bad_input", `Eval case ${id} needs split "dev" or "holdout".`);
+    if (split2 !== "dev" && split2 !== "holdout") throw new RefereeError("bad_input", `Eval case ${id} needs split "dev" or "holdout".`);
     if (typeof expected !== "string" || !expected) throw new RefereeError("bad_input", `Eval case ${id} needs an expected label.`);
     seen.add(id);
-    return { ...raw, id, split, expected };
+    return { ...raw, id, split: split2, expected };
   });
 }
 __name(parseCases, "parseCases");
@@ -4373,6 +4373,99 @@ function sweep(items, positive, thresholds) {
 __name(sweep, "sweep");
 
 // src/cli/commands/judge.ts
+import { resolve as resolve4 } from "node:path";
+
+// src/engine/baseline.ts
+import { createHash as createHash4 } from "node:crypto";
+import { existsSync as existsSync4, mkdirSync as mkdirSync5, readFileSync as readFileSync8, renameSync, writeFileSync as writeFileSync4 } from "node:fs";
+import { dirname as dirname3 } from "node:path";
+var BASELINE_VERSION = 1;
+var HASH = /^[0-9a-f]{16}$/;
+function normalise(text) {
+  return text.normalize("NFC").replace(/\s+/g, " ").trim();
+}
+__name(normalise, "normalise");
+function itemHash(question3, text) {
+  return createHash4("sha256").update(`v${BASELINE_VERSION}\0${question3}\0${normalise(text)}`).digest("hex").slice(0, 16);
+}
+__name(itemHash, "itemHash");
+function parseBaseline(text) {
+  const bad = /* @__PURE__ */ __name((why) => new RefereeError("bad_input", `The baseline file is not valid: ${why}.`, { next_step: "Record it again with --baseline-write." }), "bad");
+  let raw;
+  try {
+    raw = JSON.parse(text);
+  } catch {
+    throw bad("not JSON");
+  }
+  const { version, pack, entries } = raw ?? {};
+  if (version !== BASELINE_VERSION) throw bad(`version ${String(version)} is not supported, expected ${BASELINE_VERSION}`);
+  if (typeof pack !== "string" || typeof entries !== "object" || entries === null || Array.isArray(entries)) throw bad("missing pack or entries");
+  const checked = {};
+  for (const [question3, hashes] of Object.entries(entries)) {
+    if (typeof hashes !== "object" || hashes === null || Array.isArray(hashes)) throw bad(`entries.${question3} is not an object`);
+    const counts3 = {};
+    for (const [hash, count] of Object.entries(hashes)) {
+      if (!HASH.test(hash) || typeof count !== "number" || !Number.isInteger(count) || count < 1) throw bad(`entries.${question3} holds a bad hash or count`);
+      counts3[hash] = count;
+    }
+    checked[question3] = counts3;
+  }
+  return { version, pack, entries: checked };
+}
+__name(parseBaseline, "parseBaseline");
+function readBaseline(path) {
+  if (!existsSync4(path)) return null;
+  try {
+    return parseBaseline(readFileSync8(path, "utf8"));
+  } catch (error) {
+    if (error instanceof RefereeError) throw error;
+    throw new RefereeError("bad_input", "Cannot read the baseline file.");
+  }
+}
+__name(readBaseline, "readBaseline");
+function buildBaseline(pack, flagged) {
+  const entries = {};
+  for (const { question: question3, hash } of flagged) {
+    const counts3 = entries[question3] ??= {};
+    counts3[hash] = (counts3[hash] ?? 0) + 1;
+  }
+  return { version: BASELINE_VERSION, pack, entries };
+}
+__name(buildBaseline, "buildBaseline");
+function writeBaseline(path, baseline) {
+  const sorted = Object.fromEntries(
+    Object.keys(baseline.entries).sort().map((q) => [q, Object.fromEntries(Object.entries(baseline.entries[q] ?? {}).sort(([a], [b]) => a < b ? -1 : 1))])
+  );
+  const body = JSON.stringify({ version: baseline.version, pack: baseline.pack, entries: sorted }, null, 2) + "\n";
+  try {
+    mkdirSync5(dirname3(path), { recursive: true });
+    const temp = `${path}.tmp-${process.pid}`;
+    writeFileSync4(temp, body);
+    renameSync(temp, path);
+  } catch {
+    throw new RefereeError("bad_input", "Cannot write the baseline file.", { next_step: "Check the path and permissions; the answers are cached, so running again is free." });
+  }
+}
+__name(writeBaseline, "writeBaseline");
+function split(baseline, questions, flagged) {
+  const left = /* @__PURE__ */ new Map();
+  for (const q of questions) for (const [hash, count] of Object.entries(baseline.entries[q] ?? {})) left.set(`${q}:${hash}`, count);
+  const fresh = flagged.map(({ question: question3, hash }) => {
+    const key = `${question3}:${hash}`;
+    const remaining = left.get(key) ?? 0;
+    if (remaining > 0) {
+      left.set(key, remaining - 1);
+      return false;
+    }
+    return true;
+  });
+  let gone = 0;
+  for (const remaining of left.values()) gone += remaining;
+  return { fresh, gone };
+}
+__name(split, "split");
+
+// src/cli/commands/judge.ts
 var MAX_ITEMS = 500;
 var LIST_LIMIT = 20;
 function parseItems(text) {
@@ -4423,27 +4516,43 @@ var judge = {
     inputs: {
       "--question <id[,id]>": "Pack question ids, e.g. line.risky or failure.env.",
       "--items <file|->": "A JSON array of strings or {id, text}, JSON lines, or plain lines (id = line number). Max 500 items.",
-      "--context <text>": "Optional shared context for every item, e.g. the file name."
+      "--context <text>": "Optional shared context for every item, e.g. the file name.",
+      "--baseline <file>": "Compare with a recorded baseline: only findings not in it count. The file holds hashes of question id plus whitespace-normalised item text with a count, no text, ids or paths, so it is safe to commit (e.g. .claude/referee-baseline.json). A moved line stays known, an edited line is new, the Nth+1 copy of a line recorded N times is new.",
+      "--baseline-write": "With --baseline: record the current yes answers into the file instead of comparing. Entries for the questions asked are replaced; entries for other questions in the file are kept (unless the file was recorded with another pack, which is replaced whole). Verdict is recorded; review and unanswered items are not recorded."
     },
     outputs: {
-      verdict: "flagged when any answer is yes, review when some are unsure or unanswered, clear otherwise",
+      verdict: "flagged when any answer is yes, review when some are unsure or unanswered, clear otherwise; with --baseline only new yes answers count, so --fail-on flagged fails on new findings only; recorded with --baseline-write",
       items: "Number of items judged",
       yes: "Answers in the yes band",
       no: "Answers in the no band",
       review: "Answers between the bands",
-      flagged: "Item ids with a yes (first 20; 'id/question' when several questions)",
+      flagged: "Item ids with a yes (first 20; 'id/question' when several questions); with --baseline only the new ones",
+      new: "With --baseline: yes answers not in the baseline",
+      baselined: "With --baseline: yes answers already in the baseline",
+      gone: "With --baseline: recorded findings no longer flagged (items fixed, edited or not sent this time)",
+      recorded: "With --baseline-write: yes answers written to the baseline",
+      added: "With --baseline-write over an existing file: recorded findings it did not hold",
+      dropped: "With --baseline-write over an existing file: findings it held that are no longer flagged",
       review_ids: "Item ids to review (first 20)",
       stopped: "Item ids not sent because they held something shaped like a credential",
       unanswered: "Item ids with no answer because of an API error or the 90-second deadline (first 20)"
     },
     errors: [...JEV_ERRORS],
-    effects: JEV_EFFECTS,
+    effects: `${JEV_EFFECTS} --baseline-write also writes the baseline file.`,
     cost: `${JEV_COST} judge makes one request per item, six at a time.`
   },
-  options: { question: { type: "string" }, items: { type: "string" }, context: { type: "string" } },
+  options: { question: { type: "string" }, items: { type: "string" }, context: { type: "string" }, baseline: { type: "string" }, "baseline-write": { type: "boolean" } },
   async run(context) {
     const ids = (str(context, "question") ?? "").split(",").map((s) => s.trim()).filter(Boolean);
     if (ids.length === 0) throw new RefereeError("bad_input", "Give --question with one or more pack question ids.", { next_step: "The generic pack has line.risky and failure.env." });
+    const baselineFile = str(context, "baseline");
+    const writing = context.values["baseline-write"] === true;
+    if (writing && !baselineFile) throw new RefereeError("bad_input", "--baseline-write needs --baseline <file>.");
+    const baselinePath = baselineFile ? resolve4(context.io.cwd, baselineFile) : void 0;
+    const previous = baselinePath ? readBaseline(baselinePath) : null;
+    if (baselinePath && !writing && !previous) {
+      throw new RefereeError("bad_input", `No baseline file at ${baselineFile}.`, { next_step: "Record one first: judge --baseline <file> --baseline-write." });
+    }
     const items = parseItems(await readSource(context, str(context, "items"), "items"));
     if (items.length === 0) throw new RefereeError("bad_input", "No items to judge.");
     if (items.length > MAX_ITEMS) throw new RefereeError("too_large", `At most ${MAX_ITEMS} items per call.`, { next_step: "Split the items into several calls." });
@@ -4456,6 +4565,9 @@ var judge = {
     }
     const shared = str(context, "context");
     const planned = items.map((item) => ({ id: item.id, state: { item: clip(item.text, 4e3, 4e3), ...shared ? { context: shared } : {} }, questions }));
+    if (previous && !writing && previous.pack !== pack.name) {
+      throw new RefereeError("bad_input", `The baseline was recorded with pack ${previous.pack}, this run uses ${pack.name}.`, { next_step: "Use the same pack, or record the baseline again with --baseline-write." });
+    }
     const auto = Object.fromEntries(ids.map((id) => [id, threshold(pack, project?.thresholds, id, "auto", 0.9)]));
     return jevCommand(
       context,
@@ -4470,7 +4582,8 @@ var judge = {
         const reviewIds = [];
         const stopped = [];
         const unanswered = [];
-        for (const outcome of outcomes) {
+        const hits = [];
+        for (const [index, outcome] of outcomes.entries()) {
           if (outcome.error) {
             unanswered.push(outcome.id);
             continue;
@@ -4487,6 +4600,7 @@ var judge = {
             if (atLeast(p, band)) {
               yes += 1;
               flagged.push(label);
+              hits.push({ question: id, hash: itemHash(id, items[index]?.text ?? ""), label });
             } else if (atMost(p, 1 - band)) {
               no += 1;
             } else {
@@ -4495,7 +4609,23 @@ var judge = {
             }
           }
         }
-        const verdict = yes > 0 ? "flagged" : review > 0 || unanswered.length > 0 ? "review" : "clear";
+        const extra = {};
+        let shown = flagged;
+        let newYes = yes;
+        if (baselinePath && writing) {
+          const built = buildBaseline(pack.name, hits);
+          const kept = previous && previous.pack === pack.name ? Object.entries(previous.entries).filter(([q]) => !ids.includes(q)) : [];
+          const next = { ...built, entries: { ...Object.fromEntries(kept), ...built.entries } };
+          const diff = previous ? split(previous, ids, hits) : null;
+          writeBaseline(baselinePath, next);
+          Object.assign(extra, { recorded: yes }, diff ? { added: diff.fresh.filter(Boolean).length, dropped: diff.gone } : {});
+        } else if (previous) {
+          const { fresh, gone } = split(previous, ids, hits);
+          shown = hits.filter((_, i) => fresh[i]).map((h) => h.label);
+          newYes = shown.length;
+          Object.assign(extra, { new: newYes, baselined: yes - newYes, gone });
+        }
+        const verdict = writing && baselinePath ? "recorded" : newYes > 0 ? "flagged" : review > 0 || unanswered.length > 0 ? "review" : "clear";
         return {
           ok: true,
           verdict,
@@ -4503,7 +4633,8 @@ var judge = {
           yes,
           no,
           review,
-          ...flagged.length ? { flagged: flagged.slice(0, LIST_LIMIT) } : {},
+          ...extra,
+          ...shown.length ? { flagged: shown.slice(0, LIST_LIMIT) } : {},
           ...reviewIds.length ? { review_ids: reviewIds.slice(0, LIST_LIMIT) } : {},
           ...stopped.length ? { stopped } : {},
           ...unanswered.length ? { unanswered: unanswered.slice(0, LIST_LIMIT), next_step: "Some items got no answer; run judge again on those items." } : {}
@@ -4800,12 +4931,12 @@ var verify = { ...claims, name: "verify", describe: { ...claims.describe, summar
 var LIST_LIMIT2 = 20;
 function readSuite(root, name) {
   const dir = join8(root, name);
-  if (!existsSync4(join8(dir, "suite.json")) || !existsSync4(join8(dir, "cases.jsonl"))) {
+  if (!existsSync5(join8(dir, "suite.json")) || !existsSync5(join8(dir, "cases.jsonl"))) {
     throw new RefereeError("bad_input", `No eval suite ${name}: it needs suite.json and cases.jsonl.`, { next_step: `Look in ${root}.` });
   }
   let raw;
   try {
-    raw = JSON.parse(readFileSync8(join8(dir, "suite.json"), "utf8"));
+    raw = JSON.parse(readFileSync9(join8(dir, "suite.json"), "utf8"));
   } catch {
     throw new RefereeError("bad_input", `Suite ${name}: suite.json is not valid JSON.`);
   }
@@ -4823,15 +4954,15 @@ function readSuite(root, name) {
     name,
     dir,
     config,
-    cases: parseCases(readFileSync8(join8(dir, "cases.jsonl"), "utf8")),
-    recordings: existsSync4(recorded) ? parseRecordings(readFileSync8(recorded, "utf8")) : []
+    cases: parseCases(readFileSync9(join8(dir, "cases.jsonl"), "utf8")),
+    recordings: existsSync5(recorded) ? parseRecordings(readFileSync9(recorded, "utf8")) : []
   };
 }
 __name(readSuite, "readSuite");
 function suites(root, name) {
   if (name !== "all") return [readSuite(root, name)];
-  if (!existsSync4(root)) return [];
-  return readdirSync4(root, { withFileTypes: true }).filter((d) => d.isDirectory() && existsSync4(join8(root, d.name, "suite.json"))).map((d) => readSuite(root, d.name)).sort((a, b) => a.name.localeCompare(b.name));
+  if (!existsSync5(root)) return [];
+  return readdirSync4(root, { withFileTypes: true }).filter((d) => d.isDirectory() && existsSync5(join8(root, d.name, "suite.json"))).map((d) => readSuite(root, d.name)).sort((a, b) => a.name.localeCompare(b.name));
 }
 __name(suites, "suites");
 function criteriaFor(suite, item) {
@@ -4843,9 +4974,9 @@ function criteriaFor(suite, item) {
 __name(criteriaFor, "criteriaFor");
 function stopRequest(pack, suite, item) {
   const name = typeof item["transcript"] === "string" ? item["transcript"] : "";
-  const file = resolve4(suite.dir, name);
-  if (!name || !file.startsWith(resolve4(suite.dir) + sep2) || !existsSync4(file)) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: the transcript file is missing or outside the suite.`);
-  const facts3 = analyzeTranscript(readFileSync8(file, "utf8"));
+  const file = resolve5(suite.dir, name);
+  if (!name || !file.startsWith(resolve5(suite.dir) + sep2) || !existsSync5(file)) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: the transcript file is missing or outside the suite.`);
+  const facts3 = analyzeTranscript(readFileSync9(file, "utf8"));
   const skip = stopSkipReason(facts3);
   if (skip) return { planned: [], finish: /* @__PURE__ */ __name(() => ({ verdict: "skipped", reason: skip }), "finish") };
   const planned = [{ id: "stop", state: stopState(facts3, facts3.finalMessage), questions: stopQuestions(pack) }];
@@ -4966,8 +5097,8 @@ async function record(context, pack, list2) {
   });
 }
 __name(record, "record");
-function scoreSuite(context, pack, suite, model, split, sweepSpec) {
-  const items = suite.cases.filter((c) => !split || c.split === split).map((item) => {
+function scoreSuite(context, pack, suite, model, split2, sweepSpec) {
+  const items = suite.cases.filter((c) => !split2 || c.split === split2).map((item) => {
     const req = request(context, pack, suite, item);
     if (req.planned === null) {
       const decided = req.finish([]);
@@ -4995,13 +5126,13 @@ function scoreSuite(context, pack, suite, model, split, sweepSpec) {
 __name(scoreSuite, "scoreSuite");
 function score2(context, pack, list2, all) {
   const model = resolveModel(context.io.env);
-  const split = str(context, "split");
-  if (split !== void 0 && split !== "dev" && split !== "holdout") throw new RefereeError("bad_input", '--split takes "dev" or "holdout".');
-  const scored = (all ? list2.filter((s) => s.recordings.length > 0) : list2).map((s) => scoreSuite(context, pack, s, model, split, str(context, "sweep")));
+  const split2 = str(context, "split");
+  if (split2 !== void 0 && split2 !== "dev" && split2 !== "holdout") throw new RefereeError("bad_input", '--split takes "dev" or "holdout".');
+  const scored = (all ? list2.filter((s) => s.recordings.length > 0) : list2).map((s) => scoreSuite(context, pack, s, model, split2, str(context, "sweep")));
   const verdict = scored.some((s) => s["verdict"] === "violated") ? "violated" : "pass";
   if (!all && scored[0]) {
     const { suite, verdict: v, ...rest } = scored[0];
-    return { ok: true, verdict: v, suite, model, ...split ? { split } : {}, ...rest };
+    return { ok: true, verdict: v, suite, model, ...split2 ? { split: split2 } : {}, ...rest };
   }
   return {
     ok: true,
@@ -5046,7 +5177,7 @@ var evalCommand = {
     if (action !== "record" && action !== "score") throw new RefereeError("bad_input", "eval needs an action: record or score.", { next_step: "Example: eval score --suite injection" });
     const name = str(context, "suite");
     if (!name) throw new RefereeError("bad_input", "Give --suite <name|all>.");
-    const root = resolve4(context.io.cwd, str(context, "evals-dir") ?? "jev-evals");
+    const root = resolve5(context.io.cwd, str(context, "evals-dir") ?? "jev-evals");
     const list2 = suites(root, name);
     const { pack } = openPack(context);
     return action === "record" ? record(context, pack, list2) : score2(context, pack, list2, name === "all");
@@ -5054,8 +5185,8 @@ var evalCommand = {
 };
 
 // src/cli/commands/lint-pack.ts
-import { existsSync as existsSync5, readFileSync as readFileSync9, readdirSync as readdirSync5 } from "node:fs";
-import { join as join9, resolve as resolve5 } from "node:path";
+import { existsSync as existsSync6, readFileSync as readFileSync10, readdirSync as readdirSync5 } from "node:fs";
+import { join as join9, resolve as resolve6 } from "node:path";
 
 // src/engine/lint.ts
 var OTHER = /^(?:other|none|neither|unknown|unsure|undecided|says_nothing|no_answer)$/i;
@@ -5112,7 +5243,7 @@ __name(lintRecorded, "lintRecorded");
 // src/cli/commands/lint-pack.ts
 function readJson2(path) {
   try {
-    return JSON.parse(readFileSync9(path, "utf8"));
+    return JSON.parse(readFileSync10(path, "utf8"));
   } catch {
     throw new RefereeError("bad_input", `Not valid JSON: ${path}`);
   }
@@ -5120,12 +5251,12 @@ function readJson2(path) {
 __name(readJson2, "readJson");
 function recordedNouls(root) {
   const out = {};
-  if (!existsSync5(root)) throw new RefereeError("bad_input", `No evals directory: ${root}`);
+  if (!existsSync6(root)) throw new RefereeError("bad_input", `No evals directory: ${root}`);
   for (const entry of readdirSync5(root, { withFileTypes: true })) {
     const file = join9(root, entry.name, "recorded.jsonl");
-    if (!entry.isDirectory() || !existsSync5(file)) continue;
+    if (!entry.isDirectory() || !existsSync6(file)) continue;
     const latest = /* @__PURE__ */ new Map();
-    for (const line of parseRecordings(readFileSync9(file, "utf8"))) latest.set(String(line.case), line.answers);
+    for (const line of parseRecordings(readFileSync10(file, "utf8"))) latest.set(String(line.case), line.answers);
     for (const answers of latest.values()) {
       for (const [key, answer] of Object.entries(answers ?? {})) {
         const a = answer;
@@ -5157,23 +5288,23 @@ var lintPack = {
   async run(context) {
     const target = context.positionals[0];
     if (!target) throw new RefereeError("bad_input", "Give the pack directory.", { next_step: "Example: lint-pack plugins/claude-referee/packs/generic" });
-    const dir = resolve5(context.io.cwd, target);
-    if (!existsSync5(join9(dir, "pack.json"))) throw new RefereeError("bad_input", `No pack.json in ${dir}.`);
+    const dir = resolve6(context.io.cwd, target);
+    if (!existsSync6(join9(dir, "pack.json"))) throw new RefereeError("bad_input", `No pack.json in ${dir}.`);
     const meta = readJson2(join9(dir, "pack.json"));
     const questions = {};
     const qdir = join9(dir, "questions");
-    if (existsSync5(qdir)) for (const file of readdirSync5(qdir).filter((f) => f.endsWith(".json")).sort()) Object.assign(questions, readJson2(join9(qdir, file)));
+    if (existsSync6(qdir)) for (const file of readdirSync5(qdir).filter((f) => f.endsWith(".json")).sort()) Object.assign(questions, readJson2(join9(qdir, file)));
     const findings = lintQuestions(questions, meta.model);
     const recorded = context.values["recorded"];
-    if (typeof recorded === "string") findings.push(...lintRecorded(recordedNouls(resolve5(context.io.cwd, recorded))));
+    if (typeof recorded === "string") findings.push(...lintRecorded(recordedNouls(resolve6(context.io.cwd, recorded))));
     const verdict = findings.some((f) => f.severity === "error") ? "errors" : findings.length ? "warnings" : "clean";
     return { ok: true, verdict, questions: Object.keys(questions).length, findings, next_step: verdict === "clean" ? void 0 : "Fix the findings; each message says what to change." };
   }
 };
 
 // src/cli/commands/receipts.ts
-import { mkdirSync as mkdirSync6, writeFileSync as writeFileSync5 } from "node:fs";
-import { dirname as dirname3, resolve as resolve6 } from "node:path";
+import { mkdirSync as mkdirSync7, writeFileSync as writeFileSync6 } from "node:fs";
+import { dirname as dirname4, resolve as resolve7 } from "node:path";
 
 // src/engine/stopgate/interval.ts
 var MIN_LABELS_PER_CLASS = 10;
@@ -5248,7 +5379,7 @@ function suggestThreshold(records, current) {
 __name(suggestThreshold, "suggestThreshold");
 
 // src/engine/stopgate/stops.ts
-import { appendFileSync as appendFileSync3, chmodSync, existsSync as existsSync6, mkdirSync as mkdirSync5, readFileSync as readFileSync10, renameSync, statSync as statSync4, writeFileSync as writeFileSync4 } from "node:fs";
+import { appendFileSync as appendFileSync3, chmodSync, existsSync as existsSync7, mkdirSync as mkdirSync6, readFileSync as readFileSync11, renameSync as renameSync2, statSync as statSync4, writeFileSync as writeFileSync5 } from "node:fs";
 import { join as join10 } from "node:path";
 var RETENTION_MS = 90 * 864e5;
 function stopsFile(dataDir) {
@@ -5277,8 +5408,8 @@ function readLabels(dataDir) {
   const out = /* @__PURE__ */ new Map();
   try {
     const file = labelsFile(dataDir);
-    if (!existsSync6(file)) return out;
-    for (const line of readFileSync10(file, "utf8").split("\n")) {
+    if (!existsSync7(file)) return out;
+    for (const line of readFileSync11(file, "utf8").split("\n")) {
       if (!line.trim()) continue;
       try {
         const v = JSON.parse(line);
@@ -5296,9 +5427,9 @@ __name(readLabels, "readLabels");
 function readStops(dataDir) {
   const file = stopsFile(dataDir);
   try {
-    if (!existsSync6(file)) return [];
+    if (!existsSync7(file)) return [];
     const labels = readLabels(dataDir);
-    return parseLines(readFileSync10(file, "utf8")).map((r) => {
+    return parseLines(readFileSync11(file, "utf8")).map((r) => {
       const l = labels.get(r.id);
       return l ? { ...r, label: l.label, labelled_at: l.labelled_at } : r;
     });
@@ -5348,7 +5479,7 @@ function stopStats(records) {
 __name(stopStats, "stopStats");
 
 // src/engine/stopgate/weak.ts
-import { readFileSync as readFileSync11 } from "node:fs";
+import { readFileSync as readFileSync12 } from "node:fs";
 import { join as join11 } from "node:path";
 var W = String.raw`(?<![\p{L}\p{N}])`;
 var E = String.raw`(?![\p{L}\p{N}])`;
@@ -5427,7 +5558,7 @@ function suggestForStops(dirs, stops) {
     let text = null;
     for (const dir of dirs) {
       try {
-        text = readFileSync11(join11(dir, `${session}.jsonl`), "utf8");
+        text = readFileSync12(join11(dir, `${session}.jsonl`), "utf8");
         break;
       } catch {
         continue;
@@ -5446,7 +5577,7 @@ function suggestForStops(dirs, stops) {
 __name(suggestForStops, "suggestForStops");
 
 // src/engine/usage.ts
-import { existsSync as existsSync7, readdirSync as readdirSync6, readFileSync as readFileSync12 } from "node:fs";
+import { existsSync as existsSync8, readdirSync as readdirSync6, readFileSync as readFileSync13 } from "node:fs";
 import { join as join12 } from "node:path";
 var SEPARATORS2 = /* @__PURE__ */ new Set(["&&", "||", "|", "|&", ";", "&", "\n", "(", ")"]);
 var ASSIGNMENT3 = /^[A-Za-z_][A-Za-z0-9_]*=/;
@@ -5544,12 +5675,12 @@ function cliCallsIn(command) {
 }
 __name(cliCallsIn, "cliCallsIn");
 function transcriptFiles(dir) {
-  if (!existsSync7(dir)) return [];
+  if (!existsSync8(dir)) return [];
   const files = [];
   for (const entry of readdirSync6(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
     if (entry.isFile() && entry.name.endsWith(".jsonl")) files.push({ path: join12(dir, entry.name), subagent: false });
     const sub = join12(dir, entry.name, "subagents");
-    if (entry.isDirectory() && existsSync7(sub)) {
+    if (entry.isDirectory() && existsSync8(sub)) {
       for (const name of readdirSync6(sub).filter((n) => n.endsWith(".jsonl")).sort()) files.push({ path: join12(sub, name), subagent: true });
     }
   }
@@ -5572,7 +5703,7 @@ function scanUsage(dirs, since) {
   const calls = /* @__PURE__ */ new Map();
   const sizes = /* @__PURE__ */ new Map();
   for (const file of files) {
-    for (const line of readFileSync12(file.path, "utf8").split("\n")) {
+    for (const line of readFileSync13(file.path, "utf8").split("\n")) {
       if (!line.trim()) continue;
       let entry;
       try {
@@ -5681,9 +5812,9 @@ var receipts = {
       const out = str(context, "out");
       if (!out) throw new RefereeError("bad_input", "export needs --out <file>.");
       const all = readReceipts(dataDir);
-      const path = resolve6(io.cwd, out);
-      mkdirSync6(dirname3(path), { recursive: true });
-      writeFileSync5(path, all.map((r) => JSON.stringify(r)).join("\n") + (all.length ? "\n" : ""));
+      const path = resolve7(io.cwd, out);
+      mkdirSync7(dirname4(path), { recursive: true });
+      writeFileSync6(path, all.map((r) => JSON.stringify(r)).join("\n") + (all.length ? "\n" : ""));
       return { ok: true, verdict: "exported", receipts: all.length, out: tildify(path, io.home) };
     }
     if (positionals[0] === "verify") {
