@@ -1,0 +1,118 @@
+{
+ "note": "Code-level counts only: no Jev answers exist for this sample. met_reachable = the caps would allow met if the judge answered p=1.",
+ "jev_scored": false,
+ "all": {
+  "total": {
+   "cases": 229,
+   "code_decided": 30,
+   "sent": 199,
+   "expected_met": 123,
+   "expected_missing": 76,
+   "met_reachable_expected_met": 116,
+   "met_reachable_expected_missing": 50
+  },
+  "R": {
+   "cases": 82,
+   "code_decided": 14,
+   "sent": 68,
+   "expected_met": 44,
+   "expected_missing": 24,
+   "met_reachable_expected_met": 42,
+   "met_reachable_expected_missing": 7
+  },
+  "E": {
+   "cases": 147,
+   "code_decided": 16,
+   "sent": 131,
+   "expected_met": 79,
+   "expected_missing": 52,
+   "met_reachable_expected_met": 74,
+   "met_reachable_expected_missing": 43
+  },
+  "U": {
+   "cases": 0,
+   "code_decided": 0,
+   "sent": 0,
+   "expected_met": 0,
+   "expected_missing": 0,
+   "met_reachable_expected_met": 0,
+   "met_reachable_expected_missing": 0
+  }
+ },
+ "dev": {
+  "total": {
+   "cases": 124,
+   "code_decided": 22,
+   "sent": 102,
+   "expected_met": 59,
+   "expected_missing": 43,
+   "met_reachable_expected_met": 59,
+   "met_reachable_expected_missing": 29
+  },
+  "R": {
+   "cases": 40,
+   "code_decided": 11,
+   "sent": 29,
+   "expected_met": 16,
+   "expected_missing": 13,
+   "met_reachable_expected_met": 16,
+   "met_reachable_expected_missing": 4
+  },
+  "E": {
+   "cases": 84,
+   "code_decided": 11,
+   "sent": 73,
+   "expected_met": 43,
+   "expected_missing": 30,
+   "met_reachable_expected_met": 43,
+   "met_reachable_expected_missing": 25
+  },
+  "U": {
+   "cases": 0,
+   "code_decided": 0,
+   "sent": 0,
+   "expected_met": 0,
+   "expected_missing": 0,
+   "met_reachable_expected_met": 0,
+   "met_reachable_expected_missing": 0
+  }
+ },
+ "holdout": {
+  "total": {
+   "cases": 105,
+   "code_decided": 8,
+   "sent": 97,
+   "expected_met": 64,
+   "expected_missing": 33,
+   "met_reachable_expected_met": 57,
+   "met_reachable_expected_missing": 21
+  },
+  "R": {
+   "cases": 42,
+   "code_decided": 3,
+   "sent": 39,
+   "expected_met": 28,
+   "expected_missing": 11,
+   "met_reachable_expected_met": 26,
+   "met_reachable_expected_missing": 3
+  },
+  "E": {
+   "cases": 63,
+   "code_decided": 5,
+   "sent": 58,
+   "expected_met": 36,
+   "expected_missing": 22,
+   "met_reachable_expected_met": 31,
+   "met_reachable_expected_missing": 18
+  },
+  "U": {
+   "cases": 0,
+   "code_decided": 0,
+   "sent": 0,
+   "expected_met": 0,
+   "expected_missing": 0,
+   "met_reachable_expected_met": 0,
+   "met_reachable_expected_missing": 0
+  }
+ }
+}
