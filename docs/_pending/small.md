@@ -14,3 +14,7 @@ Pending lines for the integrator (stream: small). Not a published doc.
 
 - Remove the bullet "**More redaction patterns.** **help wanted:** ..." or reword it to: "**More redaction patterns.** Done for the formats in [redaction-patterns.md](docs/decisions/redaction-patterns.md); **help wanted:** formats seen in the wild that have a distinctive prefix, each with stop and keep fixtures."
 - Replace the "**`decide` policy.**" bullet with: "**`decide` policy.** Settled: two requests for every option count ([decide-policy.md](docs/decisions/decide-policy.md)). Reopen with a measurement of 3, 5 or 6 options or a lower-noise K3 re-run."
+
+## CHANGELOG.md, under [Unreleased], Fixed
+
+- Redaction: Telegram bot tokens in the Bot API URL form (`.../bot<id>:<secret>/getMe`) now stop a request. The token pattern requires the `AA` secret prefix, so numeric strings like `20260101:...` no longer stop; Hugging Face tokens need a digit, so long identifiers such as `hf_getUserSessionToken...` no longer stop.

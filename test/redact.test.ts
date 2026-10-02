@@ -40,6 +40,7 @@ const MORE_STOPS: ReadonlyArray<readonly [string, string]> = [
   ["huggingface_token", b("hf", "_", A36)],
   ["sendgrid_key", b("S", "G.", "aB3dE6gH9jK2mN5pQ8sT1v", ".", A36, A36.slice(0, 7))],
   ["telegram_bot_token", b("123456789", ":", "AAFaB3dE6gH9jK2mN5pQ8sT1vW4yZ7cF0hJ")],
+  ["telegram_bot_token", b("curl https://api.telegram.org/bot", "123456789", ":", "AAFaB3dE6gH9jK2mN5pQ8sT1vW4yZ7cF0hJ", "/getMe")],
   ["azure_storage_key", b("DefaultEndpointsProtocol=https;AccountName=demo;Account", "Key=", A36, A36, A36.slice(0, 14), "==")],
   ["docker_auth", b('{"auths": {"registry.example.com": {"au', 'th": "ZGVtb3VzZXI6ZGVtb3Bhc3N3b3Jk"}}}')],
 ];
@@ -58,6 +59,9 @@ const MORE_KEEP = [
   "glpat-",
   "12:30:45",
   "1234567890:short",
+  "build 20260101:abcdefghijklmnopqrstuvwxyzabcdefghi done",
+  "1700000000:" + "a".repeat(35),
+  "const hf_getUserSessionTokenFromRequestHeaders = 1",
   "AccountKey=<your key>",
   "hooks.slack.com/services/T/B/x",
   "xapp-notes",
