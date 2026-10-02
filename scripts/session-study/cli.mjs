@@ -1,10 +1,11 @@
 // Command line of the session base-rate study (docs/decisions/session-base-rate.md). Raw runs go under --out, outside the repository.
-// Usage: node scripts/session-study/cli.mjs prepare|plan|run|review|labels|report|fixture --out <dir> [--set hard] [--pilot] [--stage 1|2] [--cap-usd 8] [--projects-dir <dir>] [--claude <bin>]
+// Usage: node scripts/session-study/cli.mjs prepare|plan|run|review|labels|report|breakdown|fixture --out <dir> [--set hard] [--pilot] [--stage 1|2] [--cap-usd 8] [--projects-dir <dir>] [--claude <bin>]
 
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { addFixture } from "./fixture.mjs";
+import { activeCriteria, hardBreakdown } from "./hard-breakdown.mjs";
 import { HARD_ASKED_TARGET, HARD_CAP_USD, HARD_PER_SESSION_USD, hardReport, planHard } from "./hard.mjs";
 import { ASKED_TARGET, CAP_USD, MAX_SESSIONS, PER_SESSION_USD, analyze, planSessions } from "./lib.mjs";
 import { ALLOWED_TOOLS_HARD, ambiguousPending, askedCount, prepare, readGrounds, readLedger, runAll, setManual, writeLabels } from "./runner.mjs";
@@ -16,7 +17,7 @@ const flag = (name, fallback) => (rest.includes(name) ? rest[rest.indexOf(name) 
 const has = (name) => rest.includes(name);
 const out = flag("--out");
 if (!command || !out) {
-  console.error("usage: cli.mjs prepare|plan|run|review|labels|report|fixture --out <dir> [--pilot] [--stage 1|2] [--cap-usd n] [--projects-dir dir] [--claude bin]");
+  console.error("usage: cli.mjs prepare|plan|run|review|labels|report|breakdown|fixture --out <dir> [--pilot] [--stage 1|2] [--cap-usd n] [--projects-dir dir] [--claude bin]");
   process.exit(2);
 }
 const outDir = resolve(out);
@@ -61,6 +62,11 @@ if (command === "prepare") {
 } else if (command === "report") {
   const result = await report();
   console.log(JSON.stringify({ ...result, ledger_entries: readLedger(outDir).length }, null, 1));
+} else if (command === "breakdown") {
+  const { clopperPearson } = await import("../../src/engine/stopgate/interval.ts");
+  const sessions = readGrounds(outDir);
+  const result = hardReport(sessions, clopperPearson);
+  console.log(JSON.stringify({ ...hardBreakdown(sessions, clopperPearson), active_criteria: activeCriteria(result, { abRun: has("--ab-run") }) }, null, 1));
 } else {
   console.error(`unknown command ${command}`);
   process.exit(2);

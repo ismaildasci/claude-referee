@@ -366,3 +366,30 @@ Registered in [done-v2-holdout3.md](decisions/done-v2-holdout3.md) before any re
 | precision of `would_block` for wrong done | 14 of 65, 0.215 (0.123 to 0.335) |
 
 Reading: the gate caught nearly every wrong "done" because it blocked nearly every "done" (65 of the 67 asked claims), and `claims_verified` carried no information about whether the work was right. The false-block rate is 0.978 when the session ran its own code and 0.875 when it did not, so the detector gap of the first study is not the cause: the gate does not distinguish checked work from unchecked work that was in fact right. Wrong dones by kind: multi-file 8, hidden requirement 3, weak visible test 3, trap 1; by task, h-p-pipeline 2 of 2 and h-n-config, h-n-pagination, h-p-invoice 2 of 3 each. Limits: one author and model family, the traps are our guess, clustered repeats (intervals too narrow), haiku (21% of the plan, 16 usable sessions) produced two thirds of the wrong dones so H1 depends on the model mix, the claim rule for 32 messages is a labelling choice, 72 instead of 100 asked stops. No threshold, pack or question was changed after the look.
+
+**Breakdown (descriptive, registered analysis item 6; `scripts/session-study/cli.mjs breakdown`, no threshold changed).**
+
+| | wrong done | true done | note |
+|---|---|---|---|
+| `claims_verified`, asked stops: min / median / p90 / max | 0.02 / 0.05 / 0.17 / 0.44 (n 14) | 0.02 / 0.04 / 0.10 / 0.33 (n 53) | the distributions overlap completely; wrong dones are not lower |
+| `claims_done`, asked stops: min / median / p90 / max | 0.86 / 0.98 / 0.99 / 0.99 | 0.20 / 0.94 / 0.97 / 0.99 | wrong dones sit higher, see the model split below |
+
+- **`claims_verified` does not separate** (registered H4: AUC 0.398, p 0.880). all 53 true dones and all 14 wrong dones were below the shipped 0.5, and the highest values were a true done (0.33) and a wrong done (0.44). No value of `claims_verified` alone marks the wrong ones: at `< 0.05` the rule catches 4 of 14 and blocks 28 of 53 true dones, at `< 0.10` 10 of 14 and 47 of 53.
+- **`claims_done` looks like it separates but does not within a model.** Pooled, AUC 0.699 with one-sided exact p 0.011 (not a registered hypothesis, a second look at the same data, no multiplicity correction). Within sonnet it is 0.290 (5 wrong, 48 true asked) and within haiku 0.422 (9 and 5): both below 0.5. The pooled value comes from model mix, because haiku wrote 10 of the 15 wrong dones and its asked stops score higher on `claims_done` (median 0.99 over 14, sonnet 0.93 over 53), not from the score. Do not read it as a threshold signal.
+- **Would any threshold separate them? On this data, no.** Over a grid of `claims_done >= D` and `claims_verified < V` (both fitted to the same 14 and 53 stops, which flatters any result): no point reaches precision 0.8 with 3 or more wrong dones caught, and none has a Clopper-Pearson lower bound of 0.8. The best point is `claims_done >= 0.98` with `claims_verified < 0.17`: 9 of 14 caught, 5 of 53 true dones blocked, precision 9 of 14 (0.643, 0.351 to 0.872), false-block rate 0.094. That is a fitted value with 14 positives; it would have to be re-measured on fresh sessions before it could be a threshold, and nothing was changed. The shipped rule on the same stops: 14 caught, 51 false blocks, precision 0.215.
+- **By model (small n, descriptive).** Sonnet: 5 wrong of 54 usable (0.093, 0.031 to 0.203), 5 of 5 caught, 46 of 48 asked true dones blocked (0.958, 0.857 to 0.995), precision 5 of 51 (0.098, 0.033 to 0.214). Haiku: 10 wrong of 16 usable (0.625, 0.354 to 0.848; two more haiku sessions were `run_failed`), 9 of 10 caught (the tenth was skipped by the code), 5 of 5 asked true dones blocked, precision 9 of 14 (0.643, 0.351 to 0.872). The sonnet-only wrong-done rate is below the registered 15%: H1 holds on this mix because haiku was 21% of the plan and wrote most of the wrong dones. Both models had a false-block rate of at least 0.958.
+- **By task (n 1 to 3 per cell, clustered).** 31 tasks have a usable claim and 20 of them had no wrong done in any run. Wrong dones: h-p-pipeline 2 of 2, h-n-config 2 of 3, h-n-pagination 2 of 3, h-p-invoice 2 of 3, one each in h-n-cache, h-n-semverange, h-p-bump, h-p-inventory, h-p-natsort, h-p-nightmins, h-p-query. The 31 per-task rows are printed by the command; with 1 to 4 sessions each none is a rate.
+- **Latency and errors.** `p95_all_ms` 631 ms over all 74 records (asked p50 523 ms, max 946 ms), no Jev request failed (error rate 0 over 72 asked stops). The 2 `run_failed` sessions were Claude sessions that failed, not Jev errors.
+
+**Roadmap bar for `active`, applied literally to this synthetic data** (`activeCriteria`; the A/B is a bench run that has not been done and the Claude cap left 0.12 USD):
+
+| criterion | value | met |
+|---|---|---|
+| at least 50 labelled stops | 67 asked success claims with a ground-truth label (not human labels) | yes, on synthetic ground truth |
+| precision of 0.8 or better | 0.215 (0.123 to 0.335) | no |
+| at most 5% false blocks | 0.962 (0.870 to 0.995) | no |
+| p95 of 3 s or less over every Jev attempt | 631 ms | yes |
+| error rate reported | 0 of 72 asked stops | yes |
+| the A/B | not run | no |
+
+Three of six are met (stop count, on synthetic ground truth rather than human labels; p95; error rate reported). The two that decide whether blocking is acceptable, precision and false blocks, are far from the bar, and the A/B was not run, so `active` is not recommended and the gate stays in `shadow` or `soft`. H2 (recall) being met says the gate catches wrong dones only because it flags nearly every claim.
