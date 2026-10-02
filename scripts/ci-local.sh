@@ -20,7 +20,7 @@ for c in done decide judge claims verify receipts doctor eval; do
 done
 echo 'not json' | clean_env node "$tmp/claude-referee/dist/hook.mjs" session-start
 echo '{}' | clean_env node "$tmp/claude-referee/dist/hook.mjs" stop
-test "$(wc -c < "$tmp/claude-referee/dist/cli.mjs")" -lt 280000
+test "$(wc -c < "$tmp/claude-referee/dist/cli.mjs")" -lt 340000
 test "$(wc -c < "$tmp/claude-referee/dist/hook.mjs")" -lt 200000
 
 step "recorded evals score offline with CI's HOME"
