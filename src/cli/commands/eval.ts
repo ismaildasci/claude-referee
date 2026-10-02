@@ -167,6 +167,13 @@ function cap(context: Context, flag: string): number | undefined {
   return value;
 }
 
+// A reversed run reuses the full recording; a context run has its own lines, and a case without context text shares the full line (same hashes).
+function lookup(suite: Suite, item: EvalCase, req: CaseRequest, model: string, ablation: Ablation | undefined): ReturnType<typeof findRecording> {
+  const key = { case: item.id, qhash: req.qhash, shash: req.shash, model };
+  const own = ablation === "context" ? findRecording(suite.recordings, { ...key, ablation }) : undefined;
+  return own?.status === "ok" ? own : findRecording(suite.recordings, key);
+}
+
 function ablationFlag(context: Context): Ablation | undefined {
   const raw = str(context, "ablation");
   if (raw === undefined) return undefined;
@@ -195,8 +202,10 @@ async function record(context: Context, pack: Pack, list: readonly Suite[]): Pro
   for (const suite of list) {
     for (const item of suite.cases) {
       const req = request(context, pack, suite, item, ablation);
+      const found = lookup(suite, item, req, session.model, ablation).status === "ok";
+      if (ablation === "reversed" && req.planned.length > 0 && !found) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: --ablation reversed is rescored from the full recording and records nothing.`, { next_step: `Run eval record --suite ${suite.name} without --ablation first.` });
       if (req.planned.length === 0) skipped += 1;
-      else if (!flags.fresh && findRecording(suite.recordings, { case: item.id, qhash: req.qhash, shash: req.shash, model: session.model }).status === "ok") skipped += 1;
+      else if ((!flags.fresh || ablation === "reversed") && found) skipped += 1;
       else todo.push(req);
     }
   }
@@ -255,13 +264,15 @@ async function record(context: Context, pack: Pack, list: readonly Suite[]): Pro
 function replay(context: Context, pack: Pack, suite: Suite, item: EvalCase, model: string, ablation?: Ablation): Result {
   const req = request(context, pack, suite, item, ablation);
   if (req.planned.length === 0) return req.finish([]);
-  const found = findRecording(suite.recordings, { case: item.id, qhash: req.qhash, shash: req.shash, model });
+  const found = lookup(suite, item, req, model, ablation);
   if (found.status !== "ok") {
     const why = found.status === "missing" ? `no recording for ${model}` : "the question text or input changed since it was recorded";
     const flag = ablation ? ` --ablation ${ablation}` : "";
     throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: ${why}${ablation ? ` with the ${ablation} ablation` : ""}.`, { next_step: `Run eval record --suite ${suite.name}${flag} with a key.` });
   }
   const answers = [found.line.answers, ...(Array.isArray(found.line["also"]) ? found.line["also"] : [])] as Outcome["answers"][];
+  const missing = req.planned.findIndex((_, i) => !answers[i]);
+  if (missing >= 0) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: the recording has ${answers.filter(Boolean).length} of ${req.planned.length} answers.`, { next_step: `Run eval record --suite ${suite.name} --fresh with a key.` });
   return req.finish(req.planned.map((p, i) => ({ id: p.id, answers: answers[i] ?? null, stopped: [], cached: true })));
 }
 

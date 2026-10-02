@@ -71,3 +71,15 @@ test("parseCases needs unique ids, a dev or holdout split and an expected label"
     assert.throws(() => parseCases(bad), /case/i, bad);
   }
 });
+
+test("findRecording keeps ablation lines apart from the full run", () => {
+  const lines = [
+    { case: "a", qhash: "q1", shash: "s1", model: "m", answers: 1 },
+    { case: "a", qhash: "q1", shash: "s1", model: "m", ablation: "reversed", answers: 2 },
+  ];
+  const full = findRecording(lines, { case: "a", qhash: "q1", shash: "s1", model: "m" });
+  assert.equal(full.status === "ok" && full.line.answers, 1);
+  const rev = findRecording(lines, { case: "a", qhash: "q1", shash: "s1", model: "m", ablation: "reversed" });
+  assert.equal(rev.status === "ok" && rev.line.answers, 2);
+  assert.equal(findRecording(lines, { case: "a", qhash: "q1", shash: "s1", model: "m", ablation: "context" }).status, "missing");
+});

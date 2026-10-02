@@ -13,3 +13,7 @@ Replace "Still to do: `decide` suites and `--ablation`." with "`eval` handles `d
 ## docs/measurements.md (add)
 
 Decide eval, 2026-10-02, `jev-1.13.0`, 39 close-call cases, one author's labels: full run 16 of 39 leaders match (verdicts 0 clear, 25 weak, 14 tie; 12 order disagreements); written order only 17 of 39 (8 leaders and 9 verdicts changed); context removed 11 of 39 (22 leaders changed, 8 clear verdicts of which 2 matched). Dev split 11 of 20, hold-out 5 of 19. Not evidence that decide is accurate; labels are single-author judgement on decisions built to be close.
+
+## CHANGELOG (Unreleased, Fixed)
+
+- `eval score` fails on a recorded decide line that lacks an answer for an order instead of scoring it as a tie, and recordings are matched by their `ablation`: `eval record --ablation reversed` no longer writes a line (it needs the full recording and records nothing), so it cannot shadow the two-order recording.

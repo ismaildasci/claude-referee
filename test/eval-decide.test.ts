@@ -161,3 +161,45 @@ test("decideMetrics and decideShift are plain counts", () => {
   const shift = decideShift(rows, [{ ...(rows[0] as (typeof rows)[0]), lean: "b" }, rows[1] as (typeof rows)[0]]);
   assert.deepEqual(shift, { leader_changed: 1, agree_delta: -1, verdict_changed: 0 });
 });
+
+test("a recorded line missing the second order fails scoring instead of becoming a tie", async () => {
+  const root = suite();
+  await record(root);
+  const file = join(root, "s1", "recorded.jsonl");
+  const lines = readFileSync(file, "utf8").trim().split("\n").map((l) => JSON.parse(l) as Record<string, unknown>);
+  delete lines[0]!["also"];
+  writeFileSync(file, lines.map((l) => JSON.stringify(l)).join("\n") + "\n");
+  const { code, out } = await score(root);
+  assert.notEqual(code, 0);
+  assert.match(JSON.stringify(out), /1 of 2 answers/);
+});
+
+test("record --ablation reversed writes nothing and never shadows the full recording", async () => {
+  const empty = suite();
+  const refused = await record(empty, ["--ablation", "reversed"]);
+  assert.notEqual(refused.code, 0);
+  assert.equal(refused.requests, 0);
+  const root = suite();
+  await record(root);
+  const file = join(root, "s1", "recorded.jsonl");
+  const before = readFileSync(file, "utf8");
+  await record(root, ["--ablation", "reversed", "--fresh"]);
+  assert.equal(readFileSync(file, "utf8"), before);
+  const { out } = await score(root);
+  assert.equal(out["order_disagrees"], 1);
+});
+
+test("a line recorded under another ablation is ignored by the full score", async () => {
+  const root = suite();
+  await record(root);
+  const file = join(root, "s1", "recorded.jsonl");
+  const lines = readFileSync(file, "utf8").trim().split("\n").map((l) => JSON.parse(l) as Record<string, unknown>);
+  const stray = lines.map((l) => {
+    const { also: _also, ...rest } = l;
+    return { ...rest, ablation: "reversed" };
+  });
+  writeFileSync(file, [...lines, ...stray].map((l) => JSON.stringify(l)).join("\n") + "\n");
+  const { code, out } = await score(root);
+  assert.equal(code, 0);
+  assert.equal(out["order_disagrees"], 1);
+});

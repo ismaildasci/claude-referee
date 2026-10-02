@@ -15,6 +15,7 @@ export interface RecordingKey {
   readonly qhash: string;
   readonly shash: string;
   readonly model: string;
+  readonly ablation?: string | undefined;
 }
 
 export interface Recording extends RecordingKey {
@@ -84,7 +85,7 @@ export function parseRecordings(text: string): Recording[] {
 }
 
 export function findRecording(lines: readonly Recording[], key: RecordingKey): { status: "ok"; line: Recording } | { status: "missing" | "stale" } {
-  const forCase = lines.filter((l) => l.case === key.case && l.model === key.model);
+  const forCase = lines.filter((l) => l.case === key.case && l.model === key.model && (l.ablation ?? undefined) === key.ablation);
   const match = [...forCase].reverse().find((l) => l.qhash === key.qhash && l.shash === key.shash);
   if (match) return { status: "ok", line: match };
   return { status: forCase.length > 0 ? "stale" : "missing" };
