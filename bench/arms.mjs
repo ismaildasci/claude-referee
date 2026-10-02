@@ -1,4 +1,5 @@
-// The four registered arms of the A/B and their exact configuration: files written into the task's work tree, whether the plugin loads, and how the prompt is built.
+// The arms of the A/B and their exact configuration: files written into the work tree, whether the plugin loads, and how the prompt is built.
+// ARMS are the superseded four-arm study (PREREG Appendix A); DELEGATION_ARMS (alone, delegate) at the bottom are the registered ones.
 // The 20-line test hook is TEST_HOOK below (16 lines); the active-equivalent referee arm is listed as unavailable because `active` is not built.
 
 export const TEST_HOOK = `#!/bin/bash
