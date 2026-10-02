@@ -5488,6 +5488,7 @@ function tokenize2(command) {
   return tokens2;
 }
 __name(tokenize2, "tokenize");
+var NAMES = ["evidence-referee", "claude-referee"];
 function subcommand(token) {
   return token && /^[a-z][a-z-]*$/.test(token) ? token : "other";
 }
@@ -5496,18 +5497,18 @@ function callIn(segment) {
   let i = 0;
   while (i < segment.length && (ASSIGNMENT3.test(segment[i] ?? "") || ["{", "time", "exec", "command", "env"].includes(segment[i] ?? ""))) i++;
   const first = segment[i];
-  if (first === "claude-referee") return subcommand(segment[i + 1]);
+  if (first !== void 0 && NAMES.includes(first)) return subcommand(segment[i + 1]);
   if (first === "npx") {
     i++;
     while ((segment[i] ?? "").startsWith("-")) i += segment[i] === "--package" || segment[i] === "-p" ? 2 : 1;
     const name = segment[i] ?? "";
-    return name === "claude-referee" || name.startsWith("claude-referee@") ? subcommand(segment[i + 1]) : null;
+    return NAMES.some((n) => name === n || name.startsWith(`${n}@`)) ? subcommand(segment[i + 1]) : null;
   }
   if (first === "node") {
     i++;
     while ((segment[i] ?? "").startsWith("-")) i++;
     const path = segment[i] ?? "";
-    return path.endsWith("/dist/cli.mjs") && path.includes("claude-referee") ? subcommand(segment[i + 1]) : null;
+    return path.endsWith("/dist/cli.mjs") && NAMES.some((n) => path.includes(n)) ? subcommand(segment[i + 1]) : null;
   }
   return null;
 }
