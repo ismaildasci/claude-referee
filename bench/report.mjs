@@ -52,7 +52,31 @@ export function outcomeOne(grounds, arms = ARM_IDS) {
     perCase[g.task][g.arm].n++;
     if (g.class === "wrong_done") perCase[g.task][g.arm].wrong_done++;
   }
-  return { per_arm: perArm, comparisons, events_total: events, evaluable, evaluable_rule: "no-gate arm has at least 5 wrong done", per_case: perCase };
+  const stratum = (acts) =>
+    Object.fromEntries(
+      arms.map((arm) => {
+        const rows = cases.filter((g) => g.arm === arm && g.hook_acts === acts);
+        const k = rows.filter((g) => g.class === "wrong_done").length;
+        return [arm, { n: rows.length, wrong_done: k, rate: rows.length ? r3(k / rows.length) : null, ci95: ci(k, rows.length) }];
+      }),
+    );
+  const by_hook_stratum = { visible_test: stratum(true), no_visible_test: stratum(false) };
+  return { per_arm: perArm, comparisons, events_total: events, evaluable, evaluable_rule: "no-gate arm has at least 5 wrong done", per_case: perCase, by_hook_stratum };
+}
+
+// Cost per correct for one arm over no gate on one basis: the transcript figure (cost_usd) or the CLI total (cost_reconcile.reported_usd, falling back to cost_usd when a session has none).
+const usdOf = (g, basis) => (basis === "reported" ? g.cost_reconcile?.reported_usd ?? g.cost_usd ?? 0 : g.cost_usd ?? 0);
+function costRatio(grounds, arm, basis) {
+  const ratio = (rows) => {
+    const x = rows.filter((g) => g.arm === arm);
+    const y = rows.filter((g) => g.arm === "nogate");
+    const cx = x.filter(isCorrect).length;
+    const cy = y.filter(isCorrect).length;
+    if (!cx || !cy) return null;
+    return x.reduce((s, g) => s + usdOf(g, basis), 0) / cx / (y.reduce((s, g) => s + usdOf(g, basis), 0) / cy);
+  };
+  const sub = grounds.filter((g) => g.arm === arm || g.arm === "nogate");
+  return { point: ratio(sub), boot: clusterBootstrap(sub, ratio, { resamples: 10000, seed: 11 }) };
 }
 
 export function costPerCorrect(grounds, arms = ARM_IDS) {
@@ -77,7 +101,9 @@ export function costPerCorrect(grounds, arms = ARM_IDS) {
     arms.filter((a) => a !== "nogate" && perArm[a].sessions > 0 && perArm["nogate"].sessions > 0).map((a) => {
       const boot = clusterBootstrap(grounds.filter((g) => g.arm === a || g.arm === "nogate"), stat(a), { resamples: 10000, seed: 11 });
       const point = perArm[a].usd_per_correct !== null && perArm["nogate"].usd_per_correct ? perArm[a].usd_per_correct / perArm["nogate"].usd_per_correct : null;
-      return [a, { ratio_vs_nogate: r3(point), cluster_bootstrap95: [r3(boot.lower), r3(boot.upper)], dropped_resamples: boot.dropped }];
+      const rep = costRatio(grounds, a, "reported");
+      const gap = perArm[a].reported_usd > 0 ? (perArm[a].reported_usd - perArm[a].usd) / perArm[a].reported_usd : 0;
+      return [a, { ratio_vs_nogate: r3(point), cluster_bootstrap95: [r3(boot.lower), r3(boot.upper)], dropped_resamples: boot.dropped, transcript_vs_cli_gap: r3(gap), ...(gap > 0.05 ? { headline_both: true, ratio_vs_nogate_cli: r3(rep.point), cluster_bootstrap95_cli: [r3(rep.boot.lower), r3(rep.boot.upper)] } : {}) }];
     }),
   );
   return { per_arm: perArm, ratios };

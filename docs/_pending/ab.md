@@ -21,3 +21,10 @@ Replace the bullet with wording like:
 - The Jev forks (primary-outcome reading, cost denominator, hook guard) were taken conservatively without receipts because running the CLI from the main checkout was denied; PREREG section 14 lists them and says they can go to Jev before the pilot and be recorded as an amendment.
 - `bench/cases.json` is a frozen copy of 20 `scripts/session-study` tasks; do not regenerate it after registration (its SHA-256 is quoted in PREREG and checked by `test/bench-stats-plan.test.ts`).
 - `bench/stats.mjs` imports `src/engine/stopgate/interval.ts` directly (Node 22.18 or later type stripping, like the tests and `scripts/session-study/cli.mjs`); it is not part of the bundle.
+
+## Review fixes (stream ab)
+
+- Referee arm now sets `hooks.sessionStart: false` (no briefing, no callable Jev); PREREG wording and an amendment updated.
+- Test-hook strata (`hook_acts`, `by_hook_stratum`): the hook acts on 7 of 16 cases; P1 is reported per stratum.
+- `stop_hook_blocks` counts exit-2 blocks (hookErrors), not only preventedContinuation.
+- C1 also reports the ratio and interval on the CLI total when the transcript gap exceeds 5 percent.

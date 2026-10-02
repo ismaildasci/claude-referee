@@ -5,7 +5,7 @@ import { spawn, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { appendFileSync, cpSync, existsSync, mkdirSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve, sep } from "node:path";
-import { ARMS } from "./arms.mjs";
+import { ARMS, testHookActs } from "./arms.mjs";
 import { classifyClaim, sessionClass } from "./classify.mjs";
 import { accountTranscript, reconcile, sessionCost } from "./cost.mjs";
 
@@ -201,10 +201,11 @@ function transcriptEvents(transcript) {
   return { summaries, goal };
 }
 
+// A Stop block by exit 2 is recorded by Claude Code in hookErrors with preventedContinuation false, so a block is either signal.
 // What each arm's mechanism left in the artefacts, counted from files and never from Jev: referee stops, hook runs and blocks, goal verdicts.
 export function armEvidence({ armId, dataDir, transcript }) {
   const ev = transcriptEvents(transcript);
-  const hooks = { stop_hook_runs: ev.summaries.length, stop_hook_blocks: ev.summaries.filter((x) => x.prevented).length, stop_hook_errors: ev.summaries.reduce((s, x) => s + x.errors, 0) };
+  const hooks = { stop_hook_runs: ev.summaries.length, stop_hook_blocks: ev.summaries.filter((x) => x.prevented || x.errors > 0).length, stop_hook_errors: ev.summaries.reduce((s, x) => s + x.errors, 0) };
   if (armId === "referee") {
     const stops = readLines(join(dataDir, "stops.jsonl"));
     const asked = stops.filter((s) => !s.skipped);
@@ -267,6 +268,7 @@ export async function runSession({ out, plan, cases, opts = {} }) {
     kind: task.kind,
     lang: task.lang,
     arm: plan.arm,
+    hook_acts: testHookActs(task.files),
     model: plan.model,
     model_id: parsed?.modelUsage ? Object.keys(parsed.modelUsage).join(",") : null,
     rep: plan.rep,

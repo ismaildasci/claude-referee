@@ -22,7 +22,7 @@ export const TEST_HOOK_SETTINGS = JSON.stringify({ hooks: { Stop: [{ hooks: [{ t
 
 export const GOAL_CONDITION = "The goal is met when the work described above is complete and you have run a check that demonstrates it works, with its output shown in this conversation. Stop after 15 turns if it is not met.";
 
-export const REFEREE_SOFT_JSON = JSON.stringify({ pack: "generic", hooks: { stopGate: "soft" } }) + "\n";
+export const REFEREE_SOFT_JSON = JSON.stringify({ pack: "generic", hooks: { sessionStart: false, stopGate: "soft" } }) + "\n";
 
 export const ARMS = {
   nogate: { id: "nogate", label: "no gate", plugin: false, files: () => ({}), prompt: (task) => task.prompt },
@@ -33,6 +33,13 @@ export const ARMS = {
 
 export const ARM_IDS = Object.keys(ARMS);
 
-export const UNAVAILABLE_ARMS = [{ id: "referee-active", reason: "hooks.stopGate `active` is not built (docs/configuration.md); soft mode never blocks and gives Claude no context, so it cannot change what Claude does" }];
+export const UNAVAILABLE_ARMS = [{ id: "referee-active", reason: "hooks.stopGate `active` is not built (docs/configuration.md); soft mode never blocks, and the arm turns the SessionStart briefing off (hooks.sessionStart false), so it gives Claude no context" }];
+
+// Whether TEST_HOOK finds a test command in a task's starter files (same two checks as the script); false means the hook exits 0 and the arm equals no gate there.
+export function testHookActs(files) {
+  const mk = files?.["Makefile"];
+  const pj = files?.["package.json"];
+  return (typeof mk === "string" && /^test:/m.test(mk)) || (typeof pj === "string" && pj.includes('"test"'));
+}
 
 export const TEST_HOOK_LINES = TEST_HOOK.trimEnd().split("\n").length;

@@ -45,7 +45,7 @@ Order of a real study: `run --stage pilot`, `review`, `size`, then `run --stage 
 | Arm | Class | Turns | Transcript-priced | CLI `total_cost_usd` | Gap | What the arm's mechanism left behind |
 |---|---|---|---|---|---|---|
 | `nogate` | true done | 4 | 0.034145 | 0.034145 | 0 | nothing |
-| `testhook` | true done | 4 | 0.035075 | 0.035075 | 0 | 1 Stop hook run (378 ms), 0 blocks (tests green) |
+| `testhook` | true done | 4 | 0.035075 | 0.035075 | 0 | 1 Stop hook run (378 ms), 0 blocks (tests green; a block is a summary with hookErrors or preventedContinuation) |
 | `goal` | true done | 9 | 0.063113 | 0.082501 | 0.019388 (23.5%) | `/goal` set, 1 verdict (met), 1 Stop hook run |
 | `referee` | true done | 4 | 0.034953 | 0.034953 | -0.000001 | 1 Stop hook run, `stops.jsonl` record with mode `soft`, `would_block` false |
 

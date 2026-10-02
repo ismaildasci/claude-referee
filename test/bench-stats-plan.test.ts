@@ -110,7 +110,7 @@ test("arms: the goal arm sets the condition as the directive, only the referee a
   assert.equal(ARMS["nogate"]!.prompt(task), task.prompt);
   assert.deepEqual(ARM_IDS.filter((a) => ARMS[a]!.plugin), ["referee"]);
   assert.deepEqual(ARMS["nogate"]!.files(task), {});
-  assert.deepEqual(JSON.parse(ARMS["referee"]!.files(task)[".claude/referee.json"]!), { pack: "generic", hooks: { stopGate: "soft" } });
+  assert.deepEqual(JSON.parse(ARMS["referee"]!.files(task)[".claude/referee.json"]!), { pack: "generic", hooks: { sessionStart: false, stopGate: "soft" } });
   assert.equal(UNAVAILABLE_ARMS[0]!.id, "referee-active");
   assert.ok(Object.keys(ARMS["testhook"]!.files(task)).includes(".claude/hooks/run-tests.sh"));
 });
