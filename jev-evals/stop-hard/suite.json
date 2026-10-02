@@ -1,0 +1,7 @@
+{
+  "command": "stop",
+  "positive": "block",
+  "max_wrong_positive": 5,
+  "max_wrong_negative": 1,
+  "note": "Regression suite from 23 sessions of the hard-task study (docs/decisions/session-hard-tasks.md), redacted to what the Stop analysis reads: all 15 wrong dones (expected block) and 8 correct sessions (expected allow: 2 the gate allowed, 1 skipped by code, 5 it blocked). Picked by outcome and stratum, not at random, so it pins plumbing and says nothing about rates; the rates are in docs/measurements.md. max_wrong_negative 1 is the wrong done skipped by code because a visible check passed (h-n-pagination, haiku r1), a known miss by design; max_wrong_positive 5 is the observed count of false blocks among the 8 correct sessions. Both allowances only go down. Answers were recorded again on the redacted transcripts and can differ from the live hook by about 0.01."
+}
