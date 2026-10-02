@@ -1,0 +1,219 @@
+[
+ {
+  "tool": "cmake build",
+  "purpose": "build",
+  "cases": 12,
+  "expected_met": 5,
+  "repos": 4
+ },
+ {
+  "tool": "dotnet build",
+  "purpose": "build",
+  "cases": 5,
+  "expected_met": 5,
+  "repos": 4
+ },
+ {
+  "tool": "swift test",
+  "purpose": "test",
+  "cases": 6,
+  "expected_met": 4,
+  "repos": 4
+ },
+ {
+  "tool": "swift build",
+  "purpose": "build",
+  "cases": 5,
+  "expected_met": 3,
+  "repos": 2
+ },
+ {
+  "tool": "make",
+  "purpose": "build",
+  "cases": 3,
+  "expected_met": 3,
+  "repos": 3
+ },
+ {
+  "tool": "dotnet test",
+  "purpose": "test",
+  "cases": 3,
+  "expected_met": 3,
+  "repos": 1
+ },
+ {
+  "tool": "npm build",
+  "purpose": "build",
+  "cases": 3,
+  "expected_met": 3,
+  "repos": 1
+ },
+ {
+  "tool": "make test",
+  "purpose": "test",
+  "cases": 5,
+  "expected_met": 2,
+  "repos": 4
+ },
+ {
+  "tool": "maven build",
+  "purpose": "build",
+  "cases": 3,
+  "expected_met": 2,
+  "repos": 2
+ },
+ {
+  "tool": "npm build -> build",
+  "purpose": "build",
+  "cases": 3,
+  "expected_met": 2,
+  "repos": 2
+ },
+ {
+  "tool": "docker build",
+  "purpose": "build",
+  "cases": 2,
+  "expected_met": 2,
+  "repos": 2
+ },
+ {
+  "tool": "ruff",
+  "purpose": "lint",
+  "cases": 5,
+  "expected_met": 1,
+  "repos": 2
+ },
+ {
+  "tool": "rubocop",
+  "purpose": "lint",
+  "cases": 2,
+  "expected_met": 1,
+  "repos": 2
+ },
+ {
+  "tool": "npm test",
+  "purpose": "test",
+  "cases": 2,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "pre-commit",
+  "purpose": "lint",
+  "cases": 2,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "xcodebuild",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "ctest",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "npm build -> /home/runner/_work/firecrawl/firecrawl/apps/js-sdk/firecrawl",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "npm build -> /home/runner/work/ui/ui",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "npm build -> /home/runner/work/next.js/next.js",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "shellcheck",
+  "purpose": "lint",
+  "cases": 3,
+  "expected_met": 0,
+  "repos": 2
+ },
+ {
+  "tool": "checkstyle",
+  "purpose": "lint",
+  "cases": 3,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "phpunit",
+  "purpose": "test",
+  "cases": 3,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "flake8",
+  "purpose": "lint",
+  "cases": 2,
+  "expected_met": 0,
+  "repos": 2
+ },
+ {
+  "tool": "phpcs",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "phpstan",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "pytest",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "rspec",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "npm test -> test-treeshake",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "npm test -> test-e2e",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "black",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ }
+]
