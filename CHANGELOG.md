@@ -33,6 +33,13 @@ All notable changes to this project are documented here. The format follows [Kee
 - `receipts --stops` returns `threshold_suggestion`: available only with at least 10 human labels of each class on `would_block` stops. It uses exact Clopper-Pearson 95% intervals (no dependency) and suggests the smallest `claims_done` at or above the current threshold whose kept labelled stops have a precision lower bound of 0.8 or more, or null; it never suggests lowering it and writes nothing.
 - `hooks.stopGate: "soft"`: like `shadow`, and when Jev would block the Stop hook also prints one `systemMessage` warning (shown to the user, no block, no context for Claude). Stops are recorded with `mode: "soft"`.
 - Receipt integrity: each receipt carries `prev`, the sha256 of the previous line of its project's chain, and `receipts verify [--project-only]` reports breaks (`mismatch`, `fork` from two runs appending at once, `unreadable`); receipts written before this are counted as `unchained`. `receipts overrule <id>` records a human veto in `overruled.jsonl` and deletes the cached answers that receipt used, so the next run asks Jev again. Receipts now list the `cache_keys` they used. The chain detects edits and deletions in the middle of the history; it does not stop someone who rewrites it from the start or truncates its end.
+- `eval` now handles `decide` suites. `eval record` asks both option orders per case; `eval score` reports leader agreement with the labelled best option, the clear/weak/tie mix, order disagreements and agreement per verdict as raw counts, with no precision, recall or pass/fail threshold. Metric choice and first numbers: [docs/decisions/decide-eval-metric.md](docs/decisions/decide-eval-metric.md).
+- `eval record` and `eval score` take `--ablation context|reversed` for decide suites: `context` leaves the context text out of the request, `reversed` asks the written order only (rescored from the same recording, no request).
+- New suite `jev-evals/decide-best`: the 39 close-call decisions with one author-written best option each, recorded against `jev-1.13.0`.
+
+### Fixed
+
+- `eval score` fails on a recorded decide line that lacks an answer for an order instead of scoring it as a tie, and recordings are matched by their `ablation`: `eval record --ablation reversed` no longer writes a line (it needs the full recording and records nothing), so it cannot shadow the two-order recording.
 
 ## [0.1.6] - 2026-10-01
 

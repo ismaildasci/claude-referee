@@ -2020,6 +2020,48 @@ function argmax(p) {
   return Object.entries(p).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "";
 }
 __name(argmax, "argmax");
+function planDecide(pack, thresholds, state, options, ablation) {
+  const best = question(pack, "decide.best");
+  const ask = /* @__PURE__ */ __name((list2) => ({ best: { ...best, criteria: Object.fromEntries(list2.map((o) => [o.name, o.text])) } }), "ask");
+  const stateTokens = estimateTokens(JSON.stringify(state));
+  const questionTokens = estimateTokens(JSON.stringify(ask(options)));
+  const perOption = stateTokens + questionTokens > Math.min(STATE_TOKEN_LIMIT, REQUEST_TOKEN_LIMIT);
+  const fit = question(pack, "decide.fit");
+  const planned = perOption ? options.map((o) => ({ id: `fit:${o.name}`, state: { ...state, option: o.text }, questions: { fit } })) : [
+    { id: "written", state, questions: ask(options) },
+    ...ablation === "reversed" ? [] : [{ id: "reversed", state, questions: ask([...options].reverse()) }]
+  ];
+  const qid = perOption ? "decide.fit" : "decide.best";
+  const clearAt = threshold(pack, thresholds, qid, "clear", 0.85);
+  const margin = threshold(pack, thresholds, qid, "margin", 0.1);
+  const summarize2 = /* @__PURE__ */ __name((byId) => {
+    const mean = {};
+    let disagree = false;
+    if (perOption) {
+      for (const o of options) {
+        const answer = byId.get(`fit:${o.name}`)?.["fit"];
+        const levels = Array.isArray(fit.criteria) ? fit.criteria.length : 5;
+        mean[o.name] = answer?.type === "score" ? answer.score / Math.max(levels - 1, 1) : 0;
+      }
+    } else {
+      const probs = /* @__PURE__ */ __name((id) => {
+        const answer = byId.get(id)?.["best"];
+        return answer?.type === "choice" ? { ...answer.probabilities } : {};
+      }, "probs");
+      const written = probs("written");
+      const reversed = ablation === "reversed" ? written : probs("reversed");
+      for (const o of options) mean[o.name] = ((written[o.name] ?? 0) + (reversed[o.name] ?? 0)) / 2;
+      disagree = argmax(written) !== argmax(reversed);
+    }
+    const ranked = Object.entries(mean).sort((a, b) => b[1] - a[1]);
+    const [lean = "", p1 = 0] = ranked[0] ?? [];
+    const p2 = ranked[1]?.[1] ?? 0;
+    const verdict = !disagree && atLeast(p1, clearAt) && atLeast(p1 - p2, margin) ? "clear" : !disagree && atLeast(p1 - p2, margin) ? "weak" : "tie";
+    return { mean, lean, verdict, disagree };
+  }, "summarize");
+  return { planned, perOption, summarize: summarize2 };
+}
+__name(planDecide, "planDecide");
 var decide = {
   name: "decide",
   describe: {
@@ -2056,15 +2098,9 @@ var decide = {
     };
     const stateTokens = estimateTokens(JSON.stringify(state));
     if (stateTokens > STATE_TOKEN_LIMIT) throw new RefereeError("too_large", "The context is too large for one Jev request.", { next_step: "Trim context or context_files." });
-    const best = question(pack, "decide.best");
-    const ask = /* @__PURE__ */ __name((options) => ({ best: { ...best, criteria: Object.fromEntries(options.map((o) => [o.name, o.text])) } }), "ask");
-    const questionTokens = estimateTokens(JSON.stringify(ask(input.options)));
-    const perOption = stateTokens + questionTokens > Math.min(STATE_TOKEN_LIMIT, REQUEST_TOKEN_LIMIT);
-    const fit = question(pack, "decide.fit");
-    const planned = perOption ? input.options.map((o) => ({ id: `fit:${o.name}`, state: { ...state, option: o.text }, questions: { fit } })) : [
-      { id: "written", state, questions: ask(input.options) },
-      { id: "reversed", state, questions: ask([...input.options].reverse()) }
-    ];
+    const plan = planDecide(pack, project?.thresholds, state, input.options);
+    const { perOption } = plan;
+    const planned = [...plan.planned];
     const packMicro = Object.entries(pack.questions).filter(([id, q]) => id.startsWith("decide.micro.") && q.type === "noul").map(([id]) => ({ id: id.slice("decide.micro.".length), question: "", bad: (pack.thresholds[id]?.["bad"] ?? 0) >= 1 }));
     const micros = input.micro.length > 0 ? input.micro : packMicro;
     if (micros.length > 0) {
@@ -2073,33 +2109,9 @@ var decide = {
       );
       for (const o of input.options) planned.push({ id: `micro:${o.name}`, state: { ...state, option: o.text }, questions: micro });
     }
-    const qid = perOption ? "decide.fit" : "decide.best";
-    const clearAt = threshold(pack, project?.thresholds, qid, "clear", 0.85);
-    const margin = threshold(pack, project?.thresholds, qid, "margin", 0.1);
     return jevCommand(context, "decide", pack, planned, (outcomes) => {
       const byId = new Map(outcomes.map((o) => [o.id, o.answers]));
-      const mean = {};
-      let disagree = false;
-      if (perOption) {
-        for (const o of input.options) {
-          const answer = byId.get(`fit:${o.name}`)?.["fit"];
-          const levels = Array.isArray(fit.criteria) ? fit.criteria.length : 5;
-          mean[o.name] = answer?.type === "score" ? answer.score / Math.max(levels - 1, 1) : 0;
-        }
-      } else {
-        const probs = /* @__PURE__ */ __name((id) => {
-          const answer = byId.get(id)?.["best"];
-          return answer?.type === "choice" ? { ...answer.probabilities } : {};
-        }, "probs");
-        const written = probs("written");
-        const reversed = probs("reversed");
-        for (const o of input.options) mean[o.name] = ((written[o.name] ?? 0) + (reversed[o.name] ?? 0)) / 2;
-        disagree = argmax(written) !== argmax(reversed);
-      }
-      const ranked = Object.entries(mean).sort((a, b) => b[1] - a[1]);
-      const [lean = "", p1 = 0] = ranked[0] ?? [];
-      const p2 = ranked[1]?.[1] ?? 0;
-      const verdict = !disagree && atLeast(p1, clearAt) && atLeast(p1 - p2, margin) ? "clear" : !disagree && atLeast(p1 - p2, margin) ? "weak" : "tie";
+      const { mean, lean, verdict, disagree } = plan.summarize(byId);
       const flags = input.options.flatMap(
         (o) => micros.flatMap((m) => {
           const answer = byId.get(`micro:${o.name}`)?.[m.id];
@@ -4319,7 +4331,7 @@ function parseRecordings(text) {
 }
 __name(parseRecordings, "parseRecordings");
 function findRecording(lines3, key) {
-  const forCase = lines3.filter((l) => l.case === key.case && l.model === key.model);
+  const forCase = lines3.filter((l) => l.case === key.case && l.model === key.model && (l.ablation ?? void 0) === key.ablation);
   const match = [...forCase].reverse().find((l) => l.qhash === key.qhash && l.shash === key.shash);
   if (match) return { status: "ok", line: match };
   return { status: forCase.length > 0 ? "stale" : "missing" };
@@ -4371,6 +4383,32 @@ function sweep(items, positive, thresholds) {
   return safe ? { rows, suggested: safe.t } : { rows, suggested: null, reason: "No threshold in the range avoids a wrong positive." };
 }
 __name(sweep, "sweep");
+var DECIDE_VERDICTS = ["clear", "weak", "tie"];
+function decideMetrics(items) {
+  const verdicts = Object.fromEntries(DECIDE_VERDICTS.map((v) => [v, 0]));
+  const byVerdict = Object.fromEntries(DECIDE_VERDICTS.map((v) => [v, { cases: 0, agree: 0 }]));
+  let agree = 0;
+  for (const item of items) {
+    const hit = item.lean === item.expected;
+    if (hit) agree += 1;
+    verdicts[item.verdict] = (verdicts[item.verdict] ?? 0) + 1;
+    const group = byVerdict[item.verdict] ??= { cases: 0, agree: 0 };
+    group.cases += 1;
+    if (hit) group.agree += 1;
+  }
+  return { cases: items.length, agree, agreement: ratio(agree, items.length), verdicts, order_disagrees: items.filter((i) => i.order_disagrees).length, by_verdict: byVerdict };
+}
+__name(decideMetrics, "decideMetrics");
+function decideShift(base2, other) {
+  const byId = new Map(base2.map((b) => [b.id, b]));
+  const pairs = other.flatMap((o) => byId.has(o.id) ? [[byId.get(o.id), o]] : []);
+  return {
+    leader_changed: pairs.filter(([x, y]) => x.lean !== y.lean).length,
+    agree_delta: decideMetrics(other).agree - decideMetrics(base2).agree,
+    verdict_changed: pairs.filter(([x, y]) => x.verdict !== y.verdict).length
+  };
+}
+__name(decideShift, "decideShift");
 
 // src/cli/commands/judge.ts
 import { resolve as resolve4 } from "node:path";
@@ -4929,6 +4967,7 @@ var verify = { ...claims, name: "verify", describe: { ...claims.describe, summar
 
 // src/cli/commands/eval.ts
 var LIST_LIMIT2 = 20;
+var ABLATIONS = ["context", "reversed"];
 function readSuite(root, name) {
   const dir = join8(root, name);
   if (!existsSync5(join8(dir, "suite.json")) || !existsSync5(join8(dir, "cases.jsonl"))) {
@@ -4989,12 +5028,29 @@ function stopRequest(pack, suite, item) {
   };
 }
 __name(stopRequest, "stopRequest");
-function request(context, pack, suite, item) {
+function decideCaseRequest(pack, suite, item, ablation) {
+  const input = parseInput(JSON.stringify({ decision: item["decision"], context: item["context"], options: item["options"] }));
+  const plan = planDecide(pack, void 0, { decision: input.decision, ...input.context && ablation !== "context" ? { context: input.context } : {} }, input.options, ablation === "reversed" ? "reversed" : void 0);
+  if (plan.perOption) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: the options do not fit one request.`);
+  if (!input.options.some((o) => o.name === item.expected)) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: expected must name one of the options.`);
+  return {
+    planned: plan.planned,
+    finish: /* @__PURE__ */ __name((outcomes) => {
+      const out = plan.summarize(new Map(outcomes.map((o, i) => [plan.planned[i]?.id ?? o.id, o.answers])));
+      return { verdict: out.verdict, lean: out.lean, p: out.mean[out.lean] ?? 0, order_disagrees: out.disagree };
+    }, "finish")
+  };
+}
+__name(decideCaseRequest, "decideCaseRequest");
+function request(context, pack, suite, item, ablation) {
   const command = suite.config.command;
-  if (command !== "done" && command !== "verify" && command !== "judge" && command !== "stop") throw new RefereeError("bad_input", `Suite ${suite.name} uses ${command}; eval handles done, verify, judge and stop suites for now.`);
+  if (command !== "done" && command !== "verify" && command !== "judge" && command !== "stop" && command !== "decide") throw new RefereeError("bad_input", `Suite ${suite.name} uses ${command}; eval handles done, verify, judge, stop and decide suites for now.`);
+  if (ablation && command !== "decide") throw new RefereeError("bad_input", `--ablation applies to decide suites; suite ${suite.name} uses ${command}.`);
   let planned;
   let finish;
-  if (command === "stop") {
+  if (command === "decide") {
+    ({ planned, finish } = decideCaseRequest(pack, suite, item, ablation));
+  } else if (command === "stop") {
     ({ planned, finish } = stopRequest(pack, suite, item));
   } else if (command === "done") {
     const evidence = doneEvidence(typeof item["evidence"] === "string" ? item["evidence"] : "");
@@ -5012,9 +5068,10 @@ function request(context, pack, suite, item) {
     ({ planned, finish } = verifyRequest(pack, void 0, [{ id: "1", text: claim }], source));
   }
   const first = planned[0];
-  if (!first) return { suite, item, planned: null, finish, qhash: "code", shash: "code" };
+  if (!first) return { suite, item, planned: [], finish, qhash: "code", shash: "code" };
   const redacted = redactRequest(first, context.io.home, pack.redact);
-  return { suite, item, planned: { ...first, id: `${suite.name}/${item.id}` }, finish, qhash: questionHash(first.questions), shash: stateHash(redacted.body.state) };
+  const ids = planned.map((p) => `${suite.name}/${item.id}` + (planned.length > 1 ? `:${p.id}` : ""));
+  return { suite, item, planned: planned.map((p, i) => ({ ...p, id: ids[i] })), finish, qhash: questionHash(first.questions), shash: stateHash(redacted.body.state) };
 }
 __name(request, "request");
 function cap3(context, flag) {
@@ -5025,7 +5082,21 @@ function cap3(context, flag) {
   return value;
 }
 __name(cap3, "cap");
+function lookup(suite, item, req, model, ablation) {
+  const key = { case: item.id, qhash: req.qhash, shash: req.shash, model };
+  const own = ablation === "context" ? findRecording(suite.recordings, { ...key, ablation }) : void 0;
+  return own?.status === "ok" ? own : findRecording(suite.recordings, key);
+}
+__name(lookup, "lookup");
+function ablationFlag(context) {
+  const raw = str(context, "ablation");
+  if (raw === void 0) return void 0;
+  if (!ABLATIONS.includes(raw)) throw new RefereeError("bad_input", `--ablation takes ${ABLATIONS.join(" or ")}.`);
+  return raw;
+}
+__name(ablationFlag, "ablationFlag");
 async function record(context, pack, list2) {
+  const ablation = ablationFlag(context);
   const maxRequests = cap3(context, "max-requests");
   const maxUsd = cap3(context, "max-usd");
   const { io, flags } = context;
@@ -5044,13 +5115,15 @@ async function record(context, pack, list2) {
   let skipped = 0;
   for (const suite of list2) {
     for (const item of suite.cases) {
-      const req = request(context, pack, suite, item);
-      if (req.planned === null) skipped += 1;
-      else if (!flags.fresh && findRecording(suite.recordings, { case: item.id, qhash: req.qhash, shash: req.shash, model: session.model }).status === "ok") skipped += 1;
+      const req = request(context, pack, suite, item, ablation);
+      const found = lookup(suite, item, req, session.model, ablation).status === "ok";
+      if (ablation === "reversed" && req.planned.length > 0 && !found) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: --ablation reversed is rescored from the full recording and records nothing.`, { next_step: `Run eval record --suite ${suite.name} without --ablation first.` });
+      if (req.planned.length === 0) skipped += 1;
+      else if ((!flags.fresh || ablation === "reversed") && found) skipped += 1;
       else todo.push(req);
     }
   }
-  const plans = todo.map((t) => t.planned);
+  const plans = todo.flatMap((t) => t.planned);
   const tokens2 = plans.reduce((sum2, p) => sum2 + estimateTokens(JSON.stringify([p.state, p.questions])), 0);
   const usd = costUsd(session.model, tokens2);
   if (!flags.dryRun && maxRequests !== void 0 && plans.length > maxRequests) {
@@ -5063,10 +5136,13 @@ async function record(context, pack, list2) {
   const outcomes = todo.length ? await session.run(plans, { partial: true }) : [];
   const failed = [];
   let recorded = 0;
-  todo.forEach((req, i) => {
-    const outcome = outcomes[i];
-    if (!outcome?.answers) {
-      failed.push(req.planned?.id ?? req.item.id);
+  let at = 0;
+  todo.forEach((req) => {
+    const rest = outcomes.slice(at, at + req.planned.length);
+    at += req.planned.length;
+    const outcome = rest[0];
+    if (!outcome?.answers || rest.some((o) => !o.answers)) {
+      failed.push(`${req.suite.name}/${req.item.id}`);
       return;
     }
     const line = {
@@ -5077,7 +5153,9 @@ async function record(context, pack, list2) {
       pack: `${pack.name}@${pack.version}`,
       qhash: req.qhash,
       shash: req.shash,
+      ...ablation ? { ablation } : {},
       answers: outcome.answers,
+      ...rest.length > 1 ? { also: rest.slice(1).map((o) => o.answers) } : {},
       recorded_at: new Date(io.now()).toISOString()
     };
     appendFileSync2(join8(req.suite.dir, "recorded.jsonl"), JSON.stringify(line) + "\n");
@@ -5097,19 +5175,42 @@ async function record(context, pack, list2) {
   });
 }
 __name(record, "record");
+function replay(context, pack, suite, item, model, ablation) {
+  const req = request(context, pack, suite, item, ablation);
+  if (req.planned.length === 0) return req.finish([]);
+  const found = lookup(suite, item, req, model, ablation);
+  if (found.status !== "ok") {
+    const why = found.status === "missing" ? `no recording for ${model}` : "the question text or input changed since it was recorded";
+    const flag = ablation ? ` --ablation ${ablation}` : "";
+    throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: ${why}${ablation ? ` with the ${ablation} ablation` : ""}.`, { next_step: `Run eval record --suite ${suite.name}${flag} with a key.` });
+  }
+  const answers = [found.line.answers, ...Array.isArray(found.line["also"]) ? found.line["also"] : []];
+  const missing = req.planned.findIndex((_, i) => !answers[i]);
+  if (missing >= 0) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: the recording has ${answers.filter(Boolean).length} of ${req.planned.length} answers.`, { next_step: `Run eval record --suite ${suite.name} --fresh with a key.` });
+  return req.finish(req.planned.map((p, i) => ({ id: p.id, answers: answers[i] ?? null, stopped: [], cached: true })));
+}
+__name(replay, "replay");
+function scoreDecide(context, pack, suite, model, split2) {
+  const cases = suite.cases.filter((c) => !split2 || c.split === split2);
+  const items = /* @__PURE__ */ __name((ablation) => cases.map((item) => {
+    const r = replay(context, pack, suite, item, model, ablation);
+    return { id: item.id, split: item.split, expected: item.expected, lean: String(r["lean"]), verdict: String(r["verdict"]), order_disagrees: r["order_disagrees"] === true };
+  }), "items");
+  return { scored: items(), of: items };
+}
+__name(scoreDecide, "scoreDecide");
 function scoreSuite(context, pack, suite, model, split2, sweepSpec) {
+  const ablation = ablationFlag(context);
+  if (suite.config.command === "decide") {
+    if (sweepSpec) throw new RefereeError("bad_input", "--sweep does not apply to decide suites: decide has no positive label.");
+    const { scored, of } = scoreDecide(context, pack, suite, model, split2);
+    if (!ablation) return { suite: suite.name, verdict: "scored", ...decideMetrics(scored) };
+    const ablated = of(ablation);
+    return { suite: suite.name, verdict: "scored", ablation, ...decideMetrics(ablated), baseline: decideMetrics(scored), ...decideShift(scored, ablated) };
+  }
+  if (ablation) throw new RefereeError("bad_input", `--ablation applies to decide suites; suite ${suite.name} uses ${suite.config.command}.`);
   const items = suite.cases.filter((c) => !split2 || c.split === split2).map((item) => {
-    const req = request(context, pack, suite, item);
-    if (req.planned === null) {
-      const decided = req.finish([]);
-      return { id: item.id, split: item.split, expected: item.expected, verdict: String(decided["verdict"]), p: Number.NaN };
-    }
-    const found = findRecording(suite.recordings, { case: item.id, qhash: req.qhash, shash: req.shash, model });
-    if (found.status !== "ok") {
-      const why = found.status === "missing" ? `no recording for ${model}` : "the question text or input changed since it was recorded";
-      throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: ${why}.`, { next_step: `Run eval record --suite ${suite.name} with a key.` });
-    }
-    const result = req.finish([{ id: req.planned.id, answers: found.line.answers, stopped: [], cached: true }]);
+    const result = replay(context, pack, suite, item, model);
     return { id: item.id, split: item.split, expected: item.expected, verdict: String(result["verdict"]), p: Number(result["p"]) };
   });
   const m = metrics(items, suite.config.positive);
@@ -5138,7 +5239,7 @@ function score2(context, pack, list2, all) {
     ok: true,
     verdict,
     model,
-    suites: scored.map((s) => ({ suite: s["suite"], verdict: s["verdict"], cases: s["cases"], wrong_positive: s["wrong_positive"], max_wrong_positive: s["max_wrong_positive"] }))
+    suites: scored.map((s) => s["agreement"] !== void 0 ? { suite: s["suite"], verdict: s["verdict"], cases: s["cases"], agreement: s["agreement"] } : { suite: s["suite"], verdict: s["verdict"], cases: s["cases"], wrong_positive: s["wrong_positive"], max_wrong_positive: s["max_wrong_positive"] })
   };
 }
 __name(score2, "score");
@@ -5149,9 +5250,10 @@ var evalCommand = {
     inputs: {
       "record | score": "Positional action.",
       "--suite <name|all>": "A directory under the evals dir with suite.json, cases.jsonl and, once recorded, recorded.jsonl. 'all' takes every suite; score then skips suites without recordings.",
-      "--evals-dir <dir>": "Where the suites live; default jev-evals in the current directory. A suite.json names its command: done, verify or judge (a judge suite also names its question, and its cases have text and an expected yes, no or review).",
+      "--evals-dir <dir>": "Where the suites live; default jev-evals in the current directory. A suite.json names its command: done, verify, judge, stop or decide (a decide case has decision, context, options and an expected option name; a judge suite also names its question, and its cases have text and an expected yes, no or review).",
       "--split <dev|holdout>": "score: only cases from this split.",
       "--sweep <from:to:step>": "score: precision, recall and wrong positives per threshold; suggests one only with at least 10 cases per class.",
+      "--ablation <context|reversed>": "decide suites only. record: record answers with the context text left out of the request (reversed needs no new recording). score: rescore with that element removed and report the change against the full run; context needs those answers recorded first.",
       "--fresh": "record: record every case again, even ones already recorded for this question text, input and model.",
       "--max-requests <n>": "record: stop before the first request when more than n cases are still to record.",
       "--max-usd <x>": "record: stop before the first request when the estimated input cost, from a token estimate, is above x USD."
@@ -5165,13 +5267,17 @@ var evalCommand = {
       recall: "score: share of expected positives found",
       automation: "score: share of cases with a definite verdict",
       wrong_positive: "score: positive verdicts that should not be; the kill criterion",
+      agreement: "score, decide suites: share of cases whose lean equals the labelled best option; no precision or recall and no pass or fail threshold",
+      by_verdict: "score, decide suites: cases and agreeing cases per verdict (clear, weak, tie), raw counts",
+      order_disagrees: "score, decide suites: cases where the written and reversed orders picked different leaders",
+      leader_changed: "score with --ablation: cases whose lean differs from the full run; agree_delta is the change in agreeing cases and verdict_changed the cases with another verdict",
       wrong_negative: "score: expected positives that got a definite non-positive verdict (for a stop suite also a skip); enforced only when suite.json sets max_wrong_negative"
     },
     errors: [...JEV_ERRORS],
     effects: "record sends each unrecorded case to the TypeSafe API and appends to recorded.jsonl; score reads files only.",
     cost: "record: one Jev request per case not yet recorded. score: free and offline."
   },
-  options: { suite: { type: "string" }, split: { type: "string" }, sweep: { type: "string" }, "evals-dir": { type: "string" }, "max-requests": { type: "string" }, "max-usd": { type: "string" } },
+  options: { suite: { type: "string" }, split: { type: "string" }, sweep: { type: "string" }, "evals-dir": { type: "string" }, "max-requests": { type: "string" }, "max-usd": { type: "string" }, ablation: { type: "string" } },
   async run(context) {
     const action = context.positionals[0];
     if (action !== "record" && action !== "score") throw new RefereeError("bad_input", "eval needs an action: record or score.", { next_step: "Example: eval score --suite injection" });
