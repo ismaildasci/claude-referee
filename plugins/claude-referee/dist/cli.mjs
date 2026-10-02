@@ -51,7 +51,7 @@ var init_dist = __esm({
       #parseResponse;
       #parsed;
       constructor(responsePromise, parseResponse) {
-        super((resolve8) => resolve8(void 0));
+        super((resolve10) => resolve10(void 0));
         this.#responsePromise = responsePromise;
         this.#parseResponse = parseResponse;
       }
@@ -143,7 +143,7 @@ var init_dist = __esm({
       const exponential = Math.min(policy.backoffInitialMs * 2 ** attempt, policy.backoffMaxMs);
       return Math.round(exponential * (1 - random() * policy.backoffJitter));
     }, "retryDelayMs");
-    sleep = /* @__PURE__ */ __name((ms, signal) => new Promise((resolve8, reject) => {
+    sleep = /* @__PURE__ */ __name((ms, signal) => new Promise((resolve10, reject) => {
       if (signal?.aborted) return reject(signal.reason);
       const onAbort = /* @__PURE__ */ __name(() => {
         clearTimeout(timer);
@@ -151,7 +151,7 @@ var init_dist = __esm({
       }, "onAbort");
       const timer = setTimeout(() => {
         signal?.removeEventListener("abort", onAbort);
-        resolve8();
+        resolve10();
       }, ms);
       signal?.addEventListener("abort", onAbort, { once: true });
     }), "sleep");
@@ -1285,12 +1285,12 @@ __name(tildify, "tildify");
 
 // src/engine/key.ts
 import { execFile } from "node:child_process";
-var runCommand = /* @__PURE__ */ __name((file, args, timeoutMs) => new Promise((resolve8) => {
+var runCommand = /* @__PURE__ */ __name((file, args, timeoutMs) => new Promise((resolve10) => {
   execFile(
     file,
     [...args],
     { timeout: timeoutMs, encoding: "utf8", windowsHide: true, maxBuffer: 64 * 1024 },
-    (error, stdout) => resolve8(error ? null : stdout)
+    (error, stdout) => resolve10(error ? null : stdout)
   );
 }), "runCommand");
 var processMemo = /* @__PURE__ */ new Map();
@@ -1648,13 +1648,13 @@ function stateHash(state) {
 __name(stateHash, "stateHash");
 function redactRequest(p, home, extra) {
   const options = { home, extra };
-  const count = /* @__PURE__ */ __name((replaced) => Object.values(replaced).reduce((a, b) => a + b, 0), "count");
+  const count2 = /* @__PURE__ */ __name((replaced) => Object.values(replaced).reduce((a, b) => a + b, 0), "count");
   const state = redact2({ state: p.state }, options);
   const questions = redact2({ questions: p.questions }, { ...options, keepKeys: true });
   return {
     body: { state: state.value.state, questions: questions.value.questions },
     stops: [...state.stopped, ...questions.stopped],
-    replaced: count(state.replaced) + count(questions.replaced)
+    replaced: count2(state.replaced) + count2(questions.replaced)
   };
 }
 __name(redactRequest, "redactRequest");
@@ -4453,9 +4453,9 @@ function parseBaseline(text) {
   for (const [question3, hashes] of Object.entries(entries)) {
     if (typeof hashes !== "object" || hashes === null || Array.isArray(hashes)) throw bad(`entries.${question3} is not an object`);
     const counts3 = {};
-    for (const [hash, count] of Object.entries(hashes)) {
-      if (!HASH.test(hash) || typeof count !== "number" || !Number.isInteger(count) || count < 1) throw bad(`entries.${question3} holds a bad hash or count`);
-      counts3[hash] = count;
+    for (const [hash, count2] of Object.entries(hashes)) {
+      if (!HASH.test(hash) || typeof count2 !== "number" || !Number.isInteger(count2) || count2 < 1) throw bad(`entries.${question3} holds a bad hash or count`);
+      counts3[hash] = count2;
     }
     checked[question3] = counts3;
   }
@@ -4498,7 +4498,7 @@ function writeBaseline(path, baseline) {
 __name(writeBaseline, "writeBaseline");
 function split(baseline, questions, flagged) {
   const left = /* @__PURE__ */ new Map();
-  for (const q of questions) for (const [hash, count] of Object.entries(baseline.entries[q] ?? {})) left.set(`${q}:${hash}`, count);
+  for (const q of questions) for (const [hash, count2] of Object.entries(baseline.entries[q] ?? {})) left.set(`${q}:${hash}`, count2);
   const fresh = flagged.map(({ question: question3, hash }) => {
     const key = `${question3}:${hash}`;
     const remaining = left.get(key) ?? 0;
@@ -4521,9 +4521,9 @@ function parseItems(text) {
   const trimmed = text.trim();
   const toItem = /* @__PURE__ */ __name((value, i) => {
     if (typeof value === "string") return value.trim() ? { id: String(i + 1), text: value } : null;
-    const { id, text: body } = value ?? {};
+    const { id, text: body, context } = value ?? {};
     if (typeof body !== "string" || !body.trim()) return null;
-    return { id: typeof id === "string" || typeof id === "number" ? String(id) : String(i + 1), text: body };
+    return { id: typeof id === "string" || typeof id === "number" ? String(id) : String(i + 1), text: body, ...typeof context === "string" && context.trim() ? { context } : {} };
   }, "toItem");
   if (trimmed.startsWith("[")) {
     try {
@@ -4564,8 +4564,8 @@ var judge = {
     summary: "Run a pack's yes/no questions over many items: lines, strings, failures.",
     inputs: {
       "--question <id[,id]>": "Pack question ids, e.g. line.risky or failure.env.",
-      "--items <file|->": "A JSON array of strings or {id, text}, JSON lines, or plain lines (id = line number). Max 500 items.",
-      "--context <text>": "Optional shared context for every item, e.g. the file name.",
+      "--items <file|->": "A JSON array of strings or {id, text, context?}, JSON lines, or plain lines (id = line number). Max 500 items. An item's own context replaces --context for that item; the extract command writes items in this form.",
+      "--context <text>": "Optional context for every item that has none of its own, e.g. the file name.",
       "--baseline <file>": "Compare with a recorded baseline: only findings not in it count. The file holds hashes of question id plus whitespace-normalised item text with a count, no text, ids or paths, so it is safe to commit (e.g. .claude/referee-baseline.json). A moved line stays known, an edited line is new, the Nth+1 copy of a line recorded N times is new.",
       "--baseline-write": "With --baseline: record the current yes answers into the file instead of comparing. Entries for the questions asked are replaced; entries for other questions in the file are kept (unless the file was recorded with another pack, which is replaced whole). Verdict is recorded; review and unanswered items are not recorded."
     },
@@ -4593,7 +4593,7 @@ var judge = {
   options: { question: { type: "string" }, items: { type: "string" }, context: { type: "string" }, baseline: { type: "string" }, "baseline-write": { type: "boolean" } },
   async run(context) {
     const ids = (str(context, "question") ?? "").split(",").map((s) => s.trim()).filter(Boolean);
-    if (ids.length === 0) throw new RefereeError("bad_input", "Give --question with one or more pack question ids.", { next_step: "The generic pack has line.risky and failure.env." });
+    if (ids.length === 0) throw new RefereeError("bad_input", "Give --question with one or more pack question ids.", { next_step: "The generic pack has line.risky and failure.env; the i18n pack has string.translatable." });
     const baselineFile = str(context, "baseline");
     const writing = context.values["baseline-write"] === true;
     if (writing && !baselineFile) throw new RefereeError("bad_input", "--baseline-write needs --baseline <file>.");
@@ -4613,7 +4613,7 @@ var judge = {
       questions[id] = q;
     }
     const shared = str(context, "context");
-    const planned = items.map((item) => ({ id: item.id, state: { item: clip(item.text, 4e3, 4e3), ...shared ? { context: shared } : {} }, questions }));
+    const planned = items.map((item) => ({ id: item.id, state: { item: clip(item.text, 4e3, 4e3), ...item.context ? { context: clip(item.context, 300, 300) } : shared ? { context: shared } : {} }, questions }));
     if (previous && !writing && previous.pack !== pack.name) {
       throw new RefereeError("bad_input", `The baseline was recorded with pack ${previous.pack}, this run uses ${pack.name}.`, { next_step: "Use the same pack, or record the baseline again with --baseline-write." });
     }
@@ -5301,9 +5301,782 @@ var evalCommand = {
   }
 };
 
+// src/cli/commands/extract.ts
+import { mkdirSync as mkdirSync6, writeFileSync as writeFileSync5 } from "node:fs";
+import { dirname as dirname4, resolve as resolve7 } from "node:path";
+
+// src/engine/i18n-extract.ts
+import { existsSync as existsSync6, readdirSync as readdirSync5, readFileSync as readFileSync10, statSync as statSync4 } from "node:fs";
+import { extname, join as join9, relative as relative2, resolve as resolve6, sep as sep3 } from "node:path";
+var UI_ATTRS = /* @__PURE__ */ new Set(["placeholder", "title", "alt", "aria-label", "aria-description", "aria-placeholder", "label"]);
+var UI_KEYS = /* @__PURE__ */ new Set([
+  "label",
+  "title",
+  "text",
+  "message",
+  "description",
+  "placeholder",
+  "tooltip",
+  "helperText",
+  "errorMessage",
+  "successMessage",
+  "caption",
+  "heading",
+  "header",
+  "subtitle",
+  "hint",
+  "emptyText",
+  "buttonText",
+  "confirmText",
+  "cancelText",
+  "okText",
+  "noResultsText",
+  "error"
+]);
+var TRANSLATE = /(?:^|\.)(?:t|tc|te|\$t|\$tc|\$te|_|__|_t|trans|translate|gettext|ngettext|pgettext|\$gettext|\$ngettext|formatMessage|defineMessage|defineMessages|msg|plural|\$localize|localize)$|(?:^|\.)(?:i18n|i18next|intl)(?:\.[A-Za-z]+)?$/;
+var LOG = /(?:^|\.)(?:console|logger|log|winston|pino|bunyan|consola|debug|captureMessage|captureException)(?:\.[A-Za-z]+)?$/;
+var TEST = /^(?:describe|it|test|suite|context|expect|assert)(?:\.[A-Za-z]+)*$|(?:^|\.)(?:toThrow|toThrowError|toBe|toEqual|toContain|toMatch|toHaveText|toHaveTextContent|toHaveAttribute|getByText|getByLabelText|getByRole|getByPlaceholderText|getByTitle|getByAltText|findByText|queryByText|locator|contains)$/;
+var UI_CALL = /(?:^|\.)(?:alert|confirm|prompt|toast|notify|showToast|showAlert|showNotification|enqueueSnackbar|swal)$|(?:^|\.)(?:toast|message|notification|snackbar|Alert|Swal|Modal|\$toast|\$message|\$notify|\$alert|\$confirm|messageApi|toaster)\.[A-Za-z]+$/;
+var ASSIGN_UI = /\.(?:title|textContent|innerText|placeholder|ariaLabel|alt)$/;
+var TRANS_TAGS = /* @__PURE__ */ new Set(["Trans", "FormattedMessage", "Translation", "I18nText", "Translate"]);
+var RAW_TAGS = /* @__PURE__ */ new Set(["code", "pre", "kbd", "samp", "var", "script", "style", "textarea"]);
+var VOID = /* @__PURE__ */ new Set(["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]);
+var WRAP_ATTRS = /* @__PURE__ */ new Set(["data-i18n", "i18n", "data-i18n-key", "v-t", "x-i18n", "i18nkey"]);
+var KEYWORDS = /* @__PURE__ */ new Set(["return", "typeof", "instanceof", "in", "of", "new", "delete", "void", "throw", "case", "do", "else", "yield", "await", "default", "export"]);
+var OBJECT_PREV = /* @__PURE__ */ new Set(["(", ",", "=", ":", "[", "?", "&&", "||", "??", "return"]);
+var CHILD_PREV = /* @__PURE__ */ new Set(["{", "?", ":", "&&", "||", "??", "+", "("]);
+var ENTITIES = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " ", copy: "©", hellip: "…", mdash: "—", ndash: "–" };
+var SOURCE_EXTENSIONS = [".jsx", ".tsx", ".js", ".mjs", ".cjs", ".ts", ".mts", ".cts", ".vue", ".html", ".htm"];
+var SKIP_DIRS = /* @__PURE__ */ new Set(["node_modules", "dist", "build", "coverage", "vendor", ".git", ".next", ".nuxt", ".svelte-kit", ".turbo", "__tests__", "__snapshots__"]);
+var TEST_FILE = /\.(?:test|spec|stories)\.[cm]?[jt]sx?$|\.min\.(?:js|css)$/;
+var MAX_FILE = 1e6;
+var decode = /* @__PURE__ */ __name((s) => s.replace(/&(?:#(\d+)|#x([0-9a-f]+)|([a-z]+));/gi, (m, d, h, n) => d ? String.fromCodePoint(Number(d)) : h ? String.fromCodePoint(parseInt(h, 16)) : ENTITIES[String(n).toLowerCase()] ?? m), "decode");
+var collapse = /* @__PURE__ */ __name((s) => s.replace(/\s+/g, " ").trim(), "collapse");
+var clipTag = /* @__PURE__ */ __name((s) => collapse(s).length > 90 ? collapse(s).slice(0, 87) + "..." : collapse(s), "clipTag");
+function looksTechnical(text) {
+  const t = text.trim();
+  if (!new RegExp("\\p{L}", "u").test(t)) return true;
+  const bare = t.replace(/\$\{[^}]*\}|\{\{[^}]*\}\}|\{[^}\s]*\}|%[sdif]/g, " ").trim();
+  if (!new RegExp("\\p{L}", "u").test(bare)) return true;
+  if (/^(?:https?|ftp|wss?|mailto|tel|data|file):/i.test(t) || /^\/\/\S/.test(t)) return true;
+  if (/^(?:\.{0,2}\/|~\/|[A-Za-z]:\\)\S*$/.test(t) || /^\S+\.(?:png|jpe?g|svg|gif|webp|css|js|ts|tsx|json|html?|md|ya?ml|woff2?|ico|pdf|mp[34])$/i.test(t)) return true;
+  if (/^#[0-9a-f]{3,8}$/i.test(t) || /^\^.*\$$/.test(t)) return true;
+  if (/^(?:SELECT\b.+\bFROM\b|INSERT\s+INTO\b|UPDATE\s+\S+\s+SET\b|DELETE\s+FROM\b|CREATE\s+TABLE\b|ALTER\s+TABLE\b|DROP\s+TABLE\b)/i.test(t)) return true;
+  if (/^(?:npm|npx|yarn|pnpm|git|curl|docker|kubectl|pip|brew|sudo)\s+\S/.test(t)) return true;
+  if (/^(?:application|text|image|audio|video|font|multipart|message|model)\/[a-z0-9][a-z0-9.+-]*$/i.test(t)) return true;
+  if (!/\s/.test(bare)) {
+    if (/[_=@#\\]/.test(bare) || /\w:\w/.test(bare) || /\w\/\w/.test(bare) && !/^[A-Za-z]+(?:\/[A-Za-z]+)+$/.test(bare) || /\w\.\w/.test(bare) || /[a-z][A-Z]/.test(bare) || /^[a-z0-9]+(?:-[a-z0-9]+)+$/.test(bare) || /^[A-Za-z]+\d+[A-Za-z0-9]*$/.test(bare) || /^\d+[A-Za-z]+$/.test(bare)) return true;
+    if (/^[A-Z]{7,}$/.test(bare)) return true;
+    return false;
+  }
+  const tokens2 = bare.split(/\s+/);
+  if (tokens2.length >= 2 && tokens2.every((x) => /^[a-z][a-z0-9:_/[\]\-.%]*$/.test(x)) && tokens2.filter((x) => /[-:_0-9[]/.test(x)).length >= 2) return true;
+  return false;
+}
+__name(looksTechnical, "looksTechnical");
+var Scanner = class {
+  static {
+    __name(this, "Scanner");
+  }
+  out = [];
+  i = 0;
+  calls = [];
+  braces = [];
+  exprs = [];
+  tags = [];
+  prev = "";
+  chain = "";
+  dot = false;
+  lastKey = null;
+  pendingKey = null;
+  assignTarget = "";
+  src;
+  jsx;
+  constructor(src, jsx) {
+    this.src = src;
+    this.jsx = jsx;
+  }
+  run(from, to) {
+    this.i = from;
+    this.end = to;
+    this.code(false);
+  }
+  end = 0;
+  depth() {
+    return this.calls.filter(Boolean).length + this.braces.length;
+  }
+  suppressed() {
+    return this.calls.some((c) => c && (TRANSLATE.test(c) || LOG.test(c) || TEST.test(c)));
+  }
+  nextSig(from) {
+    let j = from;
+    while (j < this.end) {
+      const c = this.src[j];
+      if (/\s/.test(c)) j += 1;
+      else if (c === "/" && this.src[j + 1] === "/") j = this.lineEnd(j);
+      else if (c === "/" && this.src[j + 1] === "*") j = this.src.indexOf("*/", j + 2) + 2 || this.end;
+      else return c;
+    }
+    return "";
+  }
+  lineEnd(j) {
+    const n = this.src.indexOf("\n", j);
+    return n < 0 || n > this.end ? this.end : n;
+  }
+  skipWs() {
+    for (; ; ) {
+      const c = this.src[this.i];
+      if (c !== void 0 && /\s/.test(c)) this.i += 1;
+      else if (c === "/" && this.src[this.i + 1] === "/") this.i = this.lineEnd(this.i);
+      else if (c === "/" && this.src[this.i + 1] === "*") {
+        const e = this.src.indexOf("*/", this.i + 2);
+        this.i = e < 0 ? this.end : e + 2;
+      } else return;
+    }
+  }
+  emit(kind, text, offset, where) {
+    if (this.suppressed()) return;
+    const value = collapse(text);
+    if (!value || looksTechnical(value)) return;
+    this.out.push({ kind, text: value, offset, where });
+  }
+  valueEnd() {
+    return this.prev === "str" || this.prev === "num" || this.prev === ")" || this.prev === "]" || this.prev === "}" || /^[A-Za-z_$]/.test(this.prev) && !KEYWORDS.has(this.prev);
+  }
+  readString(quote) {
+    const start = this.i;
+    this.i += 1;
+    let value = "";
+    while (this.i < this.end && this.src[this.i] !== quote) {
+      if (this.src[this.i] === "\\") {
+        const n = this.src[this.i + 1] ?? "";
+        value += n === "n" ? " " : n;
+        this.i += 2;
+      } else {
+        value += this.src[this.i];
+        this.i += 1;
+      }
+    }
+    this.i += 1;
+    return { value, start };
+  }
+  readTemplate() {
+    const start = this.i;
+    this.i += 1;
+    let value = "";
+    while (this.i < this.end && this.src[this.i] !== "`") {
+      const c = this.src[this.i];
+      if (c === "\\") {
+        value += this.src[this.i + 1] ?? "";
+        this.i += 2;
+      } else if (c === "$" && this.src[this.i + 1] === "{") {
+        const from = this.i;
+        this.i += 2;
+        const saved = { pb: this.prevBefore, prev: this.prev, chain: this.chain, dot: this.dot, lk: this.lastKey, pk: this.pendingKey };
+        const out = this.out.length;
+        this.code(true);
+        this.out.length = out;
+        this.prevBefore = saved.pb;
+        this.prev = saved.prev;
+        this.chain = saved.chain;
+        this.dot = saved.dot;
+        this.lastKey = saved.lk;
+        this.pendingKey = saved.pk;
+        value += this.src.slice(from, this.i);
+      } else {
+        value += c;
+        this.i += 1;
+      }
+    }
+    this.i += 1;
+    return { value, start };
+  }
+  string(value, start, key, isKey) {
+    if (isKey) return;
+    const top = this.calls.filter(Boolean).at(-1) ?? "";
+    const at = start;
+    const expr = this.exprs.at(-1);
+    if (expr && expr.mode !== "none" && CHILD_PREV.has(this.prevBefore) && this.depth() === expr.depth) {
+      if (expr.mode === "child") {
+        if (!this.tags.some((t) => t.skipText)) this.emit("jsx-expr-string", value, at, () => `jsx-expr-string in ${expr.tag?.text ?? "<>"}`);
+      } else if (UI_ATTRS.has(expr.attr)) this.emit("jsx-attr", value, at, () => `jsx-attr ${expr.attr} on ${expr.tag?.text ?? "<>"}`);
+      return;
+    }
+    if (key && UI_KEYS.has(key) && [",", "}", ""].includes(this.nextSig(this.i))) {
+      this.emit("ui-prop", value, at, () => `ui-prop ${key} in ${top ? top + "({...})" : "{ " + key + ": ... }"}`);
+      return;
+    }
+    if (top && UI_CALL.test(top) && (this.prevBefore === "(" || this.prevBefore === ",")) {
+      this.emit("ui-call", value, at, () => `ui-call in ${top}(`);
+      return;
+    }
+    const target = this.assignTarget;
+    if (this.prevBefore === "=" && ASSIGN_UI.test(target)) this.emit("ui-assign", value, at, () => `ui-assign in ${target} =`);
+  }
+  prevBefore = "";
+  code(stopAtBrace) {
+    let local = 0;
+    while (this.i < this.end) {
+      this.skipWs();
+      if (this.i >= this.end) return;
+      const c = this.src[this.i];
+      const key = this.pendingKey;
+      this.pendingKey = null;
+      this.prevBefore = this.prev;
+      if (c === "'" || c === '"') {
+        const { value, start } = this.readString(c);
+        const isKey = this.braces.at(-1) === true && (this.prev === "{" || this.prev === ",") && this.nextSig(this.i) === ":";
+        this.string(value, start, key, isKey);
+        this.lastKey = isKey ? value : null;
+        this.prev = "str";
+        this.chain = "";
+        this.dot = false;
+        continue;
+      }
+      if (c === "`") {
+        const tagged = this.prev !== "" && /^[A-Za-z_$]/.test(this.prev) && !KEYWORDS.has(this.prev) && this.chain;
+        const { value, start } = this.readTemplate();
+        if (!(tagged && TRANSLATE.test(this.chain))) this.string(value, start, key, false);
+        this.prev = "str";
+        this.chain = "";
+        this.dot = false;
+        this.lastKey = null;
+        continue;
+      }
+      if (/[A-Za-z_$]/.test(c)) {
+        let j = this.i + 1;
+        while (j < this.end && /[\w$]/.test(this.src[j])) j += 1;
+        const name = this.src.slice(this.i, j);
+        const isKey = this.braces.at(-1) === true && (this.prev === "{" || this.prev === ",") && this.nextSig(j) === ":";
+        this.i = j;
+        this.chain = this.dot ? `${this.chain}.${name}` : name;
+        this.dot = false;
+        this.prev = name;
+        this.lastKey = isKey ? name : null;
+        continue;
+      }
+      if (/\d/.test(c)) {
+        while (this.i < this.end && /[\w.]/.test(this.src[this.i])) this.i += 1;
+        this.prev = "num";
+        this.chain = "";
+        this.lastKey = null;
+        continue;
+      }
+      if (c === "/") {
+        if (!this.valueEnd()) {
+          this.skipRegex();
+          this.prev = "str";
+        } else {
+          this.i += 1;
+          this.prev = "/";
+        }
+        this.chain = "";
+        this.lastKey = null;
+        continue;
+      }
+      if (c === "<" && this.jsx && !this.valueEnd() && /[A-Za-z_$>]/.test(this.src[this.i + 1] ?? "")) {
+        if (this.element()) {
+          this.prev = "str";
+          this.chain = "";
+          this.lastKey = null;
+          continue;
+        }
+      }
+      this.lastKeyToPending(c);
+      if (c === "(") {
+        this.calls.push(this.valueEndIdent() ? this.chain : "");
+        this.i += 1;
+        this.prev = "(";
+        this.chain = "";
+        this.dot = false;
+      } else if (c === ")") {
+        this.calls.pop();
+        this.i += 1;
+        this.prev = ")";
+        this.chain = "";
+        this.dot = false;
+      } else if (c === "{") {
+        this.braces.push(OBJECT_PREV.has(this.prev));
+        local += 1;
+        this.i += 1;
+        this.prev = "{";
+        this.chain = "";
+      } else if (c === "}") {
+        this.i += 1;
+        if (local === 0 && stopAtBrace) {
+          this.prev = "}";
+          return;
+        }
+        if (local > 0) {
+          this.braces.pop();
+          local -= 1;
+        }
+        this.prev = "}";
+        this.chain = "";
+      } else if (c === ".") {
+        if (this.src.startsWith("...", this.i)) {
+          this.i += 3;
+          this.prev = "...";
+          this.dot = false;
+        } else {
+          this.i += 1;
+          this.dot = true;
+          if (this.prev === ")" || this.prev === "]" || this.prev === "str") this.chain = "";
+          this.prev = ".";
+        }
+      } else if (c === "=" && this.src[this.i + 1] !== "=" && this.src[this.i + 1] !== ">") {
+        this.assignTarget = this.chain;
+        this.i += 1;
+        this.prev = "=";
+        this.chain = "";
+      } else if (c === "?" && this.src[this.i + 1] === "." && !/\d/.test(this.src[this.i + 2] ?? "")) {
+        this.i += 2;
+        this.dot = true;
+        this.prev = ".";
+      } else {
+        let j = this.i + 1;
+        if (/[=!&|?+\-*%^~<>]/.test(c)) while (j < this.end && j < this.i + 3 && /[=!&|?+\-*%^~<>]/.test(this.src[j])) j += 1;
+        this.prev = this.src.slice(this.i, j);
+        this.i = j;
+        this.chain = "";
+        this.dot = false;
+      }
+    }
+  }
+  valueEndIdent() {
+    return /^[A-Za-z_$]/.test(this.prev) || this.prev === ")" || this.prev === "]";
+  }
+  lastKeyToPending(c) {
+    if (c === ":" && this.lastKey !== null) this.pendingKey = this.lastKey;
+    if (c !== "}" && c !== "{") this.lastKey = null;
+  }
+  skipRegex() {
+    this.i += 1;
+    let cls = false;
+    while (this.i < this.end) {
+      const c = this.src[this.i];
+      if (c === "\\") this.i += 2;
+      else if (c === "\n") break;
+      else {
+        if (c === "[") cls = true;
+        else if (c === "]") cls = false;
+        else if (c === "/" && !cls) {
+          this.i += 1;
+          break;
+        }
+        this.i += 1;
+      }
+    }
+    while (this.i < this.end && /[a-z]/.test(this.src[this.i])) this.i += 1;
+  }
+  attempt(fn) {
+    const mark = { i: this.i, out: this.out.length, calls: this.calls.length, braces: this.braces.length, exprs: this.exprs.length, tags: this.tags.length, prev: this.prev, chain: this.chain, dot: this.dot };
+    const result = fn();
+    if (result === false) {
+      this.i = mark.i;
+      this.out.length = mark.out;
+      this.calls.length = mark.calls;
+      this.braces.length = mark.braces;
+      this.exprs.length = mark.exprs;
+      this.tags.length = mark.tags;
+      this.prev = mark.prev;
+      this.chain = mark.chain;
+      this.dot = mark.dot;
+    }
+    return result;
+  }
+  element() {
+    return this.attempt(() => this.jsxElement()) !== false;
+  }
+  container(frame) {
+    this.exprs.push(frame);
+    this.prev = "{";
+    this.chain = "";
+    this.dot = false;
+    this.code(true);
+    this.exprs.pop();
+  }
+  jsxElement() {
+    const open = this.i;
+    this.i += 1;
+    this.skipWs();
+    const info = { name: "", text: "<>", skipText: false };
+    if (this.src[this.i] !== ">") {
+      const m = /^[A-Za-z_$][\w$.:-]*/.exec(this.src.slice(this.i, this.i + 120));
+      if (!m) return false;
+      info.name = m[0];
+      this.i += m[0].length;
+      info.skipText = TRANS_TAGS.has(m[0]) || RAW_TAGS.has(m[0].toLowerCase());
+      for (; ; ) {
+        this.skipWs();
+        const c = this.src[this.i];
+        if (c === void 0 || this.i >= this.end) return false;
+        if (c === "/" && this.src[this.i + 1] === ">") {
+          this.i += 2;
+          info.text = clipTag(this.src.slice(open, this.i));
+          return true;
+        }
+        if (c === ">") break;
+        if (c === "{") {
+          this.i += 1;
+          this.container({ mode: "none", attr: "", depth: this.depth(), tag: info });
+          continue;
+        }
+        const am = /^[A-Za-z_$][\w$:.-]*/.exec(this.src.slice(this.i, this.i + 80));
+        if (!am) return false;
+        const attr = am[0];
+        this.i += attr.length;
+        if (WRAP_ATTRS.has(attr.toLowerCase())) info.skipText = true;
+        this.skipWs();
+        if (this.src[this.i] !== "=") continue;
+        this.i += 1;
+        this.skipWs();
+        const q = this.src[this.i];
+        if (q === '"' || q === "'") {
+          const e = this.src.indexOf(q, this.i + 1);
+          if (e < 0) return false;
+          const value = this.src.slice(this.i + 1, e);
+          const at = this.i + 1;
+          this.i = e + 1;
+          if (attr === "translate" && value === "no") info.skipText = true;
+          if (UI_ATTRS.has(attr)) this.emit("jsx-attr", decode(value), at, () => `jsx-attr ${attr} on ${info.text}`);
+        } else if (q === "{") {
+          this.i += 1;
+          this.container({ mode: "attr", attr, depth: this.depth(), tag: info });
+        } else if (q === "<") {
+          if (!this.jsxElement()) return false;
+        } else return false;
+      }
+    }
+    this.i += 1;
+    info.text = clipTag(this.src.slice(open, this.i));
+    this.tags.push(info);
+    let buf = "";
+    let bufAt = -1;
+    const flush = /* @__PURE__ */ __name(() => {
+      if (buf.trim() && !this.tags.some((t) => t.skipText)) this.emit("jsx-text", decode(buf), bufAt, () => `jsx-text in ${info.text}`);
+      buf = "";
+      bufAt = -1;
+    }, "flush");
+    for (; ; ) {
+      const from = this.i;
+      while (this.i < this.end && this.src[this.i] !== "<" && this.src[this.i] !== "{") this.i += 1;
+      if (this.i >= this.end) return false;
+      const raw = this.src.slice(from, this.i);
+      if (raw.trim() && bufAt < 0) bufAt = from + raw.length - raw.trimStart().length;
+      buf += raw;
+      if (this.src[this.i] === "{") {
+        this.i += 1;
+        const start = this.i;
+        const before = this.out.length;
+        this.container({ mode: "child", attr: "", depth: this.depth(), tag: info });
+        const expr = this.src.slice(start, this.i - 1).replace(/\s+/g, "");
+        if (this.out.length > before) flush();
+        else if (/^(['"`])\1$/.test(expr)) buf += " ";
+        else if (expr && !expr.startsWith("/*")) {
+          if (bufAt < 0) bufAt = start - 1;
+          buf += `{${expr.slice(0, 30)}}`;
+        }
+      } else if (this.src[this.i + 1] === "/") {
+        flush();
+        const e = this.src.indexOf(">", this.i);
+        if (e < 0) return false;
+        this.i = e + 1;
+        this.tags.pop();
+        return true;
+      } else {
+        flush();
+        if (!this.jsxElement()) return false;
+      }
+    }
+  }
+};
+function scanHtml(src, from, to, vue, out) {
+  const stack = [];
+  let i = from;
+  const text = /* @__PURE__ */ __name((chunk, offset) => {
+    if (!chunk.trim() || stack.some((t) => t.skipText)) return;
+    const parent = stack.at(-1);
+    const lead = chunk.length - chunk.trimStart().length;
+    let value = collapse(decode(chunk));
+    const kind = vue ? "vue-text" : "html-text";
+    const literal = /^\{\{\s*(['"`])(.*)\1\s*\}\}$/.exec(value);
+    if (literal) value = literal[2];
+    else if (vue && /^\{\{[^}]*\}\}$/.test(value)) return;
+    if (!value || looksTechnical(value)) return;
+    out.push({ kind, text: value, offset: offset + lead, where: /* @__PURE__ */ __name(() => `${kind} in ${parent?.text ?? "document"}`, "where") });
+  }, "text");
+  while (i < to) {
+    let lt = src.indexOf("<", i);
+    if (lt < 0 || lt >= to) lt = to;
+    text(src.slice(i, lt), i);
+    if (lt >= to) break;
+    if (src.startsWith("<!--", lt)) {
+      const e = src.indexOf("-->", lt + 4);
+      i = e < 0 ? to : e + 3;
+      continue;
+    }
+    if (src[lt + 1] === "!" || src[lt + 1] === "?") {
+      const e = src.indexOf(">", lt);
+      i = e < 0 ? to : e + 1;
+      continue;
+    }
+    if (src[lt + 1] === "/") {
+      const e = src.indexOf(">", lt);
+      const name2 = /^<\/([A-Za-z][\w:.-]*)/.exec(src.slice(lt, lt + 60))?.[1]?.toLowerCase();
+      for (let k = stack.length - 1; name2 && k >= 0; k -= 1) {
+        if (stack[k]?.name === name2) {
+          stack.length = k;
+          break;
+        }
+      }
+      i = e < 0 ? to : e + 1;
+      continue;
+    }
+    const m = /^<([A-Za-z][\w:.-]*)/.exec(src.slice(lt, lt + 80));
+    if (!m) {
+      i = lt + 1;
+      continue;
+    }
+    const name = m[1].toLowerCase();
+    let j = lt + m[0].length;
+    const attrs = [];
+    let self = false;
+    for (; ; ) {
+      while (j < to && /\s/.test(src[j])) j += 1;
+      if (j >= to) break;
+      if (src[j] === ">") {
+        j += 1;
+        break;
+      }
+      if (src[j] === "/" && src[j + 1] === ">") {
+        self = true;
+        j += 2;
+        break;
+      }
+      const am = /^[^\s"'<>/=]+/.exec(src.slice(j, j + 120));
+      if (!am) {
+        j += 1;
+        continue;
+      }
+      j += am[0].length;
+      let value = null;
+      let offset = j;
+      while (j < to && /\s/.test(src[j])) j += 1;
+      if (src[j] === "=") {
+        j += 1;
+        while (j < to && /\s/.test(src[j])) j += 1;
+        const q = src[j];
+        if (q === '"' || q === "'") {
+          const e = src.indexOf(q, j + 1);
+          const end = e < 0 ? to : e;
+          value = src.slice(j + 1, end);
+          offset = j + 1;
+          j = end + 1;
+        } else {
+          const um = /^[^\s"'=<>`]+/.exec(src.slice(j, j + 400));
+          value = um?.[0] ?? "";
+          offset = j;
+          j += value.length;
+        }
+      }
+      attrs.push({ name: am[0], value, offset });
+    }
+    const tagText = clipTag(src.slice(lt, j));
+    const names = new Set(attrs.map((a) => a.name.toLowerCase()));
+    const wrapped = [...names].some((n) => WRAP_ATTRS.has(n)) || attrs.some((a) => a.name.toLowerCase() === "translate" && a.value === "no");
+    const meta = name === "meta" && /^(?:description|og:title|og:description|twitter:title|twitter:description)$/i.test(attrs.find((a) => a.name.toLowerCase() === "name" || a.name.toLowerCase() === "property")?.value ?? "");
+    const button = name === "input" && /^(?:submit|button|reset)$/i.test(attrs.find((a) => a.name.toLowerCase() === "type")?.value ?? "");
+    if (!wrapped && !stack.some((t) => t.skipText)) {
+      for (const a of attrs) {
+        const n = a.name.toLowerCase();
+        const ok = UI_ATTRS.has(n) || meta && n === "content" || button && n === "value";
+        if (!ok || a.value === null || names.has(`i18n-${n}`) || names.has(`data-i18n-${n}`)) continue;
+        const kind = vue ? "vue-attr" : "html-attr";
+        const value = collapse(decode(a.value));
+        if (value && !looksTechnical(value)) out.push({ kind, text: value, offset: a.offset, where: /* @__PURE__ */ __name(() => `${kind} ${n} on ${tagText}`, "where") });
+      }
+    }
+    if (name === "script" || name === "style") {
+      const e = src.toLowerCase().indexOf(`</${name}`, j);
+      i = e < 0 ? to : e;
+      continue;
+    }
+    if (!self && !VOID.has(name)) stack.push({ name, text: tagText, skipText: wrapped || RAW_TAGS.has(name) });
+    i = j;
+  }
+}
+__name(scanHtml, "scanHtml");
+function scanVue(src, out) {
+  const t = /^<template\b[^>]*>/m.exec(src);
+  if (t) {
+    const start = t.index + t[0].length;
+    const close = src.lastIndexOf("\n</template>");
+    scanHtml(src, start, close > start ? close : src.length, true, out);
+  }
+  const re = /^<script\b[^>]*>/gm;
+  for (let s = re.exec(src); s; s = re.exec(src)) {
+    const from = s.index + s[0].length;
+    const e = src.indexOf("</script>", from);
+    const sc = new Scanner(src, false);
+    sc.run(from, e < 0 ? src.length : e);
+    out.push(...sc.out);
+  }
+}
+__name(scanVue, "scanVue");
+function extractFile(path, source) {
+  const ext = extname(path).toLowerCase();
+  const pending = [];
+  if (ext === ".html" || ext === ".htm") scanHtml(source, 0, source.length, false, pending);
+  else if (ext === ".vue") scanVue(source, pending);
+  else {
+    const sc = new Scanner(source, ext !== ".ts" && ext !== ".mts" && ext !== ".cts");
+    sc.run(0, source.length);
+    pending.push(...sc.out);
+  }
+  const starts = [0];
+  for (let k = source.indexOf("\n"); k >= 0; k = source.indexOf("\n", k + 1)) starts.push(k + 1);
+  const lineOf = /* @__PURE__ */ __name((offset) => {
+    let lo = 0;
+    let hi = starts.length - 1;
+    while (lo < hi) {
+      const mid = lo + hi + 1 >> 1;
+      if (starts[mid] <= offset) lo = mid;
+      else hi = mid - 1;
+    }
+    return lo + 1;
+  }, "lineOf");
+  const seen = /* @__PURE__ */ new Map();
+  return pending.sort((a, b) => a.offset - b.offset).filter((p, k, all) => k === 0 || p.offset !== all[k - 1]?.offset).map((p) => {
+    const line = lineOf(p.offset);
+    const base2 = `${path}:${line}`;
+    const n = (seen.get(base2) ?? 0) + 1;
+    seen.set(base2, n);
+    const where = p.where();
+    return { id: n === 1 ? base2 : `${base2}#${n}`, text: p.text, kind: p.kind, line, context: `${base2} ${where}`.slice(0, 300), key: `${p.kind}\0${p.text}\0${where}` };
+  });
+}
+__name(extractFile, "extractFile");
+function collectFiles(cwd, targets, includeTests) {
+  const files = [];
+  const tooLarge = [];
+  const add = /* @__PURE__ */ __name((abs) => {
+    if (!SOURCE_EXTENSIONS.includes(extname(abs).toLowerCase()) || !includeTests && TEST_FILE.test(abs)) return;
+    if (statSync4(abs).size > MAX_FILE) tooLarge.push(relative2(cwd, abs).split(sep3).join("/"));
+    else files.push(abs);
+  }, "add");
+  const walk = /* @__PURE__ */ __name((dir) => {
+    for (const entry of readdirSync5(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+      if (entry.isDirectory()) {
+        if (!SKIP_DIRS.has(entry.name) && !entry.name.startsWith(".")) walk(join9(dir, entry.name));
+      } else if (entry.isFile()) add(join9(dir, entry.name));
+    }
+  }, "walk");
+  for (const target of targets) {
+    const abs = resolve6(cwd, target);
+    if (!existsSync6(abs)) continue;
+    if (statSync4(abs).isDirectory()) walk(abs);
+    else {
+      const ext = extname(abs).toLowerCase();
+      if (SOURCE_EXTENSIONS.includes(ext) && statSync4(abs).size <= MAX_FILE) files.push(abs);
+      else if (SOURCE_EXTENSIONS.includes(ext)) tooLarge.push(relative2(cwd, abs).split(sep3).join("/"));
+    }
+  }
+  return { files: [...new Set(files)], tooLarge };
+}
+__name(collectFiles, "collectFiles");
+function extractPaths(cwd, targets, options = {}) {
+  const { files, tooLarge } = collectFiles(cwd, targets, options.includeTests === true);
+  const missing = targets.filter((t) => !existsSync6(resolve6(cwd, t)));
+  const seen = /* @__PURE__ */ new Set();
+  const candidates = [];
+  let duplicates = 0;
+  for (const abs of files) {
+    const rel = relative2(cwd, abs).split(sep3).join("/");
+    for (const c of extractFile(rel, readFileSync10(abs, "utf8"))) {
+      if (!options.keepDuplicates && seen.has(c.key)) {
+        duplicates += 1;
+        continue;
+      }
+      seen.add(c.key);
+      candidates.push(c);
+    }
+  }
+  return { candidates, duplicates, files: files.length, tooLarge, missing };
+}
+__name(extractPaths, "extractPaths");
+
+// src/cli/commands/extract.ts
+function count(context, key) {
+  const raw = context.values[key];
+  if (typeof raw !== "string") return void 0;
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n < 0 || raw.trim() === "") throw new RefereeError("bad_input", `--${key} takes a whole number of 0 or more.`);
+  return n;
+}
+__name(count, "count");
+var extract = {
+  name: "extract",
+  describe: {
+    summary: "Find candidate user-visible strings in source files for the i18n pack's judge question. Offline and free.",
+    inputs: {
+      "<path>...": `Files or directories (shell globs work). Directories are walked for ${SOURCE_EXTENSIONS.join(" ")} files; node_modules, dist, build, coverage, vendor and hidden directories are skipped, and so are *.test, *.spec and *.stories files unless --include-tests.`,
+      "--out <file>": "Write the candidates as JSON lines {id, text, context, kind} for judge --items. The id is path:line (#n for a second candidate on a line); the context names the file, line and where the string sits. Without --out nothing is written and the first 10 candidates are shown.",
+      "--limit <n>": "At most n candidates after --offset (judge takes at most 500 items per call).",
+      "--offset <n>": "Skip the first n candidates, to judge a large set in several calls.",
+      "--include-tests": "Also scan test, spec and stories files.",
+      "--keep-duplicates": "Keep a candidate whose kind, text and surrounding element or call equal one already found; by default only the first is kept."
+    },
+    outputs: {
+      verdict: "extracted, or none when no candidate was found",
+      files: "Files scanned",
+      candidates: "Candidates found after removing duplicates, before --offset and --limit",
+      duplicates: "Candidates dropped as duplicates of an earlier one",
+      written: "With --out: candidates written",
+      by_kind: "Candidates per kind: jsx-text, jsx-attr, jsx-expr-string, vue-text, vue-attr, html-text, html-attr, ui-call, ui-prop, ui-assign",
+      out: "With --out: the file written",
+      preview: "Without --out: the first 10 candidates as id, kind and text",
+      too_large: "Files over 1 MB that were skipped",
+      missing: "Paths that do not exist"
+    },
+    errors: ["bad_input"],
+    effects: "Reads the given files; writes only the --out file. No network, no key, no receipt.",
+    cost: "Free. The judge step that follows costs one Jev request per item."
+  },
+  options: { out: { type: "string" }, limit: { type: "string" }, offset: { type: "string" }, "include-tests": { type: "boolean" }, "keep-duplicates": { type: "boolean" } },
+  async run(context) {
+    if (context.positionals.length === 0) throw new RefereeError("bad_input", "Give one or more files or directories.", { next_step: "Example: extract src --out .claude/i18n-items.jsonl" });
+    const found = extractPaths(context.io.cwd, context.positionals, { includeTests: context.values["include-tests"] === true, keepDuplicates: context.values["keep-duplicates"] === true });
+    if (found.files === 0 && found.missing.length === context.positionals.length) throw new RefereeError("bad_input", `None of the paths exist: ${context.positionals.slice(0, 3).join(", ")}`);
+    const offset = count(context, "offset") ?? 0;
+    const limit = count(context, "limit");
+    const chosen = found.candidates.slice(offset, limit === void 0 ? void 0 : offset + limit);
+    const byKind = {};
+    for (const c of chosen) byKind[c.kind] = (byKind[c.kind] ?? 0) + 1;
+    const out = str(context, "out");
+    if (out) {
+      const path = resolve7(context.io.cwd, out);
+      mkdirSync6(dirname4(path), { recursive: true });
+      writeFileSync5(path, chosen.map((c) => JSON.stringify({ id: c.id, text: c.text, context: c.context, kind: c.kind })).join("\n") + (chosen.length ? "\n" : ""));
+    }
+    return {
+      ok: true,
+      verdict: found.candidates.length === 0 ? "none" : "extracted",
+      files: found.files,
+      candidates: found.candidates.length,
+      duplicates: found.duplicates,
+      ...out ? { written: chosen.length, out } : { preview: chosen.slice(0, 10).map((c) => ({ id: c.id, kind: c.kind, text: c.text.slice(0, 80) })) },
+      by_kind: byKind,
+      ...found.tooLarge.length ? { too_large: found.tooLarge.slice(0, 20) } : {},
+      ...found.missing.length ? { missing: found.missing.slice(0, 20) } : {},
+      next_step: found.candidates.length === 0 ? void 0 : out ? `Judge them: judge --pack i18n --question string.translatable --items ${out} --dry-run first to see the requests.` : "Add --out <file> to write the items for judge --items."
+    };
+  }
+};
+
 // src/cli/commands/lint-pack.ts
-import { existsSync as existsSync6, readFileSync as readFileSync10, readdirSync as readdirSync5 } from "node:fs";
-import { join as join9, resolve as resolve6 } from "node:path";
+import { existsSync as existsSync7, readFileSync as readFileSync11, readdirSync as readdirSync6 } from "node:fs";
+import { join as join10, resolve as resolve8 } from "node:path";
 
 // src/engine/lint.ts
 var OTHER = /^(?:other|none|neither|unknown|unsure|undecided|says_nothing|no_answer)$/i;
@@ -5360,7 +6133,7 @@ __name(lintRecorded, "lintRecorded");
 // src/cli/commands/lint-pack.ts
 function readJson2(path) {
   try {
-    return JSON.parse(readFileSync10(path, "utf8"));
+    return JSON.parse(readFileSync11(path, "utf8"));
   } catch {
     throw new RefereeError("bad_input", `Not valid JSON: ${path}`);
   }
@@ -5368,12 +6141,12 @@ function readJson2(path) {
 __name(readJson2, "readJson");
 function recordedNouls(root) {
   const out = {};
-  if (!existsSync6(root)) throw new RefereeError("bad_input", `No evals directory: ${root}`);
-  for (const entry of readdirSync5(root, { withFileTypes: true })) {
-    const file = join9(root, entry.name, "recorded.jsonl");
-    if (!entry.isDirectory() || !existsSync6(file)) continue;
+  if (!existsSync7(root)) throw new RefereeError("bad_input", `No evals directory: ${root}`);
+  for (const entry of readdirSync6(root, { withFileTypes: true })) {
+    const file = join10(root, entry.name, "recorded.jsonl");
+    if (!entry.isDirectory() || !existsSync7(file)) continue;
     const latest = /* @__PURE__ */ new Map();
-    for (const line of parseRecordings(readFileSync10(file, "utf8"))) latest.set(String(line.case), line.answers);
+    for (const line of parseRecordings(readFileSync11(file, "utf8"))) latest.set(String(line.case), line.answers);
     for (const answers of latest.values()) {
       for (const [key, answer] of Object.entries(answers ?? {})) {
         const a = answer;
@@ -5405,23 +6178,23 @@ var lintPack = {
   async run(context) {
     const target = context.positionals[0];
     if (!target) throw new RefereeError("bad_input", "Give the pack directory.", { next_step: "Example: lint-pack plugins/claude-referee/packs/generic" });
-    const dir = resolve6(context.io.cwd, target);
-    if (!existsSync6(join9(dir, "pack.json"))) throw new RefereeError("bad_input", `No pack.json in ${dir}.`);
-    const meta = readJson2(join9(dir, "pack.json"));
+    const dir = resolve8(context.io.cwd, target);
+    if (!existsSync7(join10(dir, "pack.json"))) throw new RefereeError("bad_input", `No pack.json in ${dir}.`);
+    const meta = readJson2(join10(dir, "pack.json"));
     const questions = {};
-    const qdir = join9(dir, "questions");
-    if (existsSync6(qdir)) for (const file of readdirSync5(qdir).filter((f) => f.endsWith(".json")).sort()) Object.assign(questions, readJson2(join9(qdir, file)));
+    const qdir = join10(dir, "questions");
+    if (existsSync7(qdir)) for (const file of readdirSync6(qdir).filter((f) => f.endsWith(".json")).sort()) Object.assign(questions, readJson2(join10(qdir, file)));
     const findings = lintQuestions(questions, meta.model);
     const recorded = context.values["recorded"];
-    if (typeof recorded === "string") findings.push(...lintRecorded(recordedNouls(resolve6(context.io.cwd, recorded))));
+    if (typeof recorded === "string") findings.push(...lintRecorded(recordedNouls(resolve8(context.io.cwd, recorded))));
     const verdict = findings.some((f) => f.severity === "error") ? "errors" : findings.length ? "warnings" : "clean";
     return { ok: true, verdict, questions: Object.keys(questions).length, findings, next_step: verdict === "clean" ? void 0 : "Fix the findings; each message says what to change." };
   }
 };
 
 // src/cli/commands/receipts.ts
-import { mkdirSync as mkdirSync7, writeFileSync as writeFileSync6 } from "node:fs";
-import { dirname as dirname4, resolve as resolve7 } from "node:path";
+import { mkdirSync as mkdirSync8, writeFileSync as writeFileSync7 } from "node:fs";
+import { dirname as dirname5, resolve as resolve9 } from "node:path";
 
 // src/engine/stopgate/interval.ts
 var MIN_LABELS_PER_CLASS = 10;
@@ -5496,15 +6269,15 @@ function suggestThreshold(records, current) {
 __name(suggestThreshold, "suggestThreshold");
 
 // src/engine/stopgate/stops.ts
-import { appendFileSync as appendFileSync3, chmodSync, existsSync as existsSync7, mkdirSync as mkdirSync6, readFileSync as readFileSync11, renameSync as renameSync2, statSync as statSync4, writeFileSync as writeFileSync5 } from "node:fs";
-import { join as join10 } from "node:path";
+import { appendFileSync as appendFileSync3, chmodSync, existsSync as existsSync8, mkdirSync as mkdirSync7, readFileSync as readFileSync12, renameSync as renameSync2, statSync as statSync5, writeFileSync as writeFileSync6 } from "node:fs";
+import { join as join11 } from "node:path";
 var RETENTION_MS = 90 * 864e5;
 function stopsFile(dataDir) {
-  return join10(dataDir, "stops.jsonl");
+  return join11(dataDir, "stops.jsonl");
 }
 __name(stopsFile, "stopsFile");
 function labelsFile(dataDir) {
-  return join10(dataDir, "labels.jsonl");
+  return join11(dataDir, "labels.jsonl");
 }
 __name(labelsFile, "labelsFile");
 function parseLines(text) {
@@ -5525,8 +6298,8 @@ function readLabels(dataDir) {
   const out = /* @__PURE__ */ new Map();
   try {
     const file = labelsFile(dataDir);
-    if (!existsSync7(file)) return out;
-    for (const line of readFileSync11(file, "utf8").split("\n")) {
+    if (!existsSync8(file)) return out;
+    for (const line of readFileSync12(file, "utf8").split("\n")) {
       if (!line.trim()) continue;
       try {
         const v = JSON.parse(line);
@@ -5544,9 +6317,9 @@ __name(readLabels, "readLabels");
 function readStops(dataDir) {
   const file = stopsFile(dataDir);
   try {
-    if (!existsSync7(file)) return [];
+    if (!existsSync8(file)) return [];
     const labels = readLabels(dataDir);
-    return parseLines(readFileSync11(file, "utf8")).map((r) => {
+    return parseLines(readFileSync12(file, "utf8")).map((r) => {
       const l = labels.get(r.id);
       return l ? { ...r, label: l.label, labelled_at: l.labelled_at } : r;
     });
@@ -5596,8 +6369,8 @@ function stopStats(records) {
 __name(stopStats, "stopStats");
 
 // src/engine/stopgate/weak.ts
-import { readFileSync as readFileSync12 } from "node:fs";
-import { join as join11 } from "node:path";
+import { readFileSync as readFileSync13 } from "node:fs";
+import { join as join12 } from "node:path";
 var W = String.raw`(?<![\p{L}\p{N}])`;
 var E = String.raw`(?![\p{L}\p{N}])`;
 var compile2 = /* @__PURE__ */ __name((patterns) => patterns.map((p) => new RegExp(`${W}${p}${E}`, "iu")), "compile");
@@ -5675,7 +6448,7 @@ function suggestForStops(dirs, stops) {
     let text = null;
     for (const dir of dirs) {
       try {
-        text = readFileSync12(join11(dir, `${session}.jsonl`), "utf8");
+        text = readFileSync13(join12(dir, `${session}.jsonl`), "utf8");
         break;
       } catch {
         continue;
@@ -5694,8 +6467,8 @@ function suggestForStops(dirs, stops) {
 __name(suggestForStops, "suggestForStops");
 
 // src/engine/usage.ts
-import { existsSync as existsSync8, readdirSync as readdirSync6, readFileSync as readFileSync13 } from "node:fs";
-import { join as join12 } from "node:path";
+import { existsSync as existsSync9, readdirSync as readdirSync7, readFileSync as readFileSync14 } from "node:fs";
+import { join as join13 } from "node:path";
 var SEPARATORS2 = /* @__PURE__ */ new Set(["&&", "||", "|", "|&", ";", "&", "\n", "(", ")"]);
 var ASSIGNMENT3 = /^[A-Za-z_][A-Za-z0-9_]*=/;
 function withoutHeredocs2(command) {
@@ -5792,13 +6565,13 @@ function cliCallsIn(command) {
 }
 __name(cliCallsIn, "cliCallsIn");
 function transcriptFiles(dir) {
-  if (!existsSync8(dir)) return [];
+  if (!existsSync9(dir)) return [];
   const files = [];
-  for (const entry of readdirSync6(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
-    if (entry.isFile() && entry.name.endsWith(".jsonl")) files.push({ path: join12(dir, entry.name), subagent: false });
-    const sub = join12(dir, entry.name, "subagents");
-    if (entry.isDirectory() && existsSync8(sub)) {
-      for (const name of readdirSync6(sub).filter((n) => n.endsWith(".jsonl")).sort()) files.push({ path: join12(sub, name), subagent: true });
+  for (const entry of readdirSync7(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+    if (entry.isFile() && entry.name.endsWith(".jsonl")) files.push({ path: join13(dir, entry.name), subagent: false });
+    const sub = join13(dir, entry.name, "subagents");
+    if (entry.isDirectory() && existsSync9(sub)) {
+      for (const name of readdirSync7(sub).filter((n) => n.endsWith(".jsonl")).sort()) files.push({ path: join13(sub, name), subagent: true });
     }
   }
   return files;
@@ -5811,8 +6584,8 @@ function resultChars(content) {
 }
 __name(resultChars, "resultChars");
 function projectTranscriptDirs(env, home, cwd) {
-  const configDir = env["CLAUDE_CONFIG_DIR"]?.trim() || join12(home, ".claude");
-  return [.../* @__PURE__ */ new Set([cwd, projectRoot(cwd)])].map((p) => join12(configDir, "projects", p.replace(/[^A-Za-z0-9]/g, "-")));
+  const configDir = env["CLAUDE_CONFIG_DIR"]?.trim() || join13(home, ".claude");
+  return [.../* @__PURE__ */ new Set([cwd, projectRoot(cwd)])].map((p) => join13(configDir, "projects", p.replace(/[^A-Za-z0-9]/g, "-")));
 }
 __name(projectTranscriptDirs, "projectTranscriptDirs");
 function scanUsage(dirs, since) {
@@ -5820,7 +6593,7 @@ function scanUsage(dirs, since) {
   const calls = /* @__PURE__ */ new Map();
   const sizes = /* @__PURE__ */ new Map();
   for (const file of files) {
-    for (const line of readFileSync13(file.path, "utf8").split("\n")) {
+    for (const line of readFileSync14(file.path, "utf8").split("\n")) {
       if (!line.trim()) continue;
       let entry;
       try {
@@ -5929,9 +6702,9 @@ var receipts = {
       const out = str(context, "out");
       if (!out) throw new RefereeError("bad_input", "export needs --out <file>.");
       const all = readReceipts(dataDir);
-      const path = resolve7(io.cwd, out);
-      mkdirSync7(dirname4(path), { recursive: true });
-      writeFileSync6(path, all.map((r) => JSON.stringify(r)).join("\n") + (all.length ? "\n" : ""));
+      const path = resolve9(io.cwd, out);
+      mkdirSync8(dirname5(path), { recursive: true });
+      writeFileSync7(path, all.map((r) => JSON.stringify(r)).join("\n") + (all.length ? "\n" : ""));
       return { ok: true, verdict: "exported", receipts: all.length, out: tildify(path, io.home) };
     }
     if (positionals[0] === "verify") {
@@ -6032,17 +6805,17 @@ var receipts = {
 
 // src/cli/commands/ui.ts
 import { spawn } from "node:child_process";
-import { mkdtempSync, rmSync as rmSync2, writeFileSync as writeFileSync7 } from "node:fs";
+import { mkdtempSync, rmSync as rmSync2, writeFileSync as writeFileSync8 } from "node:fs";
 import { tmpdir } from "node:os";
-import { join as join14 } from "node:path";
+import { join as join15 } from "node:path";
 
 // src/ui/server.ts
 import { createHash as createHash5, randomBytes, timingSafeEqual } from "node:crypto";
 import { createServer } from "node:http";
 
 // src/ui/api.ts
-import { existsSync as existsSync9, statSync as statSync5 } from "node:fs";
-import { join as join13 } from "node:path";
+import { existsSync as existsSync10, statSync as statSync6 } from "node:fs";
+import { join as join14 } from "node:path";
 var EXPORT_KINDS = ["receipts", "stops", "labels"];
 var DAY_MS = 864e5;
 var WINDOW_DAYS = 30;
@@ -6129,10 +6902,10 @@ var SENT = [
   { when: "This dashboard", what: "Nothing: no network call leaves this process, no telemetry, no external fonts or scripts" }
 ];
 function fileInfo(dataDir, name) {
-  const path = join13(dataDir, name);
-  if (!existsSync9(path)) return null;
+  const path = join14(dataDir, name);
+  if (!existsSync10(path)) return null;
   try {
-    const st = statSync5(path);
+    const st = statSync6(path);
     return { name, bytes: st.isDirectory() ? dirSize(path) : st.size };
   } catch {
     return null;
@@ -6494,20 +7267,20 @@ function json(res, status, value) {
 }
 __name(json, "json");
 function readBody(req) {
-  return new Promise((resolve8) => {
+  return new Promise((resolve10) => {
     const chunks = [];
     let size = 0;
     req.on("data", (chunk) => {
       size += chunk.length;
       if (size > MAX_BODY) {
         chunks.length = 0;
-        resolve8(null);
+        resolve10(null);
         return;
       }
       chunks.push(chunk);
     });
-    req.on("end", () => resolve8(Buffer.concat(chunks).toString("utf8")));
-    req.on("error", () => resolve8(null));
+    req.on("end", () => resolve10(Buffer.concat(chunks).toString("utf8")));
+    req.on("error", () => resolve10(null));
   });
 }
 __name(readBody, "readBody");
@@ -6574,11 +7347,11 @@ async function startUi(ctx, requestedPort = 0) {
   server.requestTimeout = 1e4;
   server.headersTimeout = 5e3;
   server.keepAliveTimeout = 2e3;
-  await new Promise((resolve8, reject) => {
+  await new Promise((resolve10, reject) => {
     server.once("error", (error) => {
       reject(new RefereeError("bad_input", error.code === "EADDRINUSE" ? "That port is already in use." : `Could not start the server: ${error.code ?? "error"}`, { next_step: "Omit --port to take a random free port." }));
     });
-    server.listen(requestedPort, "127.0.0.1", resolve8);
+    server.listen(requestedPort, "127.0.0.1", resolve10);
   });
   const port = server.address().port;
   allowedHost = `127.0.0.1:${port}`;
@@ -6588,8 +7361,8 @@ async function startUi(ctx, requestedPort = 0) {
     port,
     origin: allowedOrigin,
     urlWithToken: `${allowedOrigin}/#t=${token}`,
-    close: /* @__PURE__ */ __name(() => new Promise((resolve8) => {
-      server.close(() => resolve8());
+    close: /* @__PURE__ */ __name(() => new Promise((resolve10) => {
+      server.close(() => resolve10());
       server.closeAllConnections();
     }), "close")
   };
@@ -6601,11 +7374,11 @@ var LAUNCHER_LIFETIME_MS = 2e4;
 function openLauncher(url, platform) {
   const opener = platform === "darwin" ? "open" : platform === "linux" ? "xdg-open" : null;
   if (!opener) return null;
-  const dir = mkdtempSync(join14(tmpdir(), "referee-ui-"));
-  const file = join14(dir, "open.html");
+  const dir = mkdtempSync(join15(tmpdir(), "referee-ui-"));
+  const file = join15(dir, "open.html");
   const cleanup = /* @__PURE__ */ __name(() => rmSync2(dir, { recursive: true, force: true }), "cleanup");
   try {
-    writeFileSync7(file, `<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${url}"><title>claude-referee</title>
+    writeFileSync8(file, `<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${url}"><title>claude-referee</title>
 `, { mode: 384 });
     const child = spawn(opener, [file], { detached: true, stdio: "ignore" });
     child.on("error", () => void 0);
@@ -6646,11 +7419,11 @@ var ui = {
     const server = await startUi({ dataDir: resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), cwd: io.cwd, home: io.home, env: io.env, now: io.now }, port);
     const cleanup = values["no-open"] === true ? null : openLauncher(server.urlWithToken, io.platform);
     io.write(JSON.stringify({ ok: true, verdict: "listening", url: server.urlWithToken, opened: cleanup !== null, next_step: "Stop with Ctrl-C." }, null, flags.pretty ? 2 : 0) + "\n");
-    await new Promise((resolve8) => {
+    await new Promise((resolve10) => {
       const signals = ["SIGINT", "SIGTERM", "SIGHUP"];
       const done2 = /* @__PURE__ */ __name(() => {
         for (const s of signals) process.removeListener(s, done2);
-        resolve8();
+        resolve10();
       }, "done");
       for (const s of signals) process.once(s, done2);
     });
@@ -6661,7 +7434,7 @@ var ui = {
 };
 
 // src/cli/commands/index.ts
-var commands = [done, decide, judge, claims, verify, receipts, doctor, evalCommand, lintPack, ui];
+var commands = [done, decide, judge, extract, claims, verify, receipts, doctor, evalCommand, lintPack, ui];
 
 // src/cli/io.ts
 import { homedir } from "node:os";
@@ -6687,7 +7460,7 @@ function processIo() {
 __name(processIo, "processIo");
 
 // src/cli/run.ts
-import { join as join15 } from "node:path";
+import { join as join16 } from "node:path";
 import { parseArgs } from "node:util";
 var GLOBAL_OPTIONS = {
   describe: { type: "boolean" },
@@ -6776,7 +7549,7 @@ async function run(argv, io, commands2) {
     }
     const result = await command.run({ io, flags, values: parsed.values, positionals: parsed.positionals });
     const receipt = typeof result["receipt"] === "string" ? result["receipt"] : null;
-    const detailsDir = flags.dryRun ? null : join15(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
+    const detailsDir = flags.dryRun ? null : join16(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
     io.write(render(result, { pretty, detailsDir, receipt }) + "\n");
     const verdict = result["verdict"];
     return typeof verdict === "string" && flags.failOn.includes(verdict) ? 3 : 0;

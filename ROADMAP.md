@@ -104,6 +104,7 @@ Exit criteria: the `done` v2 and `claims` acceptance numbers hold on new hold-ou
 - **`judge --baseline`**, a ratchet that records existing violations once and reports only new ones (done in main: [docs/judge-baseline.md](docs/judge-baseline.md)).
 - **The community plugin marketplace**, after the A/B.
 - **Packs for runners and languages**, each parser a good first issue.
+- **`i18n` judge pack and `extract` command** (theme audit), built in main: [recipe](docs/recipes/i18n.md). Accuracy is not claimed: the synthetic suite `jev-evals/judge-i18n` is pre-registered ([docs/decisions/i18n-pack-eval.md](docs/decisions/i18n-pack-eval.md)) but its answers were not recorded (the eval command was refused by the sandbox), and the public-repo hold-out is only planned. Next: record the suite (dev first, hold-out once), a second labeller over `cases.jsonl`, then fill docs/measurements.md.
 - **Code-only Stop note**, measured and not adopted. On 193 usable study sessions the strict keyword reading caught 11 of 16 wrong dones (Jev gate 15 of 16) because 4 wrong dones hedge in the same message; the lenient reading catches 15 of 16 but flags every correct claim without a counted check (152 of 152 asked, precision 0.09). A lenient "edits without a counted pass" reminder as an opt-in mode needs its own registration and a decision on whether it is worth shipping; see [docs/decisions/stop-code-note.md](docs/decisions/stop-code-note.md).
 
 ## 1.0

@@ -1,0 +1,13 @@
+{
+  "string.translatable": {
+    "type": "noul",
+    "instructions": {
+      "question": "Is this string shown to end users in the interface, so that it should be translated?",
+      "note": "`item` is one string found in source code. `context` gives the file, the line and where the string sits: an element, an attribute, a call or an object key."
+    },
+    "criteria": {
+      "true": "The string is text a person reads in the interface: a label, button, heading, paragraph, message, placeholder, tooltip, alt text or accessible name, in words meant for people.",
+      "false": "The string is technical: an identifier, key, class name, path, URL, query, command, pattern, format, event name, code, or a log, debug or test message that people never see."
+    }
+  }
+}

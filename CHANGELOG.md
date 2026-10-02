@@ -24,6 +24,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- `i18n` pack with the `string.translatable` judge question (extends `generic`), and the `extract` command that finds candidate UI strings in JSX/TSX, Vue, HTML and UI calls, offline and free, as items for `judge --items`; `judge --items` accepts a per-item `context`. Recipe: docs/recipes/i18n.md.
 - Added: split `done` v2 success bar by evidence class (R parsed, E exit code only, U neither), registered in `docs/decisions/done-bar-split.md`; offline rescoring scripts `scripts/done-bar/` (class, cluster, split, report) with tests.
 - Added: frozen repository-level dev and hold-out split of the real-log sample (`docs/data/done-v2-real/split.json`) and a parser backlog ranked from dev only (`backlog-dev.json`).
 - `scripts/session-study/replay-note.mjs`, an offline replay of a code-only Stop note (edits, no counted passing check, keyword success claim) over recorded study sessions; result in [docs/decisions/stop-code-note.md](docs/decisions/stop-code-note.md): not adopted, no mode built.
