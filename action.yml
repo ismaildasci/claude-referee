@@ -1,0 +1,84 @@
+name: claude-referee
+description: Run claude-referee done on a test log and claims on changed docs, and upload the receipts. Skips without a TypeSafe key.
+author: İsmail Daşcı
+branding:
+  icon: check-circle
+  color: gray-dark
+
+inputs:
+  typesafe-api-key:
+    description: TypeSafe API key, from a secret. Empty (fork PRs, Dependabot) means skip with exit 0 and send nothing.
+    required: false
+    default: ""
+  log-file:
+    description: Test or lint output to check, ideally ending in an exit code line. Missing or empty skips done.
+    required: false
+    default: ""
+  criteria:
+    description: What must hold, one per line, max 10.
+    required: false
+    default: all tests pass
+  fail-on:
+    description: Verdicts of done that fail the step (comma separated).
+    required: false
+    default: missing
+  docs:
+    description: Pathspecs of the markdown files whose added lines are checked as claims, one per line.
+    required: false
+    default: "*.md"
+  claims-source:
+    description: Files the claims must be supported by, one per line. Default is the text files this pull request changed, except markdown and lockfiles.
+    required: false
+    default: ""
+  claims-fail-on:
+    description: Verdicts of claims that fail the step (comma separated).
+    required: false
+    default: unsupported
+  base-sha:
+    description: Commit to diff against for changed files. Default is the pull request base.
+    required: false
+    default: ${{ github.event.pull_request.base.sha }}
+  on-error:
+    description: What a CLI error such as a Jev outage does, warn or fail.
+    required: false
+    default: warn
+  artifact-name:
+    description: Name of the uploaded receipts artifact.
+    required: false
+    default: claude-referee-receipts
+
+outputs:
+  skipped:
+    description: "true when no TypeSafe key was available and nothing was sent"
+    value: ${{ steps.run.outputs.skipped }}
+  done-verdict:
+    description: Verdict of done, empty when it did not run
+    value: ${{ steps.run.outputs.done-verdict }}
+  claims-verdict:
+    description: Verdict of claims, empty when it did not run
+    value: ${{ steps.run.outputs.claims-verdict }}
+
+runs:
+  using: composite
+  steps:
+    - id: run
+      shell: bash
+      env:
+        TYPESAFE_API_KEY: ${{ inputs.typesafe-api-key }}
+        IN_LOG: ${{ inputs.log-file }}
+        IN_CRITERIA: ${{ inputs.criteria }}
+        IN_FAIL_ON: ${{ inputs.fail-on }}
+        IN_DOCS: ${{ inputs.docs }}
+        IN_SOURCE: ${{ inputs.claims-source }}
+        IN_CLAIMS_FAIL_ON: ${{ inputs.claims-fail-on }}
+        IN_BASE_SHA: ${{ inputs.base-sha }}
+        IN_ON_ERROR: ${{ inputs.on-error }}
+        ACTION_PATH: ${{ github.action_path }}
+        OUT_DIR: ${{ runner.temp }}/claude-referee-receipts
+      run: bash "$ACTION_PATH/action/run.sh"
+    - uses: actions/upload-artifact@v7
+      if: always()
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ runner.temp }}/claude-referee-receipts
+        if-no-files-found: ignore
