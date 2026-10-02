@@ -211,3 +211,10 @@ test("the i18n pack lints clean and extends generic", async () => {
   const th = JSON.parse(readFileSync(join(pack, "thresholds.json"), "utf8")) as Record<string, Record<string, number>>;
   assert.equal(th["string.translatable"]?.["auto"], 0.9);
 });
+
+test("extractFile skips template strings inside raw JSX tags and mime types", () => {
+  assert.deepEqual(found("a.tsx", "export const A = () => <style>{`.a { color: red }`}</style>;"), []);
+  assert.deepEqual(found("a.ts", 'const x = { title: "application/json" };'), []);
+  assert.equal(looksTechnical("text/html"), true);
+  assert.equal(looksTechnical("Yes/No"), false);
+});

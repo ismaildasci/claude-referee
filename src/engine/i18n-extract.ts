@@ -51,6 +51,7 @@ export function looksTechnical(text: string): boolean {
   if (/^#[0-9a-f]{3,8}$/i.test(t) || /^\^.*\$$/.test(t)) return true;
   if (/^(?:SELECT\b.+\bFROM\b|INSERT\s+INTO\b|UPDATE\s+\S+\s+SET\b|DELETE\s+FROM\b|CREATE\s+TABLE\b|ALTER\s+TABLE\b|DROP\s+TABLE\b)/i.test(t)) return true;
   if (/^(?:npm|npx|yarn|pnpm|git|curl|docker|kubectl|pip|brew|sudo)\s+\S/.test(t)) return true;
+  if (/^(?:application|text|image|audio|video|font|multipart|message|model)\/[a-z0-9][a-z0-9.+-]*$/i.test(t)) return true;
   if (!/\s/.test(bare)) {
     if (/[_=@#\\]/.test(bare) || /\w:\w/.test(bare) || (/\w\/\w/.test(bare) && !/^[A-Za-z]+(?:\/[A-Za-z]+)+$/.test(bare)) || /\w\.\w/.test(bare) || /[a-z][A-Z]/.test(bare) || /^[a-z0-9]+(?:-[a-z0-9]+)+$/.test(bare) || /^[A-Za-z]+\d+[A-Za-z0-9]*$/.test(bare) || /^\d+[A-Za-z]+$/.test(bare)) return true;
     if (/^[A-Z]{7,}$/.test(bare)) return true;
@@ -215,8 +216,9 @@ class Scanner {
     const at = start;
     const expr = this.exprs.at(-1);
     if (expr && expr.mode !== "none" && CHILD_PREV.has(this.prevBefore) && this.depth() === expr.depth) {
-      if (expr.mode === "child") this.emit("jsx-expr-string", value, at, () => `jsx-expr-string in ${expr.tag?.text ?? "<>"}`);
-      else if (UI_ATTRS.has(expr.attr)) this.emit("jsx-attr", value, at, () => `jsx-attr ${expr.attr} on ${expr.tag?.text ?? "<>"}`);
+      if (expr.mode === "child") {
+        if (!this.tags.some((t) => t.skipText)) this.emit("jsx-expr-string", value, at, () => `jsx-expr-string in ${expr.tag?.text ?? "<>"}`);
+      } else if (UI_ATTRS.has(expr.attr)) this.emit("jsx-attr", value, at, () => `jsx-attr ${expr.attr} on ${expr.tag?.text ?? "<>"}`);
       return;
     }
     if (key && UI_KEYS.has(key) && [",", "}", ""].includes(this.nextSig(this.i))) {
