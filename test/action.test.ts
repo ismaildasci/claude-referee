@@ -4,7 +4,7 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { tempDir } from "./helpers.ts";
 
@@ -16,7 +16,7 @@ const fs = require("node:fs");
 const [cmd, ...args] = process.argv.slice(2);
 const dir = process.env.STUB_DIR;
 const get = (flag) => args[args.indexOf(flag) + 1];
-fs.appendFileSync(dir + "/calls.log", JSON.stringify({ cmd, args, key: process.env.TYPESAFE_API_KEY ?? null, eval: process.env.EVAL_TYPESAFE_API_KEY ?? null, data: process.env.REFEREE_DATA_DIR ?? null }) + "\\n");
+fs.appendFileSync(dir + "/calls.log", JSON.stringify({ cmd, args, key: process.env.TYPESAFE_API_KEY ?? null, plugin: process.env.CLAUDE_PLUGIN_OPTION_API_KEY ?? null, eval: process.env.EVAL_TYPESAFE_API_KEY ?? null, data: process.env.REFEREE_DATA_DIR ?? null }) + "\\n");
 if (cmd === "claims") {
   fs.copyFileSync(get("--claims"), dir + "/claims.txt");
   fs.copyFileSync(get("--source"), dir + "/source.txt");
@@ -34,7 +34,7 @@ interface Run {
   readonly dir: string;
   readonly outDir: string;
   readonly outputs: string;
-  readonly calls: { cmd: string; args: string[]; key: string | null; eval: string | null; data: string | null }[];
+  readonly calls: { cmd: string; args: string[]; key: string | null; plugin: string | null; eval: string | null; data: string | null }[];
 }
 
 function runAction(env: Record<string, string>, cwd?: string): Run {
@@ -143,6 +143,54 @@ test("claims: added doc lines are checked against the changed non-markdown files
   assert.match(source, /RETRY_LIMIT = 5/);
   assert.ok(!source.includes("README") && !source.includes("lockfile"));
   assert.match(run.outputs, /claims-verdict=supported/);
+});
+
+test("claims default source keeps files that merely contain 'lock' and drops lockfiles and sensitive files", () => {
+  const repo = tempDir("referee-repo-");
+  git(repo, "init", "-q", "-b", "main");
+  mkdirSync(join(repo, "src"));
+  writeFileSync(join(repo, "README.md"), "# Title\n");
+  git(repo, "add", ".");
+  git(repo, "commit", "-q", "-m", "base");
+  const base = git(repo, "rev-parse", "HEAD");
+  writeFileSync(join(repo, "README.md"), "# Title\n\n- The block cache expires after ten seconds.\n");
+  const kept = { "src/block.ts": "BLOCK_MARK", "src/clock.ts": "CLOCK_MARK", "src/Dockerfile.lockdown": "LOCKDOWN_MARK" };
+  const dropped = { ".env": "ENV_MARK", "config/.env.production": "ENVPROD_MARK", "certs/server.pem": "PEM_MARK", "deploy.key": "KEY_MARK", "src/secrets.json": "SECRETS_MARK", "aws-credentials.txt": "CRED_MARK", "yarn.lock": "YARN_MARK", "Cargo.lock": "CARGO_MARK", "package-lock.json": "NPMLOCK_MARK", "id_rsa": "RSA_MARK" };
+  for (const [f, v] of Object.entries({ ...kept, ...dropped })) {
+    mkdirSync(dirname(join(repo, f)), { recursive: true });
+    writeFileSync(join(repo, f), v + "\n");
+  }
+  git(repo, "add", ".");
+  git(repo, "commit", "-q", "-m", "head");
+  const run = runAction({ TYPESAFE_API_KEY: SECRET, IN_BASE_SHA: base, STUB_CLAIMS_VERDICT: "supported" }, repo);
+  assert.equal(run.status, 0, run.stdout + run.stderr);
+  const source = readFileSync(join(run.dir, "source.txt"), "utf8");
+  for (const v of Object.values(kept)) assert.ok(source.includes(v), v);
+  for (const v of Object.values(dropped)) assert.ok(!source.includes(v), v);
+});
+
+test("an explicit claims-source is used as given", () => {
+  const repo = tempDir("referee-repo-");
+  git(repo, "init", "-q", "-b", "main");
+  writeFileSync(join(repo, "README.md"), "# Title\n");
+  git(repo, "add", ".");
+  git(repo, "commit", "-q", "-m", "base");
+  const base = git(repo, "rev-parse", "HEAD");
+  writeFileSync(join(repo, "README.md"), "# Title\n\n- The block cache expires after ten seconds.\n");
+  writeFileSync(join(repo, "notes.txt"), "EXPLICIT_MARK\n");
+  git(repo, "add", ".");
+  git(repo, "commit", "-q", "-m", "head");
+  const run = runAction({ TYPESAFE_API_KEY: SECRET, IN_BASE_SHA: base, IN_SOURCE: "notes.txt" }, repo);
+  assert.match(readFileSync(join(run.dir, "source.txt"), "utf8"), /EXPLICIT_MARK/);
+});
+
+test("CLAUDE_PLUGIN_OPTION_API_KEY in the runner environment does not override the input key", () => {
+  const run = runAction({ TYPESAFE_API_KEY: SECRET, IN_LOG: logFile(), CLAUDE_PLUGIN_OPTION_API_KEY: "other-key" });
+  assert.equal(run.status, 0);
+  const done = run.calls.find((c) => c.cmd === "done");
+  assert.ok(done);
+  assert.equal(done.key, SECRET);
+  assert.equal(done.plugin, null);
 });
 
 test("claims skip with a notice when no pull request base is given", () => {

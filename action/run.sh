@@ -19,7 +19,7 @@ if [[ -z "${TYPESAFE_API_KEY:-}" ]]; then
   exit 0
 fi
 out skipped false
-unset EVAL_TYPESAFE_API_KEY TYPESAFE_API_KEY_CMD REFEREE_BASE_URL_KEY TYPESAFE_BASE_URL CLAUDE_PLUGIN_DATA
+unset EVAL_TYPESAFE_API_KEY TYPESAFE_API_KEY_CMD REFEREE_BASE_URL_KEY TYPESAFE_BASE_URL CLAUDE_PLUGIN_DATA CLAUDE_PLUGIN_OPTION_API_KEY
 
 data_dir="$(mktemp -d)"
 work="$(mktemp -d)"
@@ -86,7 +86,14 @@ if [[ -n "${IN_BASE_SHA:-}" ]] && git rev-parse --git-dir > /dev/null 2>&1; then
       if [[ -n "${f// /}" ]]; then printf '%s\n' "$f"; fi
     done <<< "$in_source" > "$work/source.list"
   else
-    git diff --name-only --diff-filter=AM "$IN_BASE_SHA" HEAD -- . ':(exclude)*.md' ':(exclude)*lock*' ':(exclude)*.min.js' > "$work/source.list" 2> /dev/null
+    git diff --name-only --diff-filter=AM "$IN_BASE_SHA" HEAD -- . ':(exclude)*.md' 2> /dev/null | while IFS= read -r f; do
+      b="$(printf '%s' "${f##*/}" | tr '[:upper:]' '[:lower:]')"
+      case "$b" in
+        *.lock | *.lockb | package-lock.json | npm-shrinkwrap.json | pnpm-lock.yaml | go.sum | *.min.js | *.min.css) continue ;;
+        .env | .env.* | *.env | .npmrc | .netrc | .pypirc | .htpasswd | .git-credentials | *.pem | *.key | *.p12 | *.pfx | *.jks | *.keystore | *.tfstate | *.tfvars | id_rsa* | id_dsa* | id_ecdsa* | id_ed25519* | *secret* | *credential*) continue ;;
+      esac
+      printf '%s\n' "$f"
+    done > "$work/source.list"
   fi
   : > "$work/source.txt"
   while IFS= read -r f; do

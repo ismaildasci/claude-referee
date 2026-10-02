@@ -59,7 +59,7 @@ Outputs: `skipped`, `done-verdict`, `claims-verdict`. Exit code 3 means a verdic
 
 ## What `claims` checks
 
-The claims are the lines the PR adds to markdown files: one per line, list markers removed, headings, tables, quotes, code fences and lines under 20 characters dropped, at most 100. The source is the code the same PR changed. A sentence in a doc that the changed code doesn't support comes back `unsupported` or `unsure`. A PR that changes docs only has no source and `claims` is skipped with a notice; set `claims-source` to the files that should back the docs.
+The claims are the lines the PR adds to markdown files: one per line, list markers removed, headings, tables, quotes, code fences and lines under 20 characters dropped, at most 100. The source is the text files the same PR changed, except markdown, lockfiles (`*.lock`, `package-lock.json`, `pnpm-lock.yaml`, `go.sum` and similar), minified files and files that look sensitive (`.env*`, `.npmrc`, `*.pem`, `*.key`, `*.p12`, `*.tfstate`, `id_rsa*`, names containing `secret` or `credential`). The filter is by file name only; a secret inside an ordinary file is still sent, so keep secrets out of the PR or set `claims-source` yourself. A `claims-source` list is used exactly as given. A sentence in a doc that the changed code doesn't support comes back `unsupported` or `unsure`. A PR that changes docs only has no source and `claims` is skipped with a notice; set `claims-source` to the files that should back the docs.
 
 ## Fork pull requests
 
@@ -76,7 +76,7 @@ Do not switch to `pull_request_target` to get the secret into fork runs: that ru
 Exactly what [privacy](../privacy.md) lists for these commands, and nothing when the key is absent:
 
 - `done`: your criteria and the log. A recognised runner's output is parsed in code and only counts, exit code and failing test names are sent; other output is sent as text, its first 2,000 and last 12,000 characters.
-- `claims`: the added doc lines and the text of the changed source files.
+- `claims`: the added doc lines and the text of the changed source files (up to 60,000 characters), after the file-name filter above. Files the filter does not catch are sent in full.
 
 Requests that contain something shaped like a secret are not sent (the step warns with `credential_in_state`), and emails, IP addresses and your home directory are replaced. Do not run this on code you may not send to a US-hosted service.
 

@@ -13,3 +13,7 @@
 - Add `docs/recipes/github-action.md` to the README docs list if one exists.
 - The action runs the committed `plugins/claude-referee/dist/cli.mjs`; rebuild dist as usual.
 - No dogfooding workflow was added on purpose (see the recipe, "Fork pull requests").
+
+## Fixes (action review)
+
+- CHANGELOG (Fixed): the action's default claims source no longer drops files whose path merely contains "lock" (src/block.ts); it excludes real lockfiles, minified files and files with sensitive names (.env*, keys, credentials) by file name, and ignores CLAUDE_PLUGIN_OPTION_API_KEY from the runner environment so the key input is the only key used.

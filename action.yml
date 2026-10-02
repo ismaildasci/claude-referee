@@ -27,7 +27,7 @@ inputs:
     required: false
     default: "*.md"
   claims-source:
-    description: Files the claims must be supported by, one per line. Default is the text files this pull request changed, except markdown and lockfiles.
+    description: Files the claims must be supported by, one per line. Default is the text files this pull request changed, except markdown, lockfiles, minified files and files with sensitive names (.env, keys, credentials).
     required: false
     default: ""
   claims-fail-on:
