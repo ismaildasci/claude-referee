@@ -7,7 +7,7 @@ Reproduce: `node scripts/done-bar/rescore.mjs && node scripts/done-bar/split.mjs
 ## What was scored
 
 - **Classes** by the repository's own `parseEvidence(doneEvidence(text)).trust`: **R** parsed by a recognised runner, **E** only an exit code line, **U** neither (`met` is impossible by design).
-- **Hold-outs 2 to 6** (`done-v2-h2` to `done-v2-h6`): the cases that remain in those suites (cases that moved to `done-v2` as dev after parsers were written are not in them; `done-v2` itself is dev plus the first hold-out and is not scored here). 209 cases. The parser regression group `done-v2-h6p` (8 cases) is reported apart, never in the pooled counts.
+- **Hold-outs 2 to 6** (`done-v2-h2` to `done-v2-h6`): the cases that remain in those suites (**28 cases were removed from these hold-outs after results were seen and parsers or caps were written: h2 5 (45 to 40), h3 10 (46 to 36), h4 1 (46 to 45), h5 12 (47 to 35), h6 0**; they moved to `done-v2` as dev, so the rates below are conditional on the cases that survived, direction not measured; `done-v2` itself is dev plus the first hold-out and is not scored here). 209 cases. The parser regression group `done-v2-h6p` (8 cases) is reported apart, never in the pooled counts.
 - **Recorded answers** replayed through current code (`doneRequest`), used only when the question and state hashes match, as `eval score` requires: **0 stale, 0 missing** in all six suites. Code-decided cases (non-zero exit, Jev never asked) are counted apart and in no denominator.
 - **Clusters:** the same step with and without the exit code line is one case. Cases merged by clustering: **0** (no such pair exists in these sets); in the real-log sample all 229 `(repo, job, step)` keys are distinct.
 - **Labels** are from model processes (hold-outs: a writer agent and a second labelling agent, hold-out 5 one author-labeller; real logs: two `claude -p` processes, kappa 0.966 on a 30% re-label). No human labelled anything. Labels were not changed after answers were seen.
@@ -33,14 +33,14 @@ Hold-out 2 was written for tools the first parsers cover (its record lists pytes
 | R | 47 | 30 | 17 | 0 of 17 (16.2%) | 15 of 17 (88.2%; 63.6% to 98.5%) | 23 of 30 (76.7%; 57.7% to 90.1%) |
 | E | 71 | 49 | 22 | 0 of 22 (12.7%) | 13 of 22 (59.1%; 36.4% to 79.3%) | 26 of 49 (53.1%; 38.3% to 67.5%) |
 | U | 19 | 1 | 18 | 0 of 18 (15.3%) | 15 of 18 (83.3%; 58.6% to 96.4%) | 0 of 1 |
-| all | 137 | 80 | 57 | 0 of 57 (5.1%) | 43 of 57 (75.4%; 62.2% to 85.9%) | 49 of 80 (61.3%; 49.7% to 71.9%) |
+| all | 137 | 80 | 57 | 0 of 57 (5.1%; R and E only: 0 of 39, 7.4%) | 43 of 57 (75.4%; 62.2% to 85.9%) | 49 of 80 (61.3%; 49.7% to 71.9%) |
 
 Against the registered bar, descriptively:
 
 1. **Wrong `met` is 0 in every class, after code caps.** **Before the caps the judge's answers gave 9 wrong `met` among the 57 expected-`missing` clusters** (R 1, E 6, U 2; table below). Whether that 0 says anything depends on when each cap was written (decision records checked case by case):
    - *In-sample, the cap was written after the case was seen:* `h4-d-03` (the narrow lint-warning cap came from it, [exit-code-only-met.md](decisions/exit-code-only-met.md)), `h6-c-07` and `h6-e-08` (the wide cap, [exit-code-only-lint-wide.md](decisions/exit-code-only-lint-wide.md)), `h3-e-04` (the skipped-tests cap was decided after hold-out 3 showed it, [done-v2-holdout3.md](decisions/done-v2-holdout3.md)). 4 cases.
    - *The cap predates the case:* `h5-c-03`, `h6-c-06`, `h6-c-10` are caught by the narrow warning cap, which was in place before hold-outs 5 and 6 (their records say so; hold-out 5 had 0 wrong `met`, hold-out 6's two wrong `met` were `h6-c-07` and `h6-e-08`). `h3-c-03` and `h6-e-03` are U cases stopped by the unparsed rule, which is by design and was never fitted. 5 cases. The three narrow-cap cases are the only out-of-sample evidence for a fitted cap here: 3 of 3 further raw wrong `met` caught.
-   Upper bounds are wide as always: 12.7% for 0 of 22 in E.
+   Upper bounds are wide as always: 12.7% for 0 of 22 in E. **The pooled 0 of 57 (5.1%) counts the 18 U clusters, where `met` is impossible by design** (the two U raw wrong `met`, `h3-c-03` and `h6-e-03`, were stopped only by the unparsed rule); the registration excludes code-decided cases from every denominator for the same reason, so the consistent headline is **R and E only: 0 of 39, one-sided 95% upper bound 7.4%** (`wrongMetExcludingU` in `scripts/done-bar/lib.mjs`). The 0 of 57 row is kept for comparison only.
 2. **`missing` recall 0.754, below 0.9: the pooled bar fails.** All 14 misses are `unsure`, none `met`. By class: R 0.88, U 0.83, E 0.59. With the 72 code-decided cases added as the registration also asks (69 expected `missing` and found by code; 3 labelled `met` with a non-zero exit code, `h2-e-07`, `h3-f-07`, `h4-f-08`, which the convention "a non-zero exit code is always `missing`" contradicts and which stay as labelled): 112 of 126 (0.889). That figure is inflated by construction, since code decides those cases, and still below 0.9.
 3. **R `met` recall 23 of 30 (0.767): evaluable only because n is exactly the minimum of 30, and below 0.9.** Seven misses: three are `unsure` from the skipped-tests cap on runs that print skipped tests but were labelled `met` under the older labelling of hold-outs 2 and 3 (`h2-b-01` 1 skipped, `h2-e-04` 2 skipped, `h3-a-02` unittest `OK (skipped=2)`); the convention since hold-out 4 says skipped tests make "all tests pass" not shown, which is what the code does. Labels were left as they were; reading those three as `missing` would give 23 of 27 (0.85), still below 0.9. The other four: `h2-f-04` and `h2-f-05` (`unsure`, 0.63 and 0.56), `h3-a-07` (`unsure`, 0.64) and `h3-b-01` (`lint is clean`, `missing`, 0.25).
 4. **E `met` recall 0.53, no bar.** By criterion, expected-`met` E cases: "all tests pass" 0 of 18 (11 `missing`, 7 `unsure`; the exit code does not show tests ran), build 14 of 15, lint 8 of 12 (4 `unsure` from the lint caps), typecheck 4 of 4. This is the trade the lint caps make on purpose.
@@ -102,7 +102,7 @@ By repository, seed `done-bar-split-v1`, even positions dev and odd positions ho
 | dev | 48 | 124 | 102 | 16 |
 | hold-out | 46 | 105 | 97 | 28 |
 
-Hold-out SHA-256 of the sorted case-id list: `9d1e9e4e7c6baa71188a41ef4103b79d414c38757c67f806f243d4eecaccbbf9`.
+Hold-out SHA-256 of the case-id list (ids sorted with the default string sort, joined with a single newline, no trailing newline, UTF-8): `9d1e9e4e7c6baa71188a41ef4103b79d414c38757c67f806f243d4eecaccbbf9`.
 
 **Correction to the registration.** It estimated "about 22" parsed expected-`met` cases in the hold-out; the actual figure is **28**. It is still below 30, so the conclusion stands: **bar 3 (R `met` recall) is not evaluable on this hold-out** (n = 28). The estimate was written before the split was computed and was wrong; the number above is the one to read.
 

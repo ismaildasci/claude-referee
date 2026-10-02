@@ -85,7 +85,15 @@ export function splitRepos(repos, seed = SEED) {
   return out;
 }
 
+// Format: ids sorted with the default string sort, joined with "\n", no trailing newline, UTF-8, SHA-256 hex.
 export const holdoutHash = (ids) => sha([...ids].sort().join("\n"));
+
+// Pooled wrong-met bound over R and E only: U cannot give met by design, so its expected-missing clusters test nothing.
+export function wrongMetExcludingU(score) {
+  const k = score.R.wrong_met.k + score.E.wrong_met.k;
+  const n = score.R.wrong_met.n + score.E.wrong_met.n;
+  return { k, n, upper95_one_sided: upperOneSided(k, n) };
+}
 
 export function backlogOf(rows) {
   const by = {};

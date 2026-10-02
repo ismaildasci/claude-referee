@@ -3,10 +3,11 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { createHash } from "node:crypto";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { R_RECALL_MIN_N, SEED, backlogOf, classOfTrust, clusterKey, holdoutHash, scoreByClass, scoreClass, splitRepos, verdictOfBar, type BarRow } from "../scripts/done-bar/lib.mjs";
+import { R_RECALL_MIN_N, SEED, backlogOf, classOfTrust, clusterKey, holdoutHash, scoreByClass, scoreClass, splitRepos, verdictOfBar, wrongMetExcludingU, type BarRow } from "../scripts/done-bar/lib.mjs";
 import { evidenceClass, replaySuite } from "../scripts/done-bar/replay.mjs";
 
 const PYTEST = "$ pytest -q\n....\n4 passed in 0.31s\nexit code: 0";
@@ -135,4 +136,27 @@ test("replay: recorded suites match current hashes, a changed text is stale, a m
   writeFileSync(join(dir, "s", "recorded.jsonl"), readFileSync(join(src, "recorded.jsonl"), "utf8"));
   const byId = Object.fromEntries(replaySuite(dir, "s").map((r) => [r.id, r.status]));
   assert.deepEqual(byId, { "h6p-01": "stale", "h6p-02": "ok", "x-fail": "code", "x-new": "missing" });
+});
+
+test("holdout hash format is pinned: sorted ids joined by newline, no trailing newline", () => {
+  const ids = ["b", "a", "c"];
+  assert.equal(holdoutHash(ids), createHash("sha256").update("a\nb\nc").digest("hex"));
+  assert.notEqual(holdoutHash(ids), createHash("sha256").update("a\nb\nc\n").digest("hex"));
+});
+
+test("pooled wrong-met excluding U drops the U clusters from the denominator", () => {
+  const mk = (cls: "R" | "E" | "U", n: number, id: string): BarRow[] => Array.from({ length: n }, (_, i) => ({ cls, expected: "missing", code_decided: false, status: "ok", verdict: "missing", cluster: `${id}${i}` }));
+  const score = scoreByClass([...mk("R", 17, "r"), ...mk("E", 22, "e"), ...mk("U", 18, "u")]);
+  assert.equal(score.all.wrong_met.n, 57);
+  const re = wrongMetExcludingU(score);
+  assert.equal(re.n, 39);
+  assert.equal(re.k, 0);
+  assert.ok(Math.abs((re.upper95_one_sided as number) - (1 - 0.05 ** (1 / 39))) < 1e-6);
+});
+
+test("measurements doc states removal counts and the hash format", () => {
+  const doc = readFileSync(new URL("../docs/measurements-done-bar-split.md", import.meta.url), "utf8");
+  assert.match(doc, /0 of 39/);
+  assert.match(doc, /28 cases were removed/);
+  assert.match(doc, /no trailing newline/);
 });

@@ -9,7 +9,7 @@ Not applied to CHANGELOG.md, ROADMAP.md or docs/measurements.md; the integrator 
 
 ## ROADMAP row (`done` v2 on real CI logs, replace or add)
 
-`done` v2 split bar | registered, rescored post hoc, not a pass | wrong `met` 0 of 57 in every class after caps (9 raw before caps), pooled `missing` recall 0.754 (0.889 with code-decided cases added, inflated by construction; bar 0.9), R `met` recall 23 of 30 (bar 0.9, evaluable at exactly the minimum n), E `met` recall 0.53 (no bar), U 19 of 137 sent clusters; real-log hold-out has 28 parsed expected-`met` (< 30, bar not evaluable) and no judge answers yet ([measurements](docs/measurements-done-bar-split.md)). Next: record real-log answers, then a fresh sample split before any parser is written.
+`done` v2 split bar | registered, rescored post hoc, not a pass | wrong `met` 0 of 39 for R and E (7.4% upper bound; U excluded as met is impossible there; 0 of 57 with U) after caps, 28 cases removed from hold-outs 2 to 5 after results (9 raw before caps), pooled `missing` recall 0.754 (0.889 with code-decided cases added, inflated by construction; bar 0.9), R `met` recall 23 of 30 (bar 0.9, evaluable at exactly the minimum n), E `met` recall 0.53 (no bar), U 19 of 137 sent clusters; real-log hold-out has 28 parsed expected-`met` (< 30, bar not evaluable) and no judge answers yet ([measurements](docs/measurements-done-bar-split.md)). Next: record real-log answers, then a fresh sample split before any parser is written.
 
 ## docs/measurements.md
 

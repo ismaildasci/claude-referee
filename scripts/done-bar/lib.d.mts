@@ -36,3 +36,4 @@ export function verdictOfBar(score: ByClass): {
 export function splitRepos(repos: readonly { repo: string; language: string }[], seed?: string): Map<string, "dev" | "holdout">;
 export function holdoutHash(ids: readonly string[]): string;
 export function backlogOf(rows: readonly { tool: string; purpose: string; repo: string; expected: string; parsed: boolean }[]): { tool: string; purpose: string; cases: number; expected_met: number; repos: number }[];
+export function wrongMetExcludingU(score: ByClass): { k: number; n: number; upper95_one_sided: number | null };
