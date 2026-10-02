@@ -136,3 +136,54 @@ export function sweep(items: readonly { expected: string; p: number }[], positiv
   const safe = rows.find((r) => r.wrong_positive === 0);
   return safe ? { rows, suggested: safe.t } : { rows, suggested: null, reason: "No threshold in the range avoids a wrong positive." };
 }
+
+export const DECIDE_VERDICTS = ["clear", "weak", "tie"] as const;
+
+export interface DecideScored {
+  readonly id: string;
+  readonly split: string;
+  readonly expected: string;
+  readonly lean: string;
+  readonly verdict: string;
+  readonly order_disagrees: boolean;
+}
+
+export interface DecideMetrics {
+  readonly cases: number;
+  readonly agree: number;
+  readonly agreement: number | null;
+  readonly verdicts: Record<string, number>;
+  readonly order_disagrees: number;
+  readonly by_verdict: Record<string, { cases: number; agree: number }>;
+}
+
+export function decideMetrics(items: readonly DecideScored[]): DecideMetrics {
+  const verdicts: Record<string, number> = Object.fromEntries(DECIDE_VERDICTS.map((v) => [v, 0]));
+  const byVerdict: Record<string, { cases: number; agree: number }> = Object.fromEntries(DECIDE_VERDICTS.map((v) => [v, { cases: 0, agree: 0 }]));
+  let agree = 0;
+  for (const item of items) {
+    const hit = item.lean === item.expected;
+    if (hit) agree += 1;
+    verdicts[item.verdict] = (verdicts[item.verdict] ?? 0) + 1;
+    const group = (byVerdict[item.verdict] ??= { cases: 0, agree: 0 });
+    group.cases += 1;
+    if (hit) group.agree += 1;
+  }
+  return { cases: items.length, agree, agreement: ratio(agree, items.length), verdicts, order_disagrees: items.filter((i) => i.order_disagrees).length, by_verdict: byVerdict };
+}
+
+export interface DecideShift {
+  readonly leader_changed: number;
+  readonly agree_delta: number;
+  readonly verdict_changed: number;
+}
+
+export function decideShift(base: readonly DecideScored[], other: readonly DecideScored[]): DecideShift {
+  const byId = new Map(base.map((b) => [b.id, b]));
+  const pairs = other.flatMap((o) => (byId.has(o.id) ? [[byId.get(o.id) as DecideScored, o] as const] : []));
+  return {
+    leader_changed: pairs.filter(([x, y]) => x.lean !== y.lean).length,
+    agree_delta: decideMetrics(other).agree - decideMetrics(base).agree,
+    verdict_changed: pairs.filter(([x, y]) => x.verdict !== y.verdict).length,
+  };
+}
