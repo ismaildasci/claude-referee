@@ -54,7 +54,7 @@ test("pack names are validated and missing packs are reported", () => {
 test("pack lookup prefers the setting, then the environment, then bundled packs", () => {
   const dirs = packDirs({ CLAUDE_PLUGIN_OPTION_PACKS_DIR: "/s", REFEREE_PACKS_DIR: "/e" });
   assert.deepEqual(dirs.slice(0, 2), [{ dir: "/s", source: "setting" }, { dir: "/e", source: "env" }]);
-  assert.deepEqual(listPacks(bundled).map((p) => p.name), ["generic"]);
+  assert.deepEqual(listPacks(bundled).map((p) => p.name), ["generic", "i18n"]);
 });
 
 test("project thresholds can only get stricter", () => {
