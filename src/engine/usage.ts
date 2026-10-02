@@ -1,4 +1,4 @@
-// Claude-side usage: evidence-referee (and its former name claude-referee) CLI calls counted from Claude Code's session transcripts, subagents included.
+// Claude-side usage: claude-referee (and the short-lived name evidence-referee) CLI calls counted from Claude Code's session transcripts, subagents included.
 // A call counts only in command position, each tool call once; nothing from the transcripts is echoed back.
 
 import { existsSync, readdirSync, readFileSync } from "node:fs";
@@ -70,7 +70,7 @@ function tokenize(command: string): string[] {
   return tokens;
 }
 
-// Transcripts written before the rename still contain the old name.
+// Calls made while main was briefly named evidence-referee still count.
 const NAMES: readonly string[] = ["evidence-referee", "claude-referee"];
 
 function subcommand(token: string | undefined): string {

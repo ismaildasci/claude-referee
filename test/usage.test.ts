@@ -11,7 +11,7 @@ import { memoryIo, tempDir } from "./helpers.ts";
 
 const CLI = "/Users/someone/.claude/plugins/cache/claude-referee/claude-referee/0.1.1/dist/cli.mjs";
 
-test("cliCallsIn counts the new name and the former one", () => {
+test("cliCallsIn counts claude-referee and the short-lived evidence-referee", () => {
   const cli = "/Users/someone/.claude/plugins/cache/evidence-referee/evidence-referee/0.1.7/dist/cli.mjs";
   assert.deepEqual(cliCallsIn("npx evidence-referee receipts --tokens"), ["receipts"]);
   assert.deepEqual(cliCallsIn("evidence-referee done --criteria x; claude-referee judge --question q"), ["done", "judge"]);
