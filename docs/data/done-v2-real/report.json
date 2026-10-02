@@ -1,0 +1,100 @@
+{
+ "fetch": {
+  "after_main_pass": {
+   "repos": 97,
+   "cases": 234,
+   "failed_cases": 22,
+   "dropped": {
+    "segment_mismatch": 1440,
+    "log_expired": 144,
+    "multi_purpose": 22
+   }
+  },
+  "after_topup": {
+   "repos_without_cases": 395,
+   "accepted": {
+    "JavaScript": 8,
+    "TypeScript": 8,
+    "Python": 8,
+    "Go": 8,
+    "Rust": 8,
+    "Java": 8,
+    "Ruby": 8,
+    "PHP": 8,
+    "C#": 8,
+    "C++": 8,
+    "C": 8,
+    "Swift": 8,
+    "Kotlin": 2
+   },
+   "dropped": {
+    "segment_mismatch": 2429,
+    "log_expired": 161,
+    "multi_purpose": 26
+   },
+   "repos": 103,
+   "cases": 263,
+   "failed_cases": 30
+  }
+ },
+ "prepare": {
+  "raw": 263,
+  "redaction_stopped": 0,
+  "stopped_kinds": {},
+  "kept": 263,
+  "code_check_violations": []
+ },
+ "labelling": {
+  "screened": 263,
+  "failed_steps": 30,
+  "succeeded_steps": 233,
+  "unlabelled": [],
+  "ambiguous": [
+   {
+    "id": "rl-e07bb3a6",
+    "l1": "ambiguous",
+    "l2": null
+   },
+   {
+    "id": "rl-d9b43643",
+    "l1": "ambiguous",
+    "l2": null
+   },
+   {
+    "id": "rl-3ed5f6f7",
+    "l1": "ambiguous",
+    "l2": null
+   },
+   {
+    "id": "rl-b2f6f892",
+    "l1": "ambiguous",
+    "l2": "missing"
+   },
+   {
+    "id": "rl-5fcd27a3",
+    "l1": "ambiguous",
+    "l2": null
+   },
+   {
+    "id": "rl-82c103d2",
+    "l1": "ambiguous",
+    "l2": null
+   },
+   {
+    "id": "rl-4a996cc8",
+    "l1": "ambiguous",
+    "l2": null
+   }
+  ],
+  "disagreed": [],
+  "kept": 256,
+  "expected": {
+   "met": 149,
+   "missing": 107
+  },
+  "label2_n": 70,
+  "agreement": 0.9857142857142858,
+  "kappa": 0.9663299663299665,
+  "pairs": 70
+ }
+}

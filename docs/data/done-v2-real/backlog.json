@@ -1,0 +1,310 @@
+[
+ {
+  "tool": "cmake build",
+  "purpose": "build",
+  "cases": 24,
+  "expected_met": 10,
+  "repos": 14
+ },
+ {
+  "tool": "docker build",
+  "purpose": "build",
+  "cases": 7,
+  "expected_met": 7,
+  "repos": 6
+ },
+ {
+  "tool": "go build",
+  "purpose": "build",
+  "cases": 7,
+  "expected_met": 7,
+  "repos": 3
+ },
+ {
+  "tool": "dotnet build",
+  "purpose": "build",
+  "cases": 6,
+  "expected_met": 6,
+  "repos": 5
+ },
+ {
+  "tool": "npm build -> build",
+  "purpose": "build",
+  "cases": 7,
+  "expected_met": 5,
+  "repos": 6
+ },
+ {
+  "tool": "swift test",
+  "purpose": "test",
+  "cases": 7,
+  "expected_met": 5,
+  "repos": 5
+ },
+ {
+  "tool": "make",
+  "purpose": "build",
+  "cases": 5,
+  "expected_met": 5,
+  "repos": 5
+ },
+ {
+  "tool": "phpcs",
+  "purpose": "lint",
+  "cases": 8,
+  "expected_met": 4,
+  "repos": 5
+ },
+ {
+  "tool": "swift build",
+  "purpose": "build",
+  "cases": 6,
+  "expected_met": 4,
+  "repos": 3
+ },
+ {
+  "tool": "npm lint -> lint",
+  "purpose": "lint",
+  "cases": 5,
+  "expected_met": 4,
+  "repos": 5
+ },
+ {
+  "tool": "npm build",
+  "purpose": "build",
+  "cases": 4,
+  "expected_met": 4,
+  "repos": 2
+ },
+ {
+  "tool": "make test",
+  "purpose": "test",
+  "cases": 8,
+  "expected_met": 3,
+  "repos": 7
+ },
+ {
+  "tool": "rubocop",
+  "purpose": "lint",
+  "cases": 5,
+  "expected_met": 3,
+  "repos": 5
+ },
+ {
+  "tool": "pre-commit",
+  "purpose": "lint",
+  "cases": 5,
+  "expected_met": 3,
+  "repos": 3
+ },
+ {
+  "tool": "dotnet test",
+  "purpose": "test",
+  "cases": 3,
+  "expected_met": 3,
+  "repos": 1
+ },
+ {
+  "tool": "ctest",
+  "purpose": "test",
+  "cases": 4,
+  "expected_met": 2,
+  "repos": 4
+ },
+ {
+  "tool": "maven build",
+  "purpose": "build",
+  "cases": 3,
+  "expected_met": 2,
+  "repos": 2
+ },
+ {
+  "tool": "make lint",
+  "purpose": "lint",
+  "cases": 2,
+  "expected_met": 2,
+  "repos": 1
+ },
+ {
+  "tool": "ruff",
+  "purpose": "lint",
+  "cases": 6,
+  "expected_met": 1,
+  "repos": 3
+ },
+ {
+  "tool": "flake8",
+  "purpose": "lint",
+  "cases": 3,
+  "expected_met": 1,
+  "repos": 3
+ },
+ {
+  "tool": "npm test",
+  "purpose": "test",
+  "cases": 3,
+  "expected_met": 1,
+  "repos": 2
+ },
+ {
+  "tool": "black",
+  "purpose": "lint",
+  "cases": 2,
+  "expected_met": 1,
+  "repos": 2
+ },
+ {
+  "tool": "xcodebuild",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "clang-tidy",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "isort",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "maven test",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "prettier",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "cargo build",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "eslint",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "hadolint",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "npm build -> /home/runner/_work/firecrawl/firecrawl/apps/js-sdk/firecrawl",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "vite build",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "npm build -> /home/runner/work/ui/ui",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "npm build -> /home/runner/work/next.js/next.js",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "shellcheck",
+  "purpose": "lint",
+  "cases": 6,
+  "expected_met": 0,
+  "repos": 5
+ },
+ {
+  "tool": "phpunit",
+  "purpose": "test",
+  "cases": 5,
+  "expected_met": 0,
+  "repos": 3
+ },
+ {
+  "tool": "checkstyle",
+  "purpose": "lint",
+  "cases": 3,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "pytest",
+  "purpose": "test",
+  "cases": 2,
+  "expected_met": 0,
+  "repos": 2
+ },
+ {
+  "tool": "vitest",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "node --test",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "make test -> It is",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "rspec",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "npm test -> test-treeshake",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "npm test -> test-e2e",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ }
+]
