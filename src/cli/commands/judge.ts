@@ -15,6 +15,7 @@ import { JEV_COST, JEV_EFFECTS, JEV_ERRORS, clip, jevCommand, openPack, question
 interface Item {
   readonly id: string;
   readonly text: string;
+  readonly context?: string;
 }
 
 const MAX_ITEMS = 500;
@@ -24,9 +25,9 @@ export function parseItems(text: string): Item[] {
   const trimmed = text.trim();
   const toItem = (value: unknown, i: number): Item | null => {
     if (typeof value === "string") return value.trim() ? { id: String(i + 1), text: value } : null;
-    const { id, text: body } = (value ?? {}) as { id?: unknown; text?: unknown };
+    const { id, text: body, context } = (value ?? {}) as { id?: unknown; text?: unknown; context?: unknown };
     if (typeof body !== "string" || !body.trim()) return null;
-    return { id: typeof id === "string" || typeof id === "number" ? String(id) : String(i + 1), text: body };
+    return { id: typeof id === "string" || typeof id === "number" ? String(id) : String(i + 1), text: body, ...(typeof context === "string" && context.trim() ? { context } : {}) };
   };
   if (trimmed.startsWith("[")) {
     try {
@@ -69,8 +70,8 @@ export const judge: Command = {
     summary: "Run a pack's yes/no questions over many items: lines, strings, failures.",
     inputs: {
       "--question <id[,id]>": "Pack question ids, e.g. line.risky or failure.env.",
-      "--items <file|->": "A JSON array of strings or {id, text}, JSON lines, or plain lines (id = line number). Max 500 items.",
-      "--context <text>": "Optional shared context for every item, e.g. the file name.",
+      "--items <file|->": "A JSON array of strings or {id, text, context?}, JSON lines, or plain lines (id = line number). Max 500 items. An item's own context replaces --context for that item; the extract command writes items in this form.",
+      "--context <text>": "Optional context for every item that has none of its own, e.g. the file name.",
       "--baseline <file>": "Compare with a recorded baseline: only findings not in it count. The file holds hashes of question id plus whitespace-normalised item text with a count, no text, ids or paths, so it is safe to commit (e.g. .claude/referee-baseline.json). A moved line stays known, an edited line is new, the Nth+1 copy of a line recorded N times is new.",
       "--baseline-write": "With --baseline: record the current yes answers into the file instead of comparing. Entries for the questions asked are replaced; entries for other questions in the file are kept (unless the file was recorded with another pack, which is replaced whole). Verdict is recorded; review and unanswered items are not recorded.",
     },
@@ -98,7 +99,7 @@ export const judge: Command = {
   options: { question: { type: "string" }, items: { type: "string" }, context: { type: "string" }, baseline: { type: "string" }, "baseline-write": { type: "boolean" } },
   async run(context) {
     const ids = (str(context, "question") ?? "").split(",").map((s) => s.trim()).filter(Boolean);
-    if (ids.length === 0) throw new RefereeError("bad_input", "Give --question with one or more pack question ids.", { next_step: "The generic pack has line.risky and failure.env." });
+    if (ids.length === 0) throw new RefereeError("bad_input", "Give --question with one or more pack question ids.", { next_step: "The generic pack has line.risky and failure.env; the i18n pack has string.translatable." });
     const baselineFile = str(context, "baseline");
     const writing = context.values["baseline-write"] === true;
     if (writing && !baselineFile) throw new RefereeError("bad_input", "--baseline-write needs --baseline <file>.");
@@ -118,7 +119,7 @@ export const judge: Command = {
       questions[id] = q;
     }
     const shared = str(context, "context");
-    const planned: Planned[] = items.map((item) => ({ id: item.id, state: { item: clip(item.text, 4_000, 4_000), ...(shared ? { context: shared } : {}) }, questions }));
+    const planned: Planned[] = items.map((item) => ({ id: item.id, state: { item: clip(item.text, 4_000, 4_000), ...(item.context ? { context: clip(item.context, 300, 300) } : shared ? { context: shared } : {}) }, questions }));
     if (previous && !writing && previous.pack !== pack.name) {
       throw new RefereeError("bad_input", `The baseline was recorded with pack ${previous.pack}, this run uses ${pack.name}.`, { next_step: "Use the same pack, or record the baseline again with --baseline-write." });
     }
