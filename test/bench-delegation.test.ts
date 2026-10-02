@@ -8,7 +8,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { ALONE_SUFFIX, CHUNK_SIZE, DELEGATION_ARMS, TASK_TEXT, chunkFiles, delegateSuffix } from "../bench/arms.mjs";
 import { isTracked, sha256, armItemsJsonl, itemsHash } from "../bench/delegation-items.mjs";
-import { K_MAX, analyzeDelegation, jevCost, judgeStats, loadDelegationCases, planDelegation, planDry, prepareDelegation, readDelegationGrounds, runDelegationSession, scoreFindings, sizeDelegationPilot, toolStats, transcriptTools, type Ground, type Item } from "../bench/delegation-session.mjs";
+import { K_MAX, analyzeDelegation, detectLeak, jevCost, judgeStats, loadDelegationCases, planDelegation, planDry, prepareDelegation, readDelegationGrounds, runDelegationSession, scoreFindings, sizeDelegationPilot, toolStats, transcriptTools, type Ground, type Item } from "../bench/delegation-session.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, "..");
@@ -163,7 +163,7 @@ test("a session against a stub claude: arm reaches the command line, findings ar
   const itemsByCase = { "d-x": items };
   prepareDelegation({ out: s.out, repoRoot, cases: fake as never, itemsByCase });
   assert.ok(existsSync(join(s.out, "plugin/packs/bench-todo/questions/judge.json")));
-  assert.deepEqual(JSON.parse(readFileSync(join(s.out, "labels/d-x.json"), "utf8")).tracked, ["n001", "n002", "n003"]);
+  assert.ok(!existsSync(join(s.out, "labels")), "no label file is written");
   const plans = planDry("d-x");
   const a = await runDelegationSession({ out: s.out, plan: plans[0]!, cases: fake as never, itemsByCase, opts: s.opts });
   const d = await runDelegationSession({ out: s.out, plan: plans[1]!, cases: fake as never, itemsByCase, opts: s.opts });
@@ -238,4 +238,32 @@ test("pilot rule: stop on failures, worse accuracy or no saving; otherwise K fro
   assert.equal(u.decision, "run_underpowered");
   assert.equal(u.cases, K_MAX);
   assert.equal(sha256("x").length, 64);
+});
+
+const tu = (name: string, input: Record<string, unknown>) => JSON.stringify({ type: "assistant", message: { content: [{ type: "tool_use", id: `t${Math.random()}`, name, input }] } });
+
+test("leak detection: relative and absolute reads outside the work tree are leaked, the work tree and plugin copy are not", () => {
+  const out = "/o/run";
+  const ctx = { out, work: `${out}/work/s1`, plugin: `${out}/plugin` };
+  assert.equal(detectLeak(tu("Read", { file_path: `${out}/work/s1/items.jsonl` }), ctx), false);
+  assert.equal(detectLeak(tu("Read", { file_path: "items.jsonl" }), ctx), false);
+  assert.equal(detectLeak(tu("Read", { file_path: `${out}/plugin/packs/bench-todo/questions/judge.json` }), ctx), false);
+  assert.equal(detectLeak(tu("Bash", { command: "ls /usr/bin | head" }), ctx), false);
+  assert.equal(detectLeak(tu("Read", { file_path: "../../labels/d-pytest.json" }), ctx), true);
+  assert.equal(detectLeak(tu("Bash", { command: "cat ../s2/findings.json" }), ctx), true);
+  assert.equal(detectLeak(tu("Read", { file_path: `${out}/work/s2/findings.json` }), ctx), true);
+  assert.equal(detectLeak(tu("Bash", { command: "cat ground.json" }), ctx), true);
+});
+
+test("a leaked session removes its whole (case, rep) block from the analysis and the pilot rule, so the arms stay paired", () => {
+  const g = [row("a", "alone", 5, 0, 5, 1), row("a", "delegate", 5, 0, 5, 0.5, 0, { leaked: true }), row("b", "alone", 5, 0, 5, 1), row("b", "delegate", 5, 0, 5, 2)];
+  const r = analyzeDelegation(g);
+  assert.equal(r.leaked, 1);
+  assert.equal(r.excluded_sessions, 2);
+  assert.equal(r.cost.alone.sessions, 1);
+  assert.equal(r.cost.delegate.sessions, 1);
+  assert.equal(r.ratios.combined_usd.ratio, 2);
+  const withRep = g.map((x, i) => ({ ...x, rep: 1 + (i > 1 ? 1 : 0) }));
+  assert.equal(analyzeDelegation(withRep).cost.alone.sessions, 1);
+  assert.equal(sizeDelegationPilot(withRep).cost_ratio, 2);
 });

@@ -28,3 +28,5 @@ export function runAllDelegation(input: { out: string; plans: DPlan[]; cases: DC
 export function readDelegationGrounds(out: string): Ground[];
 export function analyzeDelegation(grounds: Ground[]): Record<string, any>;
 export function sizeDelegationPilot(grounds: Ground[]): Record<string, any>;
+export function detectLeak(transcript: string, ctx: { out: string; work: string; plugin: string }): boolean;
+export function dropLeakedBlocks(grounds: Ground[]): Ground[];

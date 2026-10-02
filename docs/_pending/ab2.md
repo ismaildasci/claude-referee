@@ -5,3 +5,6 @@ CHANGELOG (Unreleased, bench):
 
 ROADMAP:
 - v0.4 A/B: replace "four-arm gate A/B" with the registered delegation pilot (`bench/PREREG.md`). Next step: run `node bench/delegation-run.mjs run --stage pilot` (cap 4 USD), then `size`; the main run only if the registered rule says run.
+
+CHANGELOG (Unreleased, bench):
+- bench: delegation leak rule now excludes both arms of a (case, rep) block and flags outside-path reads (PREREG D8, amendment 3); no label file is written.

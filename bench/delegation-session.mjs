@@ -1,8 +1,8 @@
 // Delegation A/B (bench/PREREG.md D2 to D10): plans, one session (work tree, `claude -p`, transcript, Jev receipts, scoring), the analysis and the pilot rule.
-// Resumable: a session with ground.json is never rerun and its spend is in ledger.jsonl before anything else can fail. Labels live under out/labels, never in a work tree.
+// Resumable: a session with ground.json is never rerun and its spend is in ledger.jsonl before anything else can fail. Labels are rebuilt from the items in memory and never written to disk.
 
 import { appendFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve, sep } from "node:path";
 import { DELEGATION_ARMS } from "./arms.mjs";
 import { accountTranscript, reconcile, sessionCost } from "./cost.mjs";
 import { armItemsJsonl, extractItems, fetchRepo, itemsHash, sha256 } from "./delegation-items.mjs";
@@ -90,10 +90,10 @@ export function planDelegation({ caseIds, reps, stage, seed = SEED }) {
 
 export const planDry = (caseId = "d-pytest") => ["alone", "delegate"].map((arm, position) => ({ id: sessionId(caseId, arm, 1), case: caseId, arm, rep: 1, model: MODEL, block: 0, position, stage: "dry" }));
 
-// ---- Preparation: pins, labels outside the work trees, the plugin copy with the bench pack
+// ---- Preparation: pins, the plugin copy with the bench pack
 
 export function prepareDelegation({ out, repoRoot, cases, itemsByCase }) {
-  mkdirSync(join(out, "labels"), { recursive: true });
+  mkdirSync(out, { recursive: true });
   const packFile = join(repoRoot, "bench/pack/bench-todo/questions/judge.json");
   const cliFile = join(repoRoot, "plugins/claude-referee/dist/cli.mjs");
   const pins = { cases_hash: cases.hash, pack_sha256: sha256(readFileSync(packFile)), cli_sha256: existsSync(cliFile) ? sha256(readFileSync(cliFile)) : null };
@@ -101,7 +101,6 @@ export function prepareDelegation({ out, repoRoot, cases, itemsByCase }) {
   if (pinned) {
     for (const k of Object.keys(pins)) if (pinned[k] !== pins[k]) throw new Error(`${k} changed since the run started; refusing to continue`);
   } else writeJson(join(out, "manifest.json"), { ...pins, pinned_at: new Date().toISOString() });
-  for (const [id, items] of Object.entries(itemsByCase)) writeJson(join(out, "labels", `${id}.json`), { tracked: items.filter((i) => i.label).map((i) => i.id), n: items.length });
   const plugin = join(out, "plugin");
   if (!existsSync(plugin) && existsSync(join(repoRoot, "plugins/claude-referee"))) {
     cpSync(join(repoRoot, "plugins/claude-referee"), plugin, { recursive: true });
@@ -167,6 +166,34 @@ export function transcriptTools(transcript) {
     }
   }
   return { uses: [...uses.values()], results };
+}
+
+// D8: a transcript that names ground.json or the labels dir, or touches a path outside its own work tree (the plugin copy excepted), is leaked.
+const insideOf = (dir, f) => f === dir || f.startsWith(dir + sep);
+export function detectLeak(transcript, { out, work, plugin }) {
+  const text = String(transcript);
+  if (text.includes("ground.json") || text.includes(join(out, "labels"))) return true;
+  const root = resolve(out);
+  const w = resolve(work);
+  const ok = (f) => insideOf(w, f) || insideOf(resolve(plugin), f);
+  for (const u of transcriptTools(text).uses) {
+    const refs = [];
+    if (typeof u.input.file_path === "string") refs.push(u.input.file_path);
+    if (typeof u.input.path === "string") refs.push(u.input.path);
+    if (typeof u.input.command === "string") refs.push(...(u.input.command.match(/(?:\.\.?\/|\/)[^\s'"`;|&<>)(]*/g) ?? []));
+    for (const r of refs) {
+      const f = resolve(w, r);
+      if (!ok(f) && (insideOf(root, f) || /(^|\/)\.\.(\/|$)/.test(r))) return true;
+    }
+  }
+  return false;
+}
+
+// Leak exclusion is by block, (case, rep): both arms of a leaked block leave the analysis so the arms stay paired.
+export function dropLeakedBlocks(grounds) {
+  const key = (g) => `${g.case}|${g.rep}`;
+  const bad = new Set(grounds.filter((g) => g.leaked).map(key));
+  return grounds.filter((g) => !bad.has(key(g)));
 }
 
 const bashCommand = (u) => (u.name === "Bash" && typeof u.input.command === "string" ? u.input.command : "");
@@ -304,7 +331,7 @@ export async function runDelegationSession({ out, plan, cases, itemsByCase, opts
     final_message: typeof parsed?.result === "string" ? parsed.result : "",
     run_failed: !parsed || parsed.is_error === true || run.timed_out === true,
     timed_out: run.timed_out === true,
-    leaked: all.includes(join(out, "labels")) || all.includes("ground.json"),
+    leaked: detectLeak(all, { out, work: p.work, plugin }),
     has_transcript: transcript !== "",
     warnings: [...warnings, ...(account?.warnings ?? [])],
     tool_counts: stats.counts,
@@ -388,7 +415,7 @@ const metric = (rows, which) => {
 const kindTotal = (g) => Object.values(g.cost_account?.tokens ?? {}).reduce((s, v) => s + v, 0);
 
 export function analyzeDelegation(grounds) {
-  const rows = grounds.filter((g) => !g.leaked);
+  const rows = dropLeakedBlocks(grounds);
   const by = Object.fromEntries(ARMS.map((a) => [a, rows.filter((g) => g.arm === a)]));
   const accuracy = Object.fromEntries(ARMS.map((a) => [a, pooled(by[a])]));
   const d = by.delegate;
@@ -441,14 +468,14 @@ export function analyzeDelegation(grounds) {
   };
   const classes = Object.fromEntries(ARMS.map((arm) => [arm, { run_failed: by[arm].filter((g) => g.run_failed).length, timed_out: by[arm].filter((g) => g.timed_out).length, no_transcript: by[arm].filter((g) => !g.has_transcript).length, scripted: by[arm].filter((g) => g.scripted).length }]));
   const other = Object.fromEntries(ARMS.map((arm) => [arm, { median_wall_ms: median(by[arm].map((g) => g.duration_ms)), mean_turns: by[arm].length ? r3(sum(by[arm], (g) => g.turns) / by[arm].length) : null, tool_calls: Object.fromEntries(["Read", "Write", "Edit", "Bash", "other"].map((k) => [k, sum(by[arm], (g) => g.tool_counts?.[k])])) }]));
-  return { sessions: grounds.length, leaked: grounds.length - rows.length, accuracy, recall_diff: recall, precision_diff: precision, gate, cost, ratios, per_case: perCaseOut, delegation, classes, other };
+  return { sessions: grounds.length, leaked: grounds.filter((g) => g.leaked).length, excluded_sessions: grounds.length - rows.length, accuracy, recall_diff: recall, precision_diff: precision, gate, cost, ratios, per_case: perCaseOut, delegation, classes, other };
 }
 
 // ---- Pilot rule (D5)
 
 const Z = 1.959964 + 0.841621;
 export function sizeDelegationPilot(grounds) {
-  const rows = grounds.filter((g) => !g.leaked);
+  const rows = dropLeakedBlocks(grounds);
   const by = Object.fromEntries(ARMS.map((arm) => [arm, rows.filter((g) => g.arm === arm)]));
   const bad = (rs) => rs.filter((g) => g.run_failed || g.findings_status !== "ok").length;
   const reasons = [];
