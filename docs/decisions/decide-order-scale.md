@@ -107,3 +107,20 @@ A null result (all policies within noise of each other, or `wr` already at the c
 ## Deviations
 
 None yet.
+
+## Extension: wave 2, more near-ties (registered after wave 1, before any wave 2 request)
+
+Why: wave 1 (S1 to S4: 4,482 main requests and 3,630 rename requests, all done) was run and its aggregate policy table was read before this section was written. Only 16 of the 162 decisions with n >= 4 are near-ties by the registered definition (reference margin < 0.08), so every near-tie number in wave 1 rests on 16 decisions with wide intervals. The registered wave 1 analysis and rule stay as registered and are reported first, unchanged. Wave 2 adds near-tie power; it is not used to replace the wave 1 result.
+
+Decision set: S5 `cases-c.jsonl` (80) and S6 `cases-d.jsonl` (80), written by two further agents from briefs asking for balanced near-tie cases with 4 to 6 options and option texts of nearly equal length within a case (that removes the length confound that wave 1 found, see the result). Neither author saw any case or result.
+
+Screening (this one does select on a Jev answer, so it is walled off): each candidate is asked in 4 screening orders S (seeded random, drawn from orders that are not in the fixed designs F; seed from `sha256("decide-scale-S:" + id)`). A candidate is kept if the mean over those 4 answers has top-two margin < 0.10. The screening orders are excluded from everything else: for n = 4 the pool is all 24 orders minus S (20 orders, F inside it); for n >= 5 the pool R is 24 random orders not in F or S, plus F asked separately. So no policy and no reference uses a screening answer, and the near-tie status used in the analysis comes from the new pool reference (margin < 0.08), not from the screen; regression to the mean will make some kept cases not near-ties, which the analysis reports.
+
+Analyses: `analyze.mjs --sets c,d` (wave 2 alone, every table as in wave 1, to `results-wave2.json`) and `--sets close,holdout,a,b,c,d` (pooled, to `results-pooled.json`); the pooled file is read only for near-tie columns and the decision rule (overall agreement over an enriched set means nothing). The decision rule is applied three times: wave 1 near-ties (registered), wave 2 near-ties, pooled near-ties. The recommendation states all three, and says so if they disagree. No rename arm and no bias checks beyond the per-source output for wave 2.
+
+Cost: 640 screening requests plus about 36 to 60 requests per kept case.
+
+| File | sha256 |
+|---|---|
+| `jev-evals/decide-scale/cases-c.jsonl` | `f963f11e36d6180b313d84c458b836d9566d46864207f54547a62c3285bc97de` |
+| `jev-evals/decide-scale/cases-d.jsonl` | `ed782df54f3668b13c78f0967e85da58120a595feab9901229be747fd9a143aa` |
