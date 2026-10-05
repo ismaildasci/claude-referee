@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- Measured `done` v2 on the 229-case real CI log sample with Jev's answers (recorded 2026-10-05): wrong `met` 2 of 76 and `met` recall among parsed logs 33 of 44, so both registered bars failed; the frozen hold-out half has 0 wrong `met` of 33. The two wrong `met` are logs where skips show outside the parsed summary. Scored table and recorded answers are in `docs/data/done-v2-real/`; no log text is committed.
+
 ### Changed
 
 - The package is on npm (`claude-referee@0.2.0`): `npx claude-referee` works, and the README no longer carries the "Not on npm yet" warning or the tarball alias.

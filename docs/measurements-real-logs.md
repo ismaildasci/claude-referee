@@ -2,7 +2,7 @@
 
 Registered in [done-v2-real-logs.md](decisions/done-v2-real-logs.md) on 2026-10-02, before any log was fetched. This is a **re-definition of the success bar made after six failed registered checks**; `done` v2 stays "not measured" on the old bar whatever this document shows.
 
-**Status of this document: half of the registered measurement is done.** The data, labels, parser coverage and the offline structural numbers are in. **The Jev answers are not recorded**, so wrong `met` and `met` recall among parsed (registered bars 1 and 3) are **not measured**. Nothing below was tuned (see "What is missing").
+**Status of this document: the registered measurement is complete, and both Jev-dependent bars failed** (recorded 2026-10-05, `jev-1.13.0`, 181 requests and 18 cache hits for 199 sent cases; receipt `rmuv1s6mngwo4`). Wrong `met` is 2 of 76 expected-`missing` cases (bar 0, **failed**); `met` recall among parsed cases is 33 of 44 = 0.75 (bar 0.9, **failed**). The two wrong `met` are both in the dev half; the frozen hold-out half has 0 of 33. `done` v2 stays "not measured" on the old bar.
 
 ## Data
 
@@ -71,22 +71,23 @@ If Jev answered p = 1.0 for every case, how many would code allow to end as `met
 
 The last row is the exposure the registration singled out. Of the 52 expected-`missing` cases in the exit-code bucket (mostly steps that never ran the check), code caps (warning, failure and skip wording, no-tests text) stop 9; the other 43 rely on Jev's answer to the criterion and the log text, and 39 of them are `not_run` steps (see above). There are 44 parsed expected-`met` cases, so registered bar 3 is **evaluable** (at least 30); the silent-`met` drop removed none of them (all were exit-code only).
 
-## Registered metrics 1 and 3: not measured yet
+## Registered metrics 1 and 3: measured with Jev's answers (2026-10-05)
 
-- **Wrong `met` (hard bar 0):** 76 expected-`missing` succeeded steps are exposed (24 parsed, 52 exit-code only); the one-sided 95% upper bound for 0 wrong would be 1 - 0.05^(1/76) = 3.9%. Only 9 of them are hard negatives that code does not stop (previous section). No Jev answer exists, so there is no count.
-- **`met` recall among parsed (bar 0.9, n = 44):** no Jev answer exists. The offline ceiling is 42 of 44 (95.5%): the bar can be met only if Jev says `met` on at least 40 of those 42 (0.9 of 44 is 39.6, so 40 `met` verdicts).
+Recorded once with `eval record` on the local suite of 229 cases (199 sent to Jev, 30 decided in code), scored once with `scripts/real-ci/score.mjs` from `docs/data/done-v2-real/table.jsonl` (now with `verdict` and `p` per case; no log text). Nothing was tuned, no parser, cap or question was changed. A first recording was made by mistake on the superseded 256-case suite (226 sent, 195 requests); it was not used and is not reported.
 
-## What is missing
+| Registered bar | Result | Verdict |
+| --- | --- | --- |
+| Wrong `met` = 0 (expected-`missing` succeeded steps) | **2 of 76** (one-sided 95% upper bound 8.1%); parsed 2 of 24, exit-code-only 0 of 52 | **failed** |
+| `met` recall among parsed >= 0.9 (n = 44) | **33 of 44 = 0.75** (exact 95% 0.597 to 0.868) | **failed** |
+| Parsed coverage (offline) | 78 of 226 = 34.5% (see above) | reported |
 
-The Jev answers were not recorded in this run. Recording uses the repo CLI on a local suite (`done-v2-real`, with the evidence text, kept outside the repository). One command from a shell that allows it:
+Verdicts on the 199 sent cases: `met` 36, `unsure` 81, `missing` 82. Exit-code-only evidence got `met` once in 79 expected-`met` cases (0.013): Jev sees only the exit code and answers `unsure` or `missing`, as in the invented hold-outs. `missing` found: parsed 8 of 24 (0.33), exit-code-only 36 of 52 (0.69).
 
-```bash
-node plugins/claude-referee/dist/cli.mjs eval record --suite done-v2-real --evals-dir <local suite root>
-node scripts/real-ci/analyze.mjs <cache>/real-ci <local suite root> <out dir>
-node scripts/real-ci/score.mjs <out dir>/table.jsonl
-```
+**The two wrong `met`** (`rl-d7e82393`, a `node --test` run, p 0.97; `rl-cfdcfb61`, an `npm test` wrapper with a `vitest` summary of 105 passed, p 0.98). Both succeeded and parsed cleanly, and both were labelled `missing` by the single model labeller because the log shows skipped tests: the first has a nested script that prints "2 skipped" while the `node:test` summary says 0 skipped; the second shows skipped tests from another runner in the same step, which the parsed summary does not cover. Neither case was in the 30% second-labelled sample, so the label is one model's reading; a human may disagree on the first. Whichever way the labels fall, the code cap for skipped tests looks only at the parsed summary, so a skip line elsewhere in the same log is not seen. This is added to the parser backlog as a defect class (multi-runner logs and nested reporters), not fixed here.
 
-The local suite root held 229 cases (199 to send, 30 decided in code) when this was written; its text is not in the repository. The suite and table of the first aggregation (256 cases, with the 12 extra cases and the 15 silent-`met` labels) were replaced and are not scored. The registration says the result is committed separately and the suite allowance is set to the observed wrong `met` count if there is one.
+**By split** (registered in `done-bar-split.md`; dev 124 cases, frozen hold-out 105, by repository): hold-out wrong `met` **0 of 33** (upper bound 8.7%), met recall among parsed **20 of 28 = 0.71** (0.513 to 0.868; 28 is below the 30 needed for that bar to be evaluable); dev wrong `met` 2 of 43, met recall among parsed 13 of 16. The whole-sample bars above are the registered ones; the hold-out numbers are reported because the dev half drove the parser backlog.
+
+**What this does and does not show.** Real logs from 94 public repositories, labelled by one model with a 30% blind check (agreement 0.986). On this sample `done` never says `met` for exit-code-only evidence by accident (0 wrong of 52) but also almost never says `met` at all there; with a recognised runner it says `met` for 3 of 4 true passes and, in 2 of 24 negatives, for a log that hides skips. It does not show how `done` behaves on your tests: the sample over-represents plain `run:` workflows and the failed-step share is 11.7%.
 
 ## Parser backlog, ranked by frequency in this sample
 
@@ -119,5 +120,5 @@ Two readings: build and lint criteria carry most of the gap (a build success has
 - GitHub Actions only, popular repositories, plain `run:` steps; the step-mapping rule dropped 2,429 jobs across all inspected candidates. Failed-step share is 13.1%, under the 20% target.
 - Labels come from the same model family as the author: two processes, one labeller on every case, a second on 30%. High agreement (66 of 67, kappa 0.966) says the convention is applied consistently, not that it is right: on the 15 silent-`met` cases labeller 2 repeated labeller 1.
 - The sample is biased toward easy evidence: ambiguous (truncated, silent) and silent-`met` cases were dropped, 7 and 15 of 221 labelled succeeded steps. Its wrong-`met` bar rests on 29 hard negatives of which 9 reach Jev (see "What the wrong-`met` bar can test").
-- No Jev result yet: the registered bars 1 and 3 have no number.
+- One Jev model version and one recording (2026-10-05); the two wrong `met` rest on one labeller's reading (neither was in the second-labelled 30%).
 - Redistribution of log text is unresolved, so none is committed (`decide`: first ask 0.54 / 0.44 / 0.01, receipt `rmuqaymlia1f7`; with two neutral facts added 0.64 / 0.34 / 0.01, receipt `rmuqayxupkfma`; orders agreeing both times; under the 0.90 bar, so the conservative option). This directory holds hashes, labels and facts only; the suite is not rerunnable from the repository.
