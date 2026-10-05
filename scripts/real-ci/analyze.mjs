@@ -1,10 +1,15 @@
 // Real-log study step 6: joins kept cases with recorded Jev answers into table.jsonl (no log text) and the parser backlog.
 // Usage: node analyze.mjs DIR SUITE_ROOT OUT_DIR; verdicts come from the same doneRequest the done command and eval score use.
+// A recording counts only when its question and state hashes match what the current code builds; otherwise verdict is null (stale).
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { homedir } from "node:os";
 import { doneEvidence, doneRequest } from "../../src/cli/commands/done.ts";
+import { findRecording } from "../../src/engine/evals.ts";
+import { parseEvidence } from "../../src/engine/runners/index.ts";
 import { loadPack, packDirs } from "../../src/engine/pack.ts";
+import { questionHash, redactRequest, stateHash } from "../../src/engine/session.ts";
 import { negativeKind } from "./lib.mjs";
 
 const [dir, root, out] = process.argv.slice(2);
@@ -17,19 +22,23 @@ const whys = new Map(lines(join(dir, "labels1.jsonl")).map((r) => [r.id, r.why ?
 const pack = loadPack("generic", packDirs(process.env));
 const table = [];
 for (const c of kept) {
+  const facts = parseEvidence(doneEvidence(c.evidence));
   const { planned, finish } = doneRequest(pack, undefined, [c.criterion], doneEvidence(c.evidence));
   let result;
   const certain = planned.length === 0 ? null : finish([{ id: "done", answers: { c1: { type: "noul", noul: 1 } }, stopped: [], cached: true }]).verdict;
   if (planned.length === 0) result = finish([]);
   else {
-    const rec = [...recordings].reverse().find((r) => r.case === c.id);
-    result = rec ? finish([{ id: "done", answers: rec.answers, stopped: [], cached: true }]) : { verdict: null, p: null };
+    const first = planned[0];
+    const key = { qhash: questionHash(first.questions), shash: stateHash(redactRequest(first, homedir(), pack.redact).body.state) };
+    const models = [...new Set(recordings.map((r) => r.model))].reverse();
+    const found = models.map((model) => findRecording(recordings, { case: c.id, model, ...key })).find((f) => f.status === "ok");
+    result = found?.status === "ok" ? finish([{ id: "done", answers: found.line.answers, stopped: [], cached: true }]) : { verdict: null, p: null };
   }
   table.push({
     id: c.id, repo: c.repo, language: c.language, license: c.license, run_id: c.run_id, job_id: c.job_id, step_number: c.step_number,
     purpose: c.purpose, criterion: c.criterion, tool: c.tool, conclusion: c.conclusion, exit_code: c.exit_code,
     evidence_sha256: c.evidence_sha256, chars: c.chars, chars_cut: c.chars_cut,
-    parsed: c.parsed, trust: c.trust, runners: c.runners,
+    parsed: facts.runners.length > 0, trust: facts.trust, runners: facts.runners.map((r) => ({ runner: r.runner, passed: r.passed, failed: r.failed, errors: r.errors, skipped: r.skipped, warnings: r.warnings ?? 0, incomplete: r.incomplete === true })),
     label1: c.label1, label2: c.label2, expected: c.expected, negative_kind: c.expected === "missing" && !c.failed ? negativeKind(whys.get(c.id) ?? "") : null,
     code_decided: planned.length === 0, met_reachable: certain === "met", verdict: result.verdict, p: planned.length === 0 ? null : result.p ?? null, reason: result.reason ?? null,
   });

@@ -20,6 +20,7 @@ function facts(
   skipped: number,
   ids: ReadonlySet<string>,
   summary: string | null,
+  incomplete = false,
 ): RunnerFacts {
   return {
     runner,
@@ -29,6 +30,7 @@ function facts(
     skipped,
     failing: [...ids].slice(0, MAX_FAILING).map((n) => n.slice(0, MAX_NAME)),
     summary_line: summary === null ? null : summary.trim().slice(0, MAX_SUMMARY),
+    ...(incomplete ? { incomplete: true } : {}),
   };
 }
 
@@ -179,6 +181,9 @@ const cargo: RunnerParser = {
 const DOTNET_SUMMARY = /^\s*(Passed|Failed)!\s+-\s+Failed:\s*(\d+),\s*Passed:\s*(\d+),\s*Skipped:\s*(\d+),\s*Total:\s*(\d+)/;
 const DOTNET_FAILED = /^\s+Failed (.+?) \[[^\]]*\]\s*$/;
 const DOTNET_PASSED = /^\s+Passed (.+?) \[[^\]]*\]\s*$/;
+const VSTEST_RUN = /^\s*Test Run (Successful|Failed|Aborted|Canceled)\.?\s*$/;
+const VSTEST_TOTAL = /^\s*Total tests:\s*(\d+)\s*$/;
+const VSTEST_COUNT = /^\s+(Passed|Failed|Skipped):\s*(\d+)\s*$/;
 const DOTNET_ERROR = /^(.*?)\s*(?:\[[^\]]*\.\w*proj\])?\s*$/;
 
 const dotnet: RunnerParser = {
@@ -197,7 +202,35 @@ const dotnet: RunnerParser = {
     let noTests: string | null = null;
     let runFailed = false;
     let buildFailed = false;
+    let vsOpen = false;
+    let vsTotal = 0;
+    let vsAccounted = 0;
+    let vsCut = false;
     for (const line of lines) {
+      const vr = VSTEST_RUN.exec(line);
+      if (vr) {
+        vsOpen = true;
+        if (vr[1] === "Successful") summaries.push(line);
+        else if (vr[1] === "Failed") runFailed = true;
+        else vsCut = true;
+        continue;
+      }
+      if (vsOpen) {
+        const vt = VSTEST_TOTAL.exec(line);
+        if (vt) {
+          vsTotal += Number(vt[1]);
+          continue;
+        }
+        const vc = VSTEST_COUNT.exec(line);
+        if (vc) {
+          const n = Number(vc[2]);
+          vsAccounted += n;
+          if (vc[1] === "Passed") passed += n;
+          else if (vc[1] === "Failed") failedSum += n;
+          else skipped += n;
+          continue;
+        }
+      }
       const s = DOTNET_SUMMARY.exec(line);
       if (s) {
         summaries.push(line);
@@ -229,10 +262,10 @@ const dotnet: RunnerParser = {
     }
     const errors = buildErrors.size > 0 ? buildErrors.size : buildFailed ? 1 : 0;
     const failed = Math.max(failedSum, failedIds.size, failedStatus || runFailed ? 1 : 0);
-    const hasSummary = summaries.length > 0 || noTests !== null;
+    const hasSummary = summaries.length > 0 || noTests !== null || vsCut;
     if (!hasSummary && failed === 0 && errors === 0) return null;
     const summary = summaries.length > 0 ? (failedFirst ?? (summaries[summaries.length - 1] as string)) : noTests;
-    return facts("dotnet test", summaries.length > 0 ? passed : passedLines, failed, errors, skipped, failedIds, summary);
+    return facts("dotnet test", summaries.length > 0 || vsAccounted > 0 ? passed : passedLines, failed, errors, skipped, failedIds, summary, vsCut || vsTotal !== vsAccounted);
   },
 };
 

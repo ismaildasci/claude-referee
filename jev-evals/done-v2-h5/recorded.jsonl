@@ -15,3 +15,4 @@
 {"suite":"done-v2-h5","case":"h5-f-05","split":"holdout","model":"jev-1.13.0","pack":"generic@0.1.0","qhash":"3c4a05d05ac2","shash":"939646126b4a","answers":{"c1":{"type":"noul","noul":0.97}},"recorded_at":"2026-10-01T15:24:19.512Z"}
 {"suite":"done-v2-h5","case":"h5-f-07","split":"holdout","model":"jev-1.13.0","pack":"generic@0.1.0","qhash":"3c4a05d05ac2","shash":"d5ad70d246fc","answers":{"c1":{"type":"noul","noul":0.01}},"recorded_at":"2026-10-01T15:24:19.512Z"}
 {"suite":"done-v2-h5","case":"h5-f-10","split":"holdout","model":"jev-1.13.0","pack":"generic@0.1.0","qhash":"e43b3a6cbd3b","shash":"a2feb098826c","answers":{"c1":{"type":"noul","noul":0.89}},"recorded_at":"2026-10-01T15:24:19.512Z"}
+{"suite":"done-v2-h5","case":"h5-d-04","split":"holdout","model":"jev-1.13.0","pack":"generic@0.1.0","qhash":"e43b3a6cbd3b","shash":"24ebdef8e2d2","answers":{"c1":{"type":"noul","noul":0.98}},"recorded_at":"2026-10-05T10:00:32.156Z"}

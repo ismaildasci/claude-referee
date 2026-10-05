@@ -1827,7 +1827,7 @@ function prepare(text) {
   return text.replace(ANSI, "").split(/\r?\n/);
 }
 __name(prepare, "prepare");
-function facts(runner, passed, failed, errors, skipped, ids, summary) {
+function facts(runner, passed, failed, errors, skipped, ids, summary, incomplete = false) {
   return {
     runner,
     passed,
@@ -1835,7 +1835,8 @@ function facts(runner, passed, failed, errors, skipped, ids, summary) {
     errors,
     skipped,
     failing: [...ids].slice(0, MAX_FAILING).map((n) => n.slice(0, MAX_NAME)),
-    summary_line: summary === null ? null : summary.trim().slice(0, MAX_SUMMARY)
+    summary_line: summary === null ? null : summary.trim().slice(0, MAX_SUMMARY),
+    ...incomplete ? { incomplete: true } : {}
   };
 }
 __name(facts, "facts");
@@ -1981,6 +1982,9 @@ var cargo = {
 var DOTNET_SUMMARY = /^\s*(Passed|Failed)!\s+-\s+Failed:\s*(\d+),\s*Passed:\s*(\d+),\s*Skipped:\s*(\d+),\s*Total:\s*(\d+)/;
 var DOTNET_FAILED = /^\s+Failed (.+?) \[[^\]]*\]\s*$/;
 var DOTNET_PASSED = /^\s+Passed (.+?) \[[^\]]*\]\s*$/;
+var VSTEST_RUN = /^\s*Test Run (Successful|Failed|Aborted|Canceled)\.?\s*$/;
+var VSTEST_TOTAL = /^\s*Total tests:\s*(\d+)\s*$/;
+var VSTEST_COUNT = /^\s+(Passed|Failed|Skipped):\s*(\d+)\s*$/;
 var DOTNET_ERROR = /^(.*?)\s*(?:\[[^\]]*\.\w*proj\])?\s*$/;
 var dotnet = {
   name: "dotnet test",
@@ -1998,7 +2002,35 @@ var dotnet = {
     let noTests = null;
     let runFailed = false;
     let buildFailed = false;
+    let vsOpen = false;
+    let vsTotal = 0;
+    let vsAccounted = 0;
+    let vsCut = false;
     for (const line of lines3) {
+      const vr = VSTEST_RUN.exec(line);
+      if (vr) {
+        vsOpen = true;
+        if (vr[1] === "Successful") summaries.push(line);
+        else if (vr[1] === "Failed") runFailed = true;
+        else vsCut = true;
+        continue;
+      }
+      if (vsOpen) {
+        const vt = VSTEST_TOTAL.exec(line);
+        if (vt) {
+          vsTotal += Number(vt[1]);
+          continue;
+        }
+        const vc = VSTEST_COUNT.exec(line);
+        if (vc) {
+          const n = Number(vc[2]);
+          vsAccounted += n;
+          if (vc[1] === "Passed") passed += n;
+          else if (vc[1] === "Failed") failedSum += n;
+          else skipped += n;
+          continue;
+        }
+      }
       const s = DOTNET_SUMMARY.exec(line);
       if (s) {
         summaries.push(line);
@@ -2030,10 +2062,10 @@ var dotnet = {
     }
     const errors = buildErrors.size > 0 ? buildErrors.size : buildFailed ? 1 : 0;
     const failed = Math.max(failedSum, failedIds.size, failedStatus || runFailed ? 1 : 0);
-    const hasSummary = summaries.length > 0 || noTests !== null;
+    const hasSummary = summaries.length > 0 || noTests !== null || vsCut;
     if (!hasSummary && failed === 0 && errors === 0) return null;
     const summary = summaries.length > 0 ? failedFirst ?? summaries[summaries.length - 1] : noTests;
-    return facts("dotnet test", summaries.length > 0 ? passed : passedLines, failed, errors, skipped, failedIds, summary);
+    return facts("dotnet test", summaries.length > 0 || vsAccounted > 0 ? passed : passedLines, failed, errors, skipped, failedIds, summary, vsCut || vsTotal !== vsAccounted);
   }
 };
 var parsers = [go, cargo, dotnet];
@@ -2618,6 +2650,283 @@ var cargoBuild = {
 };
 var parsers4 = [unittest, clippy, golangci, viteParser, cargoBuild];
 
+// src/engine/runners/native.ts
+var SRC_ERROR = /^\S[^\s:]*:\d+(?::\d+)?: (?:fatal )?error:|^(?:clang(?:\+\+)?|gcc|g\+\+|cc|c\+\+|ld|lld|link)(?:-\d+)?: (?:fatal )?error:|: fatal error:|^collect2: error:|\bundefined reference to\b|^CMake Error\b/;
+var SRC_WARNING = /^\S[^\s:]*:\d+(?::\d+)?: warning:|^CMake Warning\b/;
+var NINJA_STATUS = /^\[(\d+)\/(\d+)\] (.*)$/;
+var NINJA_EDGE = /^(?:Building (?:[A-Z]+|Swift|ASM\S*) object |Compiling (?:[A-Z]+|C\+\+) object |Linking (?:[A-Z]+|Swift) (?:executable|static library|shared library|shared module|module library|object file)\b|Linking target |Install the project\.\.\.|Running (?:utility|custom) command|Automatic (?:MOC|UIC|RCC)|Re-running CMake)/;
+var NINJA_LINE = /^ninja: (?:Entering directory|no work to do|build stopped|error|fatal)/;
+var MESON_TEST = /^\s*\d+\/\d+ \S.* \/ \S.*\s(?:OK|FAIL|SKIP|TIMEOUT|EXPECTEDFAIL|UNEXPECTEDPASS)\s/;
+var NINJA_ERROR = /^FAILED: |^ninja: (?:build stopped|error|fatal)/;
+var ninja = {
+  name: "ninja",
+  parse(text) {
+    const lines3 = prepare2(text);
+    let claimed = false;
+    let status = null;
+    let statusIndex = -1;
+    let noWork = false;
+    let errors = 0;
+    let warnings = 0;
+    for (const [i, line] of lines3.entries()) {
+      const s = NINJA_STATUS.exec(line);
+      if (s !== null) {
+        if (NINJA_EDGE.test(s[3])) claimed = true;
+        status = s;
+        statusIndex = i;
+        continue;
+      }
+      if (NINJA_LINE.test(line)) claimed = true;
+      if (/^ninja: no work to do\.?\s*$/.test(line)) noWork = true;
+      if (NINJA_ERROR.test(line) || SRC_ERROR.test(line)) errors++;
+      else if (SRC_WARNING.test(line)) warnings++;
+    }
+    if (!claimed || lines3.some((l) => MESON_TEST.test(l))) return null;
+    const n = Number(status?.[1] ?? 0);
+    const total = Number(status?.[2] ?? 0);
+    const installTail = status !== null && n === total - 1 && /^Install the project\.\.\./.test(status[3]) && lines3.slice(statusIndex + 1).some((l) => /^-- Install configuration:/.test(l));
+    const complete = noWork || status !== null && total > 0 && (n === total || installTail);
+    return mk("ninja", { passed: noWork ? 0 : status === null ? 0 : n, errors, warnings }, [], status === null ? "ninja: no work to do." : status[0], errors === 0 && !complete);
+  }
+};
+var MSB_OK = /^\s*Build succeeded\.\s*$/;
+var MSB_FAILED = /^\s*Build FAILED\.\s*$/;
+var MSB_COUNT = /^\s*(\d+) (Warning|Error)\(s\)\s*$/;
+var MSB_DIAG = /: (error|warning) ((?:CS|VB|FS|BC|MSB|NETSDK|NU|CA|IDE|SYSLIB|RZ|WIX)\d{3,5}): /;
+var msbuild = {
+  name: "msbuild",
+  parse(text) {
+    const lines3 = prepare2(text);
+    let ok = 0;
+    let failed = false;
+    let errorCount = 0;
+    let warningCount = 0;
+    const errorDiags = /* @__PURE__ */ new Set();
+    const warningDiags = /* @__PURE__ */ new Set();
+    let summary = null;
+    for (const line of lines3) {
+      if (MSB_OK.test(line)) {
+        ok++;
+        summary = line.trim();
+        continue;
+      }
+      if (MSB_FAILED.test(line)) {
+        failed = true;
+        summary = line.trim();
+        continue;
+      }
+      const c = MSB_COUNT.exec(line);
+      if (c) {
+        if (c[2] === "Error") errorCount += Number(c[1]);
+        else warningCount += Number(c[1]);
+        continue;
+      }
+      const d = MSB_DIAG.exec(line);
+      if (d) (d[1] === "error" ? errorDiags : warningDiags).add(line.replace(/\s*\[[^\]]*\]\s*$/, "").trim());
+    }
+    if (ok === 0 && !failed && errorDiags.size === 0) return null;
+    const errors = Math.max(errorCount, errorDiags.size, failed ? 1 : 0);
+    const warnings = Math.max(warningCount, warningDiags.size);
+    return mk("msbuild", { passed: ok, errors, warnings }, errorDiags, summary, ok === 0 && errors === 0);
+  }
+};
+var DK_DONE = /^#(\d+) (?:DONE \d[\d.]*s|CACHED)\s*$/;
+var DK_VERTEX = /^#(\d+) (\[[^\]]*\].*|exporting .*|importing .*)$/;
+var DK_ERROR = /^#\d+ ERROR\b|^ERROR: (?:failed to (?:solve|build)|process )/;
+var DK_CANCELED = /^#\d+ CANCELED\s*$/;
+var DK_WARN = /^(\d+) warnings? found\b/;
+var docker = {
+  name: "docker build",
+  parse(text) {
+    const lines3 = prepare2(text);
+    const done = /* @__PURE__ */ new Set();
+    const exporting = /* @__PURE__ */ new Set();
+    let hasVertex = false;
+    let errors = 0;
+    let canceled = 0;
+    let warnings = 0;
+    let lastDone = null;
+    for (const line of lines3) {
+      const d = DK_DONE.exec(line);
+      if (d) {
+        done.add(d[1]);
+        lastDone = line;
+        continue;
+      }
+      const v = DK_VERTEX.exec(line);
+      if (v) {
+        hasVertex = true;
+        if (v[2].startsWith("exporting ")) exporting.add(v[1]);
+        continue;
+      }
+      if (DK_ERROR.test(line)) errors++;
+      else if (DK_CANCELED.test(line)) canceled++;
+      else warnings += Number(DK_WARN.exec(line)?.[1] ?? 0);
+    }
+    if (done.size === 0 || !hasVertex) return null;
+    const exported = [...exporting].some((id) => done.has(id));
+    return mk("docker build", { passed: done.size, errors: errors + canceled, warnings }, [], errors > 0 ? null : lastDone, errors + canceled === 0 && !exported);
+  }
+};
+var MAKE_LINE = /^(?:g|mingw32-)?make(?:\[\d+\])?: /;
+var MAKE_FAIL = /^(?:g|mingw32-)?make(?:\[\d+\])?: (?:\*\*\* |\[[^\]]*\] Error \d+)|^(?:g|mingw32-)?make(?:\[\d+\])?: \*\*\* No rule to make target/;
+var MAKE_WARN = /^(?:g|mingw32-)?make(?:\[\d+\])?: warning:/;
+var make = {
+  name: "make",
+  parse(text) {
+    const lines3 = prepare2(text);
+    if (!lines3.some((l) => MAKE_LINE.test(l))) return null;
+    let errors = 0;
+    let warnings = 0;
+    let summary = null;
+    for (const line of lines3) {
+      if (MAKE_FAIL.test(line)) {
+        errors++;
+        summary ??= line.trim();
+      } else if (SRC_ERROR.test(line)) errors++;
+      else if (MAKE_WARN.test(line) || SRC_WARNING.test(line)) warnings++;
+    }
+    if (errors === 0) return null;
+    return mk("make", { errors, warnings }, [], summary, false);
+  }
+};
+var SWIFT_BUILD_MARK = /^(?:Building for (?:debugging|production)\.\.\.|Build (?:of (?:product|target) '[^']*' )?complete! \(|\[\d+\/\d+\] (?:Compiling|Emitting module|Write sources|Planning build)\b)/;
+var SWIFT_BUILD_OK = /^Build (?:of (?:product|target) '[^']*' )?complete! \(/;
+var SWIFT_ERROR = /^\S[^\s:]*:\d+:\d+: error: |^error: /;
+var SWIFT_WARNING = /^\S[^\s:]*:\d+:\d+: warning: /;
+var XCTEST_MARK = /^Test (?:Suite|Case) '/;
+var TESTING_RUN = /^(?:\S )?Test run with (\d+) tests? in (\d+) suites? (passed|failed) after\b/;
+var swiftBuild = {
+  name: "swift build",
+  parse(text) {
+    const lines3 = prepare2(text);
+    if (!lines3.some((l) => SWIFT_BUILD_MARK.test(l))) return null;
+    if (lines3.some((l) => XCTEST_MARK.test(l) || TESTING_RUN.test(l))) return null;
+    let ok = 0;
+    let errors = 0;
+    let warnings = 0;
+    let summary = null;
+    for (const line of lines3) {
+      if (SWIFT_BUILD_OK.test(line)) {
+        ok++;
+        summary = line.trim();
+      } else if (SWIFT_ERROR.test(line)) errors++;
+      else if (SWIFT_WARNING.test(line)) warnings++;
+    }
+    return mk("swift build", { passed: ok, errors, warnings }, [], summary, ok === 0 && errors === 0);
+  }
+};
+var XC_SUITE_END = /^Test Suite '([^']*)' (passed|failed) at /;
+var XC_EXECUTED = /^\s*Executed (\d+) tests?, with (?:(\d+) tests? skipped and )?(\d+) failures? \((\d+) unexpected\)/;
+var XC_CASE = /^Test Case '([^']*)' (passed|failed|skipped) \(/;
+var XC_ERROR = /^\S[^\s:]*:\d+: error: (-\[[^\]]*\]|\S+) : /;
+var TESTING_FAIL = /^(?:\S )?Test "(.*)" failed after\b/;
+var TESTING_SKIP = /^(?:\S )?Test "(.*)" skipped\b/;
+var swiftTest = {
+  name: "swift test",
+  parse(text) {
+    const lines3 = prepare2(text);
+    if (!lines3.some((l) => XCTEST_MARK.test(l) || TESTING_RUN.test(l) || TESTING_FAIL.test(l))) return null;
+    let all = null;
+    const bundles = [];
+    const failedIds = /* @__PURE__ */ new Set();
+    let suiteFailed = false;
+    let skippedCases = 0;
+    let testing = null;
+    let testingSkipped = 0;
+    let xcSummary = null;
+    let testingSummary = null;
+    let suiteName = null;
+    for (const line of lines3) {
+      const end = XC_SUITE_END.exec(line);
+      if (end) {
+        suiteName = end[1];
+        if (end[2] === "failed") suiteFailed = true;
+        continue;
+      }
+      const ex = XC_EXECUTED.exec(line);
+      if (ex) {
+        const counts3 = { tests: Number(ex[1]), skipped: Number(ex[2] ?? 0), failures: Number(ex[3]) + Number(ex[4]) };
+        if (suiteName === "All tests" || suiteName === "Selected tests") {
+          all = counts3;
+          xcSummary = line.trim();
+        } else if (suiteName?.endsWith(".xctest")) bundles.push(counts3);
+        suiteName = null;
+        continue;
+      }
+      suiteName = null;
+      const c = XC_CASE.exec(line);
+      if (c) {
+        if (c[2] === "failed") failedIds.add(c[1]);
+        else if (c[2] === "skipped") skippedCases++;
+        continue;
+      }
+      if (XC_ERROR.test(line)) {
+        failedIds.add(line.trim());
+        continue;
+      }
+      const r = TESTING_RUN.exec(line);
+      if (r) {
+        testing = { tests: Number(r[1]), failed: r[3] === "failed" };
+        testingSummary = line.trim();
+        continue;
+      }
+      const f = TESTING_FAIL.exec(line);
+      if (f) {
+        failedIds.add(f[1]);
+        continue;
+      }
+      if (TESTING_SKIP.test(line)) testingSkipped++;
+    }
+    const xc = all ?? (bundles.length > 0 ? bundles.reduce((a, b) => ({ tests: a.tests + b.tests, skipped: a.skipped + b.skipped, failures: a.failures + b.failures }), { tests: 0, skipped: 0, failures: 0 }) : null);
+    const total = (xc?.tests ?? 0) + (testing?.tests ?? 0);
+    const failed = Math.max(xc?.failures ?? 0, failedIds.size, suiteFailed || testing?.failed ? 1 : 0);
+    const skipped = Math.max(xc?.skipped ?? 0, skippedCases) + testingSkipped;
+    const hasSummary = xc !== null || testing !== null;
+    const shown = [xc !== null && xc.tests > 0 ? xcSummary : null, testing !== null && testing.tests > 0 ? testingSummary : null].filter((x) => x !== null);
+    const summary = shown.length > 0 ? shown.join(" ; ") : xcSummary ?? testingSummary;
+    return mk("swift test", { passed: Math.max(0, total - failed - skipped), failed, skipped }, failedIds, summary, !hasSummary || total === 0 && failed === 0);
+  }
+};
+var MVN_MARK = /^\[(?:INFO|ERROR)\] (?:BUILD (?:SUCCESS|FAILURE)\s*$|Reactor Summary\b|Scanning for projects\.\.\.)|^\[ERROR\] Failed to execute goal /;
+var MVN_TESTS = /^\[(?:INFO|WARNING|ERROR)\] Tests run: (\d+), Failures: (\d+), Errors: (\d+), Skipped: (\d+)\s*$/;
+var MVN_FAIL = /^\[ERROR\] (?:BUILD FAILURE|COMPILATION ERROR\b|Failed to execute goal )|^\[(?:INFO|ERROR)\] BUILD FAILURE\s*$/;
+var MVN_REACTOR_FAIL = /^\[(?:INFO|ERROR)\] \S.* \.{3,} FAILURE \[/;
+var maven = {
+  name: "maven",
+  parse(text) {
+    const lines3 = prepare2(text);
+    if (!lines3.some((l) => MVN_MARK.test(l))) return null;
+    let ok = 0;
+    let errors = 0;
+    let warnings = 0;
+    let run = 0;
+    let testFailures = 0;
+    let skipped = 0;
+    let summary = null;
+    for (const line of lines3) {
+      if (/^\[INFO\] BUILD SUCCESS\s*$/.test(line)) {
+        ok++;
+        summary = line.trim();
+        continue;
+      }
+      const t = MVN_TESTS.exec(line);
+      if (t) {
+        run += Number(t[1]);
+        testFailures += Number(t[2]) + Number(t[3]);
+        skipped += Number(t[4]);
+        continue;
+      }
+      if (MVN_FAIL.test(line) || MVN_REACTOR_FAIL.test(line)) {
+        errors++;
+        summary ??= line.trim();
+      } else if (/^\[WARNING\] (?!Tests run:)/.test(line)) warnings++;
+    }
+    return mk("maven", { passed: run > 0 ? Math.max(0, run - testFailures - skipped) : ok, failed: testFailures, errors, skipped, warnings }, [], summary, ok === 0 && errors === 0 && testFailures === 0);
+  }
+};
+var parsers5 = [ninja, msbuild, docker, make, maven, swiftBuild, swiftTest];
+
 // src/engine/runners/php-ruby.ts
 var MAX_FAILING5 = 10;
 var MAX_NAME5 = 120;
@@ -2783,7 +3092,7 @@ var rspec = {
     };
   }
 };
-var parsers5 = [phpunit, rspec];
+var parsers6 = [phpunit, rspec];
 
 // src/engine/runners/python.ts
 var MAX_FAILING6 = 10;
@@ -2940,7 +3249,7 @@ var ruff = {
     };
   }
 };
-var parsers6 = [pytest, ruff];
+var parsers7 = [pytest, ruff];
 
 // src/engine/runners/scenarios.ts
 var PROVE_FILES = /^Files=(\d+), Tests=(\d+),/;
@@ -3110,7 +3419,7 @@ var tox = {
     return mk("tox", { passed: ok, failed: Math.max(bad, finalFailed ? 1 : 0), skipped }, failing, final, final === null || ok + bad + skipped === 0);
   }
 };
-var parsers7 = [prove, behave, tox];
+var parsers8 = [prove, behave, tox];
 
 // src/engine/runners/suites.ts
 var NX_SUMMARY = /^\s*Summary \[\s*[\d.]+s\] (?:(\d+)\/)?(\d+) tests? run: (.*)$/;
@@ -3336,10 +3645,10 @@ var kaocha = {
     return mk("kaocha", { passed, failed, errors, skipped: pending }, failing, best?.line ?? null, incomplete);
   }
 };
-var parsers8 = [nextest, dart, julia, kaocha];
+var parsers9 = [nextest, dart, julia, kaocha];
 
 // src/engine/runners/index.ts
-var PARSERS = [...parsers6, ...parsers3, ...parsers, ...parsers5, ...parsers4, ...parsers8, ...parsers7, ...parsers2];
+var PARSERS = [...parsers7, ...parsers3, ...parsers, ...parsers6, ...parsers4, ...parsers9, ...parsers8, ...parsers2, ...parsers5];
 function parseEvidence(text) {
   const runners = PARSERS.map((p) => p.parse(text)).filter((r) => r !== null);
   const exitMatches = [...text.matchAll(/^.{0,60}?\bexit (?:code|status)\s*[:=]?\s*(-?\d+)/gim)];
