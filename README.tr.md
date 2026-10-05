@@ -216,7 +216,7 @@ npm test 2>&1 | npx claude-referee done --criteria "all tests pass" --evidence -
 Her komut tek satır JSON basar: `ok`, karar, birkaç sayı, varsa bir `next_step` ve bir makbuz kimliği. "Bitmedi" dahil her karar 0 ile çıkar; CI'da `--fail-on missing,unsure` bu kararlarda 3 ile çıkar. `--describe` her komutun tam sözleşmesini basar.
 
 > [!TIP]
-> **Kanıtı açık yaz.** Başarıda hiçbir şey basmayan bir kontrol hiçbir şey göstermez. claude-referee geliştirilirken hakem "typecheck geçiyor" ölçütüne `missing` (0,46) dedi, çünkü `tsc` hiç çıktı basmamıştı; çıkış kodu eklenince sonuç `met` (0,97) oldu. (Bir kez ölçüldü, 2026-09-30.) Bu tek bir komuttu. Kanıtın yalnızca çıkış kodu olduğu gerçek CI loglarında `done`, geçen 67 adımın hiçbirine `met` demedi: çıkış kodu `missing`'i mümkün kılar, `met`'i nadir bırakır. Mümkünse çalıştırıcının kendi özetini yolla.
+> **Kanıtı açık yaz.** Başarıda hiçbir şey basmayan bir kontrol hiçbir şey göstermez. claude-referee geliştirilirken hakem "typecheck geçiyor" ölçütüne `missing` (0,46) dedi, çünkü `tsc` hiç çıktı basmamıştı; çıkış kodu eklenince sonuç `met` (0,97) oldu. (Bir kez ölçüldü, 2026-09-30.) Bu tek bir komuttu. Kanıtın yalnızca çıkış kodu olduğu gerçek CI loglarında `done`, geçen 67 adımın hiçbirine `met` demedi: yalnızca çıkış koduyla geçen bir adım `unsure` (34) ya da `missing` (33) döndü, hiçbiri `met` olmadı. Mümkünse çalıştırıcının kendi özetini yolla.
 > ```sh
 > { npx tsc --noEmit; echo "tsc exit code: $?"; } 2>&1 | npx claude-referee done --criteria "typecheck passes" --evidence -
 > ```

@@ -28,7 +28,7 @@ Fork: cap known issues, ignore them, or count them as failures. **This is a cons
 
 ## Replay and re-recording
 
-Both real-log tables were replayed with the recorded answers: the old code reproduces the committed tables with 0 differing rows. The new code changes 6 rows (listed in the [measurements note](../measurements-real-logs-2.md#after-the-two-parser-fixes-fitted-to-these-cases-not-an-unseen-test)); five changed their facts and were re-recorded with `eval record` on copies of the local suites (5 requests, receipts `rmuvf61f3tvvb` and `rmuvf62dqqqip`); the maven case needed none. `eval score --suite all` is unchanged for all 16 suites, same allowances; no synthetic case changed its facts.
+Both real-log tables were replayed with the recorded answers: the old code reproduces the committed tables with 0 of 501 rows differing in verdict, p, reason, parsed facts, trust or `met`-reachable. The new code changes 6 rows (listed in the [measurements note](../measurements-real-logs-2.md#after-the-two-parser-fixes-fitted-to-these-cases-not-an-unseen-test)); five changed their facts and were re-recorded with `eval record` on copies of the local suites (5 requests, receipts `rmuvf61f3tvvb` and `rmuvf62dqqqip`); the maven case needed none. `eval score --suite all` is unchanged for all 16 suites, same allowances; no synthetic case changed its facts.
 
 ## Not done
 
