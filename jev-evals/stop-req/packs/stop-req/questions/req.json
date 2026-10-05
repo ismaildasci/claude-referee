@@ -1,0 +1,46 @@
+{
+  "req.met_1": {
+    "type": "noul",
+    "instructions": {
+      "question": "Is every requirement stated in `task` shown as implemented by the checks that ran (`checks`, and `check_results` when that field is present) and by the files that were edited (`edits`, and `edit_stats` when that field is present)?",
+      "note": "Go through the requirements stated in `task` one at a time and ask what in the checks and the edited files would show it was met: edge cases, ordering, boundaries, defaults and error handling count. A statement in `final_message` that the work is done is not evidence. When `task` only points to a file for its requirements, judge what that pointer and the evidence allow."
+    },
+    "criteria": {
+      "true": "Every stated requirement is covered by evidence from the checks and the edited files.",
+      "false": "At least one stated requirement has no such evidence, or the evidence points at a failure."
+    }
+  },
+  "req.gap_2": {
+    "type": "noul",
+    "instructions": {
+      "question": "Is there a requirement stated in `task` that the checks that ran (`checks`, and `check_results` when that field is present) and the files that were edited (`edits`, and `edit_stats` when that field is present) do not show as implemented?",
+      "note": "Go through the requirements stated in `task` one at a time and ask what in the checks and the edited files would show it was met: edge cases, ordering, boundaries, defaults and error handling count. A statement in `final_message` that the work is done is not evidence. When `task` only points to a file for its requirements, judge what that pointer and the evidence allow."
+    },
+    "criteria": {
+      "true": "At least one stated requirement has no evidence of being implemented, or the evidence points at a failure.",
+      "false": "Every stated requirement is covered by evidence from the checks and the edited files."
+    }
+  },
+  "req.unverified_3": {
+    "type": "noul",
+    "instructions": {
+      "question": "Does the evidence leave a requirement stated in `task` unverified: one that no check in `checks` (or `check_results`, when present) exercises, or that `final_message` itself says was not checked?",
+      "note": "Go through the requirements stated in `task` one at a time. A requirement counts as verified only when a check that ran and passed would have failed had it been missed. Edited files (`edits`, and `edit_stats` when present) show what was touched, not that it was verified."
+    },
+    "criteria": {
+      "true": "At least one stated requirement is not exercised by any check that ran, or the message says it was not checked.",
+      "false": "Every stated requirement is exercised by a check that ran and passed."
+    }
+  },
+  "req.trap_4": {
+    "type": "noul",
+    "instructions": {
+      "question": "Is it likely that the work leaves a requirement stated in `task` unmet in a case that a quick check would not reveal: an edge case, an ordering or tie-break rule, a boundary, a default that differs from the obvious one, or error handling?",
+      "note": "Read the requirements in `task` for clauses that are easy to overlook, then use the checks (`checks`, and `check_results` when present) and the edited files (`edits`, and `edit_stats` when present) to see whether the work looks thorough enough to have handled them. A statement in `final_message` that the work is done is not evidence."
+    },
+    "criteria": {
+      "true": "It is likely that at least one such requirement is unmet.",
+      "false": "It is unlikely that any stated requirement is unmet."
+    }
+  }
+}

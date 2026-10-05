@@ -1,0 +1,6 @@
+{
+  "name": "stop-req",
+  "version": "0.1.0",
+  "model": "jev-1.13.0",
+  "description": "Experimental questions of the stop-requirements study (docs/decisions/stop-requirements-question.md). Not shipped in the plugin."
+}
