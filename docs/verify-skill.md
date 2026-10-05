@@ -11,9 +11,6 @@ curl -fsSL https://raw.githubusercontent.com/ismaildasci/claude-referee/main/doc
 
 Or copy [docs/recipes/verify/SKILL.md](recipes/verify/SKILL.md) by hand, into `.claude/skills/verify/` in a project or `~/.claude/skills/verify/` for all projects. Then change the test command in step 1 to your own. The recipe needs `claude-referee` available through `npx` and a TypeSafe key (see [configuration](configuration.md#the-api-key)).
 
-> [!WARNING]
-> **Not on npm yet.** Until the package is published (early October 2026), `npx claude-referee` fails with a 404, and the recipe as written produces no verdict. Use the alias from the [README install note](../README.md#install) and replace `npx claude-referee` with `claude-referee` in your copy. The recipe tells Claude to report a missing verdict instead of committing or looping.
-
 ## What Claude Code does with it
 
 Verified against official sources on 2026-10-01:

@@ -32,7 +32,7 @@ Four words, used the same way everywhere below. **Done**: in a release (a tag ex
 | Receipt chain, `receipts verify`, `receipts overrule` | done in main | e689e28 |
 | A/B bench (cost per task) | harness and pre-registration done, not run | 1fac7e4, ccca0b1; [bench/RESULTS.md](bench/RESULTS.md) says "Not run"; needs the maintainer's go and the Jev key |
 | Release 0.2.0 | done, 2026-10-05 | `package.json`, `npm/package.json` and `plugin.json` say 0.2.0; tags `v0.2.0` and `claude-referee--v0.2.0`; npm publish still waits for the maintainer's one-time code |
-| npm publish | blocked until 2026-10-03 14:22 UTC, then needs the maintainer's one-time code | account is read-only after a recovery code was used as an OTP; no workflow publishes |
+| npm publish | done, 2026-10-05 | `npm view claude-referee version` prints 0.2.0; `npx claude-referee@0.2.0 doctor` runs from a clean HOME; published by the maintainer with a security-key login, no workflow publishes; trusted publishing (a manually triggered workflow behind a protected environment) is still open |
 | Push of the 13 local commits | blocked | GitHub push protection (GH013) flags the Stripe-looking test fixture at `test/redact.test.ts:48` in 9e151eb and `:49` in 93d51fe; remote CI is red on the older `dist/cli.mjs` size limit that edbb46b fixes |
 | `claims` precision for release notes, community marketplace, 1.0 | open | each waits on a measurement named in its section below |
 

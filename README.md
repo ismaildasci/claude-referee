@@ -164,12 +164,6 @@ npx claude-referee receipts --tokens
 
 ## Install
 
-> [!WARNING]
-> **Not on npm yet.** Until the npm package is published (early October), `npx claude-referee` fails with a 404. Claude isn't affected: the plugin runs its own bundled copy. To run the commands on this page yourself, add this alias and type `claude-referee` wherever the docs say `npx claude-referee`:
-> ```sh
-> alias claude-referee='npx --yes --package https://github.com/ismaildasci/claude-referee/releases/download/v0.2.0/claude-referee-0.2.0.tgz claude-referee'
-> ```
-
 You need Claude Code 2.1.139 or later (tested with 2.1.285), Node 20.3 or later on the `PATH` Claude Code sees, and a [TypeSafe API key](https://docs.typesafe.ai).
 
 **1. Install the plugin**

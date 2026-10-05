@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Changed
+
+- The package is on npm (`claude-referee@0.2.0`): `npx claude-referee` works, and the README no longer carries the "Not on npm yet" warning or the tarball alias.
+
 ## [0.2.0] - 2026-10-05
 
 The measured state: `claims` and `judge` held on their hold-outs; `done` v2 is still not measured on its original bar (six invented hold-outs failed; a split bar was registered afterwards and rescored post hoc, see `docs/measurements-done-bar-split.md`); the Stop gate stays in `shadow` or `soft`, because in two synthetic studies it blocked nearly every success claim (precision about 0.1) and `active` is not recommended. The plugin name `claude-referee` is flagged by the Claude Code 2.1.287 validator as reserved; installs still work and CI tolerates only that one error.
