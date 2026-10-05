@@ -1,4 +1,4 @@
-// Parsers for Python's unittest and for cargo clippy. Counts come only from anchored structural lines, never free text.
+// Parsers for Python's unittest, cargo clippy, cargo build/check and others. Counts come only from anchored structural lines, never free text.
 // Worst case wins: of several summaries the one with the most failures is kept; a log cut off before its summary has no summary line.
 
 import type { RunnerFacts, RunnerParser } from "./types.ts";
@@ -76,6 +76,8 @@ const unittest: RunnerParser = {
 };
 
 const CLIPPY_MARK = /\bcargo clippy\b|clippy::/;
+const CLIPPY_FLAG = /(?:--(?:warn|allow|deny|forbid|force-warn)[= ]|-[WADF] ?)'?clippy::[\w:]+'?/g;
+const clippyMarked = (line: string): boolean => CLIPPY_MARK.test(line.replace(CLIPPY_FLAG, " "));
 const CLIPPY_GENERATED = /^warning: `[^`]+`(?: \([^)]*\))? generated (\d+) warnings?/;
 const CLIPPY_WARNING = /^warning: (?!`[^`]+`(?: \([^)]*\))? generated )/;
 const CLIPPY_ERROR = /^error(?:\[E\d+\])?: (?!could not compile|aborting due to)/;
@@ -85,7 +87,7 @@ const clippy: RunnerParser = {
   name: "clippy",
   parse(text) {
     const lines = prepare(text);
-    if (!lines.some((l) => CLIPPY_MARK.test(l))) return null;
+    if (!lines.some(clippyMarked)) return null;
     let generated = 0;
     let headers = 0;
     let errorHeaders = 0;
@@ -178,21 +180,31 @@ export const NEXTEST_MARK = /\bcargo[- ]nextest\b|^\s*Nextest run ID \S+ with ne
 const CARGO_BUILD_CMD = /\bcargo (?:build|check)\b/;
 const CARGO_PROGRESS = /^\s+(?:Compiling|Checking) \S+ v\d/;
 const CARGO_FINISHED = /^\s+Finished `?\w+`? (?:profile|\[)/;
+const CARGO_FINISHED_OK = /^ {4}Finished (?:`[\w.-]+` profile|[\w.-]+) \[[^\]]*\] target\(s\) in \d[\w. ]*$/;
+const CARGO_ECHO = /^(?:\$|\++|>) +(.*)$/;
+const CARGO_TEST_CMD = /\bcargo(?: +\+\S+)? +(?:test|t|bench|nextest|llvm-cov|tarpaulin|miri)\b/;
+const CARGO_TEST_OUTPUT = /^ *(?:Executable |Doc-tests |Running (?:unittests|benches|tests\/)|running \d+ tests?$)/;
+const CARGO_COMPOSITE = /&&|;|\|\|?/;
+const CARGO_TRAILING = /^(?:\s*|(?:warning|note|help): .*|.{0,60}?\bexit (?:code|status)\s*[:=]?\s*-?\d+.*)$/i;
 
 const cargoBuild: RunnerParser = {
   name: "cargo build",
   parse(text) {
     const lines = prepare(text);
-    if (lines.some((l) => CLIPPY_MARK.test(l) || NEXTEST_MARK.test(l))) return null;
+    if (lines.some((l) => clippyMarked(l) || NEXTEST_MARK.test(l) || CARGO_TEST_OUTPUT.test(l))) return null;
+    const echoes = lines.map((l) => CARGO_ECHO.exec(l)?.[1]).filter((c): c is string => c !== undefined);
+    if (echoes.some((c) => CARGO_TEST_CMD.test(c))) return null;
     const marked = lines.some((l) => CARGO_BUILD_CMD.test(l)) || (lines.some((l) => CARGO_PROGRESS.test(l)) && lines.some((l) => CARGO_FINISHED.test(l) || CLIPPY_COMPILE.test(l)));
-    if (!marked || lines.some((l) => /^running \d+ tests?$/.test(l))) return null;
+    if (!marked) return null;
     let generated = 0;
     let headers = 0;
     let errorHeaders = 0;
     let dueTo = 0;
     let couldNot = false;
     let summary: string | null = null;
-    for (const line of lines) {
+    let lastFinished = -1;
+    for (const [i, line] of lines.entries()) {
+      if (/^\s+Finished\b/.test(line)) lastFinished = i;
       const g = CLIPPY_GENERATED.exec(line);
       if (g) {
         generated += Number(g[1]);
@@ -213,7 +225,12 @@ const cargoBuild: RunnerParser = {
       if (CLIPPY_ERROR.test(line)) errorHeaders++;
     }
     const errors = Math.max(errorHeaders, dueTo, couldNot ? 1 : 0);
-    return { runner: "cargo build", passed: 0, failed: 0, errors, skipped: 0, warnings: Math.max(generated, headers), failing: [], summary_line: summary };
+    const finished = lastFinished >= 0 && CARGO_FINISHED_OK.test(lines[lastFinished] as string);
+    const composite = echoes.some((c) => CARGO_BUILD_CMD.test(c) && CARGO_COMPOSITE.test(c));
+    const trailing = lastFinished >= 0 && lines.slice(lastFinished + 1).some((l) => !CARGO_TRAILING.test(l));
+    const complete = finished && !composite && !trailing;
+    const facts: RunnerFacts = { runner: "cargo build", passed: 0, failed: 0, errors, skipped: 0, warnings: Math.max(generated, headers), ...(complete || errors > 0 ? {} : { incomplete: true }), failing: [], summary_line: complete && errors === 0 ? clip(lines[lastFinished] as string, MAX_SUMMARY) : summary };
+    return facts;
   },
 };
 

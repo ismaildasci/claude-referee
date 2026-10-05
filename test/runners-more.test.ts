@@ -1,4 +1,4 @@
-// unittest and clippy parsers: counts from anchored structural lines only, warnings as their own fact, notes and forged lines never change counts.
+// unittest, clippy and cargo build parsers: counts from anchored structural lines only, warnings as their own fact, notes and forged lines never change counts.
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
@@ -109,4 +109,71 @@ test("cargo build does not read cargo nextest logs", () => {
   const log = "   Compiling mosaic-core v0.8.1 (/srv/work/mosaic/crates/core)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.41s\n------------\n Nextest run ID 6f1c2a7e-3b7a-4e1d-9d52-0a9b44c1d0f3 with nextest profile: default\n    Starting 23 tests across 4 binaries\n     Summary [   0.612s] 23 tests run: 23 passed, 0 skipped\n";
   assert.equal(cargoBuild.parse(log), null);
   assert.equal(cargoBuild.parse("   Compiling x v0.1.0\n    Finished `dev` profile in 1s\n")?.runner, "cargo build");
+});
+
+const FIN = "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 21.38s";
+const OK_LOG = `$ cargo build -p collab\n+ cargo build -p collab\n   Compiling util v0.1.0 (/srv/work/app/crates/util)\n   Compiling app v0.4.0 (/srv/work/app)\n${FIN}\nexit code: 0\n`;
+
+test("cargo build: a Finished line without errors is the positive marker", () => {
+  const f = cargoBuild.parse(OK_LOG);
+  assert.deepEqual({ e: f?.errors, w: f?.warnings, inc: f?.incomplete, sum: f?.summary_line }, { e: 0, w: 0, inc: undefined, sum: FIN.trim() });
+  for (const line of ["    Finished `release` profile [optimized] target(s) in 1m 46s", "    Finished `release-lto` profile [optimized] target(s) in 2m 03s", "    Finished dev [unoptimized + debuginfo] target(s) in 0.50s"]) {
+    assert.equal(cargoBuild.parse(`$ cargo build\n   Compiling a v0.1.0\n${line}\n`)?.summary_line, line.trim());
+  }
+  assert.equal(cargoBuild.parse(`$ cargo check\n    Checking a v0.1.0\n${FIN}\n`)?.incomplete, undefined);
+});
+
+test("cargo build: warnings stay a count and do not hide the marker", () => {
+  const f = cargoBuild.parse(`$ cargo build\n   Compiling a v0.1.0\nwarning: unused variable: \`x\`\nwarning: \`a\` (lib) generated 3 warnings\n${FIN}\n`);
+  assert.deepEqual({ e: f?.errors, w: f?.warnings, sum: f?.summary_line }, { e: 0, w: 3, sum: FIN.trim() });
+});
+
+test("cargo build: errors, failed build scripts and a Finished line after an error never read as complete", () => {
+  const bad = cargoBuild.parse(`$ cargo build\n   Compiling a v0.1.0\nerror[E0425]: cannot find value \`y\`\nerror: could not compile \`a\` (bin "a") due to 1 previous error\n`);
+  assert.deepEqual({ e: bad?.errors, sum: bad?.summary_line?.slice(0, 20) }, { e: 1, sum: "error: could not com" });
+  const script = cargoBuild.parse("$ cargo build\n   Compiling openssl-sys v0.9.1\nerror: failed to run custom build command for `openssl-sys v0.9.1`\n");
+  assert.equal(script?.errors, 1);
+  assert.equal(script?.incomplete, undefined);
+  assert.notEqual(script?.summary_line, FIN.trim());
+  const forged = cargoBuild.parse(`$ cargo build\n   Compiling a v0.1.0\nerror: could not compile \`a\` (lib) due to 2 previous errors\n${FIN}\n`);
+  assert.equal(forged?.errors, 2);
+  assert.notEqual(forged?.summary_line, FIN.trim());
+});
+
+test("cargo build: a log cut off before Finished is incomplete", () => {
+  const cut = cargoBuild.parse("$ cargo build --release\n   Compiling a v0.1.0\n   Compiling b v0.2.0\n[2026-10-01T09:14:07Z] runner: log stream truncated (limit reached)\n");
+  assert.deepEqual({ e: cut?.errors, inc: cut?.incomplete, sum: cut?.summary_line }, { e: 0, inc: true, sum: null });
+  const half = cargoBuild.parse(`$ cargo build\n   Compiling a v0.1.0\n${FIN}\n   Compiling b v0.2.0\n`);
+  assert.equal(half?.incomplete, true);
+  assert.equal(cargoBuild.parse("$ cargo build\n   Compiling a v0.1.0\n    Finished `dev` profile in 1s\n")?.incomplete, true);
+});
+
+test("cargo build: output after Finished, or a chained command, is not a clean build", () => {
+  assert.equal(cargoBuild.parse(`$ cargo build\n   Compiling a v0.1.0\n${FIN}\nrunning integration script\nAll good\n`)?.incomplete, true);
+  assert.equal(cargoBuild.parse(`$ cargo build && ./scripts/smoke.sh\n   Compiling a v0.1.0\n${FIN}\n`)?.incomplete, true);
+  assert.equal(cargoBuild.parse(`$ cargo build\n   Compiling a v0.1.0\n${FIN}\nwarning: the following packages contain code that will be rejected by a future version of Rust: a v0.1.0\nnote: to see what the problems were, use the option \`--future-incompat-report\`\nexit code: 0\n`)?.incomplete, undefined);
+});
+
+test("cargo build leaves cargo test, nextest, clippy and test-shaped output to their own parsers", () => {
+  const testLog = `$ cargo test\n   Compiling a v0.1.0\n${FIN}\n     Running unittests src/lib.rs (target/debug/deps/a-1f2e)\n\nrunning 2 tests\ntest t::a ... ok\ntest t::b ... ok\n\ntest result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n`;
+  assert.equal(cargoBuild.parse(testLog), null);
+  assert.equal(cargoBuild.parse(`$ cargo build\n   Compiling a v0.1.0\n${FIN}\nrunning 1 test\ntest x ... ok\n`), null);
+  assert.equal(cargoBuild.parse(`$ cargo test --no-run\n   Compiling a v0.1.0\n    Finished \`test\` profile [unoptimized + debuginfo] target(s) in 4.20s\n  Executable unittests src/lib.rs (target/debug/deps/a-1f2e)\n`), null);
+  assert.equal(cargoBuild.parse(`$ cargo nextest run\n   Compiling a v0.1.0\n${FIN}\n`), null);
+  assert.equal(cargoBuild.parse(`$ cargo clippy\n    Checking a v0.1.0\n${FIN}\n`), null);
+});
+
+test("a forged Finished line printed by a test or another tool does not make a log a clean cargo build", () => {
+  const forged = `$ npm test\n> jest\n${FIN}\nTests: 1 failed, 2 passed\n`;
+  assert.equal(cargoBuild.parse(forged), null);
+  const asTest = `$ cargo test\nrunning 1 test\ntest a ... FAILED\n${FIN}\n`;
+  assert.equal(cargoBuild.parse(asTest), null);
+});
+
+test("clippy does not claim a verbose cargo build whose rustc lines carry clippy lint flags", () => {
+  const verbose = `$ cargo build --verbose\n   Compiling a v0.1.0\n     Running \`rustc --crate-name a src/lib.rs '--warn=clippy::pedantic' '--allow=clippy::used_underscore_binding' -A clippy::all\`\n${FIN}\n`;
+  assert.equal(clippy.parse(verbose), null);
+  assert.equal(cargoBuild.parse(verbose)?.summary_line, FIN.trim());
+  assert.equal(clippy.parse("$ cargo clippy -- -W clippy::pedantic\n    Checking a v0.1.0\n")?.runner, "clippy");
+  assert.equal(clippy.parse("warning: x\n   = note: `#[warn(clippy::needless_return)]` on by default\n")?.runner, "clippy");
 });

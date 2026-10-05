@@ -2932,6 +2932,8 @@ var unittest = {
   }
 };
 var CLIPPY_MARK = /\bcargo clippy\b|clippy::/;
+var CLIPPY_FLAG = /(?:--(?:warn|allow|deny|forbid|force-warn)[= ]|-[WADF] ?)'?clippy::[\w:]+'?/g;
+var clippyMarked = /* @__PURE__ */ __name((line) => CLIPPY_MARK.test(line.replace(CLIPPY_FLAG, " ")), "clippyMarked");
 var CLIPPY_GENERATED = /^warning: `[^`]+`(?: \([^)]*\))? generated (\d+) warnings?/;
 var CLIPPY_WARNING = /^warning: (?!`[^`]+`(?: \([^)]*\))? generated )/;
 var CLIPPY_ERROR = /^error(?:\[E\d+\])?: (?!could not compile|aborting due to)/;
@@ -2940,7 +2942,7 @@ var clippy = {
   name: "clippy",
   parse(text) {
     const lines3 = prepare3(text);
-    if (!lines3.some((l) => CLIPPY_MARK.test(l))) return null;
+    if (!lines3.some(clippyMarked)) return null;
     let generated = 0;
     let headers = 0;
     let errorHeaders = 0;
@@ -3027,20 +3029,30 @@ var NEXTEST_MARK = /\bcargo[- ]nextest\b|^\s*Nextest run ID \S+ with nextest pro
 var CARGO_BUILD_CMD = /\bcargo (?:build|check)\b/;
 var CARGO_PROGRESS = /^\s+(?:Compiling|Checking) \S+ v\d/;
 var CARGO_FINISHED = /^\s+Finished `?\w+`? (?:profile|\[)/;
+var CARGO_FINISHED_OK = /^ {4}Finished (?:`[\w.-]+` profile|[\w.-]+) \[[^\]]*\] target\(s\) in \d[\w. ]*$/;
+var CARGO_ECHO = /^(?:\$|\++|>) +(.*)$/;
+var CARGO_TEST_CMD = /\bcargo(?: +\+\S+)? +(?:test|t|bench|nextest|llvm-cov|tarpaulin|miri)\b/;
+var CARGO_TEST_OUTPUT = /^ *(?:Executable |Doc-tests |Running (?:unittests|benches|tests\/)|running \d+ tests?$)/;
+var CARGO_COMPOSITE = /&&|;|\|\|?/;
+var CARGO_TRAILING = /^(?:\s*|(?:warning|note|help): .*|.{0,60}?\bexit (?:code|status)\s*[:=]?\s*-?\d+.*)$/i;
 var cargoBuild = {
   name: "cargo build",
   parse(text) {
     const lines3 = prepare3(text);
-    if (lines3.some((l) => CLIPPY_MARK.test(l) || NEXTEST_MARK.test(l))) return null;
+    if (lines3.some((l) => clippyMarked(l) || NEXTEST_MARK.test(l) || CARGO_TEST_OUTPUT.test(l))) return null;
+    const echoes = lines3.map((l) => CARGO_ECHO.exec(l)?.[1]).filter((c) => c !== void 0);
+    if (echoes.some((c) => CARGO_TEST_CMD.test(c))) return null;
     const marked = lines3.some((l) => CARGO_BUILD_CMD.test(l)) || lines3.some((l) => CARGO_PROGRESS.test(l)) && lines3.some((l) => CARGO_FINISHED.test(l) || CLIPPY_COMPILE.test(l));
-    if (!marked || lines3.some((l) => /^running \d+ tests?$/.test(l))) return null;
+    if (!marked) return null;
     let generated = 0;
     let headers = 0;
     let errorHeaders = 0;
     let dueTo = 0;
     let couldNot = false;
     let summary = null;
-    for (const line of lines3) {
+    let lastFinished = -1;
+    for (const [i, line] of lines3.entries()) {
+      if (/^\s+Finished\b/.test(line)) lastFinished = i;
       const g2 = CLIPPY_GENERATED.exec(line);
       if (g2) {
         generated += Number(g2[1]);
@@ -3061,7 +3073,12 @@ var cargoBuild = {
       if (CLIPPY_ERROR.test(line)) errorHeaders++;
     }
     const errors = Math.max(errorHeaders, dueTo, couldNot ? 1 : 0);
-    return { runner: "cargo build", passed: 0, failed: 0, errors, skipped: 0, warnings: Math.max(generated, headers), failing: [], summary_line: summary };
+    const finished = lastFinished >= 0 && CARGO_FINISHED_OK.test(lines3[lastFinished]);
+    const composite = echoes.some((c) => CARGO_BUILD_CMD.test(c) && CARGO_COMPOSITE.test(c));
+    const trailing = lastFinished >= 0 && lines3.slice(lastFinished + 1).some((l) => !CARGO_TRAILING.test(l));
+    const complete = finished && !composite && !trailing;
+    const facts3 = { runner: "cargo build", passed: 0, failed: 0, errors, skipped: 0, warnings: Math.max(generated, headers), ...complete || errors > 0 ? {} : { incomplete: true }, failing: [], summary_line: complete && errors === 0 ? clip4(lines3[lastFinished], MAX_SUMMARY4) : summary };
+    return facts3;
   }
 };
 var parsers4 = [unittest, clippy, golangci, viteParser, cargoBuild];
