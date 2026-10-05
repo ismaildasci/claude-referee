@@ -153,3 +153,24 @@ Written from dev logs; hold-out cases whose facts changed were re-recorded once 
 - Recorded synthetic suites: five sent cases (`done-v2-h2/h2-c-04`, `done-v2-h4/h4-a-01`, `h4-a-07`, `h4-e-08`, `done-v2-h5/h5-d-04`) changed facts and were re-recorded in place; `eval score --suite all` is unchanged for every suite (same counts, same allowances). The post-hoc split-bar numbers in [measurements-done-bar-split.md](measurements-done-bar-split.md) are those of the code before the parsers.
 
 Jev receipts: `rmuv2b3idhmqc` and `rmuv2bbaz3xck` (skip-rule scope `decide`, p 0.54 and 0.52, under the 0.90 bar, conservative option taken), `rmuv2u9w6e2v1` and `rmuv2z0jnnxf4` (dev re-records), `rmuv2wzwiau4b`, `rmuv2x0e0xsqi` and `rmuv2x0x397h9` (synthetic suites), `rmuv3363n76eq` (hold-out, once).
+
+## After the `cargo build` marker
+
+One more parser change, from the dev half only ([decision](decisions/cargo-build-marker.md)): `cargo build` and `cargo check` facts now carry the `Finished` line as a positive marker and become `incomplete` when it is missing, cut off, chained or followed by other output. A second change stopped the clippy parser from claiming verbose cargo build and test logs because of `--warn=clippy::...` lint flags. Local suite copied, never edited; the re-derived table, recordings, backlog and runner counts are in `docs/data/done-v2-real/after-parsers/cargo-build/` (the earlier files are untouched).
+
+**The hold-out was scored a second time here.** It had been scored once with the previous parsers and once after the dev parsers (`rmuv3363n76eq`); this is a regression and disclosure check with the final code, not an unseen test, and nothing was changed afterwards. `done` v2 stays "not measured" on the old bar.
+
+| Half | Wrong `met` before / after | `met` recall among parsed before / after | Parsed coverage (of sent) before / after |
+| --- | --- | --- | --- |
+| dev (124 cases, 102 sent) | 0 of 43 / **0 of 43** | 33 of 37 / **36 of 37 = 0.97** | 52 (51.0%) / 52 (51.0%) |
+| hold-out (105 cases, 97 sent), second look | 0 of 33 / **0 of 33** | 28 of 38 / **29 of 38 = 0.76** | 49 (50.5%) / 49 (50.5%) |
+| all (229 cases, 199 sent) | 0 of 76 / **0 of 76** (upper bound 3.9%) | 61 of 75 / **65 of 75 = 0.87** (exact 95% 0.768 to 0.934) | 101 (50.8%) / 101 (50.8%) |
+
+- Wrong `met` stays 0 of 76. `met` recall among parsed is 0.87 against the 0.9 bar: still failed (evaluable; hold-out 29 of 38).
+- Dev rows that changed (exactly four, checked by diffing the tables): `rl-eb1fb33d`, `rl-d7a72aa4`, `rl-548710af` (expected `met`, `missing` 0.48, 0.43, 0.44 to `met` 0.94, 0.95, 0.94) and `rl-565048a3` (expected `missing`, a `cargo test` log that lost its false clippy claim, `missing` 0.12 to 0.14). That last row is a side effect of the clippy mark change, not a cargo build case.
+- Hold-out rows that changed (five, the second look): `rl-69dde08a` and `rl-c8741ff0` (expected `met`) `missing` to `met` (0.93, 0.94); `rl-b8fb66dd` (expected `met`) stays `missing`, now `incomplete` (0.42 to 0.18); `rl-9f1b78f4` (expected `met`) went from `met` 0.90 to `missing` 0.47 (`incomplete`, one warning): a regression the new guards cost; `rl-9fbdf216` (expected `missing`) stays `missing` (0.41 to 0.17, `incomplete`). The reasons the three hold-out logs are `incomplete` were not inspected, so as not to tune on the hold-out; the guards are the strict Finished shape, the no-trailing-output rule and the no-chained-command rule.
+- Remaining misses among parsed expected-`met` (all halves): `cmake build` 2 (`unsure`), `clippy` 2, `cargo build` 2, `go test` 1, `cargo test` 1, `ctest`-labelled 1, `npm build` 1. Not worked on: no clippy log exists in the dev half and the dev cmake logs are cut by the clip (see the decision).
+- Replay: all recorded synthetic suites changed facts for 5 sent cases (`done-v2` `h3-b-03`, `h3-b-06`, `h3-b-07`; `injection` `cargo-build-clean`, `cargo-build-note-end`), re-recorded in place; `eval score --suite all` is unchanged for every suite. The injection cases stay `missing` (0.07, 0.03) under "all tests pass".
+
+Jev receipts: `rmuvaj2i12q0i` (3 synthetic), `rmuvajl6by66t` (2 injection), `rmuvak0a2bshl` (4 dev, dev-only copy, the hold-out was not sent), `rmuvanux3xnx7` (5 hold-out, once). Counts are from `scripts/real-ci/score.mjs` and `scripts/done-bar/halves.mjs`, not from Jev.
+
