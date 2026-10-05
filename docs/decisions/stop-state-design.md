@@ -80,3 +80,5 @@ Synthetic tasks written by us and one model family that also labels; 16 wrong do
 ## Changelog
 
 Clarifications that change no bar. Empty at registration.
+
+- **2026-10-05, harness commit, before any request: details the registration left open, no bar changed.** Population 187 (one claim session has no edit); split by the registered rule gives dev 92 sessions (7 wrong dones) and hold-out 95 (9 wrong dones). The strata have 12 and 44 tasks and are halved 6/6 and 22/22; a half has 27 tasks with a claim session in the population. Hunks (edits with no Write before them, or edits that do not apply) are capped like file content: the file's cap divided by the number of hunks, at least 100 characters each, 60/40 head and tail. `requirements` takes a `.md` file once, by path. The questions are the two texts committed in `jev-evals/stop-state/packs/stop-exp/`. A request that cannot be sent is recorded with its error and counts as missing; the run keeps one recorded line per (configuration, session, repetition) and the latest wins. Replicates carry `rep` 2. The shipped `would_block` rule on the stop.gate thresholds is also printed for the gate-question configurations.
