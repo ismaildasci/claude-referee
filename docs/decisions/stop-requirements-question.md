@@ -78,3 +78,10 @@ Synthetic tasks written by us and one model family that also labels; the fresh s
 ## Changelog
 
 Clarifications that change no bar. Empty at registration.
+
+- **2026-10-05, harness commit c8b2af9, before the first request: details the registration left open, no bar changed.** The questions are sent under the keys `met`, `gap`, `unverified` and `trap`. Line counts are the literal rule (a trailing newline counts one more line). A's recorded dev and hold-out answers are read from the contents study's `recorded.jsonl` and A on the fresh set is requested once. Population counts on dev and hold-out reproduce the contents study (92 and 95 sessions, 7 and 9 wrong dones). The within-task AUC is the mean over tasks that hold both classes of the AUC within the task. One single-request size probe (the largest state) was made before the dev run; it is part of the 2 208 dev requests.
+- **2026-10-05, after the dev freeze (1f61897) and before any fresh session:** the dev result was a dev failure (best hard AUC 0.571); the fresh set was run anyway, as registered.
+
+## Result
+
+Added after the runs; the registration above is unchanged apart from the changelog. Full tables: [measurements-stop-requirements.md](../measurements-stop-requirements.md). Frozen on dev (a dev failure, best hard AUC 0.571): primary `R0-W2` (the gap wording on the shipped state) with threshold 0.555, secondary `R1-W2` (adds parsed check counts) with threshold 0.615. Fresh set, scored once (56 sessions run for 5.79 USD, 49 in the population, 11 wrong dones in 31 tasks): primary AUC 0.626 (task-clustered 95% interval 0.432 to 0.791, exact permutation p 0.107) against 0.543 for the shipped gate; recall 10 of 11, false blocks 29 of 38. P1, P2 and P3 fail, P4 holds. Verdict: the requirements question does not separate on the state the gate already sends; the signal of the contents study needed the code. The secondary candidate fails too (AUC 0.581, p 0.212). The seen-once hold-out gives AUC 0.453 and 0.433. No proposal is written; nothing in `src/hooks`, the shipped pack, thresholds or defaults changes.
