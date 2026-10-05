@@ -1,12 +1,13 @@
 // done: does the check output show each criterion holds? One request; every criterion is a Noul on the same evidence.
 // Recognised runner output is parsed in code and only those facts reach Jev; unrecognised output can never become met.
-// A non-zero exit code in the evidence is missing without a request; skipped, risky or incomplete tests cap met at unsure.
+// A non-zero exit code in the evidence is missing without a request; skipped, risky or incomplete tests, or a skip marker anywhere in the log, cap met at unsure.
 // Exit-code-only evidence for a lint or clean criterion that shows a warning, notice, failure or skip message, or a swallowed exit code, is capped at unsure.
 // A parsed run that is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion with parsed warnings, is capped the same way.
 
 import type { EntryType, Questions } from "@typesafe-ai/sdk";
 import { RefereeError } from "../../engine/errors.ts";
 import { parseEvidence, type ParsedEvidence } from "../../engine/runners/index.ts";
+import { skipMarkers } from "../../engine/runners/skips.ts";
 import type { Result } from "../../engine/output.ts";
 import { threshold, type Pack, type Thresholds } from "../../engine/pack.ts";
 import type { Outcome, Planned } from "../../engine/session.ts";
@@ -30,8 +31,8 @@ const INCOMPLETE_NEXT = "The run is cut off, empty, cancelled, flaky or changed 
 const NO_TESTS_NEXT = "The log itself says no tests ran, so done won't say met. Run the tests that were meant to run and pipe their output in.";
 const SKIP_WORDS = /^OK, but .*\b(?:incomplete|skipped|risky)\b/i;
 
-function hasSkips(parsed: ParsedEvidence): boolean {
-  return parsed.runners.some((r) => r.skipped > 0 || (r.summary_line !== null && SKIP_WORDS.test(r.summary_line)));
+function hasSkips(parsed: ParsedEvidence, evidence: string): boolean {
+  return parsed.runners.some((r) => r.skipped > 0 || (r.summary_line !== null && SKIP_WORDS.test(r.summary_line))) || skipMarkers(evidence).length > 0;
 }
 
 function hasIncomplete(parsed: ParsedEvidence): boolean {
@@ -93,7 +94,7 @@ export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, crit
       const answer = outcome?.answers?.[`c${i + 1}`];
       const p = answer?.type === "noul" ? answer.noul : 0;
       const raw: Verdict = p >= met ? "met" : p < missing ? "missing" : "unsure";
-      const skipCap = raw === "met" && hasSkips(parsed);
+      const skipCap = raw === "met" && hasSkips(parsed, evidence);
       const noTestsCap = raw === "met" && NO_TESTS.test(evidence);
       const incompleteCap = raw === "met" && hasIncomplete(parsed);
       const warningCap = raw === "met" && warnCap && CLEAN_CRITERION.test(criterion);

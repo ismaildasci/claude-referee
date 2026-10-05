@@ -122,3 +122,17 @@ Two readings: build and lint criteria carry most of the gap (a build success has
 - The sample is biased toward easy evidence: ambiguous (truncated, silent) and silent-`met` cases were dropped, 7 and 15 of 221 labelled succeeded steps. Its wrong-`met` bar rests on 29 hard negatives of which 9 reach Jev (see "What the wrong-`met` bar can test").
 - One Jev model version and one recording (2026-10-05); the two wrong `met` rest on one labeller's reading (neither was in the second-labelled 30%).
 - Redistribution of log text is unresolved, so none is committed (`decide`: first ask 0.54 / 0.44 / 0.01, receipt `rmuqaymlia1f7`; with two neutral facts added 0.64 / 0.34 / 0.01, receipt `rmuqayxupkfma`; orders agreeing both times; under the 0.90 bar, so the conservative option). This directory holds hashes, labels and facts only; the suite is not rerunnable from the repository.
+
+## After the skip fix and the dev parsers
+
+### Skip markers beyond the summary (replayed offline, 2026-10-05)
+
+The skipped-tests cap now reads structured skip markers anywhere in the log ([decision](decisions/skip-markers-beyond-summary.md)). Re-derived from the recorded Jev answers (no new request; code caps do not change the state hash) with `scripts/real-ci/analyze.mjs` and `scripts/done-bar/halves.mjs`. **The rule was designed from the two dev cases; the hold-out numbers are a regression check, not a clean test, because the hold-out was seen when scoring.**
+
+| Half | Wrong `met` before | after | `met` recall among parsed before | after |
+| --- | --- | --- | --- | --- |
+| dev (124 cases) | 2 of 43 | 0 of 43 | 13 of 16 | 13 of 16 |
+| hold-out (105 cases) | 0 of 33 | 0 of 33 | 20 of 28 | 20 of 28 |
+| all (229 cases) | 2 of 76 | 0 of 76 | 33 of 44 | 33 of 44 |
+
+Exactly two table rows changed (`rl-d7e82393`, `rl-cfdcfb61`, both `met` to `unsure`, `skipped_tests`). No expected-`met` case of either half is capped, so recall is unchanged at 0.75; parsed coverage is unchanged (68 of 199). Nothing here claims the bar passes: the registered measurement is the earlier one and `done` v2 stays not measured on the old bar.

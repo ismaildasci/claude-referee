@@ -10,6 +10,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
+- `done` caps `met` at `unsure` (`skipped_tests`) on a skip, pending, xfail or todo marker anywhere in the log (nested reporters, earlier summaries, unrecognised runners), not only in the parsed summary; the two wrong `met` of the real-log sample are gone, no other recorded case changed ([decision](docs/decisions/skip-markers-beyond-summary.md)).
 - The package is on npm (`claude-referee@0.2.0`): `npx claude-referee` works, and the README no longer carries the "Not on npm yet" warning or the tarball alias.
 
 ## [0.2.0] - 2026-10-05

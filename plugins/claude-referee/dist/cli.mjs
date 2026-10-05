@@ -3768,6 +3768,62 @@ function parseEvidence(text) {
 }
 __name(parseEvidence, "parseEvidence");
 
+// src/engine/runners/skips.ts
+var ANSI6 = /\u001b(?:\[[0-?]*[ -/]*[@-~]|\][^\u0007\u001b]*(?:\u0007|\u001b\\)?)/g;
+var SKIP_WORD = "(?:skipped|skip|pending|todo|xfailed|xfail|ignored|disabled|inconclusive|notrun)";
+var SKIP_WORD_RE = new RegExp(`^${SKIP_WORD}$`, "i");
+var LABEL = /^(?:test result:? \w+\.?[:\s]|(?:total tests|tests?|test files?|test suites?|test cases?|suites?|specs?|examples?|results?|summary|totals?|ran|run|snapshots?|checks?|files?)\b)[:\s]*/i;
+var LEVEL = /^\[(?:INFO|WARNING|WARN|ERROR)\]\s*/;
+var DURATION = /\s*[-,;|]?\s*(?:in|duration:?|time elapsed:?|time:?|finished in|elapsed:?)\s+[\d.,]+\s*(?:ms|s|sec|secs|seconds?|m|min)\b.*$/i;
+var COUNT_TOKEN = /^(?:(\d+)\s+(filtered out|[A-Za-z][A-Za-z-]*)|([A-Za-z][A-Za-z-]*)(?::\s*|\s+)(\d+))(?:\s*[,;|.·]\s*|\s+|$)/;
+var ECHO = /^(?:\$ |> |\+ |Run |shell: |##\[|::|\[command\])/;
+var DIRECTIVES = [
+  /^(?:#\s*)?(?:not )?ok\s+\d+\b.*\s#\s*(?:skip(?:ped)?|todo)\b/i,
+  /\s# (?:SKIP|TODO)\b/,
+  /\((?:skipped|todo|pending)(?::[^)]*)?\)\s*$/i,
+  /\(\d+ tests? \| (?:\d+ \w+ \| )*[1-9]\d* (?:skipped|todo|pending)\b/,
+  /^\S+\.py::\S+\s+(?:SKIPPED|XFAIL)\b/,
+  /^(?:SKIPPED|XFAIL)\s+(?:\[\d+\]|\S+::)/,
+  /^\S+\.py\s+[.FEsxX]*[sx][.FEsxX]*(?:\s+\[\s*\d+%\])?$/,
+  /^\s*--- SKIP: \S+/,
+  /\.\.\. (?:skipped\b|expected failure\b)/,
+  /\((?:[^)]*, )?(?:skipped|expected failures)=[1-9]/,
+  /\(PENDING\b/,
+  /^Pending:\s*(?:\(|$)/,
+  /^\s*[○✎] (?:skipped|todo)\b/,
+  /^test \S+ \.\.\. ignored\b/,
+  /^(?:Passed|Failed|Skipped)!\s+-\s+Failed:\s*\d+,\s*Passed:\s*\d+,\s*Skipped:\s*[1-9]/,
+  /^\s*Skipped \S.*\[\d+(?:\.\d+)? ?m?s\]\s*$/,
+  /^Tests are skipped\.?$/,
+  /^[^>\n].*\sSKIPPED$/
+];
+function skipTokens(line) {
+  let rest = line.replace(LEVEL, "").replace(/^[#=\s-]+/, "").replace(LABEL, "").replace(DURATION, "").replace(/\s*\([^)]*\)/g, "").replace(/[\s=-]+$/, "");
+  if (rest === "") return 0;
+  let total = 0;
+  let tokens2 = 0;
+  while (rest !== "") {
+    const m = COUNT_TOKEN.exec(rest);
+    if (m === null) return 0;
+    const [n, word] = m[1] === void 0 ? [m[4], m[3]] : [m[1], m[2]];
+    if (SKIP_WORD_RE.test(word)) total += Number(n);
+    tokens2++;
+    rest = rest.slice(m[0].length);
+  }
+  return tokens2 > 0 ? total : 0;
+}
+__name(skipTokens, "skipTokens");
+function skipMarkers(text) {
+  const found = [];
+  for (const raw of text.replace(ANSI6, "").split(/\r?\n/)) {
+    const line = raw.trim();
+    if (line === "" || ECHO.test(line) || line.startsWith("> Task ")) continue;
+    if (DIRECTIVES.some((d) => d.test(line)) || skipTokens(line) > 0) found.push(line.slice(0, 120));
+  }
+  return found;
+}
+__name(skipMarkers, "skipMarkers");
+
 // src/cli/commands/done.ts
 var NEXT = {
   missing: "The evidence doesn't show the criterion. Run the check that proves it and pipe its output in; the same evidence gives the same answer.",
@@ -3782,8 +3838,8 @@ var NO_TESTS = /\b(?:no tests? (?:to run|found|were found|executed|ran|collected
 var INCOMPLETE_NEXT = "The run is cut off, empty, cancelled, flaky or changed files, so done won't say met. Run the full check again and pipe all of its output in.";
 var NO_TESTS_NEXT = "The log itself says no tests ran, so done won't say met. Run the tests that were meant to run and pipe their output in.";
 var SKIP_WORDS = /^OK, but .*\b(?:incomplete|skipped|risky)\b/i;
-function hasSkips(parsed) {
-  return parsed.runners.some((r) => r.skipped > 0 || r.summary_line !== null && SKIP_WORDS.test(r.summary_line));
+function hasSkips(parsed, evidence) {
+  return parsed.runners.some((r) => r.skipped > 0 || r.summary_line !== null && SKIP_WORDS.test(r.summary_line)) || skipMarkers(evidence).length > 0;
 }
 __name(hasSkips, "hasSkips");
 function hasIncomplete(parsed) {
@@ -3843,7 +3899,7 @@ function doneRequest(pack, thresholds, criteria, evidence) {
       const answer = outcome?.answers?.[`c${i + 1}`];
       const p = answer?.type === "noul" ? answer.noul : 0;
       const raw = p >= met ? "met" : p < missing ? "missing" : "unsure";
-      const skipCap = raw === "met" && hasSkips(parsed);
+      const skipCap = raw === "met" && hasSkips(parsed, evidence);
       const noTestsCap = raw === "met" && NO_TESTS.test(evidence);
       const incompleteCap = raw === "met" && hasIncomplete(parsed);
       const warningCap = raw === "met" && warnCap && CLEAN_CRITERION.test(criterion);
