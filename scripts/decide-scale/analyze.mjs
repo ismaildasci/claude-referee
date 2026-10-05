@@ -372,7 +372,7 @@ const byMargin = marginBins.map(([lo, hi]) => {
   const idx = rule.filter((i) => data[i].margin >= lo - EPS && data[i].margin < hi - EPS);
   const row = { bin: `[${lo}, ${Math.min(hi, 1)})`, n: idx.length };
   for (const name of ["written", "wr", "rot3", "latin", "latin_rev", "rand4", "rand8"]) {
-    const arr = results["leave_unanimous"][name];
+    const arr = results[results["rep_unanimous"] ? "rep_unanimous" : "leave_unanimous"][name];
     const ok = idx.filter((i) => arr[i]);
     row[name] = ok.length ? r4(avg(ok.map((i) => arr[i].agree))) : null;
   }
