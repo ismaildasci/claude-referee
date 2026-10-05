@@ -58,3 +58,9 @@ The decision of the first registration is reused, not re-asked: **no log text is
 - Same classifier, same labelling model family, one Jev model version, one recording, no human labels.
 - A bar that is met on n of a few dozen negatives is weak evidence; the bounds are reported, not assumed.
 - Failed steps are decided in code and prove nothing about reading; they raise the failed share, not the test of Jev.
+
+## Amendment 1: failed-step top-up (made before any case was labelled or sent to Jev)
+
+Registered 2026-10-05 after the first fetch pass (128 repositories in 17 buckets, 270 cases) and before any label or Jev answer. Only counts were seen: 23 of 270 cases (8.5%) are from failed steps, against the 25% target; 94 of the 128 repositories had failed runs in the window but only 22 got a failed case, because the per-repository cap of 3 filled with succeeded steps of the first inspected runs. The section "Failed share" above said no further pass; it is amended here, openly, because failed steps are decided in code and cannot move any Jev bar (they cost no request and tell nothing about reading), so the change cannot favour a result.
+
+Rule: one **failed-only top-up pass** over the already accepted repositories. For each repository with fewer than 2 failed cases: take the same `--status failure` list (limit 30, `--created ">=2026-10-04"`, ordered by `sha256(run id)`), skip runs already inspected, inspect at most 6 more, jobs with conclusion `failure` only (at most 6, ordered by `sha256(job id)`), and add steps that failed, are classified test/lint/build by the unchanged classifier, have a `Process completed with exit code` line, and are not already a case, until the repository has 2 failed cases. Added cases may take a repository above 3 cases, **to at most 5 (3 + 2 failed)**; succeeded cases are never added by the top-up. If the share is still under 25% it is reported as is, and there is no second top-up.
