@@ -12,11 +12,11 @@ import { loadPack, packDirs } from "../../src/engine/pack.ts";
 import { questionHash, redactRequest, stateHash } from "../../src/engine/session.ts";
 import { negativeKind } from "./lib.mjs";
 
-const [dir, root, out] = process.argv.slice(2);
-if (!dir || !root || !out) throw new Error("usage: analyze.mjs DIR SUITE_ROOT OUT_DIR");
+const [dir, root, out, suiteName = "done-v2-real"] = process.argv.slice(2);
+if (!dir || !root || !out) throw new Error("usage: analyze.mjs DIR SUITE_ROOT OUT_DIR [SUITE]");
 const lines = (file) => readFileSync(file, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
 const kept = lines(join(dir, "kept.jsonl"));
-const recordedFile = join(root, "done-v2-real", "recorded.jsonl");
+const recordedFile = join(root, suiteName, "recorded.jsonl");
 const recordings = existsSync(recordedFile) ? lines(recordedFile) : [];
 const whys = new Map(lines(join(dir, "labels1.jsonl")).map((r) => [r.id, r.why ?? ""]));
 const pack = loadPack("generic", packDirs(process.env));

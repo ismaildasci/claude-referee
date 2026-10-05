@@ -13,3 +13,5 @@ Tools for the real-log study registered in `docs/decisions/done-v2-real-logs.md`
 | 7 score | `node score.mjs OUT/table.jsonl` | the registered metrics, from the table alone |
 
 `lib.mjs` holds the pure functions (transport stripping, step segments, classifier, evidence text, silent-output rule, negative kinds, exact intervals) and is tested in `test/real-ci-lib.test.ts`. Steps 2, 4 and 6 import the repo's own `done` code, so run them from a checkout.
+
+Second sample (`docs/decisions/done-v2-real-logs-2.md`): `fetch2.mjs --out DIR --exclude docs/data/done-v2-real/split.json` replaces `fetch.mjs`; `label.mjs DIR 2 --share 0.4 --cost`; `assemble.mjs DIR ROOT done-v2-real-2` and `analyze.mjs DIR ROOT OUT done-v2-real-2`; `score2.mjs TABLE` prints the per-class metrics with exact and repository-level intervals.

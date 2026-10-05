@@ -1,5 +1,5 @@
 // Real-log study step 3: two blind labeller processes (claude -p, no tools) label succeeded-step cases; labeller 2 gets a random 30%.
-// Usage: node label.mjs DIR 1|2 [--batch 5] [--parallel 4]; resumable via DIR/labels{1,2}.jsonl. Needs cases-screened.jsonl.
+// Usage: node label.mjs DIR 1|2 [--batch 5] [--parallel 4] [--share 0.3] [--cost]; resumable via DIR/labels{1,2}.jsonl. Needs cases-screened.jsonl.
 
 import { spawn } from "node:child_process";
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
@@ -12,6 +12,8 @@ const flag = (name, fallback) => (process.argv.includes(`--${name}`) ? process.a
 if (!dir || (which !== "1" && which !== "2")) throw new Error("usage: label.mjs DIR 1|2 [--batch n] [--parallel n]");
 const BATCH = Number(flag("batch", "5"));
 const PARALLEL = Number(flag("parallel", "4"));
+const SHARE = Number(flag("share", "0.3"));
+const COST = process.argv.includes("--cost");
 const cwd = join(dir, "labeller-cwd");
 mkdirSync(cwd, { recursive: true });
 
@@ -35,7 +37,7 @@ const cases = readFileSync(join(dir, "cases-screened.jsonl"), "utf8").split("\n"
 let todo = cases;
 if (which === "2") {
   const ranked = [...cases].sort((a, b) => (sha256(`${a.id}label2`) < sha256(`${b.id}label2`) ? -1 : 1));
-  todo = ranked.slice(0, Math.ceil(0.3 * cases.length));
+  todo = ranked.slice(0, Math.ceil(SHARE * cases.length));
 }
 const file = join(dir, `labels${which}.jsonl`);
 const done = new Set(existsSync(file) ? readFileSync(file, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l).id) : []);
@@ -46,10 +48,19 @@ for (let i = 0; i < todo.length; i += BATCH) batches.push(todo.slice(i, i + BATC
 function run(batch) {
   const body = batch.map((c) => `### case ${c.id}\ncriterion: ${c.criterion}\nevidence:\n<<<\n${doneEvidence(c.evidence)}\n>>>`).join("\n\n");
   return new Promise((resolve) => {
-    const child = spawn("claude", ["-p", "--tools", "", "--no-session-persistence", "--output-format", "text", "--system-prompt", CONVENTION], { cwd, stdio: ["pipe", "pipe", "pipe"] });
+    const child = spawn("claude", ["-p", "--tools", "", "--no-session-persistence", "--output-format", COST ? "json" : "text", "--system-prompt", CONVENTION], { cwd, stdio: ["pipe", "pipe", "pipe"] });
     let out = "";
     child.stdout.on("data", (d) => (out += d));
-    child.on("close", () => resolve(out));
+    child.on("close", () => {
+      if (!COST) return resolve(out);
+      try {
+        const j = JSON.parse(out);
+        appendFileSync(join(dir, `labels${which}-cost.jsonl`), `${JSON.stringify({ cost_usd: j.total_cost_usd ?? null, usage: j.usage ?? null })}\n`);
+        resolve(String(j.result ?? ""));
+      } catch {
+        resolve(out);
+      }
+    });
     child.stdin.end(body);
   });
 }

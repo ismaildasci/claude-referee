@@ -1,12 +1,12 @@
 // Real-log study step 4: merges labels (drops ambiguous, disagreeing and silent-met cases: met on output that is only a command echo and exit 0) and writes the local eval suite with evidence text.
-// Usage: node assemble.mjs DIR SUITE_ROOT; writes SUITE_ROOT/done-v2-real/{suite.json,cases.jsonl} and DIR/assemble.json. Text stays local.
+// Usage: node assemble.mjs DIR SUITE_ROOT; writes SUITE_ROOT/SUITE/{suite.json,cases.jsonl} and DIR/assemble.json. Text stays local.
 
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { kappa, silentOutput } from "./lib.mjs";
 
-const [dir, root] = process.argv.slice(2);
-if (!dir || !root) throw new Error("usage: assemble.mjs DIR SUITE_ROOT");
+const [dir, root, suiteName = "done-v2-real"] = process.argv.slice(2);
+if (!dir || !root) throw new Error("usage: assemble.mjs DIR SUITE_ROOT [SUITE]");
 const rows = (file) => (existsSync(file) ? readFileSync(file, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)) : []);
 const cases = rows(join(dir, "cases-screened.jsonl"));
 const l1 = new Map(rows(join(dir, "labels1.jsonl")).map((r) => [r.id, r.label]));
@@ -36,7 +36,7 @@ report.kappa = kappa(pairs);
 report.pairs = pairs.length;
 report.kept = kept.length;
 for (const c of kept) report.expected[c.expected] += 1;
-const suite = join(root, "done-v2-real");
+const suite = join(root, suiteName);
 mkdirSync(suite, { recursive: true });
 writeFileSync(join(suite, "suite.json"), `${JSON.stringify({ command: "done", positive: "met", max_wrong_positive: 0, note: "Real GitHub Actions step logs, registered in docs/decisions/done-v2-real-logs.md; text is not committed." })}\n`);
 writeFileSync(join(suite, "cases.jsonl"), `${kept.map((c) => JSON.stringify({ id: c.id, split: "holdout", group: c.purpose, variant: c.tool, criterion: c.criterion, expected: c.expected, evidence: c.evidence })).join("\n")}\n`);
