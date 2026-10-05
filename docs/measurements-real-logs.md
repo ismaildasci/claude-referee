@@ -2,6 +2,8 @@
 
 Registered in [done-v2-real-logs.md](decisions/done-v2-real-logs.md) on 2026-10-02, before any log was fetched. This is a **re-definition of the success bar made after six failed registered checks**; `done` v2 stays "not measured" on the old bar whatever this document shows.
 
+*Update: the last section re-derives the sample after a skip-marker fix and new dev-written parsers; it is not a clean test.*
+
 **Status of this document: the registered measurement is complete, and both Jev-dependent bars failed** (recorded 2026-10-05, `jev-1.13.0`, 181 requests and 18 cache hits for 199 sent cases; receipt `rmuv1s6mngwo4`). Wrong `met` is 2 of 76 expected-`missing` cases (bar 0, **failed**); `met` recall among parsed cases is 33 of 44 = 0.75 (bar 0.9, **failed**). The two wrong `met` are both in the dev half; the frozen hold-out half has 0 of 33. `done` v2 stays "not measured" on the old bar.
 
 ## Data
@@ -91,6 +93,8 @@ Verdicts on the 199 sent cases: `met` 36, `unsure` 81, `missing` 82. Exit-code-o
 
 ## Parser backlog, ranked by frequency in this sample
 
+*This section is the state at the registered measurement; the last section of this file records the parsers written since.*
+
 Unparsed cases by the classifier's tool label (`docs/data/done-v2-real/backlog.json`), ranked by expected-`met` cases, which are the ones a parser would turn into `met`. "Cases" counts every kept unparsed case of the tool, "repos" the distinct repositories.
 
 | Tool | Criterion | Cases | Expected `met` | Repos |
@@ -125,14 +129,27 @@ Two readings: build and lint criteria carry most of the gap (a build success has
 
 ## After the skip fix and the dev parsers
 
-### Skip markers beyond the summary (replayed offline, 2026-10-05)
+Two code changes were made after the registered measurement above, both from the dev half only, and the sample was re-derived twice offline. **This is not a clean test and not a pass of the registered bars.** The skip rule was designed from the two dev cases that were the wrong `met`; the parsers were written from the dev half's logs and the tools' own formats ([decision](decisions/native-build-parsers.md)); the frozen hold-out half was not read for either change, but it had been scored before, so the hold-out numbers below are a regression check and a one-time score of the final code, not an unseen test. `done` v2 stays "not measured" on the old bar.
 
-The skipped-tests cap now reads structured skip markers anywhere in the log ([decision](decisions/skip-markers-beyond-summary.md)). Re-derived from the recorded Jev answers (no new request; code caps do not change the state hash) with `scripts/real-ci/analyze.mjs` and `scripts/done-bar/halves.mjs`. **The rule was designed from the two dev cases; the hold-out numbers are a regression check, not a clean test, because the hold-out was seen when scoring.**
+### Step 1: skip markers beyond the summary (offline replay, recorded answers reused)
 
-| Half | Wrong `met` before | after | `met` recall among parsed before | after |
-| --- | --- | --- | --- | --- |
-| dev (124 cases) | 2 of 43 | 0 of 43 | 13 of 16 | 13 of 16 |
-| hold-out (105 cases) | 0 of 33 | 0 of 33 | 20 of 28 | 20 of 28 |
-| all (229 cases) | 2 of 76 | 0 of 76 | 33 of 44 | 33 of 44 |
+The skipped-tests cap now reads structured skip markers anywhere in the log ([decision](decisions/skip-markers-beyond-summary.md); `scripts/real-ci/analyze.mjs` and `scripts/done-bar/halves.mjs`; code caps do not change the state hash, so no request was needed). Exactly two table rows changed (`rl-d7e82393`, `rl-cfdcfb61`, `met` to `unsure`, `skipped_tests`), no expected-`met` case of either half was capped.
 
-Exactly two table rows changed (`rl-d7e82393`, `rl-cfdcfb61`, both `met` to `unsure`, `skipped_tests`). No expected-`met` case of either half is capped, so recall is unchanged at 0.75; parsed coverage is unchanged (68 of 199). Nothing here claims the bar passes: the registered measurement is the earlier one and `done` v2 stays not measured on the old bar.
+### Step 2: parsers for `ninja`, MSBuild, `docker build`, `maven`, `swift build`, `swift test`, VSTest, `make` errors
+
+Written from dev logs; hold-out cases whose facts changed were re-recorded once with the final code (10 requests, receipt `rmuv3363n76eq`); dev cases whose facts changed were re-recorded during development (29 requests, receipts `rmuv2u9w6e2v1`, `rmuv2z0jnnxf4`; a dev-only copy of the suite, the hold-out was not sent). The original `table.jsonl` is untouched; the re-derived table, recordings, backlog and parsed-runner counts are in `docs/data/done-v2-real/after-parsers/` (recordings matched by question and state hash, no stale answer is reused). The local suite was copied, not edited.
+
+| Half | Wrong `met` before / after skip fix / after parsers | `met` recall among parsed before / after skip fix / after parsers | Parsed coverage (of sent) before / after parsers |
+| --- | --- | --- | --- |
+| dev (124 cases, 102 sent) | 2 of 43 / 0 of 43 / **0 of 43** | 13 of 16 / 13 of 16 / **33 of 37 = 0.89** | 29 (28.4%) / 52 (51.0%) |
+| hold-out (105 cases, 97 sent) | 0 of 33 / 0 of 33 / **0 of 33** | 20 of 28 / 20 of 28 / **28 of 38 = 0.74** | 39 (40.2%) / 49 (50.5%) |
+| all (229 cases, 199 sent) | 2 of 76 / 0 of 76 / **0 of 76** (upper bound 3.9%) | 33 of 44 / 33 of 44 / **61 of 75 = 0.81** (exact 95% 0.707 to 0.894) | 68 (34.2%) / 101 (50.8%) |
+
+- **Wrong `met` is 0 of 76**, so registered bar 1 reads as met on the re-derived sample; it was designed from the two failures, which is why it does not count as a pass.
+- **`met` recall among parsed is 0.81 against the 0.9 bar: still failed**, on hold-out 28 of 38 (now at least 30 parsed expected-`met`, so the bar is evaluable there: failed). Exit-code-only evidence still almost never gets `met` (1 of 48 expected-`met`).
+- Newly parsed cases by tool (cases): `docker build` 7, `swift test` 8, `maven` 5, `ninja` 6, `msbuild` 3 and VSTest `dotnet test` 3 (dev), `swift build` 4, `make` 4 (errors only). The two dev ninja-install logs of about 500 KB stay `unsure` (one is not claimed, one is incomplete) because the clip drops the status lines.
+- Misses that remain among parsed expected-`met`: `cargo build` 6 (3 dev, 3 hold-out; the parser has no positive marker, so Jev answers `missing`), `clippy` 2, a `ctest`-labelled step 1, `go test` 1, `cargo test` 1, `cmake build` 2 (`unsure`), `npm build` 1 (`incomplete_run`). None was tuned after the hold-out was scored; they are the next dev-backed items.
+- Not parsed, no parser written: `go build` (no dev case with output), CMake Make-generator output (one failing dev log), `phpcs`/`phpstan` (no expected-`met` dev log), `xcodebuild`, bazel, `npm run build` wrappers.
+- Recorded synthetic suites: five sent cases (`done-v2-h2/h2-c-04`, `done-v2-h4/h4-a-01`, `h4-a-07`, `h4-e-08`, `done-v2-h5/h5-d-04`) changed facts and were re-recorded in place; `eval score --suite all` is unchanged for every suite (same counts, same allowances). The post-hoc split-bar numbers in [measurements-done-bar-split.md](measurements-done-bar-split.md) are those of the code before the parsers.
+
+Jev receipts: `rmuv2b3idhmqc` and `rmuv2bbaz3xck` (skip-rule scope `decide`, p 0.54 and 0.52, under the 0.90 bar, conservative option taken), `rmuv2u9w6e2v1` and `rmuv2z0jnnxf4` (dev re-records), `rmuv2wzwiau4b`, `rmuv2x0e0xsqi` and `rmuv2x0x397h9` (synthetic suites), `rmuv3363n76eq` (hold-out, once).

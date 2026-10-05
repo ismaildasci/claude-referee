@@ -7,10 +7,8 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Added
 
 - Measured `done` v2 on the 229-case real CI log sample with Jev's answers (recorded 2026-10-05): wrong `met` 2 of 76 and `met` recall among parsed logs 33 of 44, so both registered bars failed; the frozen hold-out half has 0 wrong `met` of 33. The two wrong `met` are logs where skips show outside the parsed summary. Scored table and recorded answers are in `docs/data/done-v2-real/`; no log text is committed.
-
-### Added
-
 - `done` parsers for `ninja` (`cmake --build`), MSBuild (`dotnet build`), `docker build` (BuildKit plain progress), `maven`, `swift build` and `swift test` (XCTest and Swift Testing), the VSTest summary of `dotnet test`, and `make` errors (failed or ignored), written from dev-half real logs and the tools' own formats; a missing completion marker, an error or a cut-off log never reaches `met` ([decision](docs/decisions/native-build-parsers.md)). Five sent cases of `done-v2-h2`, `h4` and `h5` were re-recorded because their facts changed.
+- Re-derived the real-log sample after the skip fix and the parsers (`docs/data/done-v2-real/after-parsers/`): wrong `met` 0 of 76, `met` recall among parsed 61 of 75 = 0.81 (bar 0.9, still failed; hold-out 28 of 38, parsed coverage 50.8% against 34.2%). Designed from the dev half, the hold-out is a regression check, not a clean test; `done` v2 stays not measured on the old bar.
 
 ### Changed
 
