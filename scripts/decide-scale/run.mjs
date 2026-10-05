@@ -1,5 +1,5 @@
 // Runs the option-order scale study through the repo's Session (redaction, cache, retry budget, one receipt per batch); appends answers to jev-evals/decide-scale/recorded-<stage>.jsonl.
-// Usage: node scripts/decide-scale/run.mjs --stage main|rename [--only <src>] [--limit n] [--dry-run] [--batch 240]; resumable: recorded requests are skipped.
+// Usage: node scripts/decide-scale/run.mjs --stage main|rename|screen|wave2 [--only <src>] [--limit n] [--dry-run] [--batch 240]; resumable: recorded requests are skipped.
 
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { loadPack, packDirs } from "../../src/engine/pack.ts";
 import { Session } from "../../src/engine/session.ts";
 import { DEFAULT_MODEL } from "../../src/engine/config.ts";
-import { ROOT, key, loadCases, neutralNames, orderPlan } from "./lib.mjs";
+import { ROOT, WAVE2, key, loadCases, neutralNames, orderPlan } from "./lib.mjs";
 
 const args = process.argv.slice(2);
 const flag = (name, fallback) => (args.includes(name) ? args[args.indexOf(name) + 1] : fallback);
@@ -16,7 +16,7 @@ const only = flag("--only", null);
 const limit = Number(flag("--limit", "0"));
 const batchSize = Number(flag("--batch", "240"));
 const dry = args.includes("--dry-run");
-if (!["main", "rename"].includes(stage)) throw new Error("--stage must be main or rename");
+if (!["main", "rename", "screen", "wave2"].includes(stage)) throw new Error("--stage must be main, rename, screen or wave2");
 
 const dir = join(ROOT, "jev-evals", "decide-scale");
 const recordedPath = join(dir, `recorded-${stage}.jsonl`);
@@ -27,7 +27,12 @@ const pack = loadPack("generic", packDirs(process.env));
 const best = pack.questions["decide.best"];
 const packRef = { name: pack.name, version: `${pack.version}+${pack.hash}`, redact: pack.redact };
 
-let cases = loadCases();
+const keptPath = join(dir, "screen-kept.json");
+let cases = stage === "screen" || stage === "wave2" ? loadCases(WAVE2) : loadCases();
+if (stage === "wave2") {
+  const kept = new Set(JSON.parse(readFileSync(keptPath, "utf8")).kept);
+  cases = cases.filter((c) => kept.has(c.id));
+}
 if (only) cases = cases.filter((c) => c.src === only);
 if (stage === "rename") cases = cases.filter((c) => ["close", "a", "b"].includes(c.src));
 if (limit > 0) cases = cases.slice(0, limit);
@@ -38,13 +43,13 @@ const tasks = [];
 for (const c of cases) {
   const plan = orderPlan(c);
   const naming = stage === "rename" ? "neutral" : "orig";
-  const orders = stage === "rename" ? plan.pool : [...plan.pool, ...plan.extra];
+  const orders = stage === "rename" ? plan.pool : stage === "screen" ? plan.screen : [...plan.pool, ...plan.extra];
   const map = naming === "neutral" ? neutralNames(c) : null;
   for (const order of orders) {
     const id = `${c.id}|${naming}|${key(order)}`;
     if (done.has(id)) continue;
     const criteria = Object.fromEntries(order.map((name) => [map ? map[name] : name, c.options[name]]));
-    const part = plan.pool.some((o) => key(o) === key(order)) ? "pool" : "fixed";
+    const part = stage === "screen" ? "screen" : plan.pool.some((o) => key(o) === key(order)) ? "pool" : "fixed";
     tasks.push({ map, meta: { case: c.id, naming, order, part }, planned: { id, state: { decision: c.raw.decision, context: c.raw.context }, questions: { best: { ...best, criteria } } } });
   }
 }
@@ -86,5 +91,20 @@ for (let at = 0; at < tasks.length; at += batchSize) {
   }
   failed += batch.length;
   console.log(`${Math.min(at + batchSize, tasks.length)}/${tasks.length} requests handled, ${sent} recorded, ${failed} failed`);
+}
+if (stage === "screen" && failed === 0) {
+  const byCase = new Map();
+  for (const l of readFileSync(recordedPath, "utf8").split("\n").filter(Boolean)) {
+    const r = JSON.parse(l);
+    if (!byCase.has(r.case)) byCase.set(r.case, []);
+    byCase.get(r.case).push(r.p);
+  }
+  const rows = [...byCase].map(([id, ps]) => {
+    const names = Object.keys(ps[0]);
+    const mean = names.map((n) => ps.reduce((a, p) => a + (p[n] ?? 0), 0) / ps.length).sort((a, b) => b - a);
+    return { id, margin: Number((mean[0] - (mean[1] ?? 0)).toFixed(4)) };
+  });
+  writeFileSync(keptPath, JSON.stringify({ rule: "kept when the mean over 4 screening orders has top-two margin < 0.10", screened: rows.length, kept: rows.filter((r) => r.margin < 0.1).map((r) => r.id), margins: rows }, null, 1) + "\n");
+  console.log(`screened ${rows.length}, kept ${rows.filter((r) => r.margin < 0.1).length}`);
 }
 console.log(`done: ${sent} recorded, ${failed} failed, model ${DEFAULT_MODEL}`);

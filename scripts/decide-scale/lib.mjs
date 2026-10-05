@@ -13,7 +13,12 @@ export const SOURCES = [
   { src: "a", file: "jev-evals/decide-scale/cases-a.jsonl", shuffle: true },
   { src: "b", file: "jev-evals/decide-scale/cases-b.jsonl", shuffle: true },
 ];
+export const WAVE2 = [
+  { src: "c", file: "jev-evals/decide-scale/cases-c.jsonl", shuffle: true, wave2: true },
+  { src: "d", file: "jev-evals/decide-scale/cases-d.jsonl", shuffle: true, wave2: true },
+];
 export const RANDOM_POOL = 24;
+export const SCREEN_ORDERS = 4;
 export const NAME_RULE = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,39}$/;
 
 export const sha256 = (text) => createHash("sha256").update(text).digest("hex");
@@ -68,7 +73,7 @@ export function validateCase(c) {
 
 export function loadCases(sources = SOURCES) {
   const out = [];
-  for (const { src, file, shuffle } of sources) {
+  for (const { src, file, shuffle, wave2 } of sources) {
     const lines = readFileSync(join(ROOT, file), "utf8").split("\n").filter((l) => l.trim());
     for (const line of lines) {
       const raw = JSON.parse(line);
@@ -77,7 +82,7 @@ export function loadCases(sources = SOURCES) {
       const id = `${src}/${raw.id}`;
       const authored = raw.options.map((o) => o.name);
       const written = shuffle ? shuffled(authored, mulberry32(seedOf(`decide-scale-written:${id}`))) : authored;
-      out.push({ id, src, raw, authored, written, options: Object.fromEntries(raw.options.map((o) => [o.name, o.text])) });
+      out.push({ id, src, wave2: wave2 === true, raw, authored, written, options: Object.fromEntries(raw.options.map((o) => [o.name, o.text])) });
     }
   }
   return out;
@@ -87,23 +92,34 @@ export function orderPlan(c) {
   const n = c.written.length;
   const d = designs(c.written);
   const fixedKeys = new Set(d.fixed.map(key));
+  const taken = new Set(fixedKeys);
+  let screen = [];
+  if (c.wave2) {
+    const rngS = mulberry32(seedOf(`decide-scale-S:${c.id}`));
+    while (screen.length < SCREEN_ORDERS) {
+      const o = shuffled(c.written, rngS);
+      if (taken.has(key(o))) continue;
+      taken.add(key(o));
+      screen.push(o);
+    }
+  }
   if (n <= 4) {
-    const pool = permutations(c.written);
-    return { n, pool, extra: [], fixed: d.fixed, poolKind: "all" };
+    const screenKeys = new Set(screen.map(key));
+    const pool = permutations(c.written).filter((o) => !screenKeys.has(key(o)));
+    return { n, pool, extra: [], fixed: d.fixed, screen, poolKind: "all" };
   }
   const rng = mulberry32(seedOf(`decide-scale-R:${c.id}`));
-  const seen = new Set(fixedKeys);
   const pool = [];
   while (pool.length < RANDOM_POOL) {
     const o = shuffled(c.written, rng);
-    if (seen.has(key(o))) continue;
-    seen.add(key(o));
+    if (taken.has(key(o))) continue;
+    taken.add(key(o));
     pool.push(o);
   }
   const extra = [];
   const added = new Set();
   for (const o of d.fixed) if (!added.has(key(o))) (added.add(key(o)), extra.push(o));
-  return { n, pool, extra, fixed: d.fixed, poolKind: "random" };
+  return { n, pool, extra, fixed: d.fixed, screen, poolKind: "random" };
 }
 
 export const neutralNames = (c) => Object.fromEntries(c.authored.map((name, i) => [name, `o${i + 1}`]));

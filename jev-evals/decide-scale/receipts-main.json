@@ -1,0 +1,222 @@
+[
+ {
+  "id": "rmuvb1vn5s2f8",
+  "ts": "2026-10-05T13:48:16.579Z",
+  "requests": 22,
+  "cached": 2,
+  "input_tokens": 11352,
+  "cost_usd": 0.00047678,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 1513
+ },
+ {
+  "id": "rmuvb239adpgj",
+  "ts": "2026-10-05T13:48:37.318Z",
+  "requests": 220,
+  "cached": 20,
+  "input_tokens": 117172,
+  "cost_usd": 0.00492122,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12376
+ },
+ {
+  "id": "rmuvb2ct4tk9e",
+  "ts": "2026-10-05T13:48:49.174Z",
+  "requests": 220,
+  "cached": 20,
+  "input_tokens": 116490,
+  "cost_usd": 0.00489258,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 11857
+ },
+ {
+  "id": "rmuvb2lyjj1ps",
+  "ts": "2026-10-05T13:49:00.702Z",
+  "requests": 220,
+  "cached": 20,
+  "input_tokens": 118800,
+  "cost_usd": 0.0049896,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 11516
+ },
+ {
+  "id": "rmuvb2uugvguo",
+  "ts": "2026-10-05T13:49:12.440Z",
+  "requests": 224,
+  "cached": 16,
+  "input_tokens": 119314,
+  "cost_usd": 0.00501119,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 11749
+ },
+ {
+  "id": "rmuvb33wvsc7q",
+  "ts": "2026-10-05T13:49:25.101Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 112032,
+  "cost_usd": 0.00470534,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12649
+ },
+ {
+  "id": "rmuvb3doaybk8",
+  "ts": "2026-10-05T13:49:37.146Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 114450,
+  "cost_usd": 0.0048069,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12045
+ },
+ {
+  "id": "rmuvb3myxrn56",
+  "ts": "2026-10-05T13:49:49.561Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 119440,
+  "cost_usd": 0.00501648,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12411
+ },
+ {
+  "id": "rmuvb3wjq55oz",
+  "ts": "2026-10-05T13:50:01.778Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 117014,
+  "cost_usd": 0.00491459,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12216
+ },
+ {
+  "id": "rmuvb45z41wh7",
+  "ts": "2026-10-05T13:50:14.300Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 117060,
+  "cost_usd": 0.00491652,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12534
+ },
+ {
+  "id": "rmuvb4fnccyqo",
+  "ts": "2026-10-05T13:50:26.692Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 116198,
+  "cost_usd": 0.00488032,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12378
+ },
+ {
+  "id": "rmuvb4p77656j",
+  "ts": "2026-10-05T13:50:39.270Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 115764,
+  "cost_usd": 0.00486209,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12574
+ },
+ {
+  "id": "rmuvb4ywkiixd",
+  "ts": "2026-10-05T13:50:51.654Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 115966,
+  "cost_usd": 0.00487057,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12382
+ },
+ {
+  "id": "rmuvb58gk8gyf",
+  "ts": "2026-10-05T13:51:05.063Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 134358,
+  "cost_usd": 0.00564304,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 13409
+ },
+ {
+  "id": "rmuvb5it4zc5h",
+  "ts": "2026-10-05T13:51:17.828Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 137686,
+  "cost_usd": 0.00578281,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12759
+ },
+ {
+  "id": "rmuvb5snln32r",
+  "ts": "2026-10-05T13:51:30.116Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 133348,
+  "cost_usd": 0.00560062,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12284
+ },
+ {
+  "id": "rmuvb624w2is9",
+  "ts": "2026-10-05T13:51:42.985Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 133376,
+  "cost_usd": 0.00560179,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12871
+ },
+ {
+  "id": "rmuvb6c2iq35g",
+  "ts": "2026-10-05T13:51:55.353Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 132194,
+  "cost_usd": 0.00555215,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12368
+ },
+ {
+  "id": "rmuvb6lm5a71j",
+  "ts": "2026-10-05T13:52:07.633Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 130728,
+  "cost_usd": 0.00549058,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12281
+ },
+ {
+  "id": "rmuvb6v3ehail",
+  "ts": "2026-10-05T13:52:15.965Z",
+  "requests": 162,
+  "cached": 0,
+  "input_tokens": 88368,
+  "cost_usd": 0.00371146,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 8317
+ }
+]

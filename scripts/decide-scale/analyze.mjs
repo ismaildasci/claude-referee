@@ -3,12 +3,13 @@
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { ROOT, key, loadCases, mulberry32, orderPlan, rotate, seedOf, shuffled } from "./lib.mjs";
+import { ROOT, SOURCES, WAVE2, key, loadCases, mulberry32, orderPlan, seedOf, shuffled } from "./lib.mjs";
 
 const args = process.argv.slice(2);
 const flag = (name, fallback) => (args.includes(name) ? args[args.indexOf(name) + 1] : fallback);
 const OUT = flag("--out", join(ROOT, "jev-evals/decide-scale/results.json"));
 const MD = flag("--md", null);
+const SETS = flag("--sets", "close,holdout,a,b").split(",");
 const EPS = 1e-9;
 const CLEAR_AT = 0.85;
 const MARGIN = 0.1;
@@ -21,9 +22,9 @@ const avg = (xs) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : NaN
 const r4 = (x) => (Number.isFinite(x) ? Number(x.toFixed(4)) : null);
 
 const jsonl = (path) => (existsSync(path) ? readFileSync(path, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)) : []);
-function loadRecorded(stage) {
+function loadRecorded(stage, files = [stage]) {
   const byCase = new Map();
-  for (const r of jsonl(join(ROOT, `jev-evals/decide-scale/recorded-${stage}.jsonl`))) {
+  for (const r of files.flatMap((f) => jsonl(join(ROOT, `jev-evals/decide-scale/recorded-${f}.jsonl`)))) {
     if (!byCase.has(r.case)) byCase.set(r.case, new Map());
     byCase.get(r.case).set(key(r.order), r.p);
   }
@@ -50,8 +51,8 @@ function polVerdict(p, names, orderLeaders, unanimous) {
   return refVerdict(p, names);
 }
 
-const cases = loadCases();
-const main = loadRecorded("main");
+const cases = loadCases([...SOURCES, ...WAVE2]).filter((c) => SETS.includes(c.src));
+const main = loadRecorded("main", ["main", "wave2"]);
 const rename = loadRecorded("rename");
 const data = [];
 for (const c of cases) {
@@ -264,7 +265,7 @@ const writtenFirst = data.map((d) => {
   return { gain: d.ans.get(w)[d.names[0]] - ref[d.names[0]], authoredFirstLeader: d.refLeader === d.c.authored[0] ? 1 : 0, expected: 1 / d.n };
 });
 const bySrc = {};
-for (const src of ["close", "holdout", "a", "b"]) {
+for (const src of ["close", "holdout", "a", "b", "c", "d"]) {
   const idx = idxAll.filter((i) => data[i].src === src);
   if (idx.length === 0) continue;
   bySrc[src] = {
@@ -307,7 +308,7 @@ const longest = data.map((d) => {
   const tops = d.names.filter((_, i) => L[i] === mx);
   return { hit: tops.includes(d.refLeader) ? 1 / tops.length : 0, exp: 1 / d.n };
 });
-const lenBySrc = Object.fromEntries(["close", "holdout", "a", "b"].map((src) => {
+const lenBySrc = Object.fromEntries(["close", "holdout", "a", "b", "c", "d"].filter((src) => SETS.includes(src)).map((src) => {
   const idx = idxAll.filter((i) => data[i].src === src && Number.isFinite(lenCorr[i].text));
   return [src, { n: idx.length, text_length_spearman: { value: r4(avg(idx.map((i) => lenCorr[i].text))), ...boot(idx, (ix) => avg(ix.map((i) => lenCorr[i].text))) }, mean_option_chars: r4(avg(data.filter((d) => d.src === src).flatMap((d) => d.names.map((n) => d.c.options[n].length)))) }];
 }));
@@ -375,6 +376,7 @@ const byMargin = marginBins.map(([lo, hi]) => {
 
 const report = {
   date: new Date().toISOString(),
+  sets: SETS,
   decisions: { total: data.length, by_n: Object.fromEntries([3, 4, 5, 6].map((n) => [n, data.filter((d) => d.n === n).length])), rule_set_n_ge_4: rule.length, near_ties_in_rule_set: near.length, n3: n3.length, n3_near: n3near.length, near_tie_share_all: r4(avg(data.map((d) => (d.nearTie ? 1 : 0)))) },
   tables,
   rule: ruleResult,
