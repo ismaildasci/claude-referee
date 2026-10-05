@@ -1,0 +1,317 @@
+[
+ {
+  "tool": "cmake build",
+  "purpose": "build",
+  "cases": 21,
+  "expected_met": 8,
+  "repos": 12
+ },
+ {
+  "tool": "make",
+  "purpose": "build",
+  "cases": 7,
+  "expected_met": 7,
+  "repos": 5
+ },
+ {
+  "tool": "mix test",
+  "purpose": "test",
+  "cases": 10,
+  "expected_met": 5,
+  "repos": 5
+ },
+ {
+  "tool": "npm build -> build",
+  "purpose": "build",
+  "cases": 7,
+  "expected_met": 5,
+  "repos": 6
+ },
+ {
+  "tool": "phpstan",
+  "purpose": "lint",
+  "cases": 4,
+  "expected_met": 4,
+  "repos": 4
+ },
+ {
+  "tool": "ctest",
+  "purpose": "test",
+  "cases": 8,
+  "expected_met": 3,
+  "repos": 5
+ },
+ {
+  "tool": "make test",
+  "purpose": "test",
+  "cases": 7,
+  "expected_met": 3,
+  "repos": 6
+ },
+ {
+  "tool": "npm test",
+  "purpose": "test",
+  "cases": 5,
+  "expected_met": 3,
+  "repos": 2
+ },
+ {
+  "tool": "xcodebuild",
+  "purpose": "build",
+  "cases": 3,
+  "expected_met": 3,
+  "repos": 1
+ },
+ {
+  "tool": "rubocop",
+  "purpose": "lint",
+  "cases": 6,
+  "expected_met": 2,
+  "repos": 3
+ },
+ {
+  "tool": "npm build",
+  "purpose": "build",
+  "cases": 3,
+  "expected_met": 2,
+  "repos": 3
+ },
+ {
+  "tool": "npm lint -> lint",
+  "purpose": "lint",
+  "cases": 3,
+  "expected_met": 2,
+  "repos": 3
+ },
+ {
+  "tool": "go build",
+  "purpose": "build",
+  "cases": 3,
+  "expected_met": 2,
+  "repos": 3
+ },
+ {
+  "tool": "dotnet build",
+  "purpose": "build",
+  "cases": 2,
+  "expected_met": 2,
+  "repos": 2
+ },
+ {
+  "tool": "npm lint",
+  "purpose": "lint",
+  "cases": 2,
+  "expected_met": 2,
+  "repos": 2
+ },
+ {
+  "tool": "clang-tidy",
+  "purpose": "lint",
+  "cases": 5,
+  "expected_met": 1,
+  "repos": 4
+ },
+ {
+  "tool": "docker build",
+  "purpose": "build",
+  "cases": 3,
+  "expected_met": 1,
+  "repos": 3
+ },
+ {
+  "tool": "hadolint",
+  "purpose": "lint",
+  "cases": 2,
+  "expected_met": 1,
+  "repos": 2
+ },
+ {
+  "tool": "pylint",
+  "purpose": "lint",
+  "cases": 2,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "phpcs",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "npm lint -> /Users/runner/work/goose/goose/ui/desktop",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "npm test -> test:smoke",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "npm test -> test:cv-visual",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "npm build -> /home/runner/work/Chart.js/Chart.js",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "npm build -> prebuild",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "eslint",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "make lint",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "make -> :build-logic:convention:checkKotlinGradlePluginConfigurationErrors SKIPPED",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "gradle build",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "shellcheck",
+  "purpose": "lint",
+  "cases": 7,
+  "expected_met": 0,
+  "repos": 6
+ },
+ {
+  "tool": "ruff",
+  "purpose": "lint",
+  "cases": 4,
+  "expected_met": 0,
+  "repos": 4
+ },
+ {
+  "tool": "pytest",
+  "purpose": "test",
+  "cases": 3,
+  "expected_met": 0,
+  "repos": 3
+ },
+ {
+  "tool": "cargo fmt",
+  "purpose": "lint",
+  "cases": 3,
+  "expected_met": 0,
+  "repos": 3
+ },
+ {
+  "tool": "dotnet test",
+  "purpose": "test",
+  "cases": 3,
+  "expected_met": 0,
+  "repos": 2
+ },
+ {
+  "tool": "npm test -> test",
+  "purpose": "test",
+  "cases": 2,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "ktlint",
+  "purpose": "lint",
+  "cases": 2,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "tox",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "npm lint -> /home/runner/work/Chart.js/Chart.js",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "npm lint -> lint-fix:style",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "npm test -> test-e2e",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "npm test -> /home/runner/work/mermaid/mermaid",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "go test",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "php-cs-fixer",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "phpunit",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "swift test",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ }
+]

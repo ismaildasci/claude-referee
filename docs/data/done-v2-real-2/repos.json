@@ -1,0 +1,8526 @@
+{
+ "note": "every repository inspected, in candidate order per bucket; accepted = yielded at least one case in the fetch; no log text",
+ "picks": {
+  "C": [
+   "Genymobile/scrcpy",
+   "curl/curl",
+   "valkey-io/valkey",
+   "libuv/libuv",
+   "radareorg/radare2",
+   "fastfetch-cli/fastfetch",
+   "postgres/postgres",
+   "sandboxie-plus/Sandboxie"
+  ],
+  "C_": [
+   "files-community/Files",
+   "Devolutions/UniGetUI",
+   "icsharpcode/ILSpy",
+   "peass-ng/PEASS-ng",
+   "ppy/osu",
+   "srwi/EverythingToolbar",
+   "CoplayDev/unity-mcp",
+   "MonoGame/MonoGame"
+  ],
+  "C__": [
+   "nlohmann/json",
+   "duckdb/duckdb",
+   "telegramdesktop/tdesktop",
+   "shadps4-emu/shadPS4",
+   "facebook/folly",
+   "notepad-plus-plus/notepad-plus-plus",
+   "ossrs/srs",
+   "fmtlib/fmt"
+  ],
+  "Dart": [
+   "localsend/localsend",
+   "getlantern/lantern",
+   "flame-engine/flame",
+   "lollipopkit/flutter_server_box",
+   "MaikuB/flutter_local_notifications",
+   "LinwoodDev/Butterfly"
+  ],
+  "Elixir": [
+   "phoenixframework/phoenix_live_view",
+   "tuist/tuist",
+   "rrrene/credo",
+   "elixir-tesla/tesla",
+   "elixir-nx/bumblebee",
+   "bartblast/hologram"
+  ],
+  "Go": [
+   "jesseduffield/lazygit",
+   "netdata/netdata",
+   "caddyserver/caddy",
+   "router-for-me/CLIProxyAPI",
+   "multica-ai/multica",
+   "mudler/LocalAI",
+   "MHSanaei/3x-ui",
+   "danielmiessler/Fabric"
+  ],
+  "Java": [
+   "iluwatar/java-design-patterns",
+   "alibaba/nacos",
+   "conductor-oss/conductor",
+   "apolloconfig/apollo",
+   "OpenAPITools/openapi-generator",
+   "floci-io/floci",
+   "google/gson",
+   "APIJSON/APIJSON"
+  ],
+  "JavaScript": [
+   "axios/axios",
+   "louislam/uptime-kuma",
+   "tt-a1i/archify",
+   "pbakaus/impeccable",
+   "career-ops-hq/career-ops",
+   "chartjs/Chart.js",
+   "byoungd/up",
+   "Mintplex-Labs/anything-llm"
+  ],
+  "Kotlin": [
+   "tiann/KernelSU",
+   "yairm210/Unciv",
+   "Heapy/awesome-kotlin",
+   "rikkahub/rikkahub",
+   "shiaho777/web-to-app",
+   "osfans/trime",
+   "embabel/embabel-agent",
+   "KernelSU-Next/KernelSU-Next"
+  ],
+  "PHP": [
+   "laravel/framework",
+   "filamentphp/filament",
+   "composer/composer",
+   "sebastianbergmann/phpunit",
+   "nikic/PHP-Parser",
+   "FreshRSS/FreshRSS",
+   "cachethq/cachet",
+   "grokability/snipe-it"
+  ],
+  "Python": [
+   "github/spec-kit",
+   "Comfy-Org/ComfyUI",
+   "harry0703/MoneyPrinterTurbo",
+   "D4Vinci/Scrapling",
+   "unclecode/crawl4ai",
+   "bytedance/deer-flow",
+   "python/cpython",
+   "unslothai/unsloth"
+  ],
+  "Ruby": [
+   "docusealco/docuseal",
+   "spree/spree",
+   "Homebrew/homebrew-core",
+   "fluent/fluentd",
+   "rubocop/rubocop",
+   "we-promise/sure",
+   "antiwork/gumroad",
+   "activeadmin/activeadmin"
+  ],
+  "Rust": [
+   "dani-garcia/vaultwarden",
+   "alacritty/alacritty",
+   "starship/starship",
+   "meilisearch/meilisearch",
+   "aaif-goose/goose",
+   "janhq/jan",
+   "tinyhumansai/openhuman",
+   "pola-rs/polars"
+  ],
+  "Scala": [
+   "lichess-org/lila",
+   "guardian/frontend",
+   "softwaremill/elasticmq",
+   "ACINQ/eclair",
+   "firesim/firesim",
+   "starlake-ai/starflow"
+  ],
+  "Shell": [
+   "tw93/Mole",
+   "lxgw/LxgwWenKai",
+   "docker-mailserver/docker-mailserver",
+   "BtbN/FFmpeg-Builds",
+   "HyDE-Project/HyDE",
+   "getsentry/self-hosted"
+  ],
+  "Swift": [
+   "gnachman/iTerm2",
+   "Lakr233/vphone-cli",
+   "altic-dev/FluidVoice",
+   "thaw-app/Thaw",
+   "swiftlang/swift-package-manager",
+   "nicklockwood/SwiftFormat",
+   "coteditor/CotEditor",
+   "apple/swift-nio"
+  ],
+  "TypeScript": [
+   "langgenius/dify",
+   "google-gemini/gemini-cli",
+   "paperclipai/paperclip",
+   "microsoft/playwright",
+   "thedotmack/claude-mem",
+   "puppeteer/puppeteer",
+   "mermaid-js/mermaid",
+   "OpenHands/OpenHands"
+  ]
+ },
+ "repos": [
+  {
+   "repo": "AvaloniaUI/Avalonia",
+   "bucket": "C#",
+   "license": "mit",
+   "stars": 31623,
+   "runs_listed": {
+    "failure": 10,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "CoplayDev/unity-mcp",
+   "bucket": "C#",
+   "license": "mit",
+   "stars": 14707,
+   "runs_listed": {
+    "failure": 11,
+    "success": 30
+   },
+   "runs_inspected": 7,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "Devolutions/UniGetUI",
+   "bucket": "C#",
+   "license": "mit",
+   "stars": 26389,
+   "runs_listed": {
+    "failure": 0,
+    "success": 7
+   },
+   "runs_inspected": 5,
+   "cases": 3,
+   "failed_cases": 1,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "Jackett/Jackett",
+   "bucket": "C#",
+   "license": "gpl-2.0",
+   "stars": 16142,
+   "runs_listed": {
+    "failure": 1,
+    "success": 2
+   },
+   "runs_inspected": 3,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "MonoGame/MonoGame",
+   "bucket": "C#",
+   "license": "other",
+   "stars": 14486,
+   "runs_listed": {
+    "failure": 0,
+    "success": 7
+   },
+   "runs_inspected": 6,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 12
+   }
+  },
+  {
+   "repo": "PowerShell/PowerShell",
+   "bucket": "C#",
+   "license": "mit",
+   "stars": 55596,
+   "runs_listed": {
+    "failure": 5,
+    "success": 10
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 9
+   }
+  },
+  {
+   "repo": "Radarr/Radarr",
+   "bucket": "C#",
+   "license": "gpl-3.0",
+   "stars": 14499,
+   "runs_listed": {
+    "failure": 0,
+    "success": 9
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "Sonarr/Sonarr",
+   "bucket": "C#",
+   "license": "gpl-3.0",
+   "stars": 16811,
+   "runs_listed": {
+    "failure": 1,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 10,
+    "log_expired": 1
+   }
+  },
+  {
+   "repo": "babalae/better-genshin-impact",
+   "bucket": "C#",
+   "license": "gpl-3.0",
+   "stars": 15913,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "bitwarden/server",
+   "bucket": "C#",
+   "license": "other",
+   "stars": 20239,
+   "runs_listed": {
+    "failure": 6,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 4
+   }
+  },
+  {
+   "repo": "d2phap/ImageGlass",
+   "bucket": "C#",
+   "license": "other",
+   "stars": 14551,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "dotnet/maui",
+   "bucket": "C#",
+   "license": "mit",
+   "stars": 23320,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "dotnet/roslyn",
+   "bucket": "C#",
+   "license": "mit",
+   "stars": 20705,
+   "runs_listed": {
+    "failure": 1,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 6
+   }
+  },
+  {
+   "repo": "dotnet/runtime",
+   "bucket": "C#",
+   "license": "mit",
+   "stars": 18312,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "files-community/Files",
+   "bucket": "C#",
+   "license": "mit",
+   "stars": 45823,
+   "runs_listed": {
+    "failure": 1,
+    "success": 2
+   },
+   "runs_inspected": 4,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "icsharpcode/ILSpy",
+   "bucket": "C#",
+   "license": "mit",
+   "stars": 26204,
+   "runs_listed": {
+    "failure": 1,
+    "success": 30
+   },
+   "runs_inspected": 1,
+   "cases": 3,
+   "failed_cases": 1,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "peass-ng/PEASS-ng",
+   "bucket": "C#",
+   "license": "other",
+   "stars": 20614,
+   "runs_listed": {
+    "failure": 3,
+    "success": 1
+   },
+   "runs_inspected": 3,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "ppy/osu",
+   "bucket": "C#",
+   "license": "mit",
+   "stars": 19222,
+   "runs_listed": {
+    "failure": 14,
+    "success": 18
+   },
+   "runs_inspected": 7,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "seerge/g-helper",
+   "bucket": "C#",
+   "license": "gpl-3.0",
+   "stars": 15453,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "srwi/EverythingToolbar",
+   "bucket": "C#",
+   "license": "other",
+   "stars": 14839,
+   "runs_listed": {
+    "failure": 0,
+    "success": 6
+   },
+   "runs_inspected": 6,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "ClickHouse/ClickHouse",
+   "bucket": "C++",
+   "license": "apache-2.0",
+   "stars": 50256,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "FreeCAD/FreeCAD",
+   "bucket": "C++",
+   "license": "lgpl-2.1",
+   "stars": 33949,
+   "runs_listed": {
+    "failure": 7,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "LadybirdBrowser/ladybird",
+   "bucket": "C++",
+   "license": "bsd-2-clause",
+   "stars": 66420,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 16
+   }
+  },
+  {
+   "repo": "LizardByte/Sunshine",
+   "bucket": "C++",
+   "license": "gpl-3.0",
+   "stars": 41874,
+   "runs_listed": {
+    "failure": 14,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 6
+   }
+  },
+  {
+   "repo": "SerenityOS/serenity",
+   "bucket": "C++",
+   "license": "bsd-2-clause",
+   "stars": 33886,
+   "runs_listed": {
+    "failure": 4,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 12
+   }
+  },
+  {
+   "repo": "ValveSoftware/Proton",
+   "bucket": "C++",
+   "license": "other",
+   "stars": 32984,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "carbon-language/carbon-lang",
+   "bucket": "C++",
+   "license": "other",
+   "stars": 33900,
+   "runs_listed": {
+    "failure": 1,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "dmlc/xgboost",
+   "bucket": "C++",
+   "license": "apache-2.0",
+   "stars": 28827,
+   "runs_listed": {
+    "failure": 2,
+    "success": 27
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 12
+   }
+  },
+  {
+   "repo": "dragonflydb/dragonfly",
+   "bucket": "C++",
+   "license": "other",
+   "stars": 31747,
+   "runs_listed": {
+    "failure": 5,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 17,
+    "log_expired": 3
+   }
+  },
+  {
+   "repo": "duckdb/duckdb",
+   "bucket": "C++",
+   "license": "mit",
+   "stars": 41920,
+   "runs_listed": {
+    "failure": 18,
+    "success": 30
+   },
+   "runs_inspected": 12,
+   "cases": 3,
+   "failed_cases": 1,
+   "topup_added": 1,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 34
+   }
+  },
+  {
+   "repo": "electron/electron",
+   "bucket": "C++",
+   "license": "mit",
+   "stars": 123389,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "emscripten-core/emscripten",
+   "bucket": "C++",
+   "license": "other",
+   "stars": 27679,
+   "runs_listed": {
+    "failure": 0,
+    "success": 15
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "envoyproxy/envoy",
+   "bucket": "C++",
+   "license": "apache-2.0",
+   "stars": 29040,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 20
+   }
+  },
+  {
+   "repo": "facebook/folly",
+   "bucket": "C++",
+   "license": "apache-2.0",
+   "stars": 30550,
+   "runs_listed": {
+    "failure": 3,
+    "success": 30
+   },
+   "runs_inspected": 2,
+   "cases": 4,
+   "failed_cases": 2,
+   "topup_added": 1,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "fmtlib/fmt",
+   "bucket": "C++",
+   "license": "mit",
+   "stars": 25867,
+   "runs_listed": {
+    "failure": 0,
+    "success": 29
+   },
+   "runs_inspected": 2,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "godotengine/godot",
+   "bucket": "C++",
+   "license": "mit",
+   "stars": 118143,
+   "runs_listed": {
+    "failure": 9,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 17
+   }
+  },
+  {
+   "repo": "google-ai-edge/mediapipe",
+   "bucket": "C++",
+   "license": "apache-2.0",
+   "stars": 37166,
+   "runs_listed": {
+    "failure": 0,
+    "success": 9
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "grpc/grpc",
+   "bucket": "C++",
+   "license": "apache-2.0",
+   "stars": 45366,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "hyprwm/Hyprland",
+   "bucket": "C++",
+   "license": "bsd-3-clause",
+   "stars": 38789,
+   "runs_listed": {
+    "failure": 25,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 11
+   }
+  },
+  {
+   "repo": "microsoft/WSL",
+   "bucket": "C++",
+   "license": "mit",
+   "stars": 33953,
+   "runs_listed": {
+    "failure": 2,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "microsoft/terminal",
+   "bucket": "C++",
+   "license": "mit",
+   "stars": 105081,
+   "runs_listed": {
+    "failure": 0,
+    "success": 5
+   },
+   "runs_inspected": 5,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 7
+   }
+  },
+  {
+   "repo": "ml-explore/mlx",
+   "bucket": "C++",
+   "license": "mit",
+   "stars": 28655,
+   "runs_listed": {
+    "failure": 4,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 22
+   }
+  },
+  {
+   "repo": "mongodb/mongo",
+   "bucket": "C++",
+   "license": "other",
+   "stars": 28614,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "nlohmann/json",
+   "bucket": "C++",
+   "license": "mit",
+   "stars": 50726,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 11,
+   "cases": 3,
+   "failed_cases": 2,
+   "topup_added": 1,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 4
+   }
+  },
+  {
+   "repo": "notepad-plus-plus/notepad-plus-plus",
+   "bucket": "C++",
+   "license": "other",
+   "stars": 29459,
+   "runs_listed": {
+    "failure": 1,
+    "success": 11
+   },
+   "runs_inspected": 6,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "ossrs/srs",
+   "bucket": "C++",
+   "license": "mit",
+   "stars": 29319,
+   "runs_listed": {
+    "failure": 0,
+    "success": 2
+   },
+   "runs_inspected": 2,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "protocolbuffers/protobuf",
+   "bucket": "C++",
+   "license": "other",
+   "stars": 72095,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 20
+   }
+  },
+  {
+   "repo": "qbittorrent/qBittorrent",
+   "bucket": "C++",
+   "license": "other",
+   "stars": 40577,
+   "runs_listed": {
+    "failure": 2,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 29,
+    "log_expired": 1
+   }
+  },
+  {
+   "repo": "react/react-native",
+   "bucket": "C++",
+   "license": "mit",
+   "stars": 126796,
+   "runs_listed": {
+    "failure": 26,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 13
+   }
+  },
+  {
+   "repo": "shadps4-emu/shadPS4",
+   "bucket": "C++",
+   "license": "gpl-2.0",
+   "stars": 33090,
+   "runs_listed": {
+    "failure": 8,
+    "success": 30
+   },
+   "runs_inspected": 3,
+   "cases": 5,
+   "failed_cases": 2,
+   "topup_added": 2,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "telegramdesktop/tdesktop",
+   "bucket": "C++",
+   "license": "gpl-3.0",
+   "stars": 33106,
+   "runs_listed": {
+    "failure": 24,
+    "success": 30
+   },
+   "runs_inspected": 11,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "tensorflow/tensorflow",
+   "bucket": "C++",
+   "license": "apache-2.0",
+   "stars": 200703,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 13
+   }
+  },
+  {
+   "repo": "DarkFlippers/unleashed-firmware",
+   "bucket": "C",
+   "license": "gpl-3.0",
+   "stars": 22423,
+   "runs_listed": {
+    "failure": 0,
+    "success": 24
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "DeusData/codebase-memory-mcp",
+   "bucket": "C",
+   "license": "mit",
+   "stars": 45809,
+   "runs_listed": {
+    "failure": 26,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "FFmpeg/FFmpeg",
+   "bucket": "C",
+   "license": "other",
+   "stars": 64768,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "Genymobile/scrcpy",
+   "bucket": "C",
+   "license": "apache-2.0",
+   "stars": 151050,
+   "runs_listed": {
+    "failure": 0,
+    "success": 1
+   },
+   "runs_inspected": 1,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "arendst/Tasmota",
+   "bucket": "C",
+   "license": "gpl-3.0",
+   "stars": 24799,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "coolsnowwolf/lede",
+   "bucket": "C",
+   "license": "other",
+   "stars": 31588,
+   "runs_listed": {
+    "failure": 0,
+    "success": 1
+   },
+   "runs_inspected": 1,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "curl/curl",
+   "bucket": "C",
+   "license": "other",
+   "stars": 43089,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 12,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 18
+   }
+  },
+  {
+   "repo": "fastfetch-cli/fastfetch",
+   "bucket": "C",
+   "license": "mit",
+   "stars": 24912,
+   "runs_listed": {
+    "failure": 4,
+    "success": 12
+   },
+   "runs_inspected": 4,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "hashcat/hashcat",
+   "bucket": "C",
+   "license": "",
+   "stars": 26944,
+   "runs_listed": {
+    "failure": 3,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 12
+   }
+  },
+  {
+   "repo": "libuv/libuv",
+   "bucket": "C",
+   "license": "mit",
+   "stars": 27225,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "microsoft/PowerToys",
+   "bucket": "C",
+   "license": "mit",
+   "stars": 139234,
+   "runs_listed": {
+    "failure": 11,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "log_expired": 2
+   }
+  },
+  {
+   "repo": "obsproject/obs-studio",
+   "bucket": "C",
+   "license": "gpl-2.0",
+   "stars": 76991,
+   "runs_listed": {
+    "failure": 0,
+    "success": 5
+   },
+   "runs_inspected": 5,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 27
+   }
+  },
+  {
+   "repo": "openwrt/openwrt",
+   "bucket": "C",
+   "license": "other",
+   "stars": 28638,
+   "runs_listed": {
+    "failure": 15,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 4
+   }
+  },
+  {
+   "repo": "php/php-src",
+   "bucket": "C",
+   "license": "bsd-3-clause",
+   "stars": 40434,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 10
+   }
+  },
+  {
+   "repo": "postgres/postgres",
+   "bucket": "C",
+   "license": "other",
+   "stars": 22285,
+   "runs_listed": {
+    "failure": 0,
+    "success": 23
+   },
+   "runs_inspected": 6,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 16
+   }
+  },
+  {
+   "repo": "radareorg/radare2",
+   "bucket": "C",
+   "license": "other",
+   "stars": 24928,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 9,
+   "cases": 4,
+   "failed_cases": 1,
+   "topup_added": 1,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "sandboxie-plus/Sandboxie",
+   "bucket": "C",
+   "license": "gpl-3.0",
+   "stars": 19609,
+   "runs_listed": {
+    "failure": 0,
+    "success": 8
+   },
+   "runs_inspected": 3,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "timescale/timescaledb",
+   "bucket": "C",
+   "license": "other",
+   "stars": 23644,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "tmux/tmux",
+   "bucket": "C",
+   "license": "isc",
+   "stars": 49764,
+   "runs_listed": {
+    "failure": 2,
+    "success": 4
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "torvalds/linux",
+   "bucket": "C",
+   "license": "other",
+   "stars": 251165,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "valkey-io/valkey",
+   "bucket": "C",
+   "license": "bsd-3-clause",
+   "stars": 27372,
+   "runs_listed": {
+    "failure": 11,
+    "success": 30
+   },
+   "runs_inspected": 12,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 11
+   }
+  },
+  {
+   "repo": "videolan/vlc",
+   "bucket": "C",
+   "license": "gpl-2.0",
+   "stars": 19878,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "JeoJay127/RapidEFI-Tool",
+   "bucket": "Dart",
+   "license": "agpl-3.0",
+   "stars": 2536,
+   "runs_listed": {
+    "failure": 0,
+    "success": 1
+   },
+   "runs_inspected": 1,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "KaringX/clashmi",
+   "bucket": "Dart",
+   "license": "gpl-3.0",
+   "stars": 9667,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "LinwoodDev/Butterfly",
+   "bucket": "Dart",
+   "license": "agpl-3.0",
+   "stars": 2046,
+   "runs_listed": {
+    "failure": 0,
+    "success": 6
+   },
+   "runs_inspected": 6,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 15
+   }
+  },
+  {
+   "repo": "MaikuB/flutter_local_notifications",
+   "bucket": "Dart",
+   "license": "",
+   "stars": 2668,
+   "runs_listed": {
+    "failure": 0,
+    "success": 16
+   },
+   "runs_inspected": 6,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "Notsfsssf/pixez-flutter",
+   "bucket": "Dart",
+   "license": "gpl-3.0",
+   "stars": 13002,
+   "runs_listed": {
+    "failure": 0,
+    "success": 10
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 6
+   }
+  },
+  {
+   "repo": "Predidit/Kazumi",
+   "bucket": "Dart",
+   "license": "gpl-3.0",
+   "stars": 30946,
+   "runs_listed": {
+    "failure": 1,
+    "success": 0
+   },
+   "runs_inspected": 1,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "Sle2p/AniCh",
+   "bucket": "Dart",
+   "license": "",
+   "stars": 6620,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "TNT-Likely/BeeCount",
+   "bucket": "Dart",
+   "license": "other",
+   "stars": 2491,
+   "runs_listed": {
+    "failure": 1,
+    "success": 18
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 7
+   }
+  },
+  {
+   "repo": "VeryGoodOpenSource/very_good_cli",
+   "bucket": "Dart",
+   "license": "mit",
+   "stars": 2425,
+   "runs_listed": {
+    "failure": 6,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 19,
+    "log_expired": 2
+   }
+  },
+  {
+   "repo": "bggRGjQaUbCoE/PiliPlus",
+   "bucket": "Dart",
+   "license": "gpl-3.0",
+   "stars": 19056,
+   "runs_listed": {
+    "failure": 1,
+    "success": 5
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 30
+   }
+  },
+  {
+   "repo": "blokadaorg/blokada",
+   "bucket": "Dart",
+   "license": "mpl-2.0",
+   "stars": 3265,
+   "runs_listed": {
+    "failure": 3,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "cogwheel0/conduit",
+   "bucket": "Dart",
+   "license": "gpl-3.0",
+   "stars": 2248,
+   "runs_listed": {
+    "failure": 0,
+    "success": 22
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 36
+   }
+  },
+  {
+   "repo": "dart-lang/sdk",
+   "bucket": "Dart",
+   "license": "bsd-3-clause",
+   "stars": 11303,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "deckerst/aves",
+   "bucket": "Dart",
+   "license": "bsd-3-clause",
+   "stars": 5346,
+   "runs_listed": {
+    "failure": 2,
+    "success": 12
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "duobaseio/forui",
+   "bucket": "Dart",
+   "license": "other",
+   "stars": 2367,
+   "runs_listed": {
+    "failure": 1,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 8
+   }
+  },
+  {
+   "repo": "edde746/plezy",
+   "bucket": "Dart",
+   "license": "gpl-3.0",
+   "stars": 3608,
+   "runs_listed": {
+    "failure": 4,
+    "success": 0
+   },
+   "runs_inspected": 4,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 13
+   }
+  },
+  {
+   "repo": "ente/ente",
+   "bucket": "Dart",
+   "license": "agpl-3.0",
+   "stars": 29244,
+   "runs_listed": {
+    "failure": 18,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 7
+   }
+  },
+  {
+   "repo": "finamp-app/finamp",
+   "bucket": "Dart",
+   "license": "mpl-2.0",
+   "stars": 4297,
+   "runs_listed": {
+    "failure": 3,
+    "success": 0
+   },
+   "runs_inspected": 3,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 15
+   }
+  },
+  {
+   "repo": "firebase/flutterfire",
+   "bucket": "Dart",
+   "license": "bsd-3-clause",
+   "stars": 9260,
+   "runs_listed": {
+    "failure": 1,
+    "success": 10
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 10
+   }
+  },
+  {
+   "repo": "flame-engine/flame",
+   "bucket": "Dart",
+   "license": "mit",
+   "stars": 10781,
+   "runs_listed": {
+    "failure": 1,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 10
+   }
+  },
+  {
+   "repo": "flutter/flutter",
+   "bucket": "Dart",
+   "license": "bsd-3-clause",
+   "stars": 179346,
+   "runs_listed": {
+    "failure": 19,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 4
+   }
+  },
+  {
+   "repo": "flutter/packages",
+   "bucket": "Dart",
+   "license": "bsd-3-clause",
+   "stars": 5317,
+   "runs_listed": {
+    "failure": 1,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "flutter/samples",
+   "bucket": "Dart",
+   "license": "other",
+   "stars": 19271,
+   "runs_listed": {
+    "failure": 0,
+    "success": 8
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 17
+   }
+  },
+  {
+   "repo": "flutter/website",
+   "bucket": "Dart",
+   "license": "other",
+   "stars": 3124,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "fossasia/pslab-app",
+   "bucket": "Dart",
+   "license": "apache-2.0",
+   "stars": 2132,
+   "runs_listed": {
+    "failure": 3,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 6
+   }
+  },
+  {
+   "repo": "fzyzcjy/flutter_rust_bridge",
+   "bucket": "Dart",
+   "license": "mit",
+   "stars": 5439,
+   "runs_listed": {
+    "failure": 1,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 6
+   }
+  },
+  {
+   "repo": "getlantern/lantern",
+   "bucket": "Dart",
+   "license": "gpl-3.0",
+   "stars": 16086,
+   "runs_listed": {
+    "failure": 3,
+    "success": 30
+   },
+   "runs_inspected": 7,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 12
+   }
+  },
+  {
+   "repo": "gokadzev/Musify",
+   "bucket": "Dart",
+   "license": "gpl-3.0",
+   "stars": 4297,
+   "runs_listed": {
+    "failure": 0,
+    "success": 3
+   },
+   "runs_inspected": 3,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "hiddify/hiddify-app",
+   "bucket": "Dart",
+   "license": "other",
+   "stars": 33045,
+   "runs_listed": {
+    "failure": 0,
+    "success": 5
+   },
+   "runs_inspected": 5,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 10
+   }
+  },
+  {
+   "repo": "kodjodevf/mangayomi",
+   "bucket": "Dart",
+   "license": "apache-2.0",
+   "stars": 3938,
+   "runs_listed": {
+    "failure": 0,
+    "success": 2
+   },
+   "runs_inspected": 2,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 12
+   }
+  },
+  {
+   "repo": "krille-chan/fluffychat",
+   "bucket": "Dart",
+   "license": "agpl-3.0",
+   "stars": 3168,
+   "runs_listed": {
+    "failure": 0,
+    "success": 10
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 13
+   }
+  },
+  {
+   "repo": "lichess-org/mobile",
+   "bucket": "Dart",
+   "license": "gpl-3.0",
+   "stars": 2581,
+   "runs_listed": {
+    "failure": 4,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 5
+   }
+  },
+  {
+   "repo": "localsend/localsend",
+   "bucket": "Dart",
+   "license": "apache-2.0",
+   "stars": 93406,
+   "runs_listed": {
+    "failure": 4,
+    "success": 27
+   },
+   "runs_inspected": 5,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "lollipopkit/flutter_server_box",
+   "bucket": "Dart",
+   "license": "agpl-3.0",
+   "stars": 8777,
+   "runs_listed": {
+    "failure": 9,
+    "success": 30
+   },
+   "runs_inspected": 9,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 8
+   }
+  },
+  {
+   "repo": "namidaco/namida",
+   "bucket": "Dart",
+   "license": "other",
+   "stars": 6540,
+   "runs_listed": {
+    "failure": 0,
+    "success": 11
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "rrousselGit/riverpod",
+   "bucket": "Dart",
+   "license": "mit",
+   "stars": 7395,
+   "runs_listed": {
+    "failure": 25,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 17
+   }
+  },
+  {
+   "repo": "shorebirdtech/shorebird",
+   "bucket": "Dart",
+   "license": "other",
+   "stars": 3033,
+   "runs_listed": {
+    "failure": 4,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 14
+   }
+  },
+  {
+   "repo": "simonoppowa/OpenNutriTracker",
+   "bucket": "Dart",
+   "license": "gpl-3.0",
+   "stars": 2623,
+   "runs_listed": {
+    "failure": 1,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 8
+   }
+  },
+  {
+   "repo": "spotiflacapp/SpotiFLAC-Mobile",
+   "bucket": "Dart",
+   "license": "mit",
+   "stars": 6615,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "wanghongenpin/proxypin",
+   "bucket": "Dart",
+   "license": "apache-2.0",
+   "stars": 14068,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "agentjido/jido",
+   "bucket": "Elixir",
+   "license": "apache-2.0",
+   "stars": 1875,
+   "runs_listed": {
+    "failure": 1,
+    "success": 6
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 24
+   }
+  },
+  {
+   "repo": "ash-project/ash",
+   "bucket": "Elixir",
+   "license": "",
+   "stars": 2514,
+   "runs_listed": {
+    "failure": 22,
+    "success": 26
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 30
+   }
+  },
+  {
+   "repo": "bartblast/hologram",
+   "bucket": "Elixir",
+   "license": "apache-2.0",
+   "stars": 1519,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 7,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "elixir-lang/elixir",
+   "bucket": "Elixir",
+   "license": "apache-2.0",
+   "stars": 26676,
+   "runs_listed": {
+    "failure": 2,
+    "success": 24
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 9
+   }
+  },
+  {
+   "repo": "elixir-nx/bumblebee",
+   "bucket": "Elixir",
+   "license": "apache-2.0",
+   "stars": 1673,
+   "runs_listed": {
+    "failure": 0,
+    "success": 6
+   },
+   "runs_inspected": 6,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "elixir-tesla/tesla",
+   "bucket": "Elixir",
+   "license": "mit",
+   "stars": 2075,
+   "runs_listed": {
+    "failure": 0,
+    "success": 14
+   },
+   "runs_inspected": 6,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "firezone/firezone",
+   "bucket": "Elixir",
+   "license": "apache-2.0",
+   "stars": 9109,
+   "runs_listed": {
+    "failure": 16,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 26
+   }
+  },
+  {
+   "repo": "oban-bg/oban",
+   "bucket": "Elixir",
+   "license": "apache-2.0",
+   "stars": 3989,
+   "runs_listed": {
+    "failure": 0,
+    "success": 2
+   },
+   "runs_inspected": 2,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 4
+   }
+  },
+  {
+   "repo": "phoenixframework/phoenix_live_view",
+   "bucket": "Elixir",
+   "license": "mit",
+   "stars": 6829,
+   "runs_listed": {
+    "failure": 0,
+    "success": 3
+   },
+   "runs_inspected": 2,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "plausible/analytics",
+   "bucket": "Elixir",
+   "license": "agpl-3.0",
+   "stars": 29316,
+   "runs_listed": {
+    "failure": 1,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 12
+   }
+  },
+  {
+   "repo": "rrrene/credo",
+   "bucket": "Elixir",
+   "license": "mit",
+   "stars": 5224,
+   "runs_listed": {
+    "failure": 2,
+    "success": 7
+   },
+   "runs_inspected": 3,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "semaphoreio/semaphore",
+   "bucket": "Elixir",
+   "license": "other",
+   "stars": 1613,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "supabase/realtime",
+   "bucket": "Elixir",
+   "license": "apache-2.0",
+   "stars": 7650,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "teslamate-org/teslamate",
+   "bucket": "Elixir",
+   "license": "agpl-3.0",
+   "stars": 9079,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "tuist/tuist",
+   "bucket": "Elixir",
+   "license": "other",
+   "stars": 5819,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 12,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 9
+   }
+  },
+  {
+   "repo": "AlistGo/alist",
+   "bucket": "Go",
+   "license": "agpl-3.0",
+   "stars": 50256,
+   "runs_listed": {
+    "failure": 1,
+    "success": 10
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "MHSanaei/3x-ui",
+   "bucket": "Go",
+   "license": "gpl-3.0",
+   "stars": 47448,
+   "runs_listed": {
+    "failure": 4,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "avelino/awesome-go",
+   "bucket": "Go",
+   "license": "mit",
+   "stars": 187044,
+   "runs_listed": {
+    "failure": 18,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 7
+   }
+  },
+  {
+   "repo": "caddyserver/caddy",
+   "bucket": "Go",
+   "license": "apache-2.0",
+   "stars": 76851,
+   "runs_listed": {
+    "failure": 3,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 2,
+   "failed_cases": 1,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "danielmiessler/Fabric",
+   "bucket": "Go",
+   "license": "mit",
+   "stars": 44157,
+   "runs_listed": {
+    "failure": 5,
+    "success": 30
+   },
+   "runs_inspected": 8,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "etcd-io/etcd",
+   "bucket": "Go",
+   "license": "apache-2.0",
+   "stars": 52326,
+   "runs_listed": {
+    "failure": 4,
+    "success": 22
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "ethereum/go-ethereum",
+   "bucket": "Go",
+   "license": "lgpl-3.0",
+   "stars": 51384,
+   "runs_listed": {
+    "failure": 5,
+    "success": 18
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "go-gitea/gitea",
+   "bucket": "Go",
+   "license": "mit",
+   "stars": 58303,
+   "runs_listed": {
+    "failure": 17,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 13
+   }
+  },
+  {
+   "repo": "gohugoio/hugo",
+   "bucket": "Go",
+   "license": "apache-2.0",
+   "stars": 90041,
+   "runs_listed": {
+    "failure": 0,
+    "success": 7
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "golang/go",
+   "bucket": "Go",
+   "license": "bsd-3-clause",
+   "stars": 139264,
+   "runs_listed": {
+    "failure": 0,
+    "success": 8
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "hashicorp/terraform",
+   "bucket": "Go",
+   "license": "other",
+   "stars": 49827,
+   "runs_listed": {
+    "failure": 1,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 11
+   }
+  },
+  {
+   "repo": "jesseduffield/lazygit",
+   "bucket": "Go",
+   "license": "mit",
+   "stars": 82901,
+   "runs_listed": {
+    "failure": 2,
+    "success": 30
+   },
+   "runs_inspected": 3,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "juanfont/headscale",
+   "bucket": "Go",
+   "license": "bsd-3-clause",
+   "stars": 44361,
+   "runs_listed": {
+    "failure": 1,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 8
+   }
+  },
+  {
+   "repo": "kubernetes/kubernetes",
+   "bucket": "Go",
+   "license": "apache-2.0",
+   "stars": 128306,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "microsoft/TypeScript",
+   "bucket": "Go",
+   "license": "apache-2.0",
+   "stars": 111349,
+   "runs_listed": {
+    "failure": 0,
+    "success": 27
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 8
+   }
+  },
+  {
+   "repo": "milvus-io/milvus",
+   "bucket": "Go",
+   "license": "apache-2.0",
+   "stars": 46317,
+   "runs_listed": {
+    "failure": 6,
+    "success": 2
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "mudler/LocalAI",
+   "bucket": "Go",
+   "license": "mit",
+   "stars": 49396,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 8,
+   "cases": 4,
+   "failed_cases": 2,
+   "topup_added": 1,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 7
+   }
+  },
+  {
+   "repo": "multica-ai/multica",
+   "bucket": "Go",
+   "license": "other",
+   "stars": 51978,
+   "runs_listed": {
+    "failure": 2,
+    "success": 30
+   },
+   "runs_inspected": 3,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "netdata/netdata",
+   "bucket": "Go",
+   "license": "gpl-3.0",
+   "stars": 80791,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 11,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 14,
+    "log_expired": 2
+   }
+  },
+  {
+   "repo": "rclone/rclone",
+   "bucket": "Go",
+   "license": "mit",
+   "stars": 60114,
+   "runs_listed": {
+    "failure": 0,
+    "success": 13
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "router-for-me/CLIProxyAPI",
+   "bucket": "Go",
+   "license": "mit",
+   "stars": 54197,
+   "runs_listed": {
+    "failure": 8,
+    "success": 30
+   },
+   "runs_inspected": 11,
+   "cases": 1,
+   "failed_cases": 1,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "syncthing/syncthing",
+   "bucket": "Go",
+   "license": "mpl-2.0",
+   "stars": 89155,
+   "runs_listed": {
+    "failure": 1,
+    "success": 19
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "traefik/traefik",
+   "bucket": "Go",
+   "license": "mit",
+   "stars": 65073,
+   "runs_listed": {
+    "failure": 1,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "APIJSON/APIJSON",
+   "bucket": "Java",
+   "license": "other",
+   "stars": 18399,
+   "runs_listed": {
+    "failure": 0,
+    "success": 6
+   },
+   "runs_inspected": 6,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "log_expired": 2
+   }
+  },
+  {
+   "repo": "Anuken/Mindustry",
+   "bucket": "Java",
+   "license": "gpl-3.0",
+   "stars": 29226,
+   "runs_listed": {
+    "failure": 1,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "CarGuo/GSYVideoPlayer",
+   "bucket": "Java",
+   "license": "apache-2.0",
+   "stars": 21506,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "JetBrains/intellij-community",
+   "bucket": "Java",
+   "license": "other",
+   "stars": 20610,
+   "runs_listed": {
+    "failure": 2,
+    "success": 4
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 8
+   }
+  },
+  {
+   "repo": "NationalSecurityAgency/ghidra",
+   "bucket": "Java",
+   "license": "apache-2.0",
+   "stars": 80708,
+   "runs_listed": {
+    "failure": 0,
+    "success": 4
+   },
+   "runs_inspected": 4,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "OpenAPITools/openapi-generator",
+   "bucket": "Java",
+   "license": "apache-2.0",
+   "stars": 26769,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 12,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 3,
+    "multi_purpose": 6
+   }
+  },
+  {
+   "repo": "ReactiveX/RxJava",
+   "bucket": "Java",
+   "license": "apache-2.0",
+   "stars": 48186,
+   "runs_listed": {
+    "failure": 1,
+    "success": 24
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "Mintplex-Labs/anything-llm",
+   "bucket": "JavaScript",
+   "license": "mit",
+   "stars": 66715,
+   "runs_listed": {
+    "failure": 5,
+    "success": 7
+   },
+   "runs_inspected": 12,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "axios/axios",
+   "bucket": "JavaScript",
+   "license": "mit",
+   "stars": 109302,
+   "runs_listed": {
+    "failure": 3,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "byoungd/up",
+   "bucket": "JavaScript",
+   "license": "other",
+   "stars": 67272,
+   "runs_listed": {
+    "failure": 2,
+    "success": 3
+   },
+   "runs_inspected": 5,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "career-ops-hq/career-ops",
+   "bucket": "JavaScript",
+   "license": "mit",
+   "stars": 73516,
+   "runs_listed": {
+    "failure": 28,
+    "success": 30
+   },
+   "runs_inspected": 7,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "chartjs/Chart.js",
+   "bucket": "JavaScript",
+   "license": "mit",
+   "stars": 67736,
+   "runs_listed": {
+    "failure": 0,
+    "success": 4
+   },
+   "runs_inspected": 4,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "gorhill/uBlock",
+   "bucket": "JavaScript",
+   "license": "gpl-3.0",
+   "stars": 68341,
+   "runs_listed": {
+    "failure": 0,
+    "success": 10
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 5
+   }
+  },
+  {
+   "repo": "louislam/uptime-kuma",
+   "bucket": "JavaScript",
+   "license": "mit",
+   "stars": 92127,
+   "runs_listed": {
+    "failure": 4,
+    "success": 30
+   },
+   "runs_inspected": 8,
+   "cases": 4,
+   "failed_cases": 1,
+   "topup_added": 1,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "mui/material-ui",
+   "bucket": "JavaScript",
+   "license": "mit",
+   "stars": 99130,
+   "runs_listed": {
+    "failure": 9,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "pbakaus/impeccable",
+   "bucket": "JavaScript",
+   "license": "apache-2.0",
+   "stars": 76830,
+   "runs_listed": {
+    "failure": 8,
+    "success": 30
+   },
+   "runs_inspected": 7,
+   "cases": 4,
+   "failed_cases": 1,
+   "topup_added": 1,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "tt-a1i/archify",
+   "bucket": "JavaScript",
+   "license": "mit",
+   "stars": 77881,
+   "runs_listed": {
+    "failure": 11,
+    "success": 30
+   },
+   "runs_inspected": 3,
+   "cases": 4,
+   "failed_cases": 2,
+   "topup_added": 1,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "YunaiV/ruoyi-vue-pro",
+   "bucket": "Java",
+   "license": "mit",
+   "stars": 39550,
+   "runs_listed": {
+    "failure": 2,
+    "success": 0
+   },
+   "runs_inspected": 2,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "alibaba/nacos",
+   "bucket": "Java",
+   "license": "apache-2.0",
+   "stars": 33416,
+   "runs_listed": {
+    "failure": 1,
+    "success": 23
+   },
+   "runs_inspected": 3,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "multi_purpose": 1
+   }
+  },
+  {
+   "repo": "apache/flink",
+   "bucket": "Java",
+   "license": "apache-2.0",
+   "stars": 26381,
+   "runs_listed": {
+    "failure": 5,
+    "success": 13
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 15
+   }
+  },
+  {
+   "repo": "apache/incubator-seata",
+   "bucket": "Java",
+   "license": "apache-2.0",
+   "stars": 26010,
+   "runs_listed": {
+    "failure": 7,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 16
+   }
+  },
+  {
+   "repo": "apache/kafka",
+   "bucket": "Java",
+   "license": "apache-2.0",
+   "stars": 33907,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "apache/shardingsphere",
+   "bucket": "Java",
+   "license": "apache-2.0",
+   "stars": 20804,
+   "runs_listed": {
+    "failure": 11,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 15
+   }
+  },
+  {
+   "repo": "apolloconfig/apollo",
+   "bucket": "Java",
+   "license": "apache-2.0",
+   "stars": 29816,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "bazelbuild/bazel",
+   "bucket": "Java",
+   "license": "apache-2.0",
+   "stars": 25919,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "conductor-oss/conductor",
+   "bucket": "Java",
+   "license": "apache-2.0",
+   "stars": 32268,
+   "runs_listed": {
+    "failure": 1,
+    "success": 3
+   },
+   "runs_inspected": 4,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "dbeaver/dbeaver",
+   "bucket": "Java",
+   "license": "apache-2.0",
+   "stars": 51958,
+   "runs_listed": {
+    "failure": 2,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 8
+   }
+  },
+  {
+   "repo": "doocs/leetcode",
+   "bucket": "Java",
+   "license": "cc-by-sa-4.0",
+   "stars": 36655,
+   "runs_listed": {
+    "failure": 1,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "elastic/elasticsearch",
+   "bucket": "Java",
+   "license": "other",
+   "stars": 78194,
+   "runs_listed": {
+    "failure": 1,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 11
+   }
+  },
+  {
+   "repo": "floci-io/floci",
+   "bucket": "Java",
+   "license": "mit",
+   "stars": 26380,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 12,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "multi_purpose": 1
+   }
+  },
+  {
+   "repo": "google/gson",
+   "bucket": "Java",
+   "license": "apache-2.0",
+   "stars": 24235,
+   "runs_listed": {
+    "failure": 0,
+    "success": 13
+   },
+   "runs_inspected": 5,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "multi_purpose": 2,
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "google/guava",
+   "bucket": "Java",
+   "license": "apache-2.0",
+   "stars": 51918,
+   "runs_listed": {
+    "failure": 0,
+    "success": 14
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "iBotPeaches/Apktool",
+   "bucket": "Java",
+   "license": "apache-2.0",
+   "stars": 25735,
+   "runs_listed": {
+    "failure": 0,
+    "success": 6
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "iluwatar/java-design-patterns",
+   "bucket": "Java",
+   "license": "other",
+   "stars": 94757,
+   "runs_listed": {
+    "failure": 1,
+    "success": 14
+   },
+   "runs_inspected": 6,
+   "cases": 1,
+   "failed_cases": 1,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 4
+   }
+  },
+  {
+   "repo": "jenkinsci/jenkins",
+   "bucket": "Java",
+   "license": "mit",
+   "stars": 26618,
+   "runs_listed": {
+    "failure": 2,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "kestra-io/kestra",
+   "bucket": "Java",
+   "license": "apache-2.0",
+   "stars": 29232,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 6
+   }
+  },
+  {
+   "repo": "keycloak/keycloak",
+   "bucket": "Java",
+   "license": "apache-2.0",
+   "stars": 37144,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 19
+   }
+  },
+  {
+   "repo": "openjdk/jdk",
+   "bucket": "Java",
+   "license": "gpl-2.0",
+   "stars": 23404,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "oracle/graal",
+   "bucket": "Java",
+   "license": "other",
+   "stars": 21725,
+   "runs_listed": {
+    "failure": 9,
+    "success": 2
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "spring-projects/spring-boot",
+   "bucket": "Java",
+   "license": "apache-2.0",
+   "stars": 81557,
+   "runs_listed": {
+    "failure": 4,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 6
+   }
+  },
+  {
+   "repo": "spring-projects/spring-framework",
+   "bucket": "Java",
+   "license": "apache-2.0",
+   "stars": 60270,
+   "runs_listed": {
+    "failure": 4,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "yuliskov/SmartTube",
+   "bucket": "Java",
+   "license": "mit",
+   "stars": 34568,
+   "runs_listed": {
+    "failure": 0,
+    "success": 3
+   },
+   "runs_inspected": 3,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "Aliucord/Aliucord",
+   "bucket": "Kotlin",
+   "license": "osl-3.0",
+   "stars": 4877,
+   "runs_listed": {
+    "failure": 0,
+    "success": 1
+   },
+   "runs_inspected": 1,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "CeuiLiSA/Pixiv-Shaft",
+   "bucket": "Kotlin",
+   "license": "gpl-2.0",
+   "stars": 8014,
+   "runs_listed": {
+    "failure": 4,
+    "success": 12
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "HapeLee/legado-with-MD3",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 6362,
+   "runs_listed": {
+    "failure": 2,
+    "success": 12
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "Heapy/awesome-kotlin",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 11386,
+   "runs_listed": {
+    "failure": 1,
+    "success": 14
+   },
+   "runs_inspected": 6,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "HeliBorg/HeliBoard",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 6258,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "JetBrains/compose-multiplatform",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 19405,
+   "runs_listed": {
+    "failure": 0,
+    "success": 4
+   },
+   "runs_inspected": 4,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "JetBrains/ideavim",
+   "bucket": "Kotlin",
+   "license": "mit",
+   "stars": 10278,
+   "runs_listed": {
+    "failure": 2,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "JetBrains/koog",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 4601,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "JetBrains/kotlin",
+   "bucket": "Kotlin",
+   "license": "",
+   "stars": 53475,
+   "runs_listed": {
+    "failure": 0,
+    "success": 1
+   },
+   "runs_inspected": 1,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "KernelSU-Next/KernelSU-Next",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 4351,
+   "runs_listed": {
+    "failure": 2,
+    "success": 2
+   },
+   "runs_inspected": 4,
+   "cases": 1,
+   "failed_cases": 1,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 4
+   }
+  },
+  {
+   "repo": "Kotlin/kotlinx.coroutines",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 13819,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "MorpheApp/morphe-manager",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 8650,
+   "runs_listed": {
+    "failure": 4,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "RetroMusicPlayer/RetroMusicPlayer",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 5338,
+   "runs_listed": {
+    "failure": 0,
+    "success": 1
+   },
+   "runs_inspected": 1,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "Swordfish90/Lemuroid",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 4370,
+   "runs_listed": {
+    "failure": 2,
+    "success": 0
+   },
+   "runs_inspected": 2,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "T8RIN/ImageToolbox",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 14864,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "android/nowinandroid",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 21883,
+   "runs_listed": {
+    "failure": 20,
+    "success": 9
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "androidx/androidx",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 6105,
+   "runs_listed": {
+    "failure": 25,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 8
+   }
+  },
+  {
+   "repo": "anilbeesetti/nextplayer",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 4472,
+   "runs_listed": {
+    "failure": 0,
+    "success": 4
+   },
+   "runs_inspected": 4,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "ankidroid/Anki-Android",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 11940,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 8
+   }
+  },
+  {
+   "repo": "bitwarden/android",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 9443,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 9
+   }
+  },
+  {
+   "repo": "breezy-weather/breezy-weather",
+   "bucket": "Kotlin",
+   "license": "lgpl-3.0",
+   "stars": 11590,
+   "runs_listed": {
+    "failure": 0,
+    "success": 8
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "log_expired": 1
+   }
+  },
+  {
+   "repo": "capcom6/android-sms-gateway",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 5826,
+   "runs_listed": {
+    "failure": 0,
+    "success": 6
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "coil-kt/coil",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 11914,
+   "runs_listed": {
+    "failure": 0,
+    "success": 4
+   },
+   "runs_inspected": 4,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 9
+   }
+  },
+  {
+   "repo": "deniscerri/ytdlnis",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 10429,
+   "runs_listed": {
+    "failure": 0,
+    "success": 4
+   },
+   "runs_inspected": 4,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 4
+   }
+  },
+  {
+   "repo": "detekt/detekt",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 7080,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1,
+    "multi_purpose": 1
+   }
+  },
+  {
+   "repo": "duckduckgo/Android",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 4841,
+   "runs_listed": {
+    "failure": 24,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "embabel/embabel-agent",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 4488,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "ethereum-lists/chains",
+   "bucket": "Kotlin",
+   "license": "mit",
+   "stars": 9828,
+   "runs_listed": {
+    "failure": 7,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "facebook/fresco",
+   "bucket": "Kotlin",
+   "license": "mit",
+   "stars": 17152,
+   "runs_listed": {
+    "failure": 0,
+    "success": 9
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "log_expired": 1,
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "facebook/litho",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 7800,
+   "runs_listed": {
+    "failure": 0,
+    "success": 1
+   },
+   "runs_inspected": 1,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "firebase/quickstart-android",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 9324,
+   "runs_listed": {
+    "failure": 0,
+    "success": 6
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "florisboard/florisboard",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 8682,
+   "runs_listed": {
+    "failure": 1,
+    "success": 1
+   },
+   "runs_inspected": 2,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "gkd-kit/gkd",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 42507,
+   "runs_listed": {
+    "failure": 0,
+    "success": 1
+   },
+   "runs_inspected": 1,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "gotson/komga",
+   "bucket": "Kotlin",
+   "license": "mit",
+   "stars": 6711,
+   "runs_listed": {
+    "failure": 0,
+    "success": 7
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "jay3-yy/BiliPai",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 4742,
+   "runs_listed": {
+    "failure": 19,
+    "success": 3
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "jellyfin/jellyfin-androidtv",
+   "bucket": "Kotlin",
+   "license": "gpl-2.0",
+   "stars": 4593,
+   "runs_listed": {
+    "failure": 0,
+    "success": 20
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "jev-chat/jev-chat-jarvis",
+   "bucket": "Kotlin",
+   "license": "mit",
+   "stars": 7353,
+   "runs_listed": {
+    "failure": 1,
+    "success": 4
+   },
+   "runs_inspected": 5,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "keiyoushi/extensions-source",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 4750,
+   "runs_listed": {
+    "failure": 10,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "komi-store/komi-store",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 19076,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "komikku-app/komikku",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 4816,
+   "runs_listed": {
+    "failure": 0,
+    "success": 17
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "ktlint/ktlint",
+   "bucket": "Kotlin",
+   "license": "mit",
+   "stars": 6751,
+   "runs_listed": {
+    "failure": 0,
+    "success": 5
+   },
+   "runs_inspected": 5,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 15
+   }
+  },
+  {
+   "repo": "ktorio/ktor",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 14536,
+   "runs_listed": {
+    "failure": 0,
+    "success": 7
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "libre-tube/LibreTube",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 12772,
+   "runs_listed": {
+    "failure": 0,
+    "success": 8
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "lysine-dev/okhttp",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 47085,
+   "runs_listed": {
+    "failure": 5,
+    "success": 3
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 5,
+    "log_expired": 1
+   }
+  },
+  {
+   "repo": "maxrave-dev/SimpMusic",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 11726,
+   "runs_listed": {
+    "failure": 0,
+    "success": 5
+   },
+   "runs_inspected": 5,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "mihonapp/mihon",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 24018,
+   "runs_listed": {
+    "failure": 0,
+    "success": 5
+   },
+   "runs_inspected": 5,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "mikepenz/AboutLibraries",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 4458,
+   "runs_listed": {
+    "failure": 0,
+    "success": 5
+   },
+   "runs_inspected": 5,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "mockk/mockk",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 5762,
+   "runs_listed": {
+    "failure": 0,
+    "success": 13
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 5
+   }
+  },
+  {
+   "repo": "nextcloud/android",
+   "bucket": "Kotlin",
+   "license": "gpl-2.0",
+   "stars": 5614,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "open-ani/animeko",
+   "bucket": "Kotlin",
+   "license": "agpl-3.0",
+   "stars": 20482,
+   "runs_listed": {
+    "failure": 1,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2,
+    "log_expired": 1
+   }
+  },
+  {
+   "repo": "osfans/trime",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 4695,
+   "runs_listed": {
+    "failure": 0,
+    "success": 1
+   },
+   "runs_inspected": 1,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "permissionlesstech/bitchat-android",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 7716,
+   "runs_listed": {
+    "failure": 3,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "plainhub/plain-app",
+   "bucket": "Kotlin",
+   "license": "agpl-3.0",
+   "stars": 6827,
+   "runs_listed": {
+    "failure": 0,
+    "success": 7
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "pppscn/SmsForwarder",
+   "bucket": "Kotlin",
+   "license": "bsd-2-clause",
+   "stars": 28268,
+   "runs_listed": {
+    "failure": 0,
+    "success": 3
+   },
+   "runs_inspected": 3,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "react-native-async-storage/async-storage",
+   "bucket": "Kotlin",
+   "license": "mit",
+   "stars": 5072,
+   "runs_listed": {
+    "failure": 0,
+    "success": 2
+   },
+   "runs_inspected": 2,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "recloudstream/cloudstream",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 10869,
+   "runs_listed": {
+    "failure": 0,
+    "success": 18
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "rikkahub/rikkahub",
+   "bucket": "Kotlin",
+   "license": "agpl-3.0",
+   "stars": 8009,
+   "runs_listed": {
+    "failure": 0,
+    "success": 8
+   },
+   "runs_inspected": 6,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "rukamori/ArchiveTune",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 6775,
+   "runs_listed": {
+    "failure": 0,
+    "success": 11
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "samolego/Canta",
+   "bucket": "Kotlin",
+   "license": "lgpl-3.0",
+   "stars": 6065,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "shiaho777/web-to-app",
+   "bucket": "Kotlin",
+   "license": "unlicense",
+   "stars": 6711,
+   "runs_listed": {
+    "failure": 2,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "shihabal3amri/DiPlay",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 4463,
+   "runs_listed": {
+    "failure": 9,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "square/leakcanary",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 30005,
+   "runs_listed": {
+    "failure": 1,
+    "success": 11
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "streetcomplete/StreetComplete",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 5032,
+   "runs_listed": {
+    "failure": 0,
+    "success": 16
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "tasks/tasks",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 5630,
+   "runs_listed": {
+    "failure": 0,
+    "success": 12
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 32
+   }
+  },
+  {
+   "repo": "thunderbird/thunderbird-android",
+   "bucket": "Kotlin",
+   "license": "apache-2.0",
+   "stars": 14062,
+   "runs_listed": {
+    "failure": 5,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 9
+   }
+  },
+  {
+   "repo": "tiann/KernelSU",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 18885,
+   "runs_listed": {
+    "failure": 10,
+    "success": 18
+   },
+   "runs_inspected": 12,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 4
+   }
+  },
+  {
+   "repo": "topjohnwu/Magisk",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 63083,
+   "runs_listed": {
+    "failure": 2,
+    "success": 17
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 13
+   }
+  },
+  {
+   "repo": "utkarshdalal/GameNative",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 10917,
+   "runs_listed": {
+    "failure": 5,
+    "success": 27
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "wxxsfxyzm/InstallerX-Revived",
+   "bucket": "Kotlin",
+   "license": "gpl-3.0",
+   "stars": 6868,
+   "runs_listed": {
+    "failure": 2,
+    "success": 16
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "log_expired": 2
+   }
+  },
+  {
+   "repo": "yairm210/Unciv",
+   "bucket": "Kotlin",
+   "license": "mpl-2.0",
+   "stars": 11394,
+   "runs_listed": {
+    "failure": 3,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "BookStackApp/BookStack",
+   "bucket": "PHP",
+   "license": "mit",
+   "stars": 19075,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "FreshRSS/FreshRSS",
+   "bucket": "PHP",
+   "license": "agpl-3.0",
+   "stars": 16233,
+   "runs_listed": {
+    "failure": 5,
+    "success": 30
+   },
+   "runs_inspected": 8,
+   "cases": 4,
+   "failed_cases": 1,
+   "topup_added": 1,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 4
+   }
+  },
+  {
+   "repo": "PHPMailer/PHPMailer",
+   "bucket": "PHP",
+   "license": "lgpl-2.1",
+   "stars": 22304,
+   "runs_listed": {
+    "failure": 0,
+    "success": 17
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 10
+   }
+  },
+  {
+   "repo": "Seldaek/monolog",
+   "bucket": "PHP",
+   "license": "mit",
+   "stars": 21401,
+   "runs_listed": {
+    "failure": 2,
+    "success": 26
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 23
+   }
+  },
+  {
+   "repo": "WordPress/WordPress",
+   "bucket": "PHP",
+   "license": "other",
+   "stars": 21449,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "appwrite/appwrite",
+   "bucket": "PHP",
+   "license": "bsd-3-clause",
+   "stars": 57574,
+   "runs_listed": {
+    "failure": 23,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 18
+   }
+  },
+  {
+   "repo": "bagisto/bagisto",
+   "bucket": "PHP",
+   "license": "mit",
+   "stars": 28211,
+   "runs_listed": {
+    "failure": 3,
+    "success": 3
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "cachethq/cachet",
+   "bucket": "PHP",
+   "license": "other",
+   "stars": 15258,
+   "runs_listed": {
+    "failure": 2,
+    "success": 5
+   },
+   "runs_inspected": 6,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "composer/composer",
+   "bucket": "PHP",
+   "license": "mit",
+   "stars": 29543,
+   "runs_listed": {
+    "failure": 0,
+    "success": 14
+   },
+   "runs_inspected": 6,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "coollabsio/coolify",
+   "bucket": "PHP",
+   "license": "apache-2.0",
+   "stars": 62603,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "danielmiessler/SecLists",
+   "bucket": "PHP",
+   "license": "mit",
+   "stars": 73943,
+   "runs_listed": {
+    "failure": 0,
+    "success": 27
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "filamentphp/filament",
+   "bucket": "PHP",
+   "license": "mit",
+   "stars": 32199,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 12,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 5
+   }
+  },
+  {
+   "repo": "grokability/snipe-it",
+   "bucket": "PHP",
+   "license": "agpl-3.0",
+   "stars": 15004,
+   "runs_listed": {
+    "failure": 4,
+    "success": 30
+   },
+   "runs_inspected": 8,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 6
+   }
+  },
+  {
+   "repo": "koel/koel",
+   "bucket": "PHP",
+   "license": "mit",
+   "stars": 17269,
+   "runs_listed": {
+    "failure": 0,
+    "success": 7
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "laravel/framework",
+   "bucket": "PHP",
+   "license": "mit",
+   "stars": 34949,
+   "runs_listed": {
+    "failure": 20,
+    "success": 30
+   },
+   "runs_inspected": 12,
+   "cases": 1,
+   "failed_cases": 1,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 35
+   }
+  },
+  {
+   "repo": "nikic/PHP-Parser",
+   "bucket": "PHP",
+   "license": "bsd-3-clause",
+   "stars": 17469,
+   "runs_listed": {
+    "failure": 0,
+    "success": 4
+   },
+   "runs_inspected": 1,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "sebastianbergmann/phpunit",
+   "bucket": "PHP",
+   "license": "bsd-3-clause",
+   "stars": 20062,
+   "runs_listed": {
+    "failure": 5,
+    "success": 30
+   },
+   "runs_inspected": 8,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "Comfy-Org/ComfyUI",
+   "bucket": "Python",
+   "license": "gpl-3.0",
+   "stars": 136148,
+   "runs_listed": {
+    "failure": 1,
+    "success": 30
+   },
+   "runs_inspected": 2,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "D4Vinci/Scrapling",
+   "bucket": "Python",
+   "license": "bsd-3-clause",
+   "stars": 85776,
+   "runs_listed": {
+    "failure": 2,
+    "success": 4
+   },
+   "runs_inspected": 4,
+   "cases": 3,
+   "failed_cases": 1,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "EbookFoundation/free-programming-books",
+   "bucket": "Python",
+   "license": "cc-by-4.0",
+   "stars": 398513,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "Graphify-Labs/graphify",
+   "bucket": "Python",
+   "license": "apache-2.0",
+   "stars": 123949,
+   "runs_listed": {
+    "failure": 3,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "NousResearch/hermes-agent",
+   "bucket": "Python",
+   "license": "mit",
+   "stars": 251334,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 6
+   }
+  },
+  {
+   "repo": "anthropics/skills",
+   "bucket": "Python",
+   "license": "",
+   "stars": 179728,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "bytedance/deer-flow",
+   "bucket": "Python",
+   "license": "mit",
+   "stars": 83403,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 12,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "fastapi/fastapi",
+   "bucket": "Python",
+   "license": "mit",
+   "stars": 102820,
+   "runs_listed": {
+    "failure": 2,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "github/spec-kit",
+   "bucket": "Python",
+   "license": "mit",
+   "stars": 140199,
+   "runs_listed": {
+    "failure": 1,
+    "success": 30
+   },
+   "runs_inspected": 8,
+   "cases": 3,
+   "failed_cases": 1,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "hacksider/Deep-Live-Cam",
+   "bucket": "Python",
+   "license": "agpl-3.0",
+   "stars": 96915,
+   "runs_listed": {
+    "failure": 1,
+    "success": 16
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "harry0703/MoneyPrinterTurbo",
+   "bucket": "Python",
+   "license": "mit",
+   "stars": 128558,
+   "runs_listed": {
+    "failure": 0,
+    "success": 10
+   },
+   "runs_inspected": 6,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 10
+   }
+  },
+  {
+   "repo": "home-assistant/core",
+   "bucket": "Python",
+   "license": "apache-2.0",
+   "stars": 91264,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 9
+   }
+  },
+  {
+   "repo": "huggingface/transformers",
+   "bucket": "Python",
+   "license": "apache-2.0",
+   "stars": 166966,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "langchain-ai/langchain",
+   "bucket": "Python",
+   "license": "mit",
+   "stars": 147465,
+   "runs_listed": {
+    "failure": 28,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 9
+   }
+  },
+  {
+   "repo": "practical-tutorials/project-based-learning",
+   "bucket": "Python",
+   "license": "mit",
+   "stars": 285889,
+   "runs_listed": {
+    "failure": 0,
+    "success": 3
+   },
+   "runs_inspected": 3,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "public-apis/public-apis",
+   "bucket": "Python",
+   "license": "mit",
+   "stars": 486190,
+   "runs_listed": {
+    "failure": 25,
+    "success": 21
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "python/cpython",
+   "bucket": "Python",
+   "license": "other",
+   "stars": 77499,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 12,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "log_expired": 1,
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "pytorch/pytorch",
+   "bucket": "Python",
+   "license": "other",
+   "stars": 103772,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 14
+   }
+  },
+  {
+   "repo": "sherlock-project/sherlock",
+   "bucket": "Python",
+   "license": "mit",
+   "stars": 93259,
+   "runs_listed": {
+    "failure": 0,
+    "success": 2
+   },
+   "runs_inspected": 2,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "unclecode/crawl4ai",
+   "bucket": "Python",
+   "license": "apache-2.0",
+   "stars": 84778,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 2,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "unslothai/unsloth",
+   "bucket": "Python",
+   "license": "apache-2.0",
+   "stars": 77216,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 8,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "vllm-project/vllm",
+   "bucket": "Python",
+   "license": "apache-2.0",
+   "stars": 93210,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "Homebrew/homebrew-core",
+   "bucket": "Ruby",
+   "license": "bsd-2-clause",
+   "stars": 15610,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 12,
+   "cases": 1,
+   "failed_cases": 1,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 12
+   }
+  },
+  {
+   "repo": "activeadmin/activeadmin",
+   "bucket": "Ruby",
+   "license": "mit",
+   "stars": 9713,
+   "runs_listed": {
+    "failure": 4,
+    "success": 4
+   },
+   "runs_inspected": 7,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "antiwork/gumroad",
+   "bucket": "Ruby",
+   "license": "mit",
+   "stars": 9763,
+   "runs_listed": {
+    "failure": 3,
+    "success": 30
+   },
+   "runs_inspected": 8,
+   "cases": 2,
+   "failed_cases": 1,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "discourse/discourse",
+   "bucket": "Ruby",
+   "license": "gpl-2.0",
+   "stars": 47931,
+   "runs_listed": {
+    "failure": 14,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 22
+   }
+  },
+  {
+   "repo": "docusealco/docuseal",
+   "bucket": "Ruby",
+   "license": "agpl-3.0",
+   "stars": 18654,
+   "runs_listed": {
+    "failure": 0,
+    "success": 3
+   },
+   "runs_inspected": 3,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "fastlane/fastlane",
+   "bucket": "Ruby",
+   "license": "mit",
+   "stars": 42202,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "fluent/fluentd",
+   "bucket": "Ruby",
+   "license": "apache-2.0",
+   "stars": 13597,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "forem/forem",
+   "bucket": "Ruby",
+   "license": "agpl-3.0",
+   "stars": 22789,
+   "runs_listed": {
+    "failure": 1,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 6
+   }
+  },
+  {
+   "repo": "gitlabhq/gitlabhq",
+   "bucket": "Ruby",
+   "license": "other",
+   "stars": 24554,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "huginn/huginn",
+   "bucket": "Ruby",
+   "license": "mit",
+   "stars": 50021,
+   "runs_listed": {
+    "failure": 1,
+    "success": 23
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "opf/openproject",
+   "bucket": "Ruby",
+   "license": "gpl-3.0",
+   "stars": 16313,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "rails/rails",
+   "bucket": "Ruby",
+   "license": "mit",
+   "stars": 58803,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "rubocop/rubocop",
+   "bucket": "Ruby",
+   "license": "mit",
+   "stars": 12910,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 2,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 1,
+    "multi_purpose": 1
+   }
+  },
+  {
+   "repo": "spree/spree",
+   "bucket": "Ruby",
+   "license": "bsd-3-clause",
+   "stars": 15739,
+   "runs_listed": {
+    "failure": 3,
+    "success": 30
+   },
+   "runs_inspected": 7,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 7
+   }
+  },
+  {
+   "repo": "teamcapybara/capybara",
+   "bucket": "Ruby",
+   "license": "mit",
+   "stars": 10177,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "ubicloud/ubicloud",
+   "bucket": "Ruby",
+   "license": "agpl-3.0",
+   "stars": 12303,
+   "runs_listed": {
+    "failure": 2,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 9
+   }
+  },
+  {
+   "repo": "we-promise/sure",
+   "bucket": "Ruby",
+   "license": "agpl-3.0",
+   "stars": 10393,
+   "runs_listed": {
+    "failure": 9,
+    "success": 30
+   },
+   "runs_inspected": 12,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 16
+   }
+  },
+  {
+   "repo": "FuelLabs/fuel-core",
+   "bucket": "Rust",
+   "license": "other",
+   "stars": 56810,
+   "runs_listed": {
+    "failure": 4,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "FuelLabs/sway",
+   "bucket": "Rust",
+   "license": "apache-2.0",
+   "stars": 61401,
+   "runs_listed": {
+    "failure": 1,
+    "success": 14
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 8
+   }
+  },
+  {
+   "repo": "GyulyVGC/sniffnet",
+   "bucket": "Rust",
+   "license": "apache-2.0",
+   "stars": 41335,
+   "runs_listed": {
+    "failure": 1,
+    "success": 29
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 13
+   }
+  },
+  {
+   "repo": "aaif-goose/goose",
+   "bucket": "Rust",
+   "license": "apache-2.0",
+   "stars": 54950,
+   "runs_listed": {
+    "failure": 18,
+    "success": 30
+   },
+   "runs_inspected": 8,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 7
+   }
+  },
+  {
+   "repo": "alacritty/alacritty",
+   "bucket": "Rust",
+   "license": "apache-2.0",
+   "stars": 65890,
+   "runs_listed": {
+    "failure": 0,
+    "success": 2
+   },
+   "runs_inspected": 1,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "astral-sh/ruff",
+   "bucket": "Rust",
+   "license": "mit",
+   "stars": 49914,
+   "runs_listed": {
+    "failure": 9,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 5
+   }
+  },
+  {
+   "repo": "bevyengine/bevy",
+   "bucket": "Rust",
+   "license": "apache-2.0",
+   "stars": 48624,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 19
+   }
+  },
+  {
+   "repo": "codewhale-hq/Codewhale",
+   "bucket": "Rust",
+   "license": "mit",
+   "stars": 41047,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "dani-garcia/vaultwarden",
+   "bucket": "Rust",
+   "license": "agpl-3.0",
+   "stars": 68538,
+   "runs_listed": {
+    "failure": 5,
+    "success": 30
+   },
+   "runs_inspected": 3,
+   "cases": 5,
+   "failed_cases": 2,
+   "topup_added": 2,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "denoland/deno",
+   "bucket": "Rust",
+   "license": "mit",
+   "stars": 108650,
+   "runs_listed": {
+    "failure": 6,
+    "success": 5
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 9
+   }
+  },
+  {
+   "repo": "herdrdev/herdr",
+   "bucket": "Rust",
+   "license": "apache-2.0",
+   "stars": 42420,
+   "runs_listed": {
+    "failure": 3,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 13
+   }
+  },
+  {
+   "repo": "janhq/jan",
+   "bucket": "Rust",
+   "license": "other",
+   "stars": 44800,
+   "runs_listed": {
+    "failure": 2,
+    "success": 30
+   },
+   "runs_inspected": 2,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "juspay/hyperswitch",
+   "bucket": "Rust",
+   "license": "apache-2.0",
+   "stars": 45280,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 9
+   }
+  },
+  {
+   "repo": "meilisearch/meilisearch",
+   "bucket": "Rust",
+   "license": "other",
+   "stars": 59488,
+   "runs_listed": {
+    "failure": 8,
+    "success": 30
+   },
+   "runs_inspected": 7,
+   "cases": 4,
+   "failed_cases": 1,
+   "topup_added": 1,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 8
+   }
+  },
+  {
+   "repo": "nushell/nushell",
+   "bucket": "Rust",
+   "license": "mit",
+   "stars": 40625,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 4,
+    "log_expired": 1
+   }
+  },
+  {
+   "repo": "oven-sh/bun",
+   "bucket": "Rust",
+   "license": "other",
+   "stars": 96122,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 9
+   }
+  },
+  {
+   "repo": "pola-rs/polars",
+   "bucket": "Rust",
+   "license": "mit",
+   "stars": 39912,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 4,
+   "cases": 4,
+   "failed_cases": 2,
+   "topup_added": 1,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "rtk-ai/rtk",
+   "bucket": "Rust",
+   "license": "apache-2.0",
+   "stars": 82419,
+   "runs_listed": {
+    "failure": 2,
+    "success": 8
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 20
+   }
+  },
+  {
+   "repo": "rust-unofficial/awesome-rust",
+   "bucket": "Rust",
+   "license": "cc0-1.0",
+   "stars": 59677,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 5
+   }
+  },
+  {
+   "repo": "rustdesk/rustdesk",
+   "bucket": "Rust",
+   "license": "agpl-3.0",
+   "stars": 125171,
+   "runs_listed": {
+    "failure": 2,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 16
+   }
+  },
+  {
+   "repo": "sharkdp/fd",
+   "bucket": "Rust",
+   "license": "apache-2.0",
+   "stars": 44642,
+   "runs_listed": {
+    "failure": 0,
+    "success": 2
+   },
+   "runs_inspected": 2,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 12
+   }
+  },
+  {
+   "repo": "starship/starship",
+   "bucket": "Rust",
+   "license": "isc",
+   "stars": 60158,
+   "runs_listed": {
+    "failure": 5,
+    "success": 30
+   },
+   "runs_inspected": 5,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 11
+   }
+  },
+  {
+   "repo": "tauri-apps/tauri",
+   "bucket": "Rust",
+   "license": "apache-2.0",
+   "stars": 111598,
+   "runs_listed": {
+    "failure": 23,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "tinyhumansai/openhuman",
+   "bucket": "Rust",
+   "license": "gpl-3.0",
+   "stars": 40642,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 12,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 10
+   }
+  },
+  {
+   "repo": "tw93/Pake",
+   "bucket": "Rust",
+   "license": "gpl-3.0",
+   "stars": 61913,
+   "runs_listed": {
+    "failure": 1,
+    "success": 29
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 5
+   }
+  },
+  {
+   "repo": "warpdotdev/warp",
+   "bucket": "Rust",
+   "license": "agpl-3.0",
+   "stars": 65360,
+   "runs_listed": {
+    "failure": 19,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 15
+   }
+  },
+  {
+   "repo": "ACINQ/eclair",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 1347,
+   "runs_listed": {
+    "failure": 1,
+    "success": 4
+   },
+   "runs_inspected": 5,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "AugustNagro/magnum",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 285,
+   "runs_listed": {
+    "failure": 0,
+    "success": 2
+   },
+   "runs_inspected": 2,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "Normation/rudder",
+   "bucket": "Scala",
+   "license": "gpl-3.0",
+   "stars": 716,
+   "runs_listed": {
+    "failure": 0,
+    "success": 17
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 5
+   }
+  },
+  {
+   "repo": "OpenBankProject/OBP-API",
+   "bucket": "Scala",
+   "license": "agpl-3.0",
+   "stars": 1740,
+   "runs_listed": {
+    "failure": 4,
+    "success": 10
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 5
+   }
+  },
+  {
+   "repo": "OpenXiangShan/XiangShan",
+   "bucket": "Scala",
+   "license": "mulanpsl-2.0",
+   "stars": 7290,
+   "runs_listed": {
+    "failure": 0,
+    "success": 1
+   },
+   "runs_inspected": 1,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "Philippus/elastic4s",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 1637,
+   "runs_listed": {
+    "failure": 1,
+    "success": 4
+   },
+   "runs_inspected": 5,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 9
+   }
+  },
+  {
+   "repo": "ReactiveMongo/ReactiveMongo",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 854,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "UdashFramework/udash-core",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 452,
+   "runs_listed": {
+    "failure": 0,
+    "success": 8
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 24
+   }
+  },
+  {
+   "repo": "VirtusLab/scala-cli",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 644,
+   "runs_listed": {
+    "failure": 1,
+    "success": 6
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 4
+   }
+  },
+  {
+   "repo": "akka/akka-core",
+   "bucket": "Scala",
+   "license": "other",
+   "stars": 13281,
+   "runs_listed": {
+    "failure": 1,
+    "success": 9
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 15
+   }
+  },
+  {
+   "repo": "apache/datafusion-comet",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 1287,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 11
+   }
+  },
+  {
+   "repo": "apache/gluten",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 1602,
+   "runs_listed": {
+    "failure": 26,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 12
+   }
+  },
+  {
+   "repo": "apache/pekko",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 1641,
+   "runs_listed": {
+    "failure": 3,
+    "success": 23
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 22
+   }
+  },
+  {
+   "repo": "apache/spark",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 44124,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "log_expired": 1,
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "apache/texera",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 317,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 5
+   }
+  },
+  {
+   "repo": "chipsalliance/chisel",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 4807,
+   "runs_listed": {
+    "failure": 5,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 9
+   }
+  },
+  {
+   "repo": "com-lihaoyi/mill",
+   "bucket": "Scala",
+   "license": "mit",
+   "stars": 2795,
+   "runs_listed": {
+    "failure": 27,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 17,
+    "log_expired": 1
+   }
+  },
+  {
+   "repo": "delta-io/delta",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 9037,
+   "runs_listed": {
+    "failure": 12,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 7
+   }
+  },
+  {
+   "repo": "effekt-lang/effekt",
+   "bucket": "Scala",
+   "license": "mit",
+   "stars": 471,
+   "runs_listed": {
+    "failure": 3,
+    "success": 0
+   },
+   "runs_inspected": 3,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 12
+   }
+  },
+  {
+   "repo": "embeddedkafka/embedded-kafka",
+   "bucket": "Scala",
+   "license": "mit",
+   "stars": 420,
+   "runs_listed": {
+    "failure": 0,
+    "success": 4
+   },
+   "runs_inspected": 4,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "ergoplatform/ergo",
+   "bucket": "Scala",
+   "license": "cc0-1.0",
+   "stars": 520,
+   "runs_listed": {
+    "failure": 13,
+    "success": 23
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 6
+   }
+  },
+  {
+   "repo": "es-meta/esmeta",
+   "bucket": "Scala",
+   "license": "bsd-3-clause",
+   "stars": 267,
+   "runs_listed": {
+    "failure": 0,
+    "success": 4
+   },
+   "runs_inspected": 4,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 6
+   }
+  },
+  {
+   "repo": "etorreborre/specs2",
+   "bucket": "Scala",
+   "license": "other",
+   "stars": 734,
+   "runs_listed": {
+    "failure": 0,
+    "success": 3
+   },
+   "runs_inspected": 3,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 4
+   }
+  },
+  {
+   "repo": "firesim/firesim",
+   "bucket": "Scala",
+   "license": "other",
+   "stars": 1043,
+   "runs_listed": {
+    "failure": 14,
+    "success": 7
+   },
+   "runs_inspected": 12,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "foundweekends/giter8",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 1750,
+   "runs_listed": {
+    "failure": 0,
+    "success": 8
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 15,
+    "log_expired": 2
+   }
+  },
+  {
+   "repo": "gatling/gatling",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 6957,
+   "runs_listed": {
+    "failure": 0,
+    "success": 1
+   },
+   "runs_inspected": 1,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "gearpump/gearpump",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 755,
+   "runs_listed": {
+    "failure": 0,
+    "success": 24
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 6
+   }
+  },
+  {
+   "repo": "getkyo/kyo",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 818,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 5
+   }
+  },
+  {
+   "repo": "ghostdogpr/caliban",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 995,
+   "runs_listed": {
+    "failure": 0,
+    "success": 7
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 6
+   }
+  },
+  {
+   "repo": "gitbucket/gitbucket",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 9402,
+   "runs_listed": {
+    "failure": 1,
+    "success": 5
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "guardian/frontend",
+   "bucket": "Scala",
+   "license": "other",
+   "stars": 5900,
+   "runs_listed": {
+    "failure": 7,
+    "success": 30
+   },
+   "runs_inspected": 10,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "guardian/grid",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 1462,
+   "runs_listed": {
+    "failure": 7,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "guardian/riff-raff",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 273,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "joernio/joern",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 3543,
+   "runs_listed": {
+    "failure": 3,
+    "success": 21
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 23
+   }
+  },
+  {
+   "repo": "json4s/json4s",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 1485,
+   "runs_listed": {
+    "failure": 0,
+    "success": 8
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "lichess-org/lila",
+   "bucket": "Scala",
+   "license": "agpl-3.0",
+   "stars": 18804,
+   "runs_listed": {
+    "failure": 26,
+    "success": 30
+   },
+   "runs_inspected": 12,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 8
+   }
+  },
+  {
+   "repo": "lichess-org/scalachess",
+   "bucket": "Scala",
+   "license": "mit",
+   "stars": 784,
+   "runs_listed": {
+    "failure": 3,
+    "success": 23
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 18
+   }
+  },
+  {
+   "repo": "llm4s/llm4s",
+   "bucket": "Scala",
+   "license": "mit",
+   "stars": 267,
+   "runs_listed": {
+    "failure": 23,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 19
+   }
+  },
+  {
+   "repo": "locationtech/geotrellis",
+   "bucket": "Scala",
+   "license": "other",
+   "stars": 1377,
+   "runs_listed": {
+    "failure": 2,
+    "success": 18
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "maxcom/lorsource",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 215,
+   "runs_listed": {
+    "failure": 0,
+    "success": 3
+   },
+   "runs_inspected": 3,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "metarank/metarank",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 2449,
+   "runs_listed": {
+    "failure": 1,
+    "success": 13
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 15
+   }
+  },
+  {
+   "repo": "neo4j/neo4j-spark-connector",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 323,
+   "runs_listed": {
+    "failure": 0,
+    "success": 8
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "orbeon/orbeon-forms",
+   "bucket": "Scala",
+   "license": "lgpl-2.1",
+   "stars": 545,
+   "runs_listed": {
+    "failure": 0,
+    "success": 1
+   },
+   "runs_inspected": 1,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "peregin/gps-overlay-on-video",
+   "bucket": "Scala",
+   "license": "mit",
+   "stars": 361,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "playframework/anorm",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 254,
+   "runs_listed": {
+    "failure": 0,
+    "success": 6
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 11
+   }
+  },
+  {
+   "repo": "playframework/playframework",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 12616,
+   "runs_listed": {
+    "failure": 3,
+    "success": 21
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 11
+   }
+  },
+  {
+   "repo": "playframework/twirl",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 561,
+   "runs_listed": {
+    "failure": 0,
+    "success": 18
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "profunktor/redis4cats",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 369,
+   "runs_listed": {
+    "failure": 2,
+    "success": 3
+   },
+   "runs_inspected": 5,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 4
+   }
+  },
+  {
+   "repo": "sangria-graphql/sangria-akka-http-example",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 240,
+   "runs_listed": {
+    "failure": 0,
+    "success": 3
+   },
+   "runs_inspected": 3,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "sbt/sbt",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 4953,
+   "runs_listed": {
+    "failure": 0,
+    "success": 29
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 21
+   }
+  },
+  {
+   "repo": "sbt/sbt-dynver",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 318,
+   "runs_listed": {
+    "failure": 0,
+    "success": 3
+   },
+   "runs_inspected": 3,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 4
+   }
+  },
+  {
+   "repo": "sbt/zinc",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 352,
+   "runs_listed": {
+    "failure": 0,
+    "success": 10
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 19
+   }
+  },
+  {
+   "repo": "scala-native/scala-native",
+   "bucket": "Scala",
+   "license": "other",
+   "stars": 4692,
+   "runs_listed": {
+    "failure": 6,
+    "success": 16
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 30
+   }
+  },
+  {
+   "repo": "scala/scala3",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 6312,
+   "runs_listed": {
+    "failure": 18,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 18
+   }
+  },
+  {
+   "repo": "scalafx/scalafx",
+   "bucket": "Scala",
+   "license": "other",
+   "stars": 701,
+   "runs_listed": {
+    "failure": 0,
+    "success": 2
+   },
+   "runs_inspected": 2,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 4
+   }
+  },
+  {
+   "repo": "scalalandio/chimney",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 1256,
+   "runs_listed": {
+    "failure": 0,
+    "success": 11
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 13
+   }
+  },
+  {
+   "repo": "scalameta/munit",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 472,
+   "runs_listed": {
+    "failure": 0,
+    "success": 6
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 10
+   }
+  },
+  {
+   "repo": "scalatra/scalatra",
+   "bucket": "Scala",
+   "license": "other",
+   "stars": 2647,
+   "runs_listed": {
+    "failure": 0,
+    "success": 3
+   },
+   "runs_inspected": 3,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 6
+   }
+  },
+  {
+   "repo": "scalikejdbc/scalikejdbc",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 1280,
+   "runs_listed": {
+    "failure": 0,
+    "success": 13
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 8
+   }
+  },
+  {
+   "repo": "scallop/scallop",
+   "bucket": "Scala",
+   "license": "mit",
+   "stars": 684,
+   "runs_listed": {
+    "failure": 0,
+    "success": 2
+   },
+   "runs_inspected": 2,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "softwaremill/elasticmq",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 2942,
+   "runs_listed": {
+    "failure": 2,
+    "success": 25
+   },
+   "runs_inspected": 6,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 19
+   }
+  },
+  {
+   "repo": "softwaremill/ox",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 525,
+   "runs_listed": {
+    "failure": 2,
+    "success": 4
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 10
+   }
+  },
+  {
+   "repo": "softwaremill/sttp",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 1507,
+   "runs_listed": {
+    "failure": 0,
+    "success": 5
+   },
+   "runs_inspected": 5,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 20
+   }
+  },
+  {
+   "repo": "softwaremill/tapir",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 1476,
+   "runs_listed": {
+    "failure": 6,
+    "success": 10
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 15
+   }
+  },
+  {
+   "repo": "starlake-ai/starflow",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 213,
+   "runs_listed": {
+    "failure": 5,
+    "success": 5
+   },
+   "runs_inspected": 8,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "typelevel/mouse",
+   "bucket": "Scala",
+   "license": "mit",
+   "stars": 376,
+   "runs_listed": {
+    "failure": 0,
+    "success": 5
+   },
+   "runs_inspected": 5,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 18
+   }
+  },
+  {
+   "repo": "wartremover/wartremover",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 1102,
+   "runs_listed": {
+    "failure": 0,
+    "success": 9
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 19
+   }
+  },
+  {
+   "repo": "webjars/webjars",
+   "bucket": "Scala",
+   "license": "mit",
+   "stars": 385,
+   "runs_listed": {
+    "failure": 0,
+    "success": 1
+   },
+   "runs_inspected": 1,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "wvlet/airframe",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 665,
+   "runs_listed": {
+    "failure": 3,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "log_expired": 1
+   }
+  },
+  {
+   "repo": "zio/zio",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 4419,
+   "runs_listed": {
+    "failure": 4,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 19
+   }
+  },
+  {
+   "repo": "zio/zio-config",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 244,
+   "runs_listed": {
+    "failure": 0,
+    "success": 7
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 7
+   }
+  },
+  {
+   "repo": "zio/zio-protoquill",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 226,
+   "runs_listed": {
+    "failure": 1,
+    "success": 24
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 7
+   }
+  },
+  {
+   "repo": "zio/zio-quill",
+   "bucket": "Scala",
+   "license": "apache-2.0",
+   "stars": 2166,
+   "runs_listed": {
+    "failure": 2,
+    "success": 10
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 20
+   }
+  },
+  {
+   "repo": "BtbN/FFmpeg-Builds",
+   "bucket": "Shell",
+   "license": "mit",
+   "stars": 11774,
+   "runs_listed": {
+    "failure": 0,
+    "success": 2
+   },
+   "runs_inspected": 2,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 7
+   }
+  },
+  {
+   "repo": "HyDE-Project/HyDE",
+   "bucket": "Shell",
+   "license": "gpl-3.0",
+   "stars": 9639,
+   "runs_listed": {
+    "failure": 2,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "VSCodium/vscodium",
+   "bucket": "Shell",
+   "license": "mit",
+   "stars": 33512,
+   "runs_listed": {
+    "failure": 2,
+    "success": 20
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "VoltAgent/awesome-claude-code-subagents",
+   "bucket": "Shell",
+   "license": "mit",
+   "stars": 25508,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "a2aproject/A2A",
+   "bucket": "Shell",
+   "license": "apache-2.0",
+   "stars": 26012,
+   "runs_listed": {
+    "failure": 4,
+    "success": 15
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "agarrharr/awesome-cli-apps",
+   "bucket": "Shell",
+   "license": "",
+   "stars": 20502,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "bin456789/reinstall",
+   "bucket": "Shell",
+   "license": "gpl-3.0",
+   "stars": 13548,
+   "runs_listed": {
+    "failure": 0,
+    "success": 1
+   },
+   "runs_inspected": 1,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "community-scripts/ProxmoxVE",
+   "bucket": "Shell",
+   "license": "mit",
+   "stars": 29734,
+   "runs_listed": {
+    "failure": 5,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "docker-mailserver/docker-mailserver",
+   "bucket": "Shell",
+   "license": "mit",
+   "stars": 18901,
+   "runs_listed": {
+    "failure": 1,
+    "success": 23
+   },
+   "runs_inspected": 3,
+   "cases": 3,
+   "failed_cases": 1,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "getsentry/self-hosted",
+   "bucket": "Shell",
+   "license": "other",
+   "stars": 9596,
+   "runs_listed": {
+    "failure": 4,
+    "success": 30
+   },
+   "runs_inspected": 7,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 6
+   }
+  },
+  {
+   "repo": "github/copilot-cli",
+   "bucket": "Shell",
+   "license": "other",
+   "stars": 11238,
+   "runs_listed": {
+    "failure": 2,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "google/oss-fuzz",
+   "bucket": "Shell",
+   "license": "apache-2.0",
+   "stars": 12693,
+   "runs_listed": {
+    "failure": 10,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "jnMetaCode/agency-agents-zh",
+   "bucket": "Shell",
+   "license": "mit",
+   "stars": 21061,
+   "runs_listed": {
+    "failure": 0,
+    "success": 2
+   },
+   "runs_inspected": 2,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "juewuy/ShellCrash",
+   "bucket": "Shell",
+   "license": "gpl-3.0",
+   "stars": 13553,
+   "runs_listed": {
+    "failure": 1,
+    "success": 1
+   },
+   "runs_inspected": 2,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "lxgw/LxgwWenKai",
+   "bucket": "Shell",
+   "license": "ofl-1.1",
+   "stars": 26165,
+   "runs_listed": {
+    "failure": 0,
+    "success": 2
+   },
+   "runs_inspected": 2,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "mattpocock/skills",
+   "bucket": "Shell",
+   "license": "mit",
+   "stars": 276728,
+   "runs_listed": {
+    "failure": 0,
+    "success": 6
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "mbadolato/iTerm2-Color-Schemes",
+   "bucket": "Shell",
+   "license": "other",
+   "stars": 27246,
+   "runs_listed": {
+    "failure": 27,
+    "success": 6
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "msitarzewski/agency-agents",
+   "bucket": "Shell",
+   "license": "mit",
+   "stars": 156996,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "ohmyzsh/ohmyzsh",
+   "bucket": "Shell",
+   "license": "mit",
+   "stars": 190160,
+   "runs_listed": {
+    "failure": 0,
+    "success": 23
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "omacom/omarchy",
+   "bucket": "Shell",
+   "license": "mit",
+   "stars": 44013,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "ophub/amlogic-s9xxx-armbian",
+   "bucket": "Shell",
+   "license": "gpl-2.0",
+   "stars": 10108,
+   "runs_listed": {
+    "failure": 0,
+    "success": 8
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 21
+   }
+  },
+  {
+   "repo": "pystardust/ani-cli",
+   "bucket": "Shell",
+   "license": "gpl-3.0",
+   "stars": 13939,
+   "runs_listed": {
+    "failure": 3,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "rockerBOO/awesome-neovim",
+   "bucket": "Shell",
+   "license": "cc0-1.0",
+   "stars": 21448,
+   "runs_listed": {
+    "failure": 1,
+    "success": 26
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "termux/termux-packages",
+   "bucket": "Shell",
+   "license": "other",
+   "stars": 17092,
+   "runs_listed": {
+    "failure": 12,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 10
+   }
+  },
+  {
+   "repo": "tw93/Mole",
+   "bucket": "Shell",
+   "license": "gpl-3.0",
+   "stars": 69317,
+   "runs_listed": {
+    "failure": 2,
+    "success": 30
+   },
+   "runs_inspected": 3,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "yonggekkk/sing-box-yg",
+   "bucket": "Shell",
+   "license": "gpl-3.0",
+   "stars": 10380,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "Lakr233/vphone-cli",
+   "bucket": "Swift",
+   "license": "mit",
+   "stars": 14894,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "TheBoredTeam/boring.notch",
+   "bucket": "Swift",
+   "license": "gpl-3.0",
+   "stars": 10947,
+   "runs_listed": {
+    "failure": 15,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "altic-dev/FluidVoice",
+   "bucket": "Swift",
+   "license": "gpl-3.0",
+   "stars": 11904,
+   "runs_listed": {
+    "failure": 5,
+    "success": 30
+   },
+   "runs_inspected": 8,
+   "cases": 1,
+   "failed_cases": 1,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "apple/swift-nio",
+   "bucket": "Swift",
+   "license": "apache-2.0",
+   "stars": 8532,
+   "runs_listed": {
+    "failure": 3,
+    "success": 0
+   },
+   "runs_inspected": 3,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "coteditor/CotEditor",
+   "bucket": "Swift",
+   "license": "other",
+   "stars": 8540,
+   "runs_listed": {
+    "failure": 0,
+    "success": 4
+   },
+   "runs_inspected": 1,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "exelban/stats",
+   "bucket": "Swift",
+   "license": "mit",
+   "stars": 42306,
+   "runs_listed": {
+    "failure": 1,
+    "success": 6
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2,
+    "log_expired": 1
+   }
+  },
+  {
+   "repo": "gnachman/iTerm2",
+   "bucket": "Swift",
+   "license": "gpl-2.0",
+   "stars": 18122,
+   "runs_listed": {
+    "failure": 0,
+    "success": 16
+   },
+   "runs_inspected": 6,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "iina/iina",
+   "bucket": "Swift",
+   "license": "gpl-3.0",
+   "stars": 46636,
+   "runs_listed": {
+    "failure": 13,
+    "success": 19
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "mozilla-mobile/firefox-ios",
+   "bucket": "Swift",
+   "license": "mpl-2.0",
+   "stars": 13050,
+   "runs_listed": {
+    "failure": 0,
+    "success": 19
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 4
+   }
+  },
+  {
+   "repo": "mrkai77/Loop",
+   "bucket": "Swift",
+   "license": "gpl-3.0",
+   "stars": 11716,
+   "runs_listed": {
+    "failure": 0,
+    "success": 5
+   },
+   "runs_inspected": 5,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "nicklockwood/SwiftFormat",
+   "bucket": "Swift",
+   "license": "mit",
+   "stars": 8928,
+   "runs_listed": {
+    "failure": 3,
+    "success": 27
+   },
+   "runs_inspected": 5,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 5
+   }
+  },
+  {
+   "repo": "palmier-io/palmier-pro",
+   "bucket": "Swift",
+   "license": "gpl-3.0",
+   "stars": 14511,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "rxhanson/Rectangle",
+   "bucket": "Swift",
+   "license": "other",
+   "stars": 30037,
+   "runs_listed": {
+    "failure": 0,
+    "success": 13
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "swiftlang/swift",
+   "bucket": "Swift",
+   "license": "apache-2.0",
+   "stars": 70472,
+   "runs_listed": {
+    "failure": 0,
+    "success": 0
+   },
+   "runs_inspected": 0,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "swiftlang/swift-package-manager",
+   "bucket": "Swift",
+   "license": "apache-2.0",
+   "stars": 10229,
+   "runs_listed": {
+    "failure": 6,
+    "success": 25
+   },
+   "runs_inspected": 6,
+   "cases": 2,
+   "failed_cases": 2,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 4
+   }
+  },
+  {
+   "repo": "thaw-app/Thaw",
+   "bucket": "Swift",
+   "license": "gpl-3.0",
+   "stars": 11758,
+   "runs_listed": {
+    "failure": 19,
+    "success": 30
+   },
+   "runs_inspected": 12,
+   "cases": 2,
+   "failed_cases": 1,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "tisfeng/Easydict",
+   "bucket": "Swift",
+   "license": "gpl-3.0",
+   "stars": 14842,
+   "runs_listed": {
+    "failure": 0,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  },
+  {
+   "repo": "vapor/vapor",
+   "bucket": "Swift",
+   "license": "mit",
+   "stars": 26229,
+   "runs_listed": {
+    "failure": 2,
+    "success": 6
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 7
+   }
+  },
+  {
+   "repo": "vorssaint/vorssaint-utils",
+   "bucket": "Swift",
+   "license": "gpl-3.0",
+   "stars": 23887,
+   "runs_listed": {
+    "failure": 28,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "OpenHands/OpenHands",
+   "bucket": "TypeScript",
+   "license": "mit",
+   "stars": 90022,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 12,
+   "cases": 1,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "anomalyco/opencode",
+   "bucket": "TypeScript",
+   "license": "mit",
+   "stars": 211824,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 5
+   }
+  },
+  {
+   "repo": "ant-design/ant-design",
+   "bucket": "TypeScript",
+   "license": "mit",
+   "stars": 99685,
+   "runs_listed": {
+    "failure": 14,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "anthropics/claude-code",
+   "bucket": "TypeScript",
+   "license": "",
+   "stars": 149474,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 5
+   }
+  },
+  {
+   "repo": "google-gemini/gemini-cli",
+   "bucket": "TypeScript",
+   "license": "apache-2.0",
+   "stars": 107230,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 8,
+   "cases": 4,
+   "failed_cases": 2,
+   "topup_added": 1,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 4,
+    "log_expired": 1
+   }
+  },
+  {
+   "repo": "immich-app/immich",
+   "bucket": "TypeScript",
+   "license": "agpl-3.0",
+   "stars": 115612,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 10
+   }
+  },
+  {
+   "repo": "iptv-org/iptv",
+   "bucket": "TypeScript",
+   "license": "unlicense",
+   "stars": 140342,
+   "runs_listed": {
+    "failure": 20,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "langgenius/dify",
+   "bucket": "TypeScript",
+   "license": "other",
+   "stars": 157873,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 12,
+   "cases": 2,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "mermaid-js/mermaid",
+   "bucket": "TypeScript",
+   "license": "mit",
+   "stars": 90545,
+   "runs_listed": {
+    "failure": 22,
+    "success": 30
+   },
+   "runs_inspected": 8,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "microsoft/playwright",
+   "bucket": "TypeScript",
+   "license": "apache-2.0",
+   "stars": 97118,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 10,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 12
+   }
+  },
+  {
+   "repo": "modelcontextprotocol/servers",
+   "bucket": "TypeScript",
+   "license": "other",
+   "stars": 91013,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "n8n-io/n8n",
+   "bucket": "TypeScript",
+   "license": "other",
+   "stars": 206705,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 10
+   }
+  },
+  {
+   "repo": "nexu-io/open-design",
+   "bucket": "TypeScript",
+   "license": "apache-2.0",
+   "stars": 99503,
+   "runs_listed": {
+    "failure": 9,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 2
+   }
+  },
+  {
+   "repo": "nilbuild/developer-roadmap",
+   "bucket": "TypeScript",
+   "license": "other",
+   "stars": 368918,
+   "runs_listed": {
+    "failure": 0,
+    "success": 5
+   },
+   "runs_inspected": 5,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {}
+  },
+  {
+   "repo": "openclaw/openclaw",
+   "bucket": "TypeScript",
+   "license": "mit",
+   "stars": 391420,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 12
+   }
+  },
+  {
+   "repo": "paperclipai/paperclip",
+   "bucket": "TypeScript",
+   "license": "mit",
+   "stars": 97432,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 8,
+   "cases": 3,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": true,
+   "dropped": {}
+  },
+  {
+   "repo": "puppeteer/puppeteer",
+   "bucket": "TypeScript",
+   "license": "apache-2.0",
+   "stars": 95653,
+   "runs_listed": {
+    "failure": 6,
+    "success": 30
+   },
+   "runs_inspected": 10,
+   "cases": 3,
+   "failed_cases": 2,
+   "topup_added": 1,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 9
+   }
+  },
+  {
+   "repo": "storybookjs/storybook",
+   "bucket": "TypeScript",
+   "license": "mit",
+   "stars": 91200,
+   "runs_listed": {
+    "failure": 5,
+    "success": 30
+   },
+   "runs_inspected": 6,
+   "cases": 0,
+   "failed_cases": 0,
+   "topup_added": 0,
+   "accepted": false,
+   "dropped": {
+    "segment_mismatch": 3
+   }
+  },
+  {
+   "repo": "thedotmack/claude-mem",
+   "bucket": "TypeScript",
+   "license": "apache-2.0",
+   "stars": 96405,
+   "runs_listed": {
+    "failure": 30,
+    "success": 30
+   },
+   "runs_inspected": 7,
+   "cases": 4,
+   "failed_cases": 1,
+   "topup_added": 1,
+   "accepted": true,
+   "dropped": {
+    "segment_mismatch": 1
+   }
+  }
+ ]
+}

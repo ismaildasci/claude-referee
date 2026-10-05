@@ -1,0 +1,59 @@
+{
+ "frozen_commit": "6ff4d0aaa61f4b90dffcb4c71f150da93495a319",
+ "gh_version": "gh version 2.86.0 (2026-01-21)",
+ "fetched_on": "2026-10-05",
+ "candidate_query": "gh search repos --language L pushed:>2026-10-03 --sort stars --archived=false --limit 100 --json fullName,license,stargazersCount,language",
+ "run_queries": [
+  "gh run list -R REPO --status failure --created >=2026-10-04 --limit 30",
+  "gh run list -R REPO --status success --created >=2026-10-04 --limit 30"
+ ],
+ "stats": {
+  "accepted": {
+   "JavaScript": 8,
+   "TypeScript": 8,
+   "Python": 8,
+   "Go": 8,
+   "Rust": 8,
+   "Java": 8,
+   "Ruby": 8,
+   "PHP": 8,
+   "C#": 8,
+   "C++": 8,
+   "C": 8,
+   "Swift": 8,
+   "Kotlin": 8,
+   "Dart": 6,
+   "Elixir": 6,
+   "Scala": 6,
+   "Shell": 6
+  },
+  "dropped": {
+   "log_expired": 6,
+   "segment_mismatch": 449,
+   "multi_purpose": 11
+  },
+  "repos": 128,
+  "cases": 288,
+  "failed_cases": 41,
+  "calls": 0
+ },
+ "labelling_cost": {
+  "labeller1": {
+   "calls": 49,
+   "usd": 13.258547800000004,
+   "out_tokens": 50432
+  },
+  "labeller2": {
+   "calls": 20,
+   "usd": 4.497092,
+   "out_tokens": 19969
+  },
+  "note": "cost_usd as reported by the claude CLI json output"
+ },
+ "jev": {
+  "receipt": "rmuveb0ms866t",
+  "sent_cases": 231,
+  "requests": 206,
+  "cache_hits": 25
+ }
+}

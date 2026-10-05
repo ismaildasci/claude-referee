@@ -1,0 +1,90 @@
+{
+ "screened": 286,
+ "failed_steps": 41,
+ "succeeded_steps": 245,
+ "unlabelled": [],
+ "ambiguous": [
+  {
+   "id": "rl-fa0808fc",
+   "l1": "ambiguous",
+   "l2": null
+  },
+  {
+   "id": "rl-c629cac8",
+   "l1": "ambiguous",
+   "l2": null
+  },
+  {
+   "id": "rl-beb31b04",
+   "l1": "ambiguous",
+   "l2": null
+  },
+  {
+   "id": "rl-4f44fc1a",
+   "l1": "missing",
+   "l2": "ambiguous"
+  },
+  {
+   "id": "rl-1ba219c9",
+   "l1": "ambiguous",
+   "l2": null
+  }
+ ],
+ "silent_met": [
+  {
+   "id": "rl-706e8639",
+   "l1": "met",
+   "l2": null
+  },
+  {
+   "id": "rl-07d59ff7",
+   "l1": "met",
+   "l2": "met"
+  },
+  {
+   "id": "rl-78c0c0d2",
+   "l1": "met",
+   "l2": "met"
+  },
+  {
+   "id": "rl-69584733",
+   "l1": "met",
+   "l2": null
+  },
+  {
+   "id": "rl-705e4b36",
+   "l1": "met",
+   "l2": null
+  },
+  {
+   "id": "rl-3a144990",
+   "l1": "met",
+   "l2": null
+  },
+  {
+   "id": "rl-45208fb5",
+   "l1": "met",
+   "l2": null
+  },
+  {
+   "id": "rl-47b9a060",
+   "l1": "met",
+   "l2": null
+  },
+  {
+   "id": "rl-94baebb9",
+   "l1": "met",
+   "l2": null
+  }
+ ],
+ "disagreed": [],
+ "kept": 272,
+ "expected": {
+  "met": 146,
+  "missing": 126
+ },
+ "label2_n": 98,
+ "agreement": 0.9897959183673469,
+ "kappa": 0.9782222222222222,
+ "pairs": 98
+}
