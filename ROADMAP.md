@@ -8,7 +8,7 @@ What it is not: a model router, a context compactor or a general code reviewer. 
 
 ## Status at 2026-10-02
 
-Four words, used the same way everywhere below. **Done**: in a release (a tag exists) or in main with tests. **Measured**: a dated row in [docs/measurements.md](docs/measurements.md) with a count and a scope. **Open**: planned, with the missing piece named. **Blocked**: waiting on something only the maintainer can do. Latest release: v0.1.6 (tag `v0.1.6`, commit 5cc24b1, GitHub release 2026-10-01). 63 commits in main since then are unreleased, among them 13 not yet on GitHub. Stop gate studies ran in `shadow` mode, so "blocked" in this file and in the measurements means "would have blocked" (`would_block`); nothing was actually stopped. The name is `claude-referee`: the rename to `evidence-referee` was reverted (2af0ad0, [record](docs/decisions/rename-reverted.md)).
+Four words, used the same way everywhere below. **Done**: in a release (a tag exists) or in main with tests. **Measured**: a dated row in [docs/measurements.md](docs/measurements.md) with a count and a scope. **Open**: planned, with the missing piece named. **Blocked**: waiting on something only the maintainer can do. Latest release: v0.2.0 (tags `v0.2.0` and `claude-referee--v0.2.0`, GitHub release 2026-10-05); the previous release was v0.1.6 (commit 5cc24b1). Stop gate studies ran in `shadow` mode, so "blocked" in this file and in the measurements means "would have blocked" (`would_block`); nothing was actually stopped. The name is `claude-referee`: the rename to `evidence-referee` was reverted (2af0ad0, [record](docs/decisions/rename-reverted.md)).
 
 | Item | State | Evidence |
 |---|---|---|
@@ -31,7 +31,7 @@ Four words, used the same way everywhere below. **Done**: in a release (a tag ex
 | `judge --baseline` | done in main | c61a919 |
 | Receipt chain, `receipts verify`, `receipts overrule` | done in main | e689e28 |
 | A/B bench (cost per task) | harness and pre-registration done, not run | 1fac7e4, ccca0b1; [bench/RESULTS.md](bench/RESULTS.md) says "Not run"; needs the maintainer's go and the Jev key |
-| Release 0.2.0 | not cut; needs the maintainer's explicit go | version is 0.1.6 in `package.json`, `npm/package.json` and `plugin.json`; no `v0.2.0` tag |
+| Release 0.2.0 | done, 2026-10-05 | `package.json`, `npm/package.json` and `plugin.json` say 0.2.0; tags `v0.2.0` and `claude-referee--v0.2.0`; npm publish still waits for the maintainer's one-time code |
 | npm publish | blocked until 2026-10-03 14:22 UTC, then needs the maintainer's one-time code | account is read-only after a recovery code was used as an OTP; no workflow publishes |
 | Push of the 13 local commits | blocked | GitHub push protection (GH013) flags the Stripe-looking test fixture at `test/redact.test.ts:48` in 9e151eb and `:49` in 93d51fe; remote CI is red on the older `dist/cli.mjs` size limit that edbb46b fixes |
 | `claims` precision for release notes, community marketplace, 1.0 | open | each waits on a measurement named in its section below |
