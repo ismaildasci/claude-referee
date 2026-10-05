@@ -1,0 +1,12 @@
+{
+ "config": "ES1-2000",
+ "threshold": 0.47,
+ "dev_auc": 0.929,
+ "dev_best_auc": 0.936,
+ "near_best": [
+  "ES1-2000",
+  "ES2-2000"
+ ],
+ "dev_failure": false,
+ "frozen_at": "2026-10-05T13:49:05.425Z"
+}

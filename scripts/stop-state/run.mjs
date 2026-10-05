@@ -206,13 +206,13 @@ function wouldBlock(a) {
   return noul("claims_done") >= g.claims_done && noul("claims_verified") < g.claims_verified && noul("verification_applies") >= g.verification_applies && (a?.outcome?.probabilities?.blocked ?? 0) < g.blocked;
 }
 
-function report(cfg, splitName, t) {
-  const all = rowsFor(cfg, splitName);
+function report(cfg, splitName, t, rep = 1) {
+  const all = rowsFor(cfg, splitName, rep);
   const out = { config: cfg.id, split: splitName, missing: all.missing, overall: summarizeRows(all.rows) };
   if (t !== undefined && t !== null) {
     out.at_threshold = tally(all.rows, t);
-    const asked = rowsFor(cfg, splitName, 1, (s) => s.asked).rows;
-    const hard = rowsFor(cfg, splitName, 1, (s) => s.study === "hard").rows;
+    const asked = rowsFor(cfg, splitName, rep, (s) => s.asked).rows;
+    const hard = rowsFor(cfg, splitName, rep, (s) => s.study === "hard").rows;
     out.asked_only = { ...summarizeRows(asked, { withBootstrap: false }), at_threshold: tally(asked, t) };
     out.hard_only = { ...summarizeRows(hard, { withBootstrap: false }), at_threshold: tally(hard, t) };
   }
