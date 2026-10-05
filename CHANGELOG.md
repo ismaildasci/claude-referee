@@ -6,7 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
-- The CI size tripwire for `dist/cli.mjs` moved from 280000 to 340000 bytes (v0.1.6 was 206 KB, now about 309 KB after the local ui, decide eval suites, judge baseline, redaction patterns and stop-gate analysis). It guards against unplanned growth, not safety; `hook.mjs` stays under 200000.
+- The CI size tripwire for `dist/cli.mjs` moved from 280000 to 400000 bytes (v0.1.6 was 206 KB, now about 341 KB after the local ui, decide eval suites, judge baseline, i18n extractor, redaction patterns and stop-gate analysis; the limit now leaves headroom so it is not nudged again for each feature). It guards against unplanned growth, not safety; `hook.mjs` stays under 200000.
 - bench: the four-arm A/B registration is superseded and archived (PREREG Appendix A); a two-arm delegation A/B (Claude alone against Claude with the judge, 4 public repositories pinned by commit, script-built labels, 16-session underpowered pilot) is registered instead. Harness, bench-only pack `bench-todo`, tests in `test/bench-delegation.test.ts`. Nothing beyond a 2-session dry run has been run.
 - bench: delegation leak rule now excludes both arms of a (case, rep) block and flags outside-path reads (PREREG D8, amendment 3); no label file is written.
 
