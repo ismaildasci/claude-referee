@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-10-05
+
+What changed in the measurements: `done` v2 was scored on 229 real GitHub Actions step logs from 94 repositories with Jev's answers. The first scoring (before any change) failed both registered bars: 2 wrong `met` of 76 and `met` recall among parsed logs 33 of 44 (0.75). This release adds a skip-marker cap and parsers for ninja, MSBuild, `docker build`, maven, swift and `cargo build`, written from the dev half only; afterwards wrong `met` is 0 of 76 and `met` recall among parsed logs is 65 of 75 (0.867), still under the 0.9 bar, so `done` v2 stays "not measured" on its old bar. The zero was reached by rules designed from two dev cases, so it is not a pass; the frozen hold-out half was looked at twice (the second look is stated as such) and one expected-`met` hold-out case regressed from `met` to `missing`. Exit-code-only evidence still almost never gets `met` by design. The plugin name `claude-referee` remains flagged as reserved by the Claude Code validator; CI tolerates only that error.
+
 ### Added
 
 - Measured `done` v2 on the 229-case real CI log sample with Jev's answers (recorded 2026-10-05): wrong `met` 2 of 76 and `met` recall among parsed logs 33 of 44, so both registered bars failed; the frozen hold-out half has 0 wrong `met` of 33. The two wrong `met` are logs where skips show outside the parsed summary. Scored table and recorded answers are in `docs/data/done-v2-real/`; no log text is committed.
