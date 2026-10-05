@@ -24,6 +24,10 @@ They answer different questions. Claude Code's bundled `/verify` builds and runs
 
 `/goal` is a Stop hook that asks a small model whether a condition holds; per [Claude Code's docs](https://code.claude.com/docs/en/goal) it calls no tools and judges only what is already in the conversation. The done-gate looks at facts first (which files were edited, whether a check passed afterwards) and asks Jev only about what is left, and it writes every decision to a local receipt. They can run together. A measured comparison is planned for v0.4; until then neither is claimed to be better.
 
+## How accurate is `done`?
+
+Not proven. `done` v2 is not measured on its original bar. On real public CI logs (272 cases from 126 repositories, 231 sent to Jev), tested once with code frozen beforehand, it failed all three registered bars: it said `met` for 2 of 85 steps that exited 0 but did not show a passing check (the bar is none), found `met` in 69 of 79 passing steps whose runner it recognises (0.873, the bar is 0.9), and named `missing` for 45 of those 85 (0.53, the bar is 0.9; most of the rest came back `unsure`). With only an exit code as evidence it almost never says `met` (0 of 67 passing steps in that sample, and 0 wrong). The two wrong `met` were fixed afterwards on those same cases, so the 0 that follows is fitted, not an unseen test. Details: [measurements-real-logs-2](measurements-real-logs-2.md). The labels are from language models, not people.
+
 ## Isn't there already a `receipts` plugin?
 
 Anthropic's official marketplace has `receipts` and `session-report` plugins that read your Claude Code transcripts to report usage. claude-referee's receipts are different: one line per decision it made (command, verdict, request ids, token counts, cost, hash of the questions). `receipts --usage` is a narrow counter of what claude-referee itself cost; for general usage, use Claude Code's `/usage`.

@@ -124,7 +124,7 @@ Setup: `done --criteria "all tests pass"` on 33 failing or unfinished test logs,
 ## Not measured yet
 
 - Whether claude-referee lowers the total cost of a task. The A/B planned for v0.4 will be pre-registered in `bench/PREREG.md` before its first run.
-- How the earlier kit's `done` thresholds perform on held-out cases. They were chosen on the same 25 cases they were scored on, so its 24 of 25 is in-sample. `done` v2 has its own held-out result, below. The Stop done-gate has no measurement on real turns yet; a [self-generated base-rate study](#the-stop-gate-on-self-generated-sessions-base-rate-study) found 1 wrong "done" in 100 asked stops (the registered kill criterion fires), a [hard-task study](#the-stop-gate-on-hard-tasks-wrong-done-study) found 15 wrong "done" in 74 usable sessions but blocked 51 of 53 correct ones, and its wording on invented negated sentences is [below](#the-stop-gate-on-negated-sentences). Both studies use synthetic ground truth, not human labels on real stops.
+- How the earlier kit's `done` thresholds perform on held-out cases. They were chosen on the same 25 cases they were scored on, so its 24 of 25 is in-sample. `done` v2 has its own held-out results, below, on invented cases; on unseen real CI logs it failed its registered bars ([result](measurements-real-logs-2.md)). The Stop done-gate has no measurement on real turns yet; a [self-generated base-rate study](#the-stop-gate-on-self-generated-sessions-base-rate-study) found 1 wrong "done" in 100 asked stops (the registered kill criterion fires), a [hard-task study](#the-stop-gate-on-hard-tasks-wrong-done-study) found 15 wrong "done" in 74 usable sessions but blocked 51 of 53 correct ones, and its wording on invented negated sentences is [below](#the-stop-gate-on-negated-sentences). Both studies use synthetic ground truth, not human labels on real stops.
 
 ## Measured with claude-referee itself
 
@@ -211,6 +211,8 @@ Both runs used `eval record`, one request per log, and are compared with each ot
 - **What changed:** nothing. The sentence isn't adopted; the fix stays on the evidence side.
 
 ### done v2 on held-out cases
+
+> Status: these hold-outs are invented cases and showed no wrong `met`; on unseen real CI logs `done` v2 failed its registered bars (wrong `met` 2 of 85, `met` recall among parsed logs 0.873; [result](measurements-real-logs-2.md)). Read the numbers below as a regression check on invented logs, not as accuracy on real ones.
 
 `eval record --suite done-v2`, one request per case, `jev-1.13.0`, 2026-10-01. 48 held-out cases (18 should be `met`, 30 `missing`) and 30 dev cases, all invented and labelled by a model that did not see the parsers, covering pytest, jest, vitest, mocha, go test, cargo test, dotnet test, PHPUnit, RSpec, ESLint, Ruff, tsc and plain commands with an exit code line. Variants: passing, failing, cut off, cut off after a failure, zero tests, skipped only, silent commands with and without an exit code, a non-zero exit code, a forged "all passed" summary after a failing run, a note aimed at the judge, retries, warnings, and two runners in one output. Cases: [cases.jsonl](../jev-evals/done-v2/cases.jsonl). Answers: [recorded.jsonl](../jev-evals/done-v2/recorded.jsonl).
 

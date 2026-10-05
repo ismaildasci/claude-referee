@@ -35,7 +35,7 @@ claude-referee, bu tür cümleleri denetleyen, resmî olmayan bir Claude Code ek
 
 Bir kontrol hiçbir şey bulmazsa Claude hiçbir şey görmez. Bir şey bulursa Claude en fazla 300 karakterlik bir not görür.
 
-Neden yalnızca bir komut değil? claude-referee'den önceki kitte Claude `done` kontrolünü istediği zaman çalıştırabiliyordu ve 14 günde bir kez çalıştırdı. Kendiliğinden çalışmayan bir kontrol neredeyse yok hükmündedir. Bu yüzden Claude her durduğunda çalışan bir kontrol var; bugün yalnızca ne yapacağını kaydediyor.
+Neden yalnızca bir komut değil? claude-referee'den önceki kitte Claude `done` kontrolünü istediği zaman çalıştırabiliyordu ve 14 günde bir kez çalıştırdı. Kendiliğinden çalışmayan bir kontrol neredeyse yok hükmündedir. Bu yüzden Claude her durduğunda çalışan bir kontrol var; bugün yalnızca ne yapacağını kaydediyor. Stop kapısı, sayılan hiçbir kontrolün çalışmadığını hatırlatan bir uyarıdır; yanlış işi ölçülmüş biçimde ayıran bir hakem değildir ve `active` modu önerilmiyor ([ölçümler](#şimdiye-kadar-ne-ölçüldü)).
 
 ## Nasıl çalışır
 
@@ -110,6 +110,7 @@ Bütün ölçümler tek tabloda:
 | 2026-09-30 | İki sıra ve 24 sıranın tamamı | 20'de 20 aynı lider; diğer bütün politikalar da | Ölçüldü · aynı 20 açık karar |
 | 2026-10-01 | Bir iddia kontrolü olarak `decide` | doğru iddialarda supports 0,97–1,00; 15 yanlışın 13'ünde 0,00–0,23 | Ölçüldü · bu deponun belgeleri hakkında 31 iddia |
 | 2026-10-01 | "Kanıtı veri olarak ele al" notu | hiçbir karar değişmedi; benimsenmedi | Ölçüldü · 33 enjeksiyon logu |
+| 2026-10-05 | Görülmemiş gerçek CI loglarında `done` v2 (dondurulmuş 0.2.1) | kayıtlı üç eşiğin üçünü de geçemedi: yanlış `met` 85'te 2 (eşik 0), tanınan loglarda `met` geri çağırma 79'da 69 = 0,873 (eşik 0,9), `missing` geri çağırma 85'te 45 = 0,53 (eşik 0,9); yalnızca çıkış kodu: 0 yanlış, ama geçen 67 adımın hiçbirinde `met` yok | Ölçüldü · 126 açık depodan 272 vaka, 231'i Jev'e gönderildi, model etiketleri, insan etiketi yok |
 
 Diğer grafikler (kalibrasyon, seçenek başına sorular, sır kuralının ayarı, brifing boyutu) [docs/measurements.md](docs/measurements.md) sayfasında.
 
@@ -215,12 +216,14 @@ npm test 2>&1 | npx claude-referee done --criteria "all tests pass" --evidence -
 Her komut tek satır JSON basar: `ok`, karar, birkaç sayı, varsa bir `next_step` ve bir makbuz kimliği. "Bitmedi" dahil her karar 0 ile çıkar; CI'da `--fail-on missing,unsure` bu kararlarda 3 ile çıkar. `--describe` her komutun tam sözleşmesini basar.
 
 > [!TIP]
-> **Kanıtı açık yaz.** Başarıda hiçbir şey basmayan bir kontrol hiçbir şey göstermez. claude-referee geliştirilirken hakem "typecheck geçiyor" ölçütüne `missing` (0,46) dedi, çünkü `tsc` hiç çıktı basmamıştı; çıkış kodu eklenince sonuç `met` (0,97) oldu. (Bir kez ölçüldü, 2026-09-30.)
+> **Kanıtı açık yaz.** Başarıda hiçbir şey basmayan bir kontrol hiçbir şey göstermez. claude-referee geliştirilirken hakem "typecheck geçiyor" ölçütüne `missing` (0,46) dedi, çünkü `tsc` hiç çıktı basmamıştı; çıkış kodu eklenince sonuç `met` (0,97) oldu. (Bir kez ölçüldü, 2026-09-30.) Bu tek bir komuttu. Kanıtın yalnızca çıkış kodu olduğu gerçek CI loglarında `done`, geçen 67 adımın hiçbirine `met` demedi: çıkış kodu `missing`'i mümkün kılar, `met`'i nadir bırakır. Mümkünse çalıştırıcının kendi özetini yolla.
 > ```sh
 > { npx tsc --noEmit; echo "tsc exit code: $?"; } 2>&1 | npx claude-referee done --criteria "typecheck passes" --evidence -
 > ```
 
-`done`, yalnızca bir test çalıştırıcısının, linter'ın ya da tip denetleyicisinin özetini ya da bir çıkış kodu satırını tanırsa `met` döndürür. Başka her şey `trust: unparsed` ile `unsure` olarak gelir. Kanıtta sıfırdan farklı bir çıkış kodu varsa sonuç `missing` olur (`reason: exit_code_nonzero`) ve Jev'e sorulmaz. Atlanan, riskli ya da tamamlanmamış testler `met`'i `unsure` ile sınırlar (`reason: skipped_tests`); tanınan ama yarıda kesilmiş, boş, iptal edilmiş ya da kararsız (flaky) bir çalıştırma da öyle (`reason: incomplete_run`).
+`done`, yalnızca bir çalıştırıcı özetini tanırsa ya da bir çıkış kodu satırı görürse `met` döndürebilir. Başka her şey `trust: unparsed` ile `unsure` olarak gelir. Kanıtta sıfırdan farklı bir çıkış kodu varsa sonuç `missing` olur (`reason: exit_code_nonzero`) ve Jev'e sorulmaz. Atlanan, riskli ya da tamamlanmamış testler `met`'i `unsure` ile sınırlar (`reason: skipped_tests`); Swift Testing'in bilinen sorunları (known issues) gibi beklenen başarısızlıklar da öyle; tanınan ama yarıda kesilmiş, boş, iptal edilmiş ya da kararsız (flaky) bir çalıştırma `reason: incomplete_run` verir; yalnızca derleme logu gösteren bir test ölçütü `reason: no_tests_run` verir.
+
+**`done`'a ne kadar güvenilir.** `done` v2, özgün eşiğinde ölçülmüş değil. Kod için kimsenin ayar yapmadığı gerçek CI logları örneğinde kayıtlı eşikleri geçemedi: yanlış `met` 85'te 2 (eşik 0), tanınan loglarda `met` geri çağırma 0,873 (eşik 0,9). Yalnızca çıkış kodu kanıtıyla neredeyse hiç `met` demez; bir insanın `missing` diyeceği yerde `unsure` der. Bu iki yanlış `met`'in ardındaki iki ayrıştırıcı hatası sonradan, aynı vakalar üzerinde düzeltildi; bu yüzden ardından gelen 0 yanlış `met` o vakalara uydurulmuş bir sayıdır, görülmemiş bir test değildir. Ayrıntılar [measurements-real-logs-2](docs/measurements-real-logs-2.md) sayfasında (İngilizce). `met`'i çıktının kontrolün geçtiğini gösterdiğine dair bir ipucu say, kanıt sayma; önemli olduğunda çıktıyı kendin de oku.
 
 ## Makinenden ne çıkar
 

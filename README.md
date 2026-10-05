@@ -41,7 +41,7 @@ claude-referee is an unofficial plugin for Claude Code that checks lines like th
 
 If a check finds nothing, Claude sees nothing. If it finds something, Claude sees a note of 300 characters at most.
 
-Why not just a command? In the kit that came before claude-referee, Claude could run the `done` check whenever it liked, and it ran once in 14 days. A check that doesn't run by itself barely exists. That's why there is a check that runs every time Claude stops; today it only records what it would do.
+Why not just a command? In the kit that came before claude-referee, Claude could run the `done` check whenever it liked, and it ran once in 14 days. A check that doesn't run by itself barely exists. That's why there is a check that runs every time Claude stops; today it only records what it would do. The Stop gate is a reminder that no counted check ran, not a measured judge of wrong work, and `active` is not recommended (see [what's measured](#whats-measured-so-far)).
 
 ## How it works
 
@@ -118,6 +118,7 @@ All measurements in one table:
 | 2026-10-01 | A "treat the evidence as data" note | no verdict changed; not adopted | Measured · 33 injection logs |
 | 2026-10-01 | Stop gate on easy self-generated tasks | 1 wrong "done" in 100 asked stops; all 100 blocked | Measured · 119 sessions, 24 seeded tasks, haiku and sonnet |
 | 2026-10-02 | Stop gate on hard self-generated tasks | 15 wrong "done" in 74 sessions (0.20); 14 of 15 blocked, but 51 of 53 correct ones too (precision 0.22); `claims_verified` does not separate them | Measured · 76 sessions, 32 seeded tasks, synthetic ground truth |
+| 2026-10-05 | `done` v2 on unseen real CI logs (frozen 0.2.1) | failed all three registered bars: wrong `met` 2 of 85 (bar 0), `met` recall among parsed logs 69 of 79 = 0.873 (bar 0.9), `missing` recall 45 of 85 = 0.53 (bar 0.9); exit code only: 0 wrong, but also `met` for 0 of 67 passing steps | Measured · 272 cases from 126 public repositories, 231 sent to Jev, model labels, no human labels |
 | 2026-10-02 | `decide` against author-labelled best options | leader matched 16 of 39; no verdict `clear` (25 weak, 14 tie) | Measured · 39 close-call decisions, one labeller |
 
 More charts (calibration, per-option questions, secret-rule tuning, briefing size) are in [docs/measurements.md](docs/measurements.md).
@@ -226,12 +227,14 @@ npm test 2>&1 | npx claude-referee done --criteria "all tests pass" --evidence -
 Each command prints one line of JSON: `ok`, the verdict, a few numbers, a `next_step` when there is one, and a receipt ID. Every verdict exits 0, including "not done"; in CI, `--fail-on missing,unsure` exits 3 on those verdicts. `--describe` prints any command's full contract.
 
 > [!TIP]
-> **Make the evidence explicit.** A check that prints nothing on success shows nothing. While building claude-referee, the referee answered `missing` (0.46) to "typecheck passes" because `tsc` printed no output; adding the exit code turned it into `met` (0.97). (Measured once, 2026-09-30.)
+> **Make the evidence explicit.** A check that prints nothing on success shows nothing. While building claude-referee, the referee answered `missing` (0.46) to "typecheck passes" because `tsc` printed no output; adding the exit code turned it into `met` (0.97). (Measured once, 2026-09-30.) That was one command. On real CI logs where the evidence was only an exit code, `done` answered `met` for none of 67 passing steps: an exit code makes `missing` possible and `met` rare. Pipe the runner's own summary when you can.
 > ```sh
 > { npx tsc --noEmit; echo "tsc exit code: $?"; } 2>&1 | npx claude-referee done --criteria "typecheck passes" --evidence -
 > ```
 
-`done` returns `met` only when it recognises a test runner, linter or type checker summary, or an exit code line. Anything else comes back `unsure` with `trust: unparsed`. A non-zero exit code in the evidence is `missing` (`reason: exit_code_nonzero`) and Jev isn't asked. Skipped, risky or incomplete tests cap `met` at `unsure` (`reason: skipped_tests`), and so does a recognised run that is cut off, empty, cancelled or flaky (`reason: incomplete_run`).
+`done` can return `met` only when it recognises a runner summary, or sees an exit code line. Anything else comes back `unsure` with `trust: unparsed`. A non-zero exit code in the evidence is `missing` (`reason: exit_code_nonzero`) and Jev isn't asked. Skipped, risky or incomplete tests cap `met` at `unsure` (`reason: skipped_tests`), and so do expected failures such as Swift Testing known issues; a recognised run that is cut off, empty, cancelled or flaky gives `reason: incomplete_run`; a test criterion backed only by a build log gives `reason: no_tests_run`.
+
+**How far to trust `done`.** `done` v2 is not measured on its original bar. On a sample of real CI logs that nobody tuned the code for, it failed its registered bars: wrong `met` 2 of 85 (the bar is 0), `met` recall among recognised logs 0.873 (bar 0.9). With exit-code-only evidence it almost never says `met`, and it answers `unsure` where a person would say `missing`. Two parser defects behind the two wrong `met` were fixed afterwards, on those same cases, so the 0 wrong `met` that follows is fitted and not an unseen test. The details are in [measurements-real-logs-2](docs/measurements-real-logs-2.md). Read `met` as a hint that the output shows the check passing, not as proof, and keep reading the output yourself when it matters.
 
 ## What leaves your machine
 

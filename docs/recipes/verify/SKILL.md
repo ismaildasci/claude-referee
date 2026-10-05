@@ -8,7 +8,7 @@ allowed-tools: Bash
 
 Run this right before committing code changes.
 
-1. Run the project's check command and pipe all of its output, including stderr and the exit code, to the referee. Replace `npm test` with the project's own command (for example `cargo nextest run`, `pytest`, `go test ./...`). The exit code line keeps the real status and lets a runner the referee does not recognise still count:
+1. Run the project's check command and pipe all of its output, including stderr and the exit code, to the referee. Replace `npm test` with the project's own command (for example `cargo nextest run`, `pytest`, `go test ./...`). The exit code line keeps the real status (a failing run is `missing`); for a runner the referee does not recognise, a passing run usually comes back `unsure`, not `met`:
 
 ```bash
 { npm test; echo "exit code: $?"; } 2>&1 | npx claude-referee done --criteria "all tests pass" --evidence - --fail-on missing,unsure
