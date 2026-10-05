@@ -1,0 +1,687 @@
+{
+ "jev_scored": true,
+ "cases": 272,
+ "repos": 126,
+ "duplicate_evidence_hashes": 0,
+ "code_decided": {
+  "n": 41,
+  "all_missing": true
+ },
+ "sent": {
+  "n": 231,
+  "expected_met": 146,
+  "expected_missing": 85,
+  "verdicts": {
+   "met": 69,
+   "missing": 85,
+   "unsure": 77
+  }
+ },
+ "classes": {
+  "R": {
+   "n": 108,
+   "expected_met": 79,
+   "expected_missing": 29,
+   "verdicts": {
+    "met": 69,
+    "unsure": 27,
+    "missing": 12
+   }
+  },
+  "E": {
+   "n": 123,
+   "expected_met": 67,
+   "expected_missing": 56,
+   "verdicts": {
+    "missing": 73,
+    "unsure": 50
+   }
+  },
+  "U": {
+   "n": 0,
+   "expected_met": 0,
+   "expected_missing": 0,
+   "verdicts": {}
+  }
+ },
+ "bar1_wrong_met": {
+  "pooled": {
+   "k": 0,
+   "n": 85,
+   "p": 0,
+   "exact95": {
+    "lo": 0,
+    "hi": 0.04247033991124921
+   },
+   "repos": 64,
+   "repo_bootstrap95": {
+    "lo": 0,
+    "hi": 0
+   },
+   "repo_clustered": {
+    "repos_hit": 0,
+    "repos": 64,
+    "one_sided_upper95": 0.04572970233076251
+   },
+   "one_sided_upper95": 0.0346300749706871
+  },
+  "R": {
+   "k": 0,
+   "n": 29,
+   "p": 0,
+   "exact95": {
+    "lo": 0,
+    "hi": 0.11944486906950275
+   },
+   "repos": 25,
+   "repo_bootstrap95": {
+    "lo": 0,
+    "hi": 0
+   },
+   "repo_clustered": {
+    "repos_hit": 0,
+    "repos": 25,
+    "one_sided_upper95": 0.11292814500684328
+   },
+   "one_sided_upper95": 0.09814462767729576
+  },
+  "E": {
+   "k": 0,
+   "n": 56,
+   "p": 0,
+   "exact95": {
+    "lo": 0,
+    "hi": 0.06375009666236214
+   },
+   "repos": 43,
+   "repo_bootstrap95": {
+    "lo": 0,
+    "hi": 0
+   },
+   "repo_clustered": {
+    "repos_hit": 0,
+    "repos": 43,
+    "one_sided_upper95": 0.06729675341386782
+   },
+   "one_sided_upper95": 0.05208952720877941
+  },
+  "U": {
+   "k": 0,
+   "n": 0,
+   "p": null,
+   "exact95": {
+    "lo": null,
+    "hi": null
+   },
+   "repos": 0,
+   "repo_bootstrap95": null,
+   "repo_clustered": {
+    "repos_hit": 0,
+    "repos": 0,
+    "one_sided_upper95": null
+   },
+   "one_sided_upper95": null
+  }
+ },
+ "bar1_passed": true,
+ "wrong_met_ids": [],
+ "bar2_met_recall_R": {
+  "k": 69,
+  "n": 79,
+  "p": 0.8734177215189873,
+  "exact95": {
+   "lo": 0.779505778518752,
+   "hi": 0.9375956777792422
+  },
+  "repos": 54,
+  "repo_bootstrap95": {
+   "lo": 0.8,
+   "hi": 0.935064935064935
+  },
+  "repo_clustered": {
+   "repos_hit": 51,
+   "repos": 54,
+   "one_sided_upper95": 0.9846880916815082
+  },
+  "one_sided_upper95": 0.929688933781218,
+  "bar": 0.9,
+  "evaluable": true,
+  "passed": false
+ },
+ "met_recall_E": {
+  "k": 0,
+  "n": 67,
+  "p": 0,
+  "exact95": {
+   "lo": 0,
+   "hi": 0.053569654127096744
+  },
+  "repos": 51,
+  "repo_bootstrap95": {
+   "lo": 0,
+   "hi": 0
+  },
+  "repo_clustered": {
+   "repos_hit": 0,
+   "repos": 51,
+   "one_sided_upper95": 0.057047952360442744
+  },
+  "one_sided_upper95": 0.043727554781889444
+ },
+ "met_recall_pooled": {
+  "k": 69,
+  "n": 146,
+  "p": 0.4726027397260274,
+  "exact95": {
+   "lo": 0.38949702028604694,
+   "hi": 0.5568426914873601
+  },
+  "repos": 95,
+  "repo_bootstrap95": {
+   "lo": 0.3821656050955414,
+   "hi": 0.5594405594405595
+  },
+  "repo_clustered": {
+   "repos_hit": 51,
+   "repos": 95,
+   "one_sided_upper95": 0.6244412842684726
+  },
+  "one_sided_upper95": 0.5439334819758546
+ },
+ "missing_recall": {
+  "pooled": {
+   "k": 45,
+   "n": 85,
+   "p": 0.5294117647058824,
+   "exact95": {
+    "lo": 0.41805625282211956,
+    "hi": 0.6386588574345211
+   },
+   "repos": 64,
+   "repo_bootstrap95": {
+    "lo": 0.40789473684210525,
+    "hi": 0.6585365853658537
+   },
+   "repo_clustered": {
+    "repos_hit": 35,
+    "repos": 64,
+    "one_sided_upper95": 0.6536353116460532
+   },
+   "one_sided_upper95": 0.6224453250458302
+  },
+  "R": {
+   "k": 5,
+   "n": 29,
+   "p": 0.1724137931034483,
+   "exact95": {
+    "lo": 0.05845608297263433,
+    "hi": 0.3577475544146441
+   },
+   "repos": 25,
+   "repo_bootstrap95": {
+    "lo": 0.034482758620689655,
+    "hi": 0.3333333333333333
+   },
+   "repo_clustered": {
+    "repos_hit": 5,
+    "repos": 25,
+    "one_sided_upper95": 0.37540513512487805
+   },
+   "one_sided_upper95": 0.32887269243481676
+  },
+  "E": {
+   "k": 40,
+   "n": 56,
+   "p": 0.7142857142857143,
+   "exact95": {
+    "lo": 0.5779012810409248,
+    "hi": 0.8270482439658049
+   },
+   "repos": 43,
+   "repo_bootstrap95": {
+    "lo": 0.5740740740740741,
+    "hi": 0.8461538461538461
+   },
+   "repo_clustered": {
+    "repos_hit": 32,
+    "repos": 43,
+    "one_sided_upper95": 0.8494195438614305
+   },
+   "one_sided_upper95": 0.8118546166184961
+  },
+  "bar": 0.9,
+  "passed": false
+ },
+ "parsed_coverage": {
+  "overall": {
+   "k": 108,
+   "n": 231,
+   "p": 0.4675324675324675,
+   "exact95": {
+    "lo": 0.4018100699481971,
+    "hi": 0.5340987308534402
+   },
+   "repos": 118,
+   "repo_bootstrap95": {
+    "lo": 0.3902439024390244,
+    "hi": 0.551440329218107
+   },
+   "repo_clustered": {
+    "repos_hit": 65,
+    "repos": 118,
+    "one_sided_upper95": 0.6287652099702299
+   },
+   "one_sided_upper95": 0.5237727584673191
+  },
+  "by_criterion": {
+   "all tests pass": {
+    "k": 65,
+    "n": 98,
+    "p": 0.6632653061224489,
+    "exact95": {
+     "lo": 0.5607368745099326,
+     "hi": 0.7556298836391837
+    },
+    "repos": 62,
+    "repo_bootstrap95": {
+     "lo": 0.5402298850574713,
+     "hi": 0.7757009345794392
+    },
+    "repo_clustered": {
+     "repos_hit": 43,
+     "repos": 62,
+     "one_sided_upper95": 0.7891323888101751
+    },
+    "one_sided_upper95": 0.7422890478302655
+   },
+   "lint is clean": {
+    "k": 10,
+    "n": 50,
+    "p": 0.2,
+    "exact95": {
+     "lo": 0.100302237472571,
+     "hi": 0.33718310838348786
+    },
+    "repos": 35,
+    "repo_bootstrap95": {
+     "lo": 0.10204081632653061,
+     "hi": 0.3181818181818182
+    },
+    "repo_clustered": {
+     "repos_hit": 10,
+     "repos": 35,
+     "one_sided_upper95": 0.43625979962696537
+    },
+    "one_sided_upper95": 0.31559606142001384
+   },
+   "the build succeeds": {
+    "k": 33,
+    "n": 83,
+    "p": 0.39759036144578314,
+    "exact95": {
+     "lo": 0.29173683215254964,
+     "hi": 0.5109741557635599
+    },
+    "repos": 56,
+    "repo_bootstrap95": {
+     "lo": 0.2692307692307692,
+     "hi": 0.5333333333333333
+    },
+    "repo_clustered": {
+     "repos_hit": 26,
+     "repos": 56,
+     "one_sided_upper95": 0.5821749441184267
+    },
+    "one_sided_upper95": 0.49368269622922545
+   }
+  },
+  "by_language": {
+   "C": {
+    "k": 4,
+    "n": 19,
+    "p": 0.21052631578947367,
+    "exact95": {
+     "lo": 0.06052453770928973,
+     "hi": 0.4556530818915058
+    },
+    "repos": 8,
+    "repo_bootstrap95": {
+     "lo": 0,
+     "hi": 0.5238095238095238
+    },
+    "repo_clustered": {
+     "repos_hit": 2,
+     "repos": 8,
+     "one_sided_upper95": 0.599689389190833
+    },
+    "one_sided_upper95": 0.4191202289169428
+   },
+   "C#": {
+    "k": 12,
+    "n": 19,
+    "p": 0.631578947368421,
+    "exact95": {
+     "lo": 0.3835779233144049,
+     "hi": 0.8371141278449004
+    },
+    "repos": 8,
+    "repo_bootstrap95": {
+     "lo": 0.38095238095238093,
+     "hi": 0.8571428571428571
+    },
+    "repo_clustered": {
+     "repos_hit": 7,
+     "repos": 8,
+     "one_sided_upper95": 0.9936088490454551
+    },
+    "one_sided_upper95": 0.8124956884945995
+   },
+   "C++": {
+    "k": 6,
+    "n": 17,
+    "p": 0.35294117647058826,
+    "exact95": {
+     "lo": 0.14209748311022102,
+     "hi": 0.6167163365565971
+    },
+    "repos": 8,
+    "repo_bootstrap95": {
+     "lo": 0.07142857142857142,
+     "hi": 0.6666666666666666
+    },
+    "repo_clustered": {
+     "repos_hit": 4,
+     "repos": 8,
+     "one_sided_upper95": 0.807097050005869
+    },
+    "one_sided_upper95": 0.5802946483738276
+   },
+   "Dart": {
+    "k": 7,
+    "n": 10,
+    "p": 0.7,
+    "exact95": {
+     "lo": 0.34754714994000235,
+     "hi": 0.9332604888222655
+    },
+    "repos": 6,
+    "repo_bootstrap95": {
+     "lo": 0.16666666666666666,
+     "hi": 0.9375
+    },
+    "repo_clustered": {
+     "repos_hit": 3,
+     "repos": 6,
+     "one_sided_upper95": 0.8468388820247768
+    },
+    "one_sided_upper95": 0.9127355660858496
+   },
+   "Elixir": {
+    "k": 2,
+    "n": 13,
+    "p": 0.15384615384615385,
+    "exact95": {
+     "lo": 0.01920667198252851,
+     "hi": 0.45447105567655777
+    },
+    "repos": 6,
+    "repo_bootstrap95": {
+     "lo": 0,
+     "hi": 0.3333333333333333
+    },
+    "repo_clustered": {
+     "repos_hit": 2,
+     "repos": 6,
+     "one_sided_upper95": 0.7286616274802475
+    },
+    "one_sided_upper95": 0.4100986048338161
+   },
+   "Go": {
+    "k": 8,
+    "n": 13,
+    "p": 0.6153846153846154,
+    "exact95": {
+     "lo": 0.3157776029140632,
+     "hi": 0.8614206611098394
+    },
+    "repos": 6,
+    "repo_bootstrap95": {
+     "lo": 0.25,
+     "hi": 0.8666666666666667
+    },
+    "repo_clustered": {
+     "repos_hit": 4,
+     "repos": 6,
+     "one_sided_upper95": 0.9371501082916456
+    },
+    "one_sided_upper95": 0.8343405732849283
+   },
+   "Java": {
+    "k": 12,
+    "n": 14,
+    "p": 0.8571428571428571,
+    "exact95": {
+     "lo": 0.5718708390903009,
+     "hi": 0.9822054845168084
+    },
+    "repos": 7,
+    "repo_bootstrap95": {
+     "lo": 0.5384615384615384,
+     "hi": 1
+    },
+    "repo_clustered": {
+     "repos_hit": 6,
+     "repos": 7,
+     "one_sided_upper95": 0.9926991680209853
+    },
+    "one_sided_upper95": 0.9740006673991322
+   },
+   "JavaScript": {
+    "k": 9,
+    "n": 18,
+    "p": 0.5,
+    "exact95": {
+     "lo": 0.26019058289509667,
+     "hi": 0.739809417104903
+    },
+    "repos": 8,
+    "repo_bootstrap95": {
+     "lo": 0.21052631578947367,
+     "hi": 0.7619047619047619
+    },
+    "repo_clustered": {
+     "repos_hit": 5,
+     "repos": 8,
+     "one_sided_upper95": 0.8888872933923708
+    },
+    "one_sided_upper95": 0.7087989244732058
+   },
+   "Kotlin": {
+    "k": 2,
+    "n": 8,
+    "p": 0.25,
+    "exact95": {
+     "lo": 0.03185402624994421,
+     "hi": 0.6508557944128242
+    },
+    "repos": 7,
+    "repo_bootstrap95": {
+     "lo": 0,
+     "hi": 0.5714285714285714
+    },
+    "repo_clustered": {
+     "repos_hit": 2,
+     "repos": 7,
+     "one_sided_upper95": 0.6587385638446641
+    },
+    "one_sided_upper95": 0.599689389190833
+   },
+   "PHP": {
+    "k": 6,
+    "n": 14,
+    "p": 0.42857142857142855,
+    "exact95": {
+     "lo": 0.17661108998211755,
+     "hi": 0.7113905999616925
+    },
+    "repos": 7,
+    "repo_bootstrap95": {
+     "lo": 0.3076923076923077,
+     "hi": 0.5833333333333334
+    },
+    "repo_clustered": {
+     "repos_hit": 6,
+     "repos": 7,
+     "one_sided_upper95": 0.9926991680209853
+    },
+    "one_sided_upper95": 0.674971518396225
+   },
+   "Python": {
+    "k": 7,
+    "n": 17,
+    "p": 0.4117647058823529,
+    "exact95": {
+     "lo": 0.18443696178394636,
+     "hi": 0.6707528460532426
+    },
+    "repos": 8,
+    "repo_bootstrap95": {
+     "lo": 0.1111111111111111,
+     "hi": 0.7222222222222222
+    },
+    "repo_clustered": {
+     "repos_hit": 4,
+     "repos": 8,
+     "one_sided_upper95": 0.807097050005869
+    },
+    "one_sided_upper95": 0.6359912267520504
+   },
+   "Ruby": {
+    "k": 2,
+    "n": 10,
+    "p": 0.2,
+    "exact95": {
+     "lo": 0.025210726326833355,
+     "hi": 0.5560954623076415
+    },
+    "repos": 6,
+    "repo_bootstrap95": {
+     "lo": 0,
+     "hi": 0.5714285714285714
+    },
+    "repo_clustered": {
+     "repos_hit": 2,
+     "repos": 6,
+     "one_sided_upper95": 0.7286616274802475
+    },
+    "one_sided_upper95": 0.5069013010632024
+   },
+   "Rust": {
+    "k": 14,
+    "n": 17,
+    "p": 0.8235294117647058,
+    "exact95": {
+     "lo": 0.5656821271557164,
+     "hi": 0.962014931929374
+    },
+    "repos": 7,
+    "repo_bootstrap95": {
+     "lo": 0.6153846153846154,
+     "hi": 0.9523809523809523
+    },
+    "repo_clustered": {
+     "repos_hit": 6,
+     "repos": 7,
+     "one_sided_upper95": 0.9926991680209853
+    },
+    "one_sided_upper95": 0.9501018454425771
+   },
+   "Scala": {
+    "k": 4,
+    "n": 7,
+    "p": 0.5714285714285714,
+    "exact95": {
+     "lo": 0.18405156764008285,
+     "hi": 0.9010117215574922
+    },
+    "repos": 6,
+    "repo_bootstrap95": {
+     "lo": 0.16666666666666666,
+     "hi": 0.8888888888888888
+    },
+    "repo_clustered": {
+     "repos_hit": 3,
+     "repos": 6,
+     "one_sided_upper95": 0.8468388820247768
+    },
+    "one_sided_upper95": 0.8712436071957574
+   },
+   "Shell": {
+    "k": 1,
+    "n": 9,
+    "p": 0.1111111111111111,
+    "exact95": {
+     "lo": 0.002809136746599161,
+     "hi": 0.48249651491733714
+    },
+    "repos": 6,
+    "repo_bootstrap95": {
+     "lo": 0,
+     "hi": 0.25
+    },
+    "repo_clustered": {
+     "repos_hit": 1,
+     "repos": 6,
+     "one_sided_upper95": 0.5818034092520259
+    },
+    "one_sided_upper95": 0.4291355470314345
+   },
+   "Swift": {
+    "k": 5,
+    "n": 10,
+    "p": 0.5,
+    "exact95": {
+     "lo": 0.1870860284473987,
+     "hi": 0.8129139715526015
+    },
+    "repos": 6,
+    "repo_bootstrap95": {
+     "lo": 0.08333333333333333,
+     "hi": 0.9166666666666666
+    },
+    "repo_clustered": {
+     "repos_hit": 3,
+     "repos": 6,
+     "one_sided_upper95": 0.8468388820247768
+    },
+    "one_sided_upper95": 0.7775588989918709
+   },
+   "TypeScript": {
+    "k": 7,
+    "n": 16,
+    "p": 0.4375,
+    "exact95": {
+     "lo": 0.19753414053266755,
+     "hi": 0.7012231009168226
+    },
+    "repos": 8,
+    "repo_bootstrap95": {
+     "lo": 0.16666666666666666,
+     "hi": 0.75
+    },
+    "repo_clustered": {
+     "repos_hit": 5,
+     "repos": 8,
+     "one_sided_upper95": 0.8888872933923708
+    },
+    "one_sided_upper95": 0.6666258284750759
+   }
+  }
+ },
+ "met_reachable_offline": {
+  "R_expected_met": "74/79",
+  "R_expected_missing": "1/29",
+  "E_expected_met": "66/67",
+  "E_expected_missing": "45/56"
+ }
+}

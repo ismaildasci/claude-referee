@@ -90,3 +90,39 @@ Both are single-labeller labels (neither was in the 40% second-labelled share), 
 On logs nobody tuned for, with code frozen before the sample existed, `done` v2 does what it was built to do in the exit-code-only class (0 wrong `met` of 56, at the price of 0 `met` of 67 true passes) and fails the three bars where a runner is recognised: it says `met` for a build-only maven log read as a test pass, `met` recall among parsed is 0.873, and `missing` recall is 0.53 because it answers `unsure` where a human says `missing` (R 22 of 29 negatives are `unsure`, which is safe but not a hit). The next dev-backed items, not started here: the maven build-versus-test distinction (a `BUILD SUCCESS` without `Tests run:` is not a test result), Swift Testing known issues and multi-run `swift test` logs, `mix test`, wrapper builds, and a positive marker for clean linters.
 
 Jev receipt: `rmuveb0ms866t` (231 cases, 206 requests, 25 cache hits). The `decide` receipts about log text are those of the first registration.
+
+## After the two parser fixes (fitted to these cases, not an unseen test)
+
+Written after the result above; every number above this heading is unchanged. The two wrong `met` were analysed, then the two parser defects behind them were fixed in code ([decision](decisions/parser-fixes-real-logs-2.md), commit `eefc0dd`). **The fixes were made by looking at exactly these two cases, so the 0 wrong `met` below is fitted to this sample and says nothing about unseen logs.** It is not a pass of the registered bars and `done` v2 stays "not measured" on the old bar. Both bars that failed on recall stay failed: `met` recall among parsed is still 69 of 79 = 0.873, `missing` recall still 45 of 85 = 0.529.
+
+What changed in code (generally, not only for these two logs):
+
+- **Maven and other build logs.** A `maven` log with no surefire totals (`Tests run:`) is marked build-only in the parsed facts; so are `ninja`, `msbuild`, `docker build`, `make`, `swift build`, `cargo build`, `next build`, `nix build` and `vite`. When every parsed runner of a log is build-only and the criterion mentions tests, `met` is capped at `unsure` with `reason: no_tests_run`. A build criterion can still be `met` on `BUILD SUCCESS`. The mark is read in code and is not sent to Jev, so no recorded answer became stale for these runners. Logs with `Tests run: 0` or "No tests to run" were already capped by the no-tests rule for any criterion and still are.
+- **Swift.** All Swift Testing `Test run with N tests ... passed|failed` summaries are added (before, only the last counted), and so are the `All tests` blocks of several `swift test` invocations. `with N known issues` and `recorded a known issue` lines are counted as `expected_failures`, which caps `met` at `unsure` (`skipped_tests`), the same way skips, xfail and "expected failure" lines already do. A "passed" summary that reports non-known `issues` counts as a failure; `warnings` are counted as warnings; a `Test run started` line with no summary after it makes the run incomplete.
+
+**Replay over every recorded suite.** `eval score --suite all` is unchanged: same counts and the same `max_wrong_positive` allowances for all 16 suites, and no stale recording (no synthetic case changed its facts). Replaying the two real-log suites with the recorded answers, the old code reproduces the committed tables exactly (0 rows differ), and the new code changes these rows:
+
+| Sample | Case | Expected | Before | After | Why |
+| --- | --- | --- | --- | --- | --- |
+| 2 | `rl-7c6caf48` google/gson | `missing` | `met` 0.93 | `unsure` (`no_tests_run`), p 0.93 unchanged | build-only maven log, test criterion; code cap only, no new request |
+| 2 | `rl-c4542111` coteditor/CotEditor | `missing` | `met` 0.98, 11 passed | `unsure` (`skipped_tests`), p 0.90, 83 passed | four summaries added; 4 known issues cap `met` |
+| 2 | `rl-a29bf97d` coteditor/CotEditor | `met` | `met` 0.98, 50 passed | `met` 0.97, 209 passed | summaries added, facts changed, re-recorded |
+| 2 | `rl-3c6a8880` coteditor/CotEditor | `met` | `met` 0.97, 12 passed | `met` 0.97, 36 passed | summaries added, re-recorded |
+| 1 | `rl-ea5d639d` Alamofire/Alamofire | `missing` | `unsure` (`skipped_tests`) 0.88 | `unsure` (`skipped_tests`) 0.72 | the log ends with a `Test run started` line and no summary, so the run is now `incomplete`; the verdict did not change |
+| 1 | `rl-756be077` steipete/CodexBar | `met` | `met` 0.98, 906 passed | `met` 0.97, 914 passed | second summary added, re-recorded |
+
+Nothing else in the 501 rows of the two tables changed (verdict, p, reason, parsed facts, `met`-reachable). Five cases changed their facts and were re-recorded with the repository's `eval record` on copies of the two local suites (the originals were not edited; 2 requests for sample 1, receipt `rmuvf61f3tvvb`; 3 for sample 2, receipt `rmuvf62dqqqip`); the gson row needed none. The re-derived tables and recordings are in `docs/data/done-v2-real-2/after-parser-fixes/` and `docs/data/done-v2-real/after-parsers/parser-fixes/`; the originals are untouched.
+
+| Second sample, 231 sent | Registered result (frozen 0.2.1, unseen) | After the two fixes (**fitted** to these cases) |
+| --- | --- | --- |
+| Wrong `met`, pooled | 2 of 85 (bound 7.2%) | **0 of 85, fitted** (bound 3.5%; repository-clustered 0 of 64, bound 4.6%) |
+| Wrong `met`, class R | 2 of 29 | **0 of 29, fitted** |
+| `met` recall among parsed | 69 of 79 = 0.873 | 69 of 79 = 0.873 (unchanged) |
+| `missing` recall | 45 of 85 = 0.529 | 45 of 85 = 0.529 (unchanged: both cases moved from `met` to `unsure`, not to `missing`) |
+| Verdicts `met` / `missing` / `unsure` | 71 / 85 / 75 | 69 / 85 / 77 |
+
+First sample (229 cases, 199 sent): no metric moved (wrong `met` 0 of 76, `met` recall among parsed 65 of 75, parsed coverage 101), two rows changed as listed.
+
+Who labelled. Both labellers of this sample, labeller 1 on every succeeded case and labeller 2 on 40%, were `claude -p` language-model processes; no human labelled any case, and the replays above reuse those labels unchanged.
+
+What this does not fix. The CotEditor log was cut by the `done` clip (78,509 characters omitted), so the four summaries are the visible ones and the omitted middle can hold more runs; the code does not cap a clipped log. The label of `rl-c4542111` stays contestable (a known issue is an expected failure); capping it is the conservative choice, not a ruling that a known issue means the tests did not pass. The remaining recall misses, the exit-code-only class (`met` for 0 of 67 passing steps), `mix test`, wrapper builds and the rest of the backlog above are untouched, and the same fixes were not tested on any log that was not already in this sample.
