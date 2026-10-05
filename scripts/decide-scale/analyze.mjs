@@ -53,6 +53,7 @@ function polVerdict(p, names, orderLeaders, unanimous) {
 
 const cases = loadCases([...SOURCES, ...WAVE2]).filter((c) => SETS.includes(c.src));
 const main = loadRecorded("main", ["main", "wave2"]);
+const repAns = loadRecorded("rep");
 const rename = loadRecorded("rename");
 const data = [];
 for (const c of cases) {
@@ -66,7 +67,7 @@ for (const c of cases) {
   const names = c.written;
   const ref = meanOver(ans, poolKeys, names);
   const { p1, p2 } = top2(ref, names);
-  data.push({ c, id: c.id, src: c.src, n: plan.n, names, ans, poolKeys, fixedKeys, plan, ref, refLeader: argmaxOf(ref, names), margin: p1 - p2, nearTie: p1 - p2 < TIE_MARGIN - EPS, refV: refVerdict(ref, names) });
+  data.push({ ans2: repAns.get(c.id) && poolKeys.every((k) => repAns.get(c.id).has(k)) ? repAns.get(c.id) : null, c, id: c.id, src: c.src, n: plan.n, names, ans, poolKeys, fixedKeys, plan, ref, refLeader: argmaxOf(ref, names), margin: p1 - p2, nearTie: p1 - p2 < TIE_MARGIN - EPS, refV: refVerdict(ref, names) });
 }
 
 function policySets(d) {
@@ -98,7 +99,7 @@ function oneSet(d, Q, mode, unanimous) {
   const pool = d.poolKeys;
   const refKeys = mode === "leave" ? pool.filter((k) => !inQ.has(k)) : pool;
   if (refKeys.length < 2) return null;
-  const ref = mode === "leave" ? meanOver(d.ans, refKeys, d.names) : d.ref;
+  const ref = mode === "leave" ? meanOver(d.ans, refKeys, d.names) : mode === "rep" ? meanOver(d.ans2, pool, d.names) : d.ref;
   const refLeader = argmaxOf(ref, d.names);
   const pol = meanOver(d.ans, Q, d.names);
   const leaders = Q.map((k) => argmaxOf(d.ans.get(k), d.names));
@@ -129,7 +130,7 @@ function evaluate(d, sets, mode, unanimous) {
 
 const results = {};
 const setsByCase = data.map(policySets);
-for (const mode of ["leave", "full"]) {
+for (const mode of data.every((d) => d.ans2) ? ["leave", "full", "rep"] : ["leave", "full"]) {
   for (const verdictVariant of ["unanimous", "mean"]) {
     const bucket = `${mode}_${verdictVariant}`;
     results[bucket] = {};
@@ -223,7 +224,7 @@ function pairedVsWr(bucket) {
   }
   return out;
 }
-const vsWr = { leave_unanimous: pairedVsWr("leave_unanimous"), full_unanimous: pairedVsWr("full_unanimous") };
+const vsWr = Object.fromEntries(Object.keys(results).filter((b) => b.endsWith("_unanimous")).map((b) => [b, pairedVsWr(b)]));
 
 // slot effect: probability = option effect + slot effect, alternating means over the pool
 function slotEffects(d) {
@@ -337,6 +338,9 @@ function shiftBetween(d, ansA, ansB) {
 }
 const floor = idxAll.map((i) => (old.has(data[i].id) ? shiftBetween(data[i], data[i].ans, old.get(data[i].id)) : null));
 const floorIdx = idxAll.filter((i) => floor[i]);
+const repIdx = idxAll.filter((i) => data[i].ans2);
+const repShift = idxAll.map((i) => (data[i].ans2 ? shiftBetween(data[i], data[i].ans, data[i].ans2) : null));
+const repAnswerDelta = idxAll.map((i) => (data[i].ans2 ? avg(data[i].poolKeys.map((k) => avg(data[i].names.map((n) => Math.abs(data[i].ans.get(k)[n] - data[i].ans2.get(k)[n]))))) : null));
 const nameShift = idxAll.map((i) => {
   const d = data[i];
   const neutral = rename.get(d.id);
@@ -348,6 +352,7 @@ const nameIdx = idxAll.filter((i) => nameShift[i]);
 const nameCloseIdx = nameIdx.filter((i) => floor[i]);
 const noiseResult = {
   floor_old_vs_new: { n: floorIdx.length, mae: { value: r4(avg(floorIdx.map((i) => floor[i].mae))), ...boot(floorIdx, (ix) => avg(ix.map((i) => floor[i].mae))) }, max_mean: r4(avg(floorIdx.map((i) => floor[i].max))), leader_flips: r4(floorIdx.reduce((s, i) => s + floor[i].flip, 0)) },
+  replicate_run1_vs_run2: { n: repIdx.length, pool_mean_mae: { value: r4(avg(repIdx.map((i) => repShift[i].mae))), ...boot(repIdx, (ix) => avg(ix.map((i) => repShift[i].mae))) }, leader_flips: r4(repIdx.reduce((s, i) => s + repShift[i].flip, 0)), same_order_answer_mae: r4(avg(repIdx.map((i) => repAnswerDelta[i]))) },
   rename_all: { n: nameIdx.length, mae: { value: r4(avg(nameIdx.map((i) => nameShift[i].mae))), ...boot(nameIdx, (ix) => avg(ix.map((i) => nameShift[i].mae))) }, max_mean: r4(avg(nameIdx.map((i) => nameShift[i].max))), leader_flips: r4(nameIdx.reduce((s, i) => s + nameShift[i].flip, 0)) },
   rename_vs_floor_same_decisions: {
     n: nameCloseIdx.length,
@@ -359,7 +364,7 @@ const noiseResult = {
   },
 };
 
-const receipts = ["main", "rename", "screen", "wave2"].flatMap((s) => (existsSync(join(ROOT, `jev-evals/decide-scale/receipts-${s}.json`)) ? JSON.parse(readFileSync(join(ROOT, `jev-evals/decide-scale/receipts-${s}.json`), "utf8")).map((r) => ({ stage: s, ...r })) : []));
+const receipts = ["main", "rename", "screen", "wave2", "rep"].flatMap((s) => (existsSync(join(ROOT, `jev-evals/decide-scale/receipts-${s}.json`)) ? JSON.parse(readFileSync(join(ROOT, `jev-evals/decide-scale/receipts-${s}.json`), "utf8")).map((r) => ({ stage: s, ...r })) : []));
 const cost = { receipts: receipts.length, requests: receipts.reduce((s, r) => s + r.requests, 0), cached: receipts.reduce((s, r) => s + r.cached, 0), input_tokens: receipts.reduce((s, r) => s + r.input_tokens, 0), cost_usd: r4(receipts.reduce((s, r) => s + r.cost_usd, 0)), replaced: receipts.reduce((s, r) => s + (r.replaced ?? 0), 0), stopped: receipts.reduce((s, r) => s + (r.stopped ?? 0), 0) };
 
 const marginBins = [[0, 0.04], [0.04, 0.08], [0.08, 0.2], [0.2, 1.01]];
