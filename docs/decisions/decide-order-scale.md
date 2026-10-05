@@ -135,3 +135,21 @@ Fix: ask every pool order of every decision a second time (all of S1 to S4 and t
 The decision rule is applied to the replicate-reference variant as well, in all three data sets (wave 1, wave 2, pooled). The recommendation is the one that holds under the replicate reference, and it states whether the leave-out and full-set variants agree. This replaces the leave-out variant as the one the recommendation rests on, a change decided after seeing the results, which is why all variants are reported side by side.
 
 Cost: about 5,900 requests, about $0.12.
+
+## Result and recommendation
+
+Numbers, tables and caveats: [measurements-decide-order-scale.md](../measurements-decide-order-scale.md). 16,044 requests, about $0.36, receipts in `jev-evals/decide-scale/receipts-*.json`. Registered wave 1: 203 decisions (162 with n >= 4, 16 near-ties); wave 2 adds 49 (16 near-ties); pooled 252 (211, 32).
+
+**Recommendation (for the maintainer; `decide` is unchanged).** By the registered rule the cheapest policy within 0.05 of the best near-tie leader agreement with false-clear at most 0.05 is `latin_rev`: the n cyclic rotations of the written order plus their reversals (2n requests: 8 for 4 options, 10 for 5, 12 for 6; all 6 orders for 3). It was the cheapest qualifier in all 18 evaluations (three data sets, three references, two verdict rules). Pooled near-tie leader agreement is 0.94 [0.84, 1.0] against 0.66 [0.50, 0.81] for today's written + reversed (paired gain +0.28 [0.09, 0.47]); on the registered 16 near-ties alone 0.875 against 0.50.
+
+What that does and does not buy:
+
+- Today's two orders are enough when the leader leads by 0.08 or more (agreement 0.99 over 179 decisions) and for deciding whether to call a result `clear` (1 of 72 false clears, against 5 of 75 for one order, which breaks the 0.05 limit). Asking a second order is worth it; this study confirms that part of today's design.
+- The gain from the balanced 2n design is confined to near-ties (the 32 of 211 decisions where the lead is under 0.08). There the leader is nearly arbitrary anyway: following `wr`'s leader gives up 0.003 of probability on average, against 0.0001.
+- 3 or 4 rotations (3 to 4.4 requests) are not distinguishable from `wr` (paired intervals include 0). If the maintainer moves beyond two orders, the study supports the balanced design, not a few extra rotations.
+- With 2n orders the unanimous "any disagreement is `tie`" rule gives verdict agreement 0.81; the mean-only verdict gives 0.96 with no false clear. A move would need that rule changed.
+- Cost of the recommended design: 6 to 10 more requests per decision (about $0.0002) at the same latency when sent in parallel; the repo's `Session` already runs 6 requests at once.
+
+Caveat: the near-tie evidence is 32 decisions (16 registered), one model version, invented decisions written mostly by agents, and the reference choice and wave 2 were fixed after earlier results were read (all three references give the same rule outcome; see deviations). Nothing here says that a different leader on a near-tie would have been a better decision.
+
+Side findings (measurements document): the first-listed option loses 0.004 and the last-listed gains 0.005 on average (0.03 spread for 5 options); the written order has no consistent first-listed gain; renaming options to neutral names moved the 24-order mean by 0.029 and changed the leader in 22 of 183 decisions, far above re-ask noise, so the option name matters more than the order does for `wr` accuracy; probability follows option text length (Spearman 0.34) when authors write options of unequal length and not when lengths are equal (0.03).
