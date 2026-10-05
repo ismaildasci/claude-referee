@@ -1,0 +1,697 @@
+{
+ "rule": "kept when the mean over 4 screening orders has top-two margin < 0.20",
+ "screened": 160,
+ "kept": [
+  "c/c05-bread-supplier",
+  "c/c06-lab-freezer",
+  "c/c20-leaking-roof",
+  "c/c22-pitch-surface",
+  "c/c26-patient-intake",
+  "c/c28-old-wiring",
+  "c/c30-reprint-run",
+  "c/c38-billing-queue",
+  "c/c39-orchard-planting",
+  "c/c40-garden-water",
+  "c/c43-exam-format",
+  "c/c45-cover-design",
+  "c/c47-hive-expansion",
+  "c/c48-store-layout",
+  "c/c53-camp-staffing",
+  "c/c60-tuition-aid",
+  "c/c62-kitchen-hire",
+  "c/c65-river-crossing",
+  "c/c67-test-suite",
+  "c/c68-trial-class",
+  "c/c73-pricing-tiers",
+  "c/c74-hay-storage",
+  "c/c75-harvest-help",
+  "c/c79-returns-policy",
+  "c/c80-crew-sched",
+  "d/d04-school-trip-bus",
+  "d/d05-flaky-test-suite",
+  "d/d06-goat-herd-feed",
+  "d/d08-lab-freezer",
+  "d/d09-youth-league-fees",
+  "d/d12-rural-bus",
+  "d/d18-backup-policy",
+  "d/d21-print-run",
+  "d/d23-seasonal-hire",
+  "d/d26-tool-library",
+  "d/d30-town-festival",
+  "d/d36-museum-ticketing",
+  "d/d38-pottery-glaze",
+  "d/d43-budget-cut",
+  "d/d44-race-route",
+  "d/d48-press-deadline",
+  "d/d51-water-meter",
+  "d/d54-brewery-batch",
+  "d/d61-harvest-labour",
+  "d/d69-estate-sale",
+  "d/d71-farm-succession",
+  "d/d72-pop-up-library",
+  "d/d74-kiln-upgrade",
+  "d/d80-market-stall"
+ ],
+ "margins": [
+  {
+   "id": "c/c01-orders-migration",
+   "margin": 0.255
+  },
+  {
+   "id": "c/c02-cache-layer",
+   "margin": 0.8875
+  },
+  {
+   "id": "c/c03-sourdough-schedule",
+   "margin": 0.695
+  },
+  {
+   "id": "c/c04-search-engine",
+   "margin": 0.46
+  },
+  {
+   "id": "c/c05-bread-supplier",
+   "margin": 0.015
+  },
+  {
+   "id": "c/c06-lab-freezer",
+   "margin": 0.1175
+  },
+  {
+   "id": "c/c07-junior-hire",
+   "margin": 0.435
+  },
+  {
+   "id": "c/c08-grant-priority",
+   "margin": 0.2425
+  },
+  {
+   "id": "c/c09-holiday-menu",
+   "margin": 0.5075
+  },
+  {
+   "id": "c/c10-trail-closure",
+   "margin": 0.815
+  },
+  {
+   "id": "c/c11-tomato-blight",
+   "margin": 0.675
+  },
+  {
+   "id": "c/c12-sales-hire",
+   "margin": 0.2525
+  },
+  {
+   "id": "c/c13-api-versioning",
+   "margin": 0.25
+  },
+  {
+   "id": "c/c14-telescope-time",
+   "margin": 0.79
+  },
+  {
+   "id": "c/c15-bus-network",
+   "margin": 0.785
+  },
+  {
+   "id": "c/c16-youth-practice",
+   "margin": 0.3525
+  },
+  {
+   "id": "c/c17-choir-repertoire",
+   "margin": 0.855
+  },
+  {
+   "id": "c/c18-lawn-replace",
+   "margin": 0.7425
+  },
+  {
+   "id": "c/c19-nurse-roster",
+   "margin": 0.335
+  },
+  {
+   "id": "c/c20-leaking-roof",
+   "margin": 0.185
+  },
+  {
+   "id": "c/c21-event-venue",
+   "margin": 0.91
+  },
+  {
+   "id": "c/c22-pitch-surface",
+   "margin": 0.1625
+  },
+  {
+   "id": "c/c23-food-bank-stock",
+   "margin": 0.83
+  },
+  {
+   "id": "c/c24-class-seating",
+   "margin": 0.3575
+  },
+  {
+   "id": "c/c25-tour-route",
+   "margin": 0.645
+  },
+  {
+   "id": "c/c26-patient-intake",
+   "margin": 0.0475
+  },
+  {
+   "id": "c/c27-seed-supplier",
+   "margin": 0.375
+  },
+  {
+   "id": "c/c28-old-wiring",
+   "margin": 0.11
+  },
+  {
+   "id": "c/c29-kiln-plan",
+   "margin": 0.8625
+  },
+  {
+   "id": "c/c30-reprint-run",
+   "margin": 0.035
+  },
+  {
+   "id": "c/c31-flash-sale",
+   "margin": 0.74
+  },
+  {
+   "id": "c/c32-wedding-plan",
+   "margin": 0.9775
+  },
+  {
+   "id": "c/c33-alert-fatigue",
+   "margin": 0.67
+  },
+  {
+   "id": "c/c34-parking-lot",
+   "margin": 0.4575
+  },
+  {
+   "id": "c/c35-museum-funding",
+   "margin": 0.595
+  },
+  {
+   "id": "c/c36-password-policy",
+   "margin": 0.3275
+  },
+  {
+   "id": "c/c37-churn-model",
+   "margin": 0.3625
+  },
+  {
+   "id": "c/c38-billing-queue",
+   "margin": 0.085
+  },
+  {
+   "id": "c/c39-orchard-planting",
+   "margin": 0.0175
+  },
+  {
+   "id": "c/c40-garden-water",
+   "margin": 0.015
+  },
+  {
+   "id": "c/c41-trip-pace",
+   "margin": 0.575
+  },
+  {
+   "id": "c/c42-irrigation-pick",
+   "margin": 0.2675
+  },
+  {
+   "id": "c/c43-exam-format",
+   "margin": 0.06
+  },
+  {
+   "id": "c/c44-club-fees",
+   "margin": 0.355
+  },
+  {
+   "id": "c/c45-cover-design",
+   "margin": 0.06
+  },
+  {
+   "id": "c/c46-parcel-routing",
+   "margin": 0.285
+  },
+  {
+   "id": "c/c47-hive-expansion",
+   "margin": 0.125
+  },
+  {
+   "id": "c/c48-store-layout",
+   "margin": 0.1225
+  },
+  {
+   "id": "c/c49-opening-act",
+   "margin": 0.805
+  },
+  {
+   "id": "c/c50-rent-or-buy",
+   "margin": 0.7875
+  },
+  {
+   "id": "c/c51-feature-flags",
+   "margin": 0.9625
+  },
+  {
+   "id": "c/c52-backup-plan",
+   "margin": 0.73
+  },
+  {
+   "id": "c/c53-camp-staffing",
+   "margin": 0.04
+  },
+  {
+   "id": "c/c54-window-upgrade",
+   "margin": 0.55
+  },
+  {
+   "id": "c/c55-onboarding-flow",
+   "margin": 0.7425
+  },
+  {
+   "id": "c/c56-sprint-length",
+   "margin": 0.9675
+  },
+  {
+   "id": "c/c57-compost-system",
+   "margin": 0.64
+  },
+  {
+   "id": "c/c58-lab-notebook",
+   "margin": 0.2025
+  },
+  {
+   "id": "c/c59-trade-booth",
+   "margin": 0.305
+  },
+  {
+   "id": "c/c60-tuition-aid",
+   "margin": 0.14
+  },
+  {
+   "id": "c/c61-conference-talks",
+   "margin": 0.865
+  },
+  {
+   "id": "c/c62-kitchen-hire",
+   "margin": 0.13
+  },
+  {
+   "id": "c/c63-pump-purchase",
+   "margin": 1
+  },
+  {
+   "id": "c/c64-shelter-intake",
+   "margin": 0.61
+  },
+  {
+   "id": "c/c65-river-crossing",
+   "margin": 0.195
+  },
+  {
+   "id": "c/c66-seedling-start",
+   "margin": 0.23
+  },
+  {
+   "id": "c/c67-test-suite",
+   "margin": 0.195
+  },
+  {
+   "id": "c/c68-trial-class",
+   "margin": 0.1725
+  },
+  {
+   "id": "c/c69-data-retention",
+   "margin": 0.6225
+  },
+  {
+   "id": "c/c70-trail-shoes",
+   "margin": 0.325
+  },
+  {
+   "id": "c/c71-studio-rent",
+   "margin": 0.5525
+  },
+  {
+   "id": "c/c72-vendor-pick",
+   "margin": 0.2725
+  },
+  {
+   "id": "c/c73-pricing-tiers",
+   "margin": 0.045
+  },
+  {
+   "id": "c/c74-hay-storage",
+   "margin": 0.1175
+  },
+  {
+   "id": "c/c75-harvest-help",
+   "margin": 0.115
+  },
+  {
+   "id": "c/c76-zine-format",
+   "margin": 0.3275
+  },
+  {
+   "id": "c/c77-textbook-adopt",
+   "margin": 0.6125
+  },
+  {
+   "id": "c/c78-incident-review",
+   "margin": 0.61
+  },
+  {
+   "id": "c/c79-returns-policy",
+   "margin": 0.1575
+  },
+  {
+   "id": "c/c80-crew-sched",
+   "margin": 0.005
+  },
+  {
+   "id": "d/d01-village-hall-roof",
+   "margin": 0.72
+  },
+  {
+   "id": "d/d02-sourdough-batch",
+   "margin": 0.51
+  },
+  {
+   "id": "d/d03-clinic-walkins",
+   "margin": 0.2425
+  },
+  {
+   "id": "d/d04-school-trip-bus",
+   "margin": 0.1625
+  },
+  {
+   "id": "d/d05-flaky-test-suite",
+   "margin": 0.075
+  },
+  {
+   "id": "d/d06-goat-herd-feed",
+   "margin": 0.115
+  },
+  {
+   "id": "d/d07-kids-saturday",
+   "margin": 0.395
+  },
+  {
+   "id": "d/d08-lab-freezer",
+   "margin": 0.1275
+  },
+  {
+   "id": "d/d09-youth-league-fees",
+   "margin": 0.1825
+  },
+  {
+   "id": "d/d10-library-hours",
+   "margin": 0.555
+  },
+  {
+   "id": "d/d11-workshop-lathe",
+   "margin": 0.7575
+  },
+  {
+   "id": "d/d12-rural-bus",
+   "margin": 0.0775
+  },
+  {
+   "id": "d/d13-database-move",
+   "margin": 0.5775
+  },
+  {
+   "id": "d/d14-tomato-glut",
+   "margin": 0.4275
+  },
+  {
+   "id": "d/d15-choir-venue",
+   "margin": 0.615
+  },
+  {
+   "id": "d/d16-hike-route",
+   "margin": 0.4275
+  },
+  {
+   "id": "d/d17-seed-library",
+   "margin": 0.355
+  },
+  {
+   "id": "d/d18-backup-policy",
+   "margin": 0.1725
+  },
+  {
+   "id": "d/d19-art-class-room",
+   "margin": 0.78
+  },
+  {
+   "id": "d/d20-hives-winter",
+   "margin": 0.8125
+  },
+  {
+   "id": "d/d21-print-run",
+   "margin": 0.1775
+  },
+  {
+   "id": "d/d22-clinic-vaccine",
+   "margin": 0.33
+  },
+  {
+   "id": "d/d23-seasonal-hire",
+   "margin": 0.185
+  },
+  {
+   "id": "d/d24-pantry-stock",
+   "margin": 0.2625
+  },
+  {
+   "id": "d/d25-research-dataset",
+   "margin": 0.7775
+  },
+  {
+   "id": "d/d26-tool-library",
+   "margin": 0.18
+  },
+  {
+   "id": "d/d27-pipeline-alerts",
+   "margin": 0.705
+  },
+  {
+   "id": "d/d28-cheese-ageing",
+   "margin": 0.4275
+  },
+  {
+   "id": "d/d29-airport-delay",
+   "margin": 0.4075
+  },
+  {
+   "id": "d/d30-town-festival",
+   "margin": 0.11
+  },
+  {
+   "id": "d/d31-allotment-waitlist",
+   "margin": 0.3025
+  },
+  {
+   "id": "d/d32-bakery-oven",
+   "margin": 0.61
+  },
+  {
+   "id": "d/d33-mentor-program",
+   "margin": 0.6725
+  },
+  {
+   "id": "d/d34-api-versioning",
+   "margin": 0.6825
+  },
+  {
+   "id": "d/d35-orchard-frost",
+   "margin": 0.215
+  },
+  {
+   "id": "d/d36-museum-ticketing",
+   "margin": 0.1825
+  },
+  {
+   "id": "d/d37-choir-hall-heat",
+   "margin": 1
+  },
+  {
+   "id": "d/d38-pottery-glaze",
+   "margin": 0.1275
+  },
+  {
+   "id": "d/d39-clinic-appointments",
+   "margin": 0.985
+  },
+  {
+   "id": "d/d40-shop-lease",
+   "margin": 0.7625
+  },
+  {
+   "id": "d/d41-recipe-scale",
+   "margin": 0.765
+  },
+  {
+   "id": "d/d42-dairy-breakdown",
+   "margin": 0.4875
+  },
+  {
+   "id": "d/d43-budget-cut",
+   "margin": 0.0775
+  },
+  {
+   "id": "d/d44-race-route",
+   "margin": 0.15
+  },
+  {
+   "id": "d/d45-repair-shop",
+   "margin": 0.2825
+  },
+  {
+   "id": "d/d46-cloud-costs",
+   "margin": 0.805
+  },
+  {
+   "id": "d/d47-holiday-plan",
+   "margin": 0.715
+  },
+  {
+   "id": "d/d48-press-deadline",
+   "margin": 0.1275
+  },
+  {
+   "id": "d/d49-night-class",
+   "margin": 0.72
+  },
+  {
+   "id": "d/d50-food-truck",
+   "margin": 0.445
+  },
+  {
+   "id": "d/d51-water-meter",
+   "margin": 0.1625
+  },
+  {
+   "id": "d/d52-hackathon-prize",
+   "margin": 0.6925
+  },
+  {
+   "id": "d/d53-elder-care",
+   "margin": 0.81
+  },
+  {
+   "id": "d/d54-brewery-batch",
+   "margin": 0.11
+  },
+  {
+   "id": "d/d55-coach-selection",
+   "margin": 0.9125
+  },
+  {
+   "id": "d/d56-quarry-noise",
+   "margin": 0.4325
+  },
+  {
+   "id": "d/d57-sensor-fleet",
+   "margin": 0.92
+  },
+  {
+   "id": "d/d58-sale-event",
+   "margin": 0.3025
+  },
+  {
+   "id": "d/d59-flood-plan",
+   "margin": 0.5675
+  },
+  {
+   "id": "d/d60-startup-hire",
+   "margin": 0.2375
+  },
+  {
+   "id": "d/d61-harvest-labour",
+   "margin": 0.1975
+  },
+  {
+   "id": "d/d62-menu-redesign",
+   "margin": 0.585
+  },
+  {
+   "id": "d/d63-autumn-term",
+   "margin": 0.2675
+  },
+  {
+   "id": "d/d64-lab-instrument",
+   "margin": 0.5075
+  },
+  {
+   "id": "d/d65-rink-ice",
+   "margin": 0.5325
+  },
+  {
+   "id": "d/d66-clinic-records",
+   "margin": 0.3025
+  },
+  {
+   "id": "d/d67-youth-camp",
+   "margin": 0.845
+  },
+  {
+   "id": "d/d68-network-outage",
+   "margin": 0.38
+  },
+  {
+   "id": "d/d69-estate-sale",
+   "margin": 0.1425
+  },
+  {
+   "id": "d/d70-train-timetable",
+   "margin": 0.5375
+  },
+  {
+   "id": "d/d71-farm-succession",
+   "margin": 0.0175
+  },
+  {
+   "id": "d/d72-pop-up-library",
+   "margin": 0.0775
+  },
+  {
+   "id": "d/d73-film-festival",
+   "margin": 0.695
+  },
+  {
+   "id": "d/d74-kiln-upgrade",
+   "margin": 0.175
+  },
+  {
+   "id": "d/d75-garden-club",
+   "margin": 0.49
+  },
+  {
+   "id": "d/d76-ward-rota",
+   "margin": 0.2
+  },
+  {
+   "id": "d/d77-data-retention",
+   "margin": 0.5975
+  },
+  {
+   "id": "d/d78-wedding-venue",
+   "margin": 0.235
+  },
+  {
+   "id": "d/d79-weir-repair",
+   "margin": 0.5075
+  },
+  {
+   "id": "d/d80-market-stall",
+   "margin": 0.18
+  }
+ ]
+}

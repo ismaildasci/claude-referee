@@ -106,7 +106,8 @@ A null result (all policies within noise of each other, or `wr` already at the c
 
 ## Deviations
 
-None yet.
+1. Wave 2 screening threshold: registered as mean margin < 0.10 over the 4 screening orders; the 640 screening answers showed only 16 of 160 candidates below 0.10 (49 below 0.20, 66 below 0.30). Before any pool request of wave 2, the threshold was widened to < 0.20 (49 kept) to get enough decisions. The screen only chooses which candidates enter wave 2, and its answers are used by nothing else, so the widening does not touch the policy comparison; it only means wave 2 has more clear decisions among its near-ties.
+2. The decide-best set was dropped as a duplicate of S1 (recorded in the table above before the first request).
 
 ## Extension: wave 2, more near-ties (registered after wave 1, before any wave 2 request)
 

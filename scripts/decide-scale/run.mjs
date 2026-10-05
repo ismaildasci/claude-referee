@@ -104,7 +104,7 @@ if (stage === "screen" && failed === 0) {
     const mean = names.map((n) => ps.reduce((a, p) => a + (p[n] ?? 0), 0) / ps.length).sort((a, b) => b - a);
     return { id, margin: Number((mean[0] - (mean[1] ?? 0)).toFixed(4)) };
   });
-  writeFileSync(keptPath, JSON.stringify({ rule: "kept when the mean over 4 screening orders has top-two margin < 0.10", screened: rows.length, kept: rows.filter((r) => r.margin < 0.1).map((r) => r.id), margins: rows }, null, 1) + "\n");
-  console.log(`screened ${rows.length}, kept ${rows.filter((r) => r.margin < 0.1).length}`);
+  writeFileSync(keptPath, JSON.stringify({ rule: "kept when the mean over 4 screening orders has top-two margin < 0.20", screened: rows.length, kept: rows.filter((r) => r.margin < 0.2).map((r) => r.id), margins: rows }, null, 1) + "\n");
+  console.log(`screened ${rows.length}, kept ${rows.filter((r) => r.margin < 0.2).length}`);
 }
 console.log(`done: ${sent} recorded, ${failed} failed, model ${DEFAULT_MODEL}`);
