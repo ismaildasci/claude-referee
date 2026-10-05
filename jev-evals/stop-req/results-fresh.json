@@ -1,0 +1,633 @@
+{
+ "split": "fresh",
+ "frozen": {
+  "primary": {
+   "config": "R0-W2",
+   "threshold": 0.555,
+   "dev_hard_auc": 0.531,
+   "dev_hard_best_auc": 0.531,
+   "near_best": [
+    "R0-W2",
+    "R0-W4"
+   ]
+  },
+  "secondary": {
+   "config": "R1-W2",
+   "threshold": 0.615,
+   "dev_hard_auc": 0.571,
+   "dev_hard_best_auc": 0.571,
+   "near_best": [
+    "R1-W2"
+   ]
+  },
+  "dev_failure": true,
+  "frozen_at": "2026-10-05T14:19:22.872Z"
+ },
+ "primary": {
+  "config": "R0-W2",
+  "threshold": 0.555,
+  "all": {
+   "missing": 0,
+   "summary": {
+    "wrong": 11,
+    "true": 38,
+    "tasks": 31,
+    "auc": 0.626,
+    "perm_p": 0.106671700208,
+    "boot_task_ci95": [
+     0.432,
+     0.791
+    ],
+    "boot_task_discarded": 0,
+    "boot_session_ci95": [
+     0.439,
+     0.8
+    ]
+   },
+   "within_task": {
+    "tasks": 4,
+    "auc": 0.75
+   },
+   "at_threshold": {
+    "threshold": 0.555,
+    "recall": {
+     "k": 10,
+     "n": 11,
+     "value": 0.909,
+     "ci95": [
+      0.587,
+      0.998
+     ]
+    },
+    "false_block": {
+     "k": 29,
+     "n": 38,
+     "value": 0.763,
+     "ci95": [
+      0.598,
+      0.886
+     ]
+    }
+   },
+   "vs_A": {
+    "diff": 0.083,
+    "ci95": [
+     -0.226,
+     0.372
+    ]
+   },
+   "by_model": {
+    "sonnet": {
+     "wrong": 6,
+     "true": 31,
+     "tasks": 29,
+     "auc": 0.645,
+     "perm_p": 0.1389182823
+    },
+    "haiku": {
+     "wrong": 5,
+     "true": 7,
+     "tasks": 12,
+     "auc": 0.6,
+     "perm_p": 0.305555555555
+    }
+   }
+  },
+  "hard_only": {
+   "missing": 0,
+   "summary": {
+    "wrong": 11,
+    "true": 38,
+    "tasks": 31,
+    "auc": 0.626,
+    "perm_p": 0.106671700208,
+    "boot_task_ci95": [
+     0.432,
+     0.791
+    ],
+    "boot_task_discarded": 0,
+    "boot_session_ci95": [
+     0.439,
+     0.8
+    ]
+   },
+   "within_task": {
+    "tasks": 4,
+    "auc": 0.75
+   },
+   "at_threshold": {
+    "threshold": 0.555,
+    "recall": {
+     "k": 10,
+     "n": 11,
+     "value": 0.909,
+     "ci95": [
+      0.587,
+      0.998
+     ]
+    },
+    "false_block": {
+     "k": 29,
+     "n": 38,
+     "value": 0.763,
+     "ci95": [
+      0.598,
+      0.886
+     ]
+    }
+   },
+   "vs_A": {
+    "diff": 0.083,
+    "ci95": [
+     -0.226,
+     0.372
+    ]
+   },
+   "by_model": {
+    "sonnet": {
+     "wrong": 6,
+     "true": 31,
+     "tasks": 29,
+     "auc": 0.645,
+     "perm_p": 0.1389182823
+    },
+    "haiku": {
+     "wrong": 5,
+     "true": 7,
+     "tasks": 12,
+     "auc": 0.6,
+     "perm_p": 0.305555555555
+    }
+   }
+  },
+  "asked_only": {
+   "wrong": 11,
+   "true": 37,
+   "tasks": 30,
+   "auc": 0.638,
+   "perm_p": 0.086731452214,
+   "at_threshold": {
+    "threshold": 0.555,
+    "recall": {
+     "k": 10,
+     "n": 11,
+     "value": 0.909,
+     "ci95": [
+      0.587,
+      0.998
+     ]
+    },
+    "false_block": {
+     "k": 28,
+     "n": 37,
+     "value": 0.757,
+     "ci95": [
+      0.588,
+      0.882
+     ]
+    }
+   }
+  },
+  "keyword_note": {
+   "reading_A": {
+    "threshold": 1,
+    "recall": {
+     "k": 7,
+     "n": 11,
+     "value": 0.636,
+     "ci95": [
+      0.308,
+      0.891
+     ]
+    },
+    "false_block": {
+     "k": 17,
+     "n": 38,
+     "value": 0.447,
+     "ci95": [
+      0.286,
+      0.617
+     ]
+    }
+   },
+   "reading_B": {
+    "threshold": 1,
+    "recall": {
+     "k": 11,
+     "n": 11,
+     "value": 1,
+     "ci95": [
+      0.715,
+      1
+     ]
+    },
+    "false_block": {
+     "k": 37,
+     "n": 38,
+     "value": 0.974,
+     "ci95": [
+      0.862,
+      0.999
+     ]
+    }
+   }
+  },
+  "adoption": {
+   "judged": true,
+   "rules": {
+    "P1": false,
+    "P2": false,
+    "P3": false,
+    "P4": true
+   },
+   "verdict": "does not separate on this state: the signal of the contents study needed the code"
+  }
+ },
+ "secondary": {
+  "config": "R1-W2",
+  "threshold": 0.615,
+  "all": {
+   "missing": 0,
+   "summary": {
+    "wrong": 11,
+    "true": 38,
+    "tasks": 31,
+    "auc": 0.581,
+    "perm_p": 0.211802832252,
+    "boot_task_ci95": [
+     0.395,
+     0.75
+    ],
+    "boot_task_discarded": 0,
+    "boot_session_ci95": [
+     0.405,
+     0.754
+    ]
+   },
+   "within_task": {
+    "tasks": 4,
+    "auc": 0.875
+   },
+   "at_threshold": {
+    "threshold": 0.615,
+    "recall": {
+     "k": 9,
+     "n": 11,
+     "value": 0.818,
+     "ci95": [
+      0.482,
+      0.977
+     ]
+    },
+    "false_block": {
+     "k": 28,
+     "n": 38,
+     "value": 0.737,
+     "ci95": [
+      0.569,
+      0.866
+     ]
+    }
+   },
+   "vs_A": {
+    "diff": 0.038,
+    "ci95": [
+     -0.245,
+     0.314
+    ]
+   },
+   "by_model": {
+    "sonnet": {
+     "wrong": 6,
+     "true": 31,
+     "tasks": 29,
+     "auc": 0.573,
+     "perm_p": 0.296805638717
+    },
+    "haiku": {
+     "wrong": 5,
+     "true": 7,
+     "tasks": 12,
+     "auc": 0.6,
+     "perm_p": 0.305555555555
+    }
+   }
+  },
+  "hard_only": {
+   "missing": 0,
+   "summary": {
+    "wrong": 11,
+    "true": 38,
+    "tasks": 31,
+    "auc": 0.581,
+    "perm_p": 0.211802832252,
+    "boot_task_ci95": [
+     0.395,
+     0.75
+    ],
+    "boot_task_discarded": 0,
+    "boot_session_ci95": [
+     0.405,
+     0.754
+    ]
+   },
+   "within_task": {
+    "tasks": 4,
+    "auc": 0.875
+   },
+   "at_threshold": {
+    "threshold": 0.615,
+    "recall": {
+     "k": 9,
+     "n": 11,
+     "value": 0.818,
+     "ci95": [
+      0.482,
+      0.977
+     ]
+    },
+    "false_block": {
+     "k": 28,
+     "n": 38,
+     "value": 0.737,
+     "ci95": [
+      0.569,
+      0.866
+     ]
+    }
+   },
+   "vs_A": {
+    "diff": 0.038,
+    "ci95": [
+     -0.245,
+     0.314
+    ]
+   },
+   "by_model": {
+    "sonnet": {
+     "wrong": 6,
+     "true": 31,
+     "tasks": 29,
+     "auc": 0.573,
+     "perm_p": 0.296805638717
+    },
+    "haiku": {
+     "wrong": 5,
+     "true": 7,
+     "tasks": 12,
+     "auc": 0.6,
+     "perm_p": 0.305555555555
+    }
+   }
+  },
+  "asked_only": {
+   "wrong": 11,
+   "true": 37,
+   "tasks": 30,
+   "auc": 0.596,
+   "perm_p": 0.173208054554,
+   "at_threshold": {
+    "threshold": 0.615,
+    "recall": {
+     "k": 9,
+     "n": 11,
+     "value": 0.818,
+     "ci95": [
+      0.482,
+      0.977
+     ]
+    },
+    "false_block": {
+     "k": 27,
+     "n": 37,
+     "value": 0.73,
+     "ci95": [
+      0.559,
+      0.862
+     ]
+    }
+   }
+  },
+  "keyword_note": {
+   "reading_A": {
+    "threshold": 1,
+    "recall": {
+     "k": 7,
+     "n": 11,
+     "value": 0.636,
+     "ci95": [
+      0.308,
+      0.891
+     ]
+    },
+    "false_block": {
+     "k": 17,
+     "n": 38,
+     "value": 0.447,
+     "ci95": [
+      0.286,
+      0.617
+     ]
+    }
+   },
+   "reading_B": {
+    "threshold": 1,
+    "recall": {
+     "k": 11,
+     "n": 11,
+     "value": 1,
+     "ci95": [
+      0.715,
+      1
+     ]
+    },
+    "false_block": {
+     "k": 37,
+     "n": 38,
+     "value": 0.974,
+     "ci95": [
+      0.862,
+      0.999
+     ]
+    }
+   }
+  },
+  "adoption": {
+   "judged": true,
+   "rules": {
+    "P1": false,
+    "P2": false,
+    "P3": false,
+    "P4": true
+   },
+   "verdict": "does not separate on this state: the signal of the contents study needed the code"
+  }
+ },
+ "baseline_A": {
+  "all": {
+   "summary": {
+    "wrong": 11,
+    "true": 38,
+    "tasks": 31,
+    "auc": 0.543,
+    "perm_p": 0.334961813336,
+    "boot_task_ci95": [
+     0.342,
+     0.728
+    ],
+    "boot_task_discarded": 0,
+    "boot_session_ci95": [
+     0.339,
+     0.733
+    ]
+   },
+   "at_threshold": {
+    "threshold": 0.555,
+    "recall": {
+     "k": 11,
+     "n": 11,
+     "value": 1,
+     "ci95": [
+      0.715,
+      1
+     ]
+    },
+    "false_block": {
+     "k": 37,
+     "n": 38,
+     "value": 0.974,
+     "ci95": [
+      0.862,
+      0.999
+     ]
+    }
+   },
+   "shipped_would_block": {
+    "threshold": 1,
+    "recall": {
+     "k": 10,
+     "n": 11,
+     "value": 0.909,
+     "ci95": [
+      0.587,
+      0.998
+     ]
+    },
+    "false_block": {
+     "k": 35,
+     "n": 38,
+     "value": 0.921,
+     "ci95": [
+      0.786,
+      0.983
+     ]
+    }
+   }
+  },
+  "hard_only": {
+   "summary": {
+    "wrong": 11,
+    "true": 38,
+    "tasks": 31,
+    "auc": 0.543,
+    "perm_p": 0.334961813336,
+    "boot_task_ci95": [
+     0.342,
+     0.728
+    ],
+    "boot_task_discarded": 0,
+    "boot_session_ci95": [
+     0.339,
+     0.733
+    ]
+   },
+   "at_threshold": {
+    "threshold": 0.555,
+    "recall": {
+     "k": 11,
+     "n": 11,
+     "value": 1,
+     "ci95": [
+      0.715,
+      1
+     ]
+    },
+    "false_block": {
+     "k": 37,
+     "n": 38,
+     "value": 0.974,
+     "ci95": [
+      0.862,
+      0.999
+     ]
+    }
+   },
+   "shipped_would_block": {
+    "threshold": 1,
+    "recall": {
+     "k": 10,
+     "n": 11,
+     "value": 0.909,
+     "ci95": [
+      0.587,
+      0.998
+     ]
+    },
+    "false_block": {
+     "k": 35,
+     "n": 38,
+     "value": 0.921,
+     "ci95": [
+      0.786,
+      0.983
+     ]
+    }
+   }
+  }
+ },
+ "keyword_note": {
+  "reading_A": {
+   "threshold": 1,
+   "recall": {
+    "k": 7,
+    "n": 11,
+    "value": 0.636,
+    "ci95": [
+     0.308,
+     0.891
+    ]
+   },
+   "false_block": {
+    "k": 17,
+    "n": 38,
+    "value": 0.447,
+    "ci95": [
+     0.286,
+     0.617
+    ]
+   }
+  },
+  "reading_B": {
+   "threshold": 1,
+   "recall": {
+    "k": 11,
+    "n": 11,
+    "value": 1,
+    "ci95": [
+     0.715,
+     1
+    ]
+   },
+   "false_block": {
+    "k": 37,
+    "n": 38,
+    "value": 0.974,
+    "ci95": [
+     0.862,
+     0.999
+    ]
+   }
+  }
+ },
+ "requests": 245
+}
