@@ -177,9 +177,9 @@ function rowsFor(cfg, splitName, rep = 1, filter = () => true) {
   return { rows, missing, total: sessions.length, mean_chars: rows.length ? Math.round(chars / rows.length) : 0 };
 }
 
-function devTable(cfgList) {
+function devTable(cfgList, filter = () => true) {
   return cfgList.map((cfg) => {
-    const { rows, missing, total, mean_chars } = rowsFor(cfg, "dev");
+    const { rows, missing, total, mean_chars } = rowsFor(cfg, "dev", 1, filter);
     const s = summarizeRows(rows, { withBootstrap: false });
     return { config: cfg.id, auc: s.auc, perm_p: s.perm_p, wrong: s.wrong, true: s.true, missing, total, error_rate: total ? Math.round((missing / total) * 1000) / 1000 : null, mean_chars };
   });
@@ -266,7 +266,7 @@ else if (cmd === "run") {
 } else if (cmd === "report") {
   const split = flag("--split", "dev");
   const ids = flag("--configs", "all") === "all" ? configs().map((c) => c.id) : flag("--configs").split(",");
-  if (split === "dev" && flag("--configs", "all") === "all") console.log(JSON.stringify(devTable(configs()), null, 1));
+  if (split === "dev" && flag("--configs", "all") === "all") console.log(JSON.stringify(devTable(configs(), rest.includes("--hard") ? (s) => s.study === "hard" : undefined), null, 1));
   else for (const id of ids) console.log(JSON.stringify(report(configs().find((c) => c.id === id), split, flag("--threshold") === undefined ? undefined : Number(flag("--threshold"))), null, 1));
 } else if (cmd === "holdout") await holdout(studies);
 else {
