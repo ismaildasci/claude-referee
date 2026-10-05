@@ -1,0 +1,24 @@
+{
+  "exp.meets_requirements_1": {
+    "type": "noul",
+    "instructions": {
+      "question": "Does the code in `changes` implement every requirement stated in `task` (and in `requirements`, when that field is present)?",
+      "note": "Read each stated requirement and check it against the code in `changes`: edge cases, ordering, boundaries, defaults and error handling count. Judge by the code, not by what `final_message` says it does."
+    },
+    "criteria": {
+      "true": "Every stated requirement is implemented by the code shown.",
+      "false": "At least one stated requirement is missing, or is implemented differently from what is stated."
+    }
+  },
+  "exp.requirement_gap_2": {
+    "type": "noul",
+    "instructions": {
+      "question": "Is there a requirement stated in `task` (or in `requirements`, when that field is present) that the code in `changes` does not implement, or implements differently from what is stated?",
+      "note": "Go through the stated requirements one at a time against the code in `changes`: edge cases, ordering, boundaries, defaults and error handling count. Judge by the code, not by what `final_message` says it does."
+    },
+    "criteria": {
+      "true": "At least one stated requirement is missing, or is implemented differently from what is stated.",
+      "false": "Every stated requirement is implemented by the code shown."
+    }
+  }
+}

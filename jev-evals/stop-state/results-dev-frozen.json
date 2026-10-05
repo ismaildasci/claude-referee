@@ -1,0 +1,217 @@
+{
+ "config": "ES1-2000",
+ "split": "dev",
+ "missing": 0,
+ "overall": {
+  "wrong": 7,
+  "true": 85,
+  "tasks": 27,
+  "auc": 0.929,
+  "perm_p": 0.000007352845,
+  "boot_task_ci95": [
+   0.825,
+   0.989
+  ],
+  "boot_task_discarded": 8,
+  "boot_session_ci95": [
+   0.867,
+   0.978
+  ]
+ },
+ "at_threshold": {
+  "threshold": 0.47,
+  "recall": {
+   "k": 6,
+   "n": 7,
+   "value": 0.857,
+   "ci95": [
+    0.421,
+    0.996
+   ]
+  },
+  "false_block": {
+   "k": 8,
+   "n": 85,
+   "value": 0.094,
+   "ci95": [
+    0.042,
+    0.177
+   ]
+  }
+ },
+ "asked_only": {
+  "wrong": 7,
+  "true": 80,
+  "tasks": 27,
+  "auc": 0.925,
+  "perm_p": 0.000011029449,
+  "at_threshold": {
+   "threshold": 0.47,
+   "recall": {
+    "k": 6,
+    "n": 7,
+    "value": 0.857,
+    "ci95": [
+     0.421,
+     0.996
+    ]
+   },
+   "false_block": {
+    "k": 8,
+    "n": 80,
+    "value": 0.1,
+    "ci95": [
+     0.044,
+     0.188
+    ]
+   }
+  }
+ },
+ "hard_only": {
+  "wrong": 7,
+  "true": 25,
+  "tasks": 15,
+  "auc": 0.76,
+  "perm_p": 0.018491581339,
+  "at_threshold": {
+   "threshold": 0.47,
+   "recall": {
+    "k": 6,
+    "n": 7,
+    "value": 0.857,
+    "ci95": [
+     0.421,
+     0.996
+    ]
+   },
+   "false_block": {
+    "k": 8,
+    "n": 25,
+    "value": 0.32,
+    "ci95": [
+     0.149,
+     0.535
+    ]
+   }
+  }
+ }
+}
+{
+ "config": "A",
+ "split": "dev",
+ "missing": 0,
+ "overall": {
+  "wrong": 7,
+  "true": 85,
+  "tasks": 27,
+  "auc": 0.295,
+  "perm_p": 0.966453487867,
+  "boot_task_ci95": [
+   0.153,
+   0.443
+  ],
+  "boot_task_discarded": 8,
+  "boot_session_ci95": [
+   0.144,
+   0.461
+  ]
+ },
+ "at_threshold": {
+  "threshold": 0.47,
+  "recall": {
+   "k": 7,
+   "n": 7,
+   "value": 1,
+   "ci95": [
+    0.59,
+    1
+   ]
+  },
+  "false_block": {
+   "k": 80,
+   "n": 85,
+   "value": 0.941,
+   "ci95": [
+    0.868,
+    0.981
+   ]
+  }
+ },
+ "asked_only": {
+  "wrong": 7,
+  "true": 80,
+  "tasks": 27,
+  "auc": 0.251,
+  "perm_p": 0.9876435212,
+  "at_threshold": {
+   "threshold": 0.47,
+   "recall": {
+    "k": 7,
+    "n": 7,
+    "value": 1,
+    "ci95": [
+     0.59,
+     1
+    ]
+   },
+   "false_block": {
+    "k": 80,
+    "n": 80,
+    "value": 1,
+    "ci95": [
+     0.955,
+     1
+    ]
+   }
+  }
+ },
+ "hard_only": {
+  "wrong": 7,
+  "true": 25,
+  "tasks": 15,
+  "auc": 0.303,
+  "perm_p": 0.945778131922,
+  "at_threshold": {
+   "threshold": 0.47,
+   "recall": {
+    "k": 7,
+    "n": 7,
+    "value": 1,
+    "ci95": [
+     0.59,
+     1
+    ]
+   },
+   "false_block": {
+    "k": 25,
+    "n": 25,
+    "value": 1,
+    "ci95": [
+     0.863,
+     1
+    ]
+   }
+  }
+ },
+ "shipped_would_block": {
+  "threshold": 1,
+  "recall": {
+   "k": 7,
+   "n": 7,
+   "value": 1,
+   "ci95": [
+    0.59,
+    1
+   ]
+  },
+  "false_block": {
+   "k": 79,
+   "n": 85,
+   "value": 0.929,
+   "ci95": [
+    0.853,
+    0.974
+   ]
+  }
+ }
+}

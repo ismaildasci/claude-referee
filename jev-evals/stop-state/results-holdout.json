@@ -1,0 +1,306 @@
+{
+ "frozen": {
+  "config": "ES1-2000",
+  "threshold": 0.47,
+  "dev_auc": 0.929,
+  "dev_best_auc": 0.936,
+  "near_best": [
+   "ES1-2000",
+   "ES2-2000"
+  ],
+  "dev_failure": false,
+  "frozen_at": "2026-10-05T13:49:05.425Z"
+ },
+ "chosen": {
+  "config": "ES1-2000",
+  "split": "holdout",
+  "missing": 0,
+  "overall": {
+   "wrong": 9,
+   "true": 86,
+   "tasks": 27,
+   "auc": 0.867,
+   "perm_p": 0.000047826664,
+   "boot_task_ci95": [
+    0.748,
+    0.959
+   ],
+   "boot_task_discarded": 19,
+   "boot_session_ci95": [
+    0.761,
+    0.954
+   ]
+  },
+  "at_threshold": {
+   "threshold": 0.47,
+   "recall": {
+    "k": 6,
+    "n": 9,
+    "value": 0.667,
+    "ci95": [
+     0.299,
+     0.925
+    ]
+   },
+   "false_block": {
+    "k": 15,
+    "n": 86,
+    "value": 0.174,
+    "ci95": [
+     0.101,
+     0.271
+    ]
+   }
+  },
+  "asked_only": {
+   "wrong": 8,
+   "true": 72,
+   "tasks": 26,
+   "auc": 0.828,
+   "perm_p": 0.000727755721,
+   "at_threshold": {
+    "threshold": 0.47,
+    "recall": {
+     "k": 5,
+     "n": 8,
+     "value": 0.625,
+     "ci95": [
+      0.245,
+      0.915
+     ]
+    },
+    "false_block": {
+     "k": 15,
+     "n": 72,
+     "value": 0.208,
+     "ci95": [
+      0.122,
+      0.32
+     ]
+    }
+   }
+  },
+  "hard_only": {
+   "wrong": 8,
+   "true": 28,
+   "tasks": 15,
+   "auc": 0.643,
+   "perm_p": 0.115901671957,
+   "at_threshold": {
+    "threshold": 0.47,
+    "recall": {
+     "k": 5,
+     "n": 8,
+     "value": 0.625,
+     "ci95": [
+      0.245,
+      0.915
+     ]
+    },
+    "false_block": {
+     "k": 13,
+     "n": 28,
+     "value": 0.464,
+     "ci95": [
+      0.275,
+      0.661
+     ]
+    }
+   }
+  }
+ },
+ "baseline": {
+  "config": "A",
+  "split": "holdout",
+  "missing": 0,
+  "overall": {
+   "wrong": 9,
+   "true": 86,
+   "tasks": 27,
+   "auc": 0.553,
+   "perm_p": 0.303786698562,
+   "boot_task_ci95": [
+    0.361,
+    0.848
+   ],
+   "boot_task_discarded": 19,
+   "boot_session_ci95": [
+    0.323,
+    0.78
+   ]
+  },
+  "at_threshold": {
+   "threshold": 0.47,
+   "recall": {
+    "k": 8,
+    "n": 9,
+    "value": 0.889,
+    "ci95": [
+     0.518,
+     0.997
+    ]
+   },
+   "false_block": {
+    "k": 72,
+    "n": 86,
+    "value": 0.837,
+    "ci95": [
+     0.742,
+     0.908
+    ]
+   }
+  },
+  "asked_only": {
+   "wrong": 8,
+   "true": 72,
+   "tasks": 26,
+   "auc": 0.542,
+   "perm_p": 0.353740058941,
+   "at_threshold": {
+    "threshold": 0.47,
+    "recall": {
+     "k": 8,
+     "n": 8,
+     "value": 1,
+     "ci95": [
+      0.631,
+      1
+     ]
+    },
+    "false_block": {
+     "k": 72,
+     "n": 72,
+     "value": 1,
+     "ci95": [
+      0.95,
+      1
+     ]
+    }
+   }
+  },
+  "hard_only": {
+   "wrong": 8,
+   "true": 28,
+   "tasks": 15,
+   "auc": 0.471,
+   "perm_p": 0.601431940288,
+   "at_threshold": {
+    "threshold": 0.47,
+    "recall": {
+     "k": 7,
+     "n": 8,
+     "value": 0.875,
+     "ci95": [
+      0.473,
+      0.997
+     ]
+    },
+    "false_block": {
+     "k": 28,
+     "n": 28,
+     "value": 1,
+     "ci95": [
+      0.877,
+      1
+     ]
+    }
+   }
+  },
+  "shipped_would_block": {
+   "threshold": 1,
+   "recall": {
+    "k": 8,
+    "n": 9,
+    "value": 0.889,
+    "ci95": [
+     0.518,
+     0.997
+    ]
+   },
+   "false_block": {
+    "k": 71,
+    "n": 86,
+    "value": 0.826,
+    "ci95": [
+     0.729,
+     0.899
+    ]
+   }
+  }
+ },
+ "keyword_note": {
+  "reading_A": {
+   "threshold": 1,
+   "recall": {
+    "k": 5,
+    "n": 9,
+    "value": 0.556,
+    "ci95": [
+     0.212,
+     0.863
+    ]
+   },
+   "false_block": {
+    "k": 49,
+    "n": 86,
+    "value": 0.57,
+    "ci95": [
+     0.458,
+     0.676
+    ]
+   }
+  },
+  "reading_B": {
+   "threshold": 1,
+   "recall": {
+    "k": 8,
+    "n": 9,
+    "value": 0.889,
+    "ci95": [
+     0.518,
+     0.997
+    ]
+   },
+   "false_block": {
+    "k": 72,
+    "n": 86,
+    "value": 0.837,
+    "ci95": [
+     0.742,
+     0.908
+    ]
+   }
+  },
+  "gate_recorded_where_asked": {
+   "threshold": 1,
+   "recall": {
+    "k": 8,
+    "n": 8,
+    "value": 1,
+    "ci95": [
+     0.631,
+     1
+    ]
+   },
+   "false_block": {
+    "k": 71,
+    "n": 72,
+    "value": 0.986,
+    "ci95": [
+     0.925,
+     1
+    ]
+   }
+  }
+ },
+ "adoption": {
+  "rules": {
+   "R1": true,
+   "R2": true,
+   "R3": false,
+   "R4": true,
+   "R5": true
+  },
+  "verdict": "separates, but not usefully"
+ }
+}

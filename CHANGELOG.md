@@ -6,12 +6,22 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- Stop gate state study (`docs/decisions/stop-state-design.md`, `docs/measurements-stop-state.md`, harness `scripts/stop-state/`, recorded answers `jev-evals/stop-state/`): giving Jev the edit contents and a question about the task's requirements separates wrong from true dones (hold-out AUC 0.867, task-clustered interval 0.748 to 0.959, against 0.553 for the current gate state), but at the threshold frozen on dev recall is 6 of 9 (bar 0.8) and the hard-task-only AUC is 0.643, so the registered adoption rule fails on recall: separates, but not usefully. 2 674 Jev requests, about 0.11 USD. Nothing shipped changes; the experimental questions are in a pack that is not shipped.
+
+## [0.2.1] - 2026-10-05
+
+What changed in the measurements: `done` v2 was scored on 229 real GitHub Actions step logs from 94 repositories with Jev's answers. The first scoring (before any change) failed both registered bars: 2 wrong `met` of 76 and `met` recall among parsed logs 33 of 44 (0.75). This release adds a skip-marker cap and parsers for ninja, MSBuild, `docker build`, maven, swift and `cargo build`, written from the dev half only; afterwards wrong `met` is 0 of 76 and `met` recall among parsed logs is 65 of 75 (0.867), still under the 0.9 bar, so `done` v2 stays "not measured" on its old bar. The zero was reached by rules designed from two dev cases, so it is not a pass; the frozen hold-out half was looked at twice (the second look is stated as such) and one expected-`met` hold-out case regressed from `met` to `missing`. Exit-code-only evidence still almost never gets `met` by design. The plugin name `claude-referee` remains flagged as reserved by the Claude Code validator; CI tolerates only that error.
+
+### Added
+
 - Measured `done` v2 on the 229-case real CI log sample with Jev's answers (recorded 2026-10-05): wrong `met` 2 of 76 and `met` recall among parsed logs 33 of 44, so both registered bars failed; the frozen hold-out half has 0 wrong `met` of 33. The two wrong `met` are logs where skips show outside the parsed summary. Scored table and recorded answers are in `docs/data/done-v2-real/`; no log text is committed.
 - `done` parsers for `ninja` (`cmake --build`), MSBuild (`dotnet build`), `docker build` (BuildKit plain progress), `maven`, `swift build` and `swift test` (XCTest and Swift Testing), the VSTest summary of `dotnet test`, and `make` errors (failed or ignored), written from dev-half real logs and the tools' own formats; a missing completion marker, an error or a cut-off log never reaches `met` ([decision](docs/decisions/native-build-parsers.md)). Five sent cases of `done-v2-h2`, `h4` and `h5` were re-recorded because their facts changed.
 - Re-derived the real-log sample after the skip fix and the parsers (`docs/data/done-v2-real/after-parsers/`): wrong `met` 0 of 76, `met` recall among parsed 61 of 75 = 0.81 (bar 0.9, still failed; hold-out 28 of 38, parsed coverage 50.8% against 34.2%). Designed from the dev half, the hold-out is a regression check, not a clean test; `done` v2 stays not measured on the old bar.
+- `done` parser for `cargo build` and `cargo check` gets a positive marker: the `Finished` line (strict shape, no error, no output after it, no chained command) goes to Jev as the summary; a missing, cut-off or chained build is `incomplete` and capped at `unsure`; cargo test, nextest and clippy logs keep their parsers ([decision](docs/decisions/cargo-build-marker.md)). Real-log sample re-derived (`docs/data/done-v2-real/after-parsers/cargo-build/`): wrong `met` 0 of 76, `met` recall among parsed 65 of 75 = 0.87 (dev 36 of 37, hold-out 29 of 38 on a second look, not an unseen test; one hold-out `met` was lost to the new guards); bar 0.9 still failed.
 
 ### Changed
 
+- The clippy parser no longer claims verbose `cargo build` or `cargo test` logs because of `--warn=clippy::...` rustc lint flags (two dev logs were wrongly claimed).
 - `done` caps `met` at `unsure` (`skipped_tests`) on a skip, pending, xfail or todo marker anywhere in the log (nested reporters, earlier summaries, unrecognised runners), not only in the parsed summary; the two wrong `met` of the real-log sample are gone, no other recorded case changed ([decision](docs/decisions/skip-markers-beyond-summary.md)).
 - The package is on npm (`claude-referee@0.2.0`): `npx claude-referee` works, and the README no longer carries the "Not on npm yet" warning or the tarball alias.
 

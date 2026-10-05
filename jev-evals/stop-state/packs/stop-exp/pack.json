@@ -1,0 +1,6 @@
+{
+  "name": "stop-exp",
+  "version": "0.1.0",
+  "model": "jev-1.13.0",
+  "description": "Experimental questions of the stop-state study (docs/decisions/stop-state-design.md). Not shipped in the plugin."
+}
