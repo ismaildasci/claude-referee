@@ -1,0 +1,23 @@
+{
+ "primary": {
+  "config": "R0-W2",
+  "threshold": 0.555,
+  "dev_hard_auc": 0.531,
+  "dev_hard_best_auc": 0.531,
+  "near_best": [
+   "R0-W2",
+   "R0-W4"
+  ]
+ },
+ "secondary": {
+  "config": "R1-W2",
+  "threshold": 0.615,
+  "dev_hard_auc": 0.571,
+  "dev_hard_best_auc": 0.571,
+  "near_best": [
+   "R1-W2"
+  ]
+ },
+ "dev_failure": true,
+ "frozen_at": "2026-10-05T14:19:22.872Z"
+}
