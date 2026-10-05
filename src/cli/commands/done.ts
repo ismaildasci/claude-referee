@@ -3,6 +3,7 @@
 // A non-zero exit code in the evidence is missing without a request; skipped, risky or incomplete tests, or a skip marker anywhere in the log, cap met at unsure.
 // Exit-code-only evidence for a lint or clean criterion that shows a warning, notice, failure or skip message, or a swallowed exit code, is capped at unsure.
 // A parsed run that is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion with parsed warnings, is capped the same way.
+// Expected failures (known issues) cap met like skips; a test criterion backed only by build runners (no test results) is capped as no tests run.
 
 import type { EntryType, Questions } from "@typesafe-ai/sdk";
 import { RefereeError } from "../../engine/errors.ts";
@@ -25,14 +26,20 @@ export function doneEvidence(text: string): string {
   return clip(stripAnsi(text), 2_000, 12_000);
 }
 
-const SKIPPED_NEXT = "Some tests were skipped, risky or incomplete, so done won't say met. Look at them: if they are expected (a platform-only test), say so yourself; otherwise run the skipped ones.";
+const SKIPPED_NEXT = "Some tests were skipped, risky, incomplete or ended in an expected failure (a known issue), so done won't say met. Look at them: if they are expected (a platform-only test), say so yourself; otherwise run the skipped ones.";
 const NO_TESTS = /\b(?:no tests? (?:to run|found|were found|executed|ran|collected|matched)|0 tests? (?:run|ran|executed|collected|found|completed)|tests? run: 0(?!\d)|nothing to run)/i;
 const INCOMPLETE_NEXT = "The run is cut off, empty, cancelled, flaky or changed files, so done won't say met. Run the full check again and pipe all of its output in.";
 const NO_TESTS_NEXT = "The log itself says no tests ran, so done won't say met. Run the tests that were meant to run and pipe their output in.";
+const BUILD_ONLY_NEXT = "The log shows only a build (no test results), and the criterion is about tests, so done won't say met. Run the tests and pipe their output in.";
+const TEST_CRITERION = /\b(?:tests?|testing|test suites?|specs?)\b/i;
 const SKIP_WORDS = /^OK, but .*\b(?:incomplete|skipped|risky)\b/i;
 
 function hasSkips(parsed: ParsedEvidence, evidence: string): boolean {
-  return parsed.runners.some((r) => r.skipped > 0 || (r.summary_line !== null && SKIP_WORDS.test(r.summary_line))) || skipMarkers(evidence).length > 0;
+  return parsed.runners.some((r) => r.skipped > 0 || (r.expected_failures ?? 0) > 0 || (r.summary_line !== null && SKIP_WORDS.test(r.summary_line))) || skipMarkers(evidence).length > 0;
+}
+
+function onlyBuilds(parsed: ParsedEvidence): boolean {
+  return parsed.runners.length > 0 && parsed.runners.every((r) => r.build_only === true);
 }
 
 function hasIncomplete(parsed: ParsedEvidence): boolean {
@@ -64,7 +71,7 @@ export function hasProblemMessage(evidence: string): boolean {
 }
 
 function factsOf(parsed: ParsedEvidence): Record<string, unknown> {
-  return { trust: parsed.trust, exit_code: parsed.exit_code, exit_lines: parsed.exit_lines, runners: parsed.runners, conflict: parsed.conflict, lines: parsed.lines };
+  return { trust: parsed.trust, exit_code: parsed.exit_code, exit_lines: parsed.exit_lines, runners: parsed.runners.map(({ build_only: _buildOnly, ...r }) => r), conflict: parsed.conflict, lines: parsed.lines };
 }
 
 export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, criteria: readonly string[], evidence: string): { planned: Planned[]; finish: (outcomes: Outcome[]) => Result } {
@@ -95,11 +102,13 @@ export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, crit
       const p = answer?.type === "noul" ? answer.noul : 0;
       const raw: Verdict = p >= met ? "met" : p < missing ? "missing" : "unsure";
       const skipCap = raw === "met" && hasSkips(parsed, evidence);
-      const noTestsCap = raw === "met" && NO_TESTS.test(evidence);
+      const logSaysNoTests = NO_TESTS.test(evidence);
+      const buildCap = raw === "met" && !logSaysNoTests && onlyBuilds(parsed) && TEST_CRITERION.test(criterion);
+      const noTestsCap = raw === "met" && (logSaysNoTests || buildCap);
       const incompleteCap = raw === "met" && hasIncomplete(parsed);
       const warningCap = raw === "met" && warnCap && CLEAN_CRITERION.test(criterion);
       const verdict: Verdict = raw === "met" && (parsed.trust === "unparsed" || parsed.conflict || skipCap || noTestsCap || incompleteCap || warningCap) ? "unsure" : raw;
-      return { i: i + 1, verdict, p, skipCap, noTestsCap, incompleteCap, warningCap };
+      return { i: i + 1, verdict, p, skipCap, noTestsCap, buildCap, incompleteCap, warningCap };
     });
     const settled = per.every((c) => c.verdict !== "missing") && parsed.trust !== "unparsed" && !parsed.conflict;
     const noTestsCapped = settled && per.some((c) => c.noTestsCap);
@@ -116,7 +125,7 @@ export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, crit
       ...(parsed.runners.length > 0 ? { runners: parsed.runners.map((r) => ({ runner: r.runner, passed: r.passed, failed: r.failed, errors: r.errors, skipped: r.skipped })) } : {}),
       ...(noTestsCapped && verdict === "unsure" ? { reason: "no_tests_run" } : skipCapped && verdict === "unsure" ? { reason: "skipped_tests" } : incompleteCapped && verdict === "unsure" ? { reason: "incomplete_run" } : warningCapped && verdict === "unsure" ? { reason: "warning_in_log" } : {}),
       ...(per.length > 1 ? { criteria: per.map(({ i, verdict: v, p: pp }) => ({ i, verdict: v, p: pp })) } : {}),
-      next_step: verdict === "met" ? undefined : noTestsCapped && verdict === "unsure" ? NO_TESTS_NEXT : skipCapped && verdict === "unsure" ? SKIPPED_NEXT : incompleteCapped && verdict === "unsure" ? INCOMPLETE_NEXT : warningCapped && verdict === "unsure" ? WARNING_NEXT : parsed.trust === "unparsed" && per.every((c) => c.verdict !== "missing") ? UNPARSED_NEXT : NEXT[verdict],
+      next_step: verdict === "met" ? undefined : noTestsCapped && verdict === "unsure" ? (per.some((c) => c.noTestsCap && !c.buildCap) ? NO_TESTS_NEXT : BUILD_ONLY_NEXT) : skipCapped && verdict === "unsure" ? SKIPPED_NEXT : incompleteCapped && verdict === "unsure" ? INCOMPLETE_NEXT : warningCapped && verdict === "unsure" ? WARNING_NEXT : parsed.trust === "unparsed" && per.every((c) => c.verdict !== "missing") ? UNPARSED_NEXT : NEXT[verdict],
     };
   };
   const state = (parsed.trust === "unparsed" ? { evidence } : { evidence: factsOf(parsed) }) as EntryType;
@@ -135,7 +144,7 @@ export const done: Command = {
       verdict: "met, unsure or missing; the lowest across criteria",
       trust: "parsed (a runner summary was recognised), exit_code (only an exit code line) or unparsed (met is not possible)",
       runners: "Parsed counts per recognised runner",
-      reason: "exit_code_nonzero when the evidence has a non-zero exit code (missing, Jev not asked); skipped_tests, no_tests_run, incomplete_run or warning_in_log when met was capped at unsure because tests were skipped, risky or incomplete, the log says no tests ran, the parsed run is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion has a warning behind it (parsed, or in a log with only an exit code)",
+      reason: "exit_code_nonzero when the evidence has a non-zero exit code (missing, Jev not asked); skipped_tests, no_tests_run, incomplete_run or warning_in_log when met was capped at unsure because tests were skipped, risky, incomplete or ended in an expected failure (a known issue), the log says no tests ran or shows only a build for a test criterion, the parsed run is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion has a warning behind it (parsed, or in a log with only an exit code)",
       p: "Lowest probability that a criterion holds",
       criteria: "Per criterion, by position, when more than one",
       next_step: "Only when not met",

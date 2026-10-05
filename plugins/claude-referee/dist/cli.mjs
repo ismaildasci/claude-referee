@@ -2501,12 +2501,14 @@ function mk(runner, counts3, failing, summary, incomplete) {
     errors: counts3.errors ?? 0,
     skipped: counts3.skipped ?? 0,
     ...counts3.warnings === void 0 ? {} : { warnings: counts3.warnings },
+    ...counts3.expected_failures === void 0 || counts3.expected_failures === 0 ? {} : { expected_failures: counts3.expected_failures },
     ...incomplete ? { incomplete: true } : {},
     failing: [...failing].slice(0, MAX_FAILING2).map((n) => clip2(n, MAX_NAME2)),
     summary_line: summary === null ? null : clip2(summary, MAX_SUMMARY2)
   };
 }
 __name(mk, "mk");
+var buildOnly = /* @__PURE__ */ __name((facts3) => ({ ...facts3, build_only: true }), "buildOnly");
 function exitCodes(lines3) {
   const out = [];
   for (const line of lines3) {
@@ -2588,7 +2590,7 @@ var nextBuild = {
       else if (NEXT_WARNING.test(line)) warnings++;
       else if (/Compiled successfully/.test(line)) compiled = line;
     }
-    return mk("next build", { errors, warnings }, [], errors > 0 ? null : route ?? compiled, route === null && errors === 0);
+    return buildOnly(mk("next build", { errors, warnings }, [], errors > 0 ? null : route ?? compiled, route === null && errors === 0));
   }
 };
 var NIX_CMD = /\bnix(?:-build| build| flake check| flake build| develop)\b|\bnixos-rebuild\b/;
@@ -2602,7 +2604,7 @@ var nix = {
     const errorLines = lines3.filter((l) => /^\s*error:(?:\s|$)/.test(l));
     const warnings = lines3.filter((l) => /^warning: /.test(l)).length;
     const codes = exitCodes(lines3);
-    return mk("nix build", { errors: errorLines.length, warnings }, [], errorLines[0] ?? null, errorLines.length === 0 && codes.length === 0);
+    return buildOnly(mk("nix build", { errors: errorLines.length, warnings }, [], errorLines[0] ?? null, errorLines.length === 0 && codes.length === 0));
   }
 };
 var parsers2 = [biome, nextBuild, nix];
@@ -3022,7 +3024,7 @@ var viteParser = {
       else if (VITE_ERROR.test(line)) errors++;
       else if (VITE_WARN.test(line)) warnings++;
     }
-    return { runner: "vite", passed: 0, failed: 0, errors, skipped: 0, warnings, failing: [], summary_line: errors > 0 ? null : built };
+    return { runner: "vite", passed: 0, failed: 0, errors, skipped: 0, warnings, build_only: true, failing: [], summary_line: errors > 0 ? null : built };
   }
 };
 var NEXTEST_MARK = /\bcargo[- ]nextest\b|^\s*Nextest run ID \S+ with nextest profile|^\s*Starting \d+ tests? across \d+ binar|^\s*Summary \[\s*[\d.]+s\] .*\btests? run:|test --no-run --message-format json-render-diagnostics/;
@@ -3077,7 +3079,7 @@ var cargoBuild = {
     const composite = echoes.some((c) => CARGO_BUILD_CMD.test(c) && CARGO_COMPOSITE.test(c));
     const trailing = lastFinished >= 0 && lines3.slice(lastFinished + 1).some((l) => !CARGO_TRAILING.test(l));
     const complete = finished && !composite && !trailing;
-    const facts3 = { runner: "cargo build", passed: 0, failed: 0, errors, skipped: 0, warnings: Math.max(generated, headers), ...complete || errors > 0 ? {} : { incomplete: true }, failing: [], summary_line: complete && errors === 0 ? clip4(lines3[lastFinished], MAX_SUMMARY4) : summary };
+    const facts3 = { runner: "cargo build", passed: 0, failed: 0, errors, skipped: 0, warnings: Math.max(generated, headers), build_only: true, ...complete || errors > 0 ? {} : { incomplete: true }, failing: [], summary_line: complete && errors === 0 ? clip4(lines3[lastFinished], MAX_SUMMARY4) : summary };
     return facts3;
   }
 };
@@ -3119,7 +3121,7 @@ var ninja = {
     const total = Number(status?.[2] ?? 0);
     const installTail = status !== null && n === total - 1 && /^Install the project\.\.\./.test(status[3]) && lines3.slice(statusIndex + 1).some((l) => /^-- Install configuration:/.test(l));
     const complete = noWork || status !== null && total > 0 && (n === total || installTail);
-    return mk("ninja", { passed: noWork ? 0 : status === null ? 0 : n, errors, warnings }, [], status === null ? "ninja: no work to do." : status[0], errors === 0 && !complete);
+    return buildOnly(mk("ninja", { passed: noWork ? 0 : status === null ? 0 : n, errors, warnings }, [], status === null ? "ninja: no work to do." : status[0], errors === 0 && !complete));
   }
 };
 var MSB_OK = /^\s*Build succeeded\.\s*$/;
@@ -3160,7 +3162,7 @@ var msbuild = {
     if (ok === 0 && !failed && errorDiags.size === 0) return null;
     const errors = Math.max(errorCount, errorDiags.size, failed ? 1 : 0);
     const warnings = Math.max(warningCount, warningDiags.size);
-    return mk("msbuild", { passed: ok, errors, warnings }, errorDiags, summary, ok === 0 && errors === 0);
+    return buildOnly(mk("msbuild", { passed: ok, errors, warnings }, errorDiags, summary, ok === 0 && errors === 0));
   }
 };
 var DK_DONE = /^#(\d+) (?:DONE \d[\d.]*s|CACHED)\s*$/;
@@ -3198,7 +3200,7 @@ var docker = {
     }
     if (done2.size === 0 || !hasVertex) return null;
     const exported = [...exporting].some((id) => done2.has(id));
-    return mk("docker build", { passed: done2.size, errors: errors + canceled, warnings }, [], errors > 0 ? null : lastDone, errors + canceled === 0 && !exported);
+    return buildOnly(mk("docker build", { passed: done2.size, errors: errors + canceled, warnings }, [], errors > 0 ? null : lastDone, errors + canceled === 0 && !exported));
   }
 };
 var MAKE_LINE = /^(?:g|mingw32-)?make(?:\[\d+\])?: /;
@@ -3220,7 +3222,7 @@ var make = {
       else if (MAKE_WARN.test(line) || SRC_WARNING.test(line)) warnings++;
     }
     if (errors === 0) return null;
-    return mk("make", { errors, warnings }, [], summary, false);
+    return buildOnly(mk("make", { errors, warnings }, [], summary, false));
   }
 };
 var SWIFT_BUILD_MARK = /^(?:Building for (?:debugging|production)\.\.\.|Build (?:of (?:product|target) '[^']*' )?complete! \(|\[\d+\/\d+\] (?:Compiling|Emitting module|Write sources|Planning build)\b)/;
@@ -3228,7 +3230,10 @@ var SWIFT_BUILD_OK = /^Build (?:of (?:product|target) '[^']*' )?complete! \(/;
 var SWIFT_ERROR = /^\S[^\s:]*:\d+:\d+: error: |^error: /;
 var SWIFT_WARNING = /^\S[^\s:]*:\d+:\d+: warning: /;
 var XCTEST_MARK = /^Test (?:Suite|Case) '/;
-var TESTING_RUN = /^(?:\S )?Test run with (\d+) tests? in (\d+) suites? (passed|failed) after\b/;
+var TESTING_RUN = /^(?:\S )?Test run with (\d+) tests? in (\d+) suites? (passed|failed) after\b(.*)$/;
+var TESTING_START = /^(?:\S )?Test run started\b/;
+var TESTING_KNOWN = /^(?:\S )?Test .* recorded a known issue\b/;
+var TESTING_TAIL = /(\d+) (known issues?|issues?|warnings?)\b/g;
 var swiftBuild = {
   name: "swift build",
   parse(text) {
@@ -3246,7 +3251,7 @@ var swiftBuild = {
       } else if (SWIFT_ERROR.test(line)) errors++;
       else if (SWIFT_WARNING.test(line)) warnings++;
     }
-    return mk("swift build", { passed: ok, errors, warnings }, [], summary, ok === 0 && errors === 0);
+    return buildOnly(mk("swift build", { passed: ok, errors, warnings }, [], summary, ok === 0 && errors === 0));
   }
 };
 var XC_SUITE_END = /^Test Suite '([^']*)' (passed|failed) at /;
@@ -3260,12 +3265,19 @@ var swiftTest = {
   parse(text) {
     const lines3 = prepare2(text);
     if (!lines3.some((l) => XCTEST_MARK.test(l) || TESTING_RUN.test(l) || TESTING_FAIL.test(l))) return null;
-    let all = null;
+    const alls = [];
     const bundles = [];
     const failedIds = /* @__PURE__ */ new Set();
     let suiteFailed = false;
     let skippedCases = 0;
-    let testing = null;
+    let testingRuns = 0;
+    let testingStarts = 0;
+    let testingTests = 0;
+    let testingFailed = false;
+    let testingIssues = 0;
+    let testingWarnings = 0;
+    let knownSummed = 0;
+    let knownLines = 0;
     let testingSkipped = 0;
     let xcSummary = null;
     let testingSummary = null;
@@ -3281,7 +3293,7 @@ var swiftTest = {
       if (ex) {
         const counts3 = { tests: Number(ex[1]), skipped: Number(ex[2] ?? 0), failures: Number(ex[3]) + Number(ex[4]) };
         if (suiteName === "All tests" || suiteName === "Selected tests") {
-          all = counts3;
+          alls.push(counts3);
           xcSummary = line.trim();
         } else if (suiteName?.endsWith(".xctest")) bundles.push(counts3);
         suiteName = null;
@@ -3300,8 +3312,24 @@ var swiftTest = {
       }
       const r = TESTING_RUN.exec(line);
       if (r) {
-        testing = { tests: Number(r[1]), failed: r[3] === "failed" };
+        testingRuns++;
+        testingTests += Number(r[1]);
+        if (r[3] === "failed") testingFailed = true;
+        for (const t of r[4].matchAll(TESTING_TAIL)) {
+          const n = Number(t[1]);
+          if (t[2].startsWith("known")) knownSummed += n;
+          else if (t[2].startsWith("issue")) testingIssues += n;
+          else testingWarnings += n;
+        }
         testingSummary = line.trim();
+        continue;
+      }
+      if (TESTING_START.test(line)) {
+        testingStarts++;
+        continue;
+      }
+      if (TESTING_KNOWN.test(line)) {
+        knownLines++;
         continue;
       }
       const f = TESTING_FAIL.exec(line);
@@ -3311,14 +3339,18 @@ var swiftTest = {
       }
       if (TESTING_SKIP.test(line)) testingSkipped++;
     }
-    const xc = all ?? (bundles.length > 0 ? bundles.reduce((a, b) => ({ tests: a.tests + b.tests, skipped: a.skipped + b.skipped, failures: a.failures + b.failures }), { tests: 0, skipped: 0, failures: 0 }) : null);
-    const total = (xc?.tests ?? 0) + (testing?.tests ?? 0);
-    const failed = Math.max(xc?.failures ?? 0, failedIds.size, suiteFailed || testing?.failed ? 1 : 0);
+    const sum3 = /* @__PURE__ */ __name((list2) => list2.reduce((a, b) => ({ tests: a.tests + b.tests, skipped: a.skipped + b.skipped, failures: a.failures + b.failures }), { tests: 0, skipped: 0, failures: 0 }), "sum");
+    const xc = alls.length > 0 ? sum3(alls) : bundles.length > 0 ? sum3(bundles) : null;
+    const total = (xc?.tests ?? 0) + testingTests;
+    const failed = Math.max(xc?.failures ?? 0, failedIds.size, suiteFailed || testingFailed || testingIssues > 0 ? 1 : 0);
     const skipped = Math.max(xc?.skipped ?? 0, skippedCases) + testingSkipped;
-    const hasSummary = xc !== null || testing !== null;
-    const shown = [xc !== null && xc.tests > 0 ? xcSummary : null, testing !== null && testing.tests > 0 ? testingSummary : null].filter((x) => x !== null);
+    const known = Math.max(knownSummed, knownLines);
+    const hasSummary = xc !== null || testingRuns > 0;
+    const testingShown = testingRuns === 1 ? testingSummary : `${testingRuns} Swift Testing runs, ${testingTests} tests in all; last: ${testingSummary ?? ""}`;
+    const shown = [xc !== null && xc.tests > 0 ? xcSummary : null, testingTests > 0 ? testingShown : null].filter((x) => x !== null);
     const summary = shown.length > 0 ? shown.join(" ; ") : xcSummary ?? testingSummary;
-    return mk("swift test", { passed: Math.max(0, total - failed - skipped), failed, skipped }, failedIds, summary, !hasSummary || total === 0 && failed === 0);
+    const unfinished = testingStarts > testingRuns;
+    return mk("swift test", { passed: Math.max(0, total - failed - skipped), failed, skipped, expected_failures: known, ...testingWarnings > 0 ? { warnings: testingWarnings } : {} }, failedIds, summary, !hasSummary || total === 0 && failed === 0 || unfinished);
   }
 };
 var MVN_MARK = /^\[(?:INFO|ERROR)\] (?:BUILD (?:SUCCESS|FAILURE)\s*$|Reactor Summary\b|Scanning for projects\.\.\.)|^\[ERROR\] Failed to execute goal /;
@@ -3355,7 +3387,8 @@ var maven = {
         summary ??= line.trim();
       } else if (/^\[WARNING\] (?!Tests run:)/.test(line)) warnings++;
     }
-    return mk("maven", { passed: run2 > 0 ? Math.max(0, run2 - testFailures - skipped) : ok, failed: testFailures, errors, skipped, warnings }, [], summary, ok === 0 && errors === 0 && testFailures === 0);
+    const facts3 = mk("maven", { passed: run2 > 0 ? Math.max(0, run2 - testFailures - skipped) : ok, failed: testFailures, errors, skipped, warnings }, [], summary, ok === 0 && errors === 0 && testFailures === 0);
+    return run2 > 0 ? facts3 : buildOnly(facts3);
   }
 };
 var parsers5 = [ninja, msbuild, docker, make, maven, swiftBuild, swiftTest];
@@ -4159,15 +4192,21 @@ function doneEvidence(text) {
   return clip(stripAnsi(text), 2e3, 12e3);
 }
 __name(doneEvidence, "doneEvidence");
-var SKIPPED_NEXT = "Some tests were skipped, risky or incomplete, so done won't say met. Look at them: if they are expected (a platform-only test), say so yourself; otherwise run the skipped ones.";
+var SKIPPED_NEXT = "Some tests were skipped, risky, incomplete or ended in an expected failure (a known issue), so done won't say met. Look at them: if they are expected (a platform-only test), say so yourself; otherwise run the skipped ones.";
 var NO_TESTS = /\b(?:no tests? (?:to run|found|were found|executed|ran|collected|matched)|0 tests? (?:run|ran|executed|collected|found|completed)|tests? run: 0(?!\d)|nothing to run)/i;
 var INCOMPLETE_NEXT = "The run is cut off, empty, cancelled, flaky or changed files, so done won't say met. Run the full check again and pipe all of its output in.";
 var NO_TESTS_NEXT = "The log itself says no tests ran, so done won't say met. Run the tests that were meant to run and pipe their output in.";
+var BUILD_ONLY_NEXT = "The log shows only a build (no test results), and the criterion is about tests, so done won't say met. Run the tests and pipe their output in.";
+var TEST_CRITERION = /\b(?:tests?|testing|test suites?|specs?)\b/i;
 var SKIP_WORDS = /^OK, but .*\b(?:incomplete|skipped|risky)\b/i;
 function hasSkips(parsed, evidence) {
-  return parsed.runners.some((r) => r.skipped > 0 || r.summary_line !== null && SKIP_WORDS.test(r.summary_line)) || skipMarkers(evidence).length > 0;
+  return parsed.runners.some((r) => r.skipped > 0 || (r.expected_failures ?? 0) > 0 || r.summary_line !== null && SKIP_WORDS.test(r.summary_line)) || skipMarkers(evidence).length > 0;
 }
 __name(hasSkips, "hasSkips");
+function onlyBuilds(parsed) {
+  return parsed.runners.length > 0 && parsed.runners.every((r) => r.build_only === true);
+}
+__name(onlyBuilds, "onlyBuilds");
 function hasIncomplete(parsed) {
   return parsed.runners.some((r) => r.incomplete === true);
 }
@@ -4195,7 +4234,7 @@ function hasProblemMessage(evidence) {
 }
 __name(hasProblemMessage, "hasProblemMessage");
 function factsOf(parsed) {
-  return { trust: parsed.trust, exit_code: parsed.exit_code, exit_lines: parsed.exit_lines, runners: parsed.runners, conflict: parsed.conflict, lines: parsed.lines };
+  return { trust: parsed.trust, exit_code: parsed.exit_code, exit_lines: parsed.exit_lines, runners: parsed.runners.map(({ build_only: _buildOnly, ...r }) => r), conflict: parsed.conflict, lines: parsed.lines };
 }
 __name(factsOf, "factsOf");
 function doneRequest(pack, thresholds, criteria, evidence) {
@@ -4226,11 +4265,13 @@ function doneRequest(pack, thresholds, criteria, evidence) {
       const p = answer?.type === "noul" ? answer.noul : 0;
       const raw = p >= met ? "met" : p < missing ? "missing" : "unsure";
       const skipCap = raw === "met" && hasSkips(parsed, evidence);
-      const noTestsCap = raw === "met" && NO_TESTS.test(evidence);
+      const logSaysNoTests = NO_TESTS.test(evidence);
+      const buildCap = raw === "met" && !logSaysNoTests && onlyBuilds(parsed) && TEST_CRITERION.test(criterion);
+      const noTestsCap = raw === "met" && (logSaysNoTests || buildCap);
       const incompleteCap = raw === "met" && hasIncomplete(parsed);
       const warningCap = raw === "met" && warnCap && CLEAN_CRITERION.test(criterion);
       const verdict2 = raw === "met" && (parsed.trust === "unparsed" || parsed.conflict || skipCap || noTestsCap || incompleteCap || warningCap) ? "unsure" : raw;
-      return { i: i + 1, verdict: verdict2, p, skipCap, noTestsCap, incompleteCap, warningCap };
+      return { i: i + 1, verdict: verdict2, p, skipCap, noTestsCap, buildCap, incompleteCap, warningCap };
     });
     const settled = per.every((c) => c.verdict !== "missing") && parsed.trust !== "unparsed" && !parsed.conflict;
     const noTestsCapped = settled && per.some((c) => c.noTestsCap);
@@ -4247,7 +4288,7 @@ function doneRequest(pack, thresholds, criteria, evidence) {
       ...parsed.runners.length > 0 ? { runners: parsed.runners.map((r) => ({ runner: r.runner, passed: r.passed, failed: r.failed, errors: r.errors, skipped: r.skipped })) } : {},
       ...noTestsCapped && verdict === "unsure" ? { reason: "no_tests_run" } : skipCapped && verdict === "unsure" ? { reason: "skipped_tests" } : incompleteCapped && verdict === "unsure" ? { reason: "incomplete_run" } : warningCapped && verdict === "unsure" ? { reason: "warning_in_log" } : {},
       ...per.length > 1 ? { criteria: per.map(({ i, verdict: v, p: pp }) => ({ i, verdict: v, p: pp })) } : {},
-      next_step: verdict === "met" ? void 0 : noTestsCapped && verdict === "unsure" ? NO_TESTS_NEXT : skipCapped && verdict === "unsure" ? SKIPPED_NEXT : incompleteCapped && verdict === "unsure" ? INCOMPLETE_NEXT : warningCapped && verdict === "unsure" ? WARNING_NEXT : parsed.trust === "unparsed" && per.every((c) => c.verdict !== "missing") ? UNPARSED_NEXT : NEXT[verdict]
+      next_step: verdict === "met" ? void 0 : noTestsCapped && verdict === "unsure" ? per.some((c) => c.noTestsCap && !c.buildCap) ? NO_TESTS_NEXT : BUILD_ONLY_NEXT : skipCapped && verdict === "unsure" ? SKIPPED_NEXT : incompleteCapped && verdict === "unsure" ? INCOMPLETE_NEXT : warningCapped && verdict === "unsure" ? WARNING_NEXT : parsed.trust === "unparsed" && per.every((c) => c.verdict !== "missing") ? UNPARSED_NEXT : NEXT[verdict]
     };
   }, "finish");
   const state = parsed.trust === "unparsed" ? { evidence } : { evidence: factsOf(parsed) };
@@ -4266,7 +4307,7 @@ var done = {
       verdict: "met, unsure or missing; the lowest across criteria",
       trust: "parsed (a runner summary was recognised), exit_code (only an exit code line) or unparsed (met is not possible)",
       runners: "Parsed counts per recognised runner",
-      reason: "exit_code_nonzero when the evidence has a non-zero exit code (missing, Jev not asked); skipped_tests, no_tests_run, incomplete_run or warning_in_log when met was capped at unsure because tests were skipped, risky or incomplete, the log says no tests ran, the parsed run is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion has a warning behind it (parsed, or in a log with only an exit code)",
+      reason: "exit_code_nonzero when the evidence has a non-zero exit code (missing, Jev not asked); skipped_tests, no_tests_run, incomplete_run or warning_in_log when met was capped at unsure because tests were skipped, risky, incomplete or ended in an expected failure (a known issue), the log says no tests ran or shows only a build for a test criterion, the parsed run is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion has a warning behind it (parsed, or in a log with only an exit code)",
       p: "Lowest probability that a criterion holds",
       criteria: "Per criterion, by position, when more than one",
       next_step: "Only when not met"

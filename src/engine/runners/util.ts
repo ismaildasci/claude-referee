@@ -13,7 +13,7 @@ export const clip = (value: string, max: number): string => value.trim().slice(0
 
 export function mk(
   runner: string,
-  counts: { passed?: number; failed?: number; errors?: number; skipped?: number; warnings?: number },
+  counts: { passed?: number; failed?: number; errors?: number; skipped?: number; warnings?: number; expected_failures?: number },
   failing: Iterable<string>,
   summary: string | null,
   incomplete: boolean,
@@ -25,11 +25,14 @@ export function mk(
     errors: counts.errors ?? 0,
     skipped: counts.skipped ?? 0,
     ...(counts.warnings === undefined ? {} : { warnings: counts.warnings }),
+    ...(counts.expected_failures === undefined || counts.expected_failures === 0 ? {} : { expected_failures: counts.expected_failures }),
     ...(incomplete ? { incomplete: true } : {}),
     failing: [...failing].slice(0, MAX_FAILING).map((n) => clip(n, MAX_NAME)),
     summary_line: summary === null ? null : clip(summary, MAX_SUMMARY),
   };
 }
+
+export const buildOnly = (facts: RunnerFacts): RunnerFacts => ({ ...facts, build_only: true });
 
 export function exitCodes(lines: readonly string[]): number[] {
   const out: number[] = [];

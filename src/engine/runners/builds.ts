@@ -2,7 +2,7 @@
 // A build with no completion marker, a lint of zero files or a nix log without an exit code line never counts as a clean result.
 
 import type { RunnerParser } from "./types.ts";
-import { exitCodes, mk, prepare } from "./util.ts";
+import { buildOnly, exitCodes, mk, prepare } from "./util.ts";
 
 const BIOME_CHECKED = /^(?:Checked|Formatted|Linted) (\d+) files? in \S+?\.(?:\s+(.*))?$/;
 const BIOME_FOUND = /^Found (\d+) (errors?|warnings?|infos?|diagnostics?)\.?\s*$/;
@@ -77,7 +77,7 @@ const nextBuild: RunnerParser = {
       else if (NEXT_WARNING.test(line)) warnings++;
       else if (/Compiled successfully/.test(line)) compiled = line;
     }
-    return mk("next build", { errors, warnings }, [], errors > 0 ? null : (route ?? compiled), route === null && errors === 0);
+    return buildOnly(mk("next build", { errors, warnings }, [], errors > 0 ? null : (route ?? compiled), route === null && errors === 0));
   },
 };
 
@@ -93,7 +93,7 @@ const nix: RunnerParser = {
     const errorLines = lines.filter((l) => /^\s*error:(?:\s|$)/.test(l));
     const warnings = lines.filter((l) => /^warning: /.test(l)).length;
     const codes = exitCodes(lines);
-    return mk("nix build", { errors: errorLines.length, warnings }, [], errorLines[0] ?? null, errorLines.length === 0 && codes.length === 0);
+    return buildOnly(mk("nix build", { errors: errorLines.length, warnings }, [], errorLines[0] ?? null, errorLines.length === 0 && codes.length === 0));
   },
 };
 

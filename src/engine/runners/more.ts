@@ -171,7 +171,7 @@ const viteParser: RunnerParser = {
       else if (VITE_ERROR.test(line)) errors++;
       else if (VITE_WARN.test(line)) warnings++;
     }
-    return { runner: "vite", passed: 0, failed: 0, errors, skipped: 0, warnings, failing: [], summary_line: errors > 0 ? null : built };
+    return { runner: "vite", passed: 0, failed: 0, errors, skipped: 0, warnings, build_only: true, failing: [], summary_line: errors > 0 ? null : built };
   },
 };
 
@@ -229,7 +229,7 @@ const cargoBuild: RunnerParser = {
     const composite = echoes.some((c) => CARGO_BUILD_CMD.test(c) && CARGO_COMPOSITE.test(c));
     const trailing = lastFinished >= 0 && lines.slice(lastFinished + 1).some((l) => !CARGO_TRAILING.test(l));
     const complete = finished && !composite && !trailing;
-    const facts: RunnerFacts = { runner: "cargo build", passed: 0, failed: 0, errors, skipped: 0, warnings: Math.max(generated, headers), ...(complete || errors > 0 ? {} : { incomplete: true }), failing: [], summary_line: complete && errors === 0 ? clip(lines[lastFinished] as string, MAX_SUMMARY) : summary };
+    const facts: RunnerFacts = { runner: "cargo build", passed: 0, failed: 0, errors, skipped: 0, warnings: Math.max(generated, headers), build_only: true, ...(complete || errors > 0 ? {} : { incomplete: true }), failing: [], summary_line: complete && errors === 0 ? clip(lines[lastFinished] as string, MAX_SUMMARY) : summary };
     return facts;
   },
 };

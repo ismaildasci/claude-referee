@@ -2,7 +2,7 @@
 // Counts come from anchored lines only; an error, a missing completion marker or a cut-off log never counts as a clean build.
 
 import type { RunnerParser } from "./types.ts";
-import { mk, prepare } from "./util.ts";
+import { buildOnly, mk, prepare } from "./util.ts";
 
 const SRC_ERROR = /^\S[^\s:]*:\d+(?::\d+)?: (?:fatal )?error:|^(?:clang(?:\+\+)?|gcc|g\+\+|cc|c\+\+|ld|lld|link)(?:-\d+)?: (?:fatal )?error:|: fatal error:|^collect2: error:|\bundefined reference to\b|^CMake Error\b/;
 const SRC_WARNING = /^\S[^\s:]*:\d+(?::\d+)?: warning:|^CMake Warning\b/;
@@ -41,7 +41,7 @@ const ninja: RunnerParser = {
     const total = Number(status?.[2] ?? 0);
     const installTail = status !== null && n === total - 1 && /^Install the project\.\.\./.test(status[3] as string) && lines.slice(statusIndex + 1).some((l) => /^-- Install configuration:/.test(l));
     const complete = noWork || (status !== null && total > 0 && (n === total || installTail));
-    return mk("ninja", { passed: noWork ? 0 : status === null ? 0 : n, errors, warnings }, [], status === null ? "ninja: no work to do." : status[0], errors === 0 && !complete);
+    return buildOnly(mk("ninja", { passed: noWork ? 0 : status === null ? 0 : n, errors, warnings }, [], status === null ? "ninja: no work to do." : status[0], errors === 0 && !complete));
   },
 };
 
@@ -84,7 +84,7 @@ const msbuild: RunnerParser = {
     if (ok === 0 && !failed && errorDiags.size === 0) return null;
     const errors = Math.max(errorCount, errorDiags.size, failed ? 1 : 0);
     const warnings = Math.max(warningCount, warningDiags.size);
-    return mk("msbuild", { passed: ok, errors, warnings }, errorDiags, summary, ok === 0 && errors === 0);
+    return buildOnly(mk("msbuild", { passed: ok, errors, warnings }, errorDiags, summary, ok === 0 && errors === 0));
   },
 };
 
@@ -124,7 +124,7 @@ const docker: RunnerParser = {
     }
     if (done.size === 0 || !hasVertex) return null;
     const exported = [...exporting].some((id) => done.has(id));
-    return mk("docker build", { passed: done.size, errors: errors + canceled, warnings }, [], errors > 0 ? null : lastDone, errors + canceled === 0 && !exported);
+    return buildOnly(mk("docker build", { passed: done.size, errors: errors + canceled, warnings }, [], errors > 0 ? null : lastDone, errors + canceled === 0 && !exported));
   },
 };
 
@@ -149,7 +149,7 @@ const make: RunnerParser = {
       else if (MAKE_WARN.test(line) || SRC_WARNING.test(line)) warnings++;
     }
     if (errors === 0) return null;
-    return mk("make", { errors, warnings }, [], summary, false);
+    return buildOnly(mk("make", { errors, warnings }, [], summary, false));
   },
 };
 
@@ -158,7 +158,10 @@ const SWIFT_BUILD_OK = /^Build (?:of (?:product|target) '[^']*' )?complete! \(/;
 const SWIFT_ERROR = /^\S[^\s:]*:\d+:\d+: error: |^error: /;
 const SWIFT_WARNING = /^\S[^\s:]*:\d+:\d+: warning: /;
 const XCTEST_MARK = /^Test (?:Suite|Case) '/;
-const TESTING_RUN = /^(?:\S )?Test run with (\d+) tests? in (\d+) suites? (passed|failed) after\b/;
+const TESTING_RUN = /^(?:\S )?Test run with (\d+) tests? in (\d+) suites? (passed|failed) after\b(.*)$/;
+const TESTING_START = /^(?:\S )?Test run started\b/;
+const TESTING_KNOWN = /^(?:\S )?Test .* recorded a known issue\b/;
+const TESTING_TAIL = /(\d+) (known issues?|issues?|warnings?)\b/g;
 
 const swiftBuild: RunnerParser = {
   name: "swift build",
@@ -177,7 +180,7 @@ const swiftBuild: RunnerParser = {
       } else if (SWIFT_ERROR.test(line)) errors++;
       else if (SWIFT_WARNING.test(line)) warnings++;
     }
-    return mk("swift build", { passed: ok, errors, warnings }, [], summary, ok === 0 && errors === 0);
+    return buildOnly(mk("swift build", { passed: ok, errors, warnings }, [], summary, ok === 0 && errors === 0));
   },
 };
 
@@ -193,12 +196,19 @@ const swiftTest: RunnerParser = {
   parse(text) {
     const lines = prepare(text);
     if (!lines.some((l) => XCTEST_MARK.test(l) || TESTING_RUN.test(l) || TESTING_FAIL.test(l))) return null;
-    let all: { tests: number; skipped: number; failures: number } | null = null;
+    const alls: { tests: number; skipped: number; failures: number }[] = [];
     const bundles: { tests: number; skipped: number; failures: number }[] = [];
     const failedIds = new Set<string>();
     let suiteFailed = false;
     let skippedCases = 0;
-    let testing: { tests: number; failed: boolean } | null = null;
+    let testingRuns = 0;
+    let testingStarts = 0;
+    let testingTests = 0;
+    let testingFailed = false;
+    let testingIssues = 0;
+    let testingWarnings = 0;
+    let knownSummed = 0;
+    let knownLines = 0;
     let testingSkipped = 0;
     let xcSummary: string | null = null;
     let testingSummary: string | null = null;
@@ -214,7 +224,7 @@ const swiftTest: RunnerParser = {
       if (ex) {
         const counts = { tests: Number(ex[1]), skipped: Number(ex[2] ?? 0), failures: Number(ex[3]) + Number(ex[4]) };
         if (suiteName === "All tests" || suiteName === "Selected tests") {
-          all = counts;
+          alls.push(counts);
           xcSummary = line.trim();
         } else if (suiteName?.endsWith(".xctest")) bundles.push(counts);
         suiteName = null;
@@ -233,8 +243,24 @@ const swiftTest: RunnerParser = {
       }
       const r = TESTING_RUN.exec(line);
       if (r) {
-        testing = { tests: Number(r[1]), failed: r[3] === "failed" };
+        testingRuns++;
+        testingTests += Number(r[1]);
+        if (r[3] === "failed") testingFailed = true;
+        for (const t of (r[4] as string).matchAll(TESTING_TAIL)) {
+          const n = Number(t[1]);
+          if ((t[2] as string).startsWith("known")) knownSummed += n;
+          else if ((t[2] as string).startsWith("issue")) testingIssues += n;
+          else testingWarnings += n;
+        }
         testingSummary = line.trim();
+        continue;
+      }
+      if (TESTING_START.test(line)) {
+        testingStarts++;
+        continue;
+      }
+      if (TESTING_KNOWN.test(line)) {
+        knownLines++;
         continue;
       }
       const f = TESTING_FAIL.exec(line);
@@ -244,14 +270,18 @@ const swiftTest: RunnerParser = {
       }
       if (TESTING_SKIP.test(line)) testingSkipped++;
     }
-    const xc = all ?? (bundles.length > 0 ? bundles.reduce((a, b) => ({ tests: a.tests + b.tests, skipped: a.skipped + b.skipped, failures: a.failures + b.failures }), { tests: 0, skipped: 0, failures: 0 }) : null);
-    const total = (xc?.tests ?? 0) + (testing?.tests ?? 0);
-    const failed = Math.max(xc?.failures ?? 0, failedIds.size, suiteFailed || testing?.failed ? 1 : 0);
+    const sum = (list: readonly { tests: number; skipped: number; failures: number }[]) => list.reduce((a, b) => ({ tests: a.tests + b.tests, skipped: a.skipped + b.skipped, failures: a.failures + b.failures }), { tests: 0, skipped: 0, failures: 0 });
+    const xc = alls.length > 0 ? sum(alls) : bundles.length > 0 ? sum(bundles) : null;
+    const total = (xc?.tests ?? 0) + testingTests;
+    const failed = Math.max(xc?.failures ?? 0, failedIds.size, suiteFailed || testingFailed || testingIssues > 0 ? 1 : 0);
     const skipped = Math.max(xc?.skipped ?? 0, skippedCases) + testingSkipped;
-    const hasSummary = xc !== null || testing !== null;
-    const shown = [xc !== null && xc.tests > 0 ? xcSummary : null, testing !== null && testing.tests > 0 ? testingSummary : null].filter((x): x is string => x !== null);
+    const known = Math.max(knownSummed, knownLines);
+    const hasSummary = xc !== null || testingRuns > 0;
+    const testingShown = testingRuns === 1 ? testingSummary : `${testingRuns} Swift Testing runs, ${testingTests} tests in all; last: ${testingSummary ?? ""}`;
+    const shown = [xc !== null && xc.tests > 0 ? xcSummary : null, testingTests > 0 ? testingShown : null].filter((x): x is string => x !== null);
     const summary = shown.length > 0 ? shown.join(" ; ") : (xcSummary ?? testingSummary);
-    return mk("swift test", { passed: Math.max(0, total - failed - skipped), failed, skipped }, failedIds, summary, !hasSummary || (total === 0 && failed === 0));
+    const unfinished = testingStarts > testingRuns;
+    return mk("swift test", { passed: Math.max(0, total - failed - skipped), failed, skipped, expected_failures: known, ...(testingWarnings > 0 ? { warnings: testingWarnings } : {}) }, failedIds, summary, !hasSummary || (total === 0 && failed === 0) || unfinished);
   },
 };
 
@@ -290,7 +320,8 @@ const maven: RunnerParser = {
         summary ??= line.trim();
       } else if (/^\[WARNING\] (?!Tests run:)/.test(line)) warnings++;
     }
-    return mk("maven", { passed: run > 0 ? Math.max(0, run - testFailures - skipped) : ok, failed: testFailures, errors, skipped, warnings }, [], summary, ok === 0 && errors === 0 && testFailures === 0);
+    const facts = mk("maven", { passed: run > 0 ? Math.max(0, run - testFailures - skipped) : ok, failed: testFailures, errors, skipped, warnings }, [], summary, ok === 0 && errors === 0 && testFailures === 0);
+    return run > 0 ? facts : buildOnly(facts);
   },
 };
 
