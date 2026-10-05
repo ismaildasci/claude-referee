@@ -1,0 +1,525 @@
+{
+ "split": "dev",
+ "frozen": {
+  "primary": {
+   "config": "R0-W2",
+   "threshold": 0.555,
+   "dev_hard_auc": 0.531,
+   "dev_hard_best_auc": 0.531,
+   "near_best": [
+    "R0-W2",
+    "R0-W4"
+   ]
+  },
+  "secondary": {
+   "config": "R1-W2",
+   "threshold": 0.615,
+   "dev_hard_auc": 0.571,
+   "dev_hard_best_auc": 0.571,
+   "near_best": [
+    "R1-W2"
+   ]
+  },
+  "dev_failure": true,
+  "frozen_at": "2026-10-05T14:19:22.872Z"
+ },
+ "primary": {
+  "config": "R0-W2",
+  "threshold": 0.555,
+  "all": {
+   "missing": 0,
+   "summary": {
+    "wrong": 7,
+    "true": 85,
+    "tasks": 27,
+    "auc": 0.566,
+    "perm_p": 0.285390805979,
+    "boot_task_ci95": [
+     0.298,
+     0.878
+    ],
+    "boot_task_discarded": 16,
+    "boot_session_ci95": [
+     0.25,
+     0.889
+    ]
+   },
+   "within_task": {
+    "tasks": 4,
+    "auc": 0.875
+   },
+   "at_threshold": {
+    "threshold": 0.555,
+    "recall": {
+     "k": 5,
+     "n": 7,
+     "value": 0.714,
+     "ci95": [
+      0.29,
+      0.963
+     ]
+    },
+    "false_block": {
+     "k": 67,
+     "n": 85,
+     "value": 0.788,
+     "ci95": [
+      0.686,
+      0.869
+     ]
+    }
+   },
+   "vs_A": {
+    "diff": 0.271,
+    "ci95": [
+     0.02,
+     0.581
+    ]
+   },
+   "by_model": {
+    "sonnet": {
+     "wrong": 2,
+     "true": 33,
+     "tasks": 26,
+     "auc": 0.598,
+     "perm_p": 0.336134453781
+    },
+    "haiku": {
+     "wrong": 5,
+     "true": 52,
+     "tasks": 21,
+     "auc": 0.562,
+     "perm_p": 0.333071816189
+    }
+   }
+  },
+  "hard_only": {
+   "missing": 0,
+   "summary": {
+    "wrong": 7,
+    "true": 25,
+    "tasks": 15,
+    "auc": 0.531,
+    "perm_p": 0.407460687563,
+    "boot_task_ci95": [
+     0.321,
+     0.81
+    ],
+    "boot_task_discarded": 11,
+    "boot_session_ci95": [
+     0.231,
+     0.828
+    ]
+   },
+   "within_task": {
+    "tasks": 4,
+    "auc": 0.875
+   },
+   "at_threshold": {
+    "threshold": 0.555,
+    "recall": {
+     "k": 5,
+     "n": 7,
+     "value": 0.714,
+     "ci95": [
+      0.29,
+      0.963
+     ]
+    },
+    "false_block": {
+     "k": 21,
+     "n": 25,
+     "value": 0.84,
+     "ci95": [
+      0.639,
+      0.955
+     ]
+    }
+   },
+   "vs_A": {
+    "diff": 0.229,
+    "ci95": [
+     -0.016,
+     0.5
+    ]
+   },
+   "by_model": {
+    "sonnet": {
+     "wrong": 2,
+     "true": 21,
+     "tasks": 14,
+     "auc": 0.5,
+     "perm_p": 0.513833992094
+    },
+    "haiku": {
+     "wrong": 5,
+     "true": 4,
+     "tasks": 9,
+     "auc": 0.5,
+     "perm_p": 0.523809523809
+    }
+   }
+  },
+  "asked_only": {
+   "wrong": 7,
+   "true": 80,
+   "tasks": 27,
+   "auc": 0.55,
+   "perm_p": 0.335681538731,
+   "at_threshold": {
+    "threshold": 0.555,
+    "recall": {
+     "k": 5,
+     "n": 7,
+     "value": 0.714,
+     "ci95": [
+      0.29,
+      0.963
+     ]
+    },
+    "false_block": {
+     "k": 66,
+     "n": 80,
+     "value": 0.825,
+     "ci95": [
+      0.724,
+      0.901
+     ]
+    }
+   }
+  }
+ },
+ "secondary": {
+  "config": "R1-W2",
+  "threshold": 0.615,
+  "all": {
+   "missing": 0,
+   "summary": {
+    "wrong": 7,
+    "true": 85,
+    "tasks": 27,
+    "auc": 0.593,
+    "perm_p": 0.211893387604,
+    "boot_task_ci95": [
+     0.33,
+     0.847
+    ],
+    "boot_task_discarded": 16,
+    "boot_session_ci95": [
+     0.307,
+     0.87
+    ]
+   },
+   "within_task": {
+    "tasks": 4,
+    "auc": 0.75
+   },
+   "at_threshold": {
+    "threshold": 0.615,
+    "recall": {
+     "k": 5,
+     "n": 7,
+     "value": 0.714,
+     "ci95": [
+      0.29,
+      0.963
+     ]
+    },
+    "false_block": {
+     "k": 57,
+     "n": 85,
+     "value": 0.671,
+     "ci95": [
+      0.56,
+      0.769
+     ]
+    }
+   },
+   "vs_A": {
+    "diff": 0.298,
+    "ci95": [
+     0.056,
+     0.554
+    ]
+   },
+   "by_model": {
+    "sonnet": {
+     "wrong": 2,
+     "true": 33,
+     "tasks": 26,
+     "auc": 0.712,
+     "perm_p": 0.181512605042
+    },
+    "haiku": {
+     "wrong": 5,
+     "true": 52,
+     "tasks": 21,
+     "auc": 0.56,
+     "perm_p": 0.337913824011
+    }
+   }
+  },
+  "hard_only": {
+   "missing": 0,
+   "summary": {
+    "wrong": 7,
+    "true": 25,
+    "tasks": 15,
+    "auc": 0.571,
+    "perm_p": 0.292140246047,
+    "boot_task_ci95": [
+     0.353,
+     0.797
+    ],
+    "boot_task_discarded": 11,
+    "boot_session_ci95": [
+     0.294,
+     0.833
+    ]
+   },
+   "within_task": {
+    "tasks": 4,
+    "auc": 0.75
+   },
+   "at_threshold": {
+    "threshold": 0.615,
+    "recall": {
+     "k": 5,
+     "n": 7,
+     "value": 0.714,
+     "ci95": [
+      0.29,
+      0.963
+     ]
+    },
+    "false_block": {
+     "k": 16,
+     "n": 25,
+     "value": 0.64,
+     "ci95": [
+      0.425,
+      0.82
+     ]
+    }
+   },
+   "vs_A": {
+    "diff": 0.269,
+    "ci95": [
+     0.025,
+     0.484
+    ]
+   },
+   "by_model": {
+    "sonnet": {
+     "wrong": 2,
+     "true": 21,
+     "tasks": 14,
+     "auc": 0.643,
+     "perm_p": 0.268774703557
+    },
+    "haiku": {
+     "wrong": 5,
+     "true": 4,
+     "tasks": 9,
+     "auc": 0.475,
+     "perm_p": 0.563492063492
+    }
+   }
+  },
+  "asked_only": {
+   "wrong": 7,
+   "true": 80,
+   "tasks": 27,
+   "auc": 0.577,
+   "perm_p": 0.256275283932,
+   "at_threshold": {
+    "threshold": 0.615,
+    "recall": {
+     "k": 5,
+     "n": 7,
+     "value": 0.714,
+     "ci95": [
+      0.29,
+      0.963
+     ]
+    },
+    "false_block": {
+     "k": 56,
+     "n": 80,
+     "value": 0.7,
+     "ci95": [
+      0.587,
+      0.797
+     ]
+    }
+   }
+  }
+ },
+ "baseline_A": {
+  "all": {
+   "summary": {
+    "wrong": 7,
+    "true": 85,
+    "tasks": 27,
+    "auc": 0.295,
+    "perm_p": 0.966453487867,
+    "boot_task_ci95": [
+     0.15,
+     0.439
+    ],
+    "boot_task_discarded": 16,
+    "boot_session_ci95": [
+     0.138,
+     0.462
+    ]
+   },
+   "at_threshold": {
+    "threshold": 0.555,
+    "recall": {
+     "k": 7,
+     "n": 7,
+     "value": 1,
+     "ci95": [
+      0.59,
+      1
+     ]
+    },
+    "false_block": {
+     "k": 80,
+     "n": 85,
+     "value": 0.941,
+     "ci95": [
+      0.868,
+      0.981
+     ]
+    }
+   },
+   "shipped_would_block": {
+    "threshold": 1,
+    "recall": {
+     "k": 7,
+     "n": 7,
+     "value": 1,
+     "ci95": [
+      0.59,
+      1
+     ]
+    },
+    "false_block": {
+     "k": 79,
+     "n": 85,
+     "value": 0.929,
+     "ci95": [
+      0.853,
+      0.974
+     ]
+    }
+   }
+  },
+  "hard_only": {
+   "summary": {
+    "wrong": 7,
+    "true": 25,
+    "tasks": 15,
+    "auc": 0.303,
+    "perm_p": 0.945778131922,
+    "boot_task_ci95": [
+     0.13,
+     0.489
+    ],
+    "boot_task_discarded": 11,
+    "boot_session_ci95": [
+     0.109,
+     0.526
+    ]
+   },
+   "at_threshold": {
+    "threshold": 0.555,
+    "recall": {
+     "k": 7,
+     "n": 7,
+     "value": 1,
+     "ci95": [
+      0.59,
+      1
+     ]
+    },
+    "false_block": {
+     "k": 25,
+     "n": 25,
+     "value": 1,
+     "ci95": [
+      0.863,
+      1
+     ]
+    }
+   },
+   "shipped_would_block": {
+    "threshold": 1,
+    "recall": {
+     "k": 7,
+     "n": 7,
+     "value": 1,
+     "ci95": [
+      0.59,
+      1
+     ]
+    },
+    "false_block": {
+     "k": 24,
+     "n": 25,
+     "value": 0.96,
+     "ci95": [
+      0.796,
+      0.999
+     ]
+    }
+   }
+  }
+ },
+ "keyword_note": {
+  "reading_A": {
+   "threshold": 1,
+   "recall": {
+    "k": 6,
+    "n": 7,
+    "value": 0.857,
+    "ci95": [
+     0.421,
+     0.996
+    ]
+   },
+   "false_block": {
+    "k": 9,
+    "n": 25,
+    "value": 0.36,
+    "ci95": [
+     0.18,
+     0.575
+    ]
+   }
+  },
+  "reading_B": {
+   "threshold": 1,
+   "recall": {
+    "k": 7,
+    "n": 7,
+    "value": 1,
+    "ci95": [
+     0.59,
+     1
+    ]
+   },
+   "false_block": {
+    "k": 25,
+    "n": 25,
+    "value": 1,
+    "ci95": [
+     0.863,
+     1
+    ]
+   }
+  }
+ },
+ "requests": 2208
+}
