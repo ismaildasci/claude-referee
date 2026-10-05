@@ -1,0 +1,35 @@
+[
+ {
+  "id": "rmuvbk48c3f67",
+  "ts": "2026-10-05T14:02:39.566Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 131220,
+  "cost_usd": 0.00551124,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 13553
+ },
+ {
+  "id": "rmuvbkeox0czr",
+  "ts": "2026-10-05T14:02:52.374Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 129860,
+  "cost_usd": 0.00545412,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12801
+ },
+ {
+  "id": "rmuvbkoklsg7r",
+  "ts": "2026-10-05T14:03:01.059Z",
+  "requests": 160,
+  "cached": 0,
+  "input_tokens": 89736,
+  "cost_usd": 0.00376891,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 8689
+ }
+]

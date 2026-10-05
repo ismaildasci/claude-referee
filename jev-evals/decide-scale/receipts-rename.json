@@ -1,0 +1,189 @@
+[
+ {
+  "id": "rmuvb71npvmcu",
+  "ts": "2026-10-05T13:52:17.732Z",
+  "requests": 24,
+  "cached": 0,
+  "input_tokens": 12384,
+  "cost_usd": 0.00052013,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 1580
+ },
+ {
+  "id": "rmuvb730qol6g",
+  "ts": "2026-10-05T13:52:30.513Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 127632,
+  "cost_usd": 0.00536054,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12593
+ },
+ {
+  "id": "rmuvb7cqk0sin",
+  "ts": "2026-10-05T13:52:42.923Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 126432,
+  "cost_usd": 0.00531014,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12411
+ },
+ {
+  "id": "rmuvb7mbe7otf",
+  "ts": "2026-10-05T13:52:55.005Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 129552,
+  "cost_usd": 0.00544118,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12120
+ },
+ {
+  "id": "rmuvb7vokmpu1",
+  "ts": "2026-10-05T13:53:07.311Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 129252,
+  "cost_usd": 0.00542858,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12245
+ },
+ {
+  "id": "rmuvb854skkwg",
+  "ts": "2026-10-05T13:53:19.356Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 119142,
+  "cost_usd": 0.00500396,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12048
+ },
+ {
+  "id": "rmuvb8efjtor1",
+  "ts": "2026-10-05T13:53:31.413Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 116760,
+  "cost_usd": 0.00490392,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12051
+ },
+ {
+  "id": "rmuvb8nqbz3iz",
+  "ts": "2026-10-05T13:53:43.741Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 117012,
+  "cost_usd": 0.0049145,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12327
+ },
+ {
+  "id": "rmuvb8x8uo93i",
+  "ts": "2026-10-05T13:53:56.094Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 116520,
+  "cost_usd": 0.00489384,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12348
+ },
+ {
+  "id": "rmuvb96rxv0vd",
+  "ts": "2026-10-05T13:54:08.389Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 115428,
+  "cost_usd": 0.00484798,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12293
+ },
+ {
+  "id": "rmuvb9g9hizxg",
+  "ts": "2026-10-05T13:54:20.446Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 124212,
+  "cost_usd": 0.0052169,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12061
+ },
+ {
+  "id": "rmuvb9pkn51fb",
+  "ts": "2026-10-05T13:54:32.830Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 134064,
+  "cost_usd": 0.00563069,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12375
+ },
+ {
+  "id": "rmuvb9z4h0qyj",
+  "ts": "2026-10-05T13:54:45.068Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 131154,
+  "cost_usd": 0.00550847,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12230
+ },
+ {
+  "id": "rmuvba8kbxe7j",
+  "ts": "2026-10-05T13:54:57.432Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 131094,
+  "cost_usd": 0.00550595,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12358
+ },
+ {
+  "id": "rmuvbai3p33ct",
+  "ts": "2026-10-05T13:55:09.894Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 129390,
+  "cost_usd": 0.00543438,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12463
+ },
+ {
+  "id": "rmuvbarq04m1t",
+  "ts": "2026-10-05T13:55:22.106Z",
+  "requests": 240,
+  "cached": 0,
+  "input_tokens": 128412,
+  "cost_usd": 0.0053933,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 12210
+ },
+ {
+  "id": "rmuvbb1582pwn",
+  "ts": "2026-10-05T13:55:23.663Z",
+  "requests": 30,
+  "cached": 0,
+  "input_tokens": 16362,
+  "cost_usd": 0.0006872,
+  "replaced": 0,
+  "stopped": 0,
+  "ms": 1549
+ }
+]
