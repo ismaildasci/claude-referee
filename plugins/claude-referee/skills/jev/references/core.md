@@ -16,7 +16,7 @@ Source: https://docs.typesafe.ai/primitives.md
 - `jev-1.13.0`; the aliases `jev-latest` and `jev-preview` point to it today. Pin the versioned id when thresholds were tuned on it.
 - $0.042 per million input tokens; output tokens are free.
 - 64K tokens per request; 32K for `state` plus the longest question.
-- Rate limits: 100K tokens and 40 requests per second, adjusted without notice while demand is high. A request over a limit gets HTTP 429.
+- Rate limits: 100K tokens and 80 requests per second, adjusted without notice while demand is high. A request over a limit gets HTTP 429.
 - English is the primary language; other languages work less well.
 - Documented errors: 401 (missing or invalid key), 422 (invalid request body), 429 (rate limit), 529 (overloaded).
 - Live probe on 2026-09-30 (UTC), not in the docs:

@@ -1,8 +1,8 @@
 {
   "models.md": {
-    "sha256": "c4ebee942e3fef93bfc12c1bce5c04ea9f3e03fd3267dcdd4b76183c83c0639c",
+    "sha256": "15351adaab85874b5f1a942fc2fdf3c7b3ecadcc936d580793d734855a0038f3",
     "facts": {
-      "rate_limits": "| Rate limits | 100K tokens per second / 40 requests per second |",
+      "rate_limits": "| Rate limits | 100K tokens per second / 80 requests per second |",
       "models": [
         "jev-1.13",
         "jev-1.13.0"
@@ -10,11 +10,11 @@
     }
   },
   "api.md": {
-    "sha256": "0252c4126fdaa45c537fa83718f90d544890a878a12324690294dfeee9f0849e",
+    "sha256": "6b760275f89341fe15cff80c28aacae94d7d0c0c99afcd987ec0bca680b5713a",
     "facts": {}
   },
   "llms.txt": {
-    "sha256": "3bad966207794ce900ebc81759fd48185cd2d1f287df13a08ae4d601e96450fd",
+    "sha256": "4151e8fd18e5494580571957beff0933e18aecbea2ac7826d3bf53184e8a6a40",
     "facts": {
       "links": 111
     }
