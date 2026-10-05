@@ -1,5 +1,5 @@
 // Runs the option-order scale study through the repo's Session (redaction, cache, retry budget, one receipt per batch); appends answers to jev-evals/decide-scale/recorded-<stage>.jsonl.
-// Usage: node scripts/decide-scale/run.mjs --stage main|rename|screen|wave2 [--only <src>] [--limit n] [--dry-run] [--batch 240]; resumable: recorded requests are skipped.
+// Usage: node scripts/decide-scale/run.mjs --stage main|rename|screen|wave2|rep [--only <src>] [--limit n] [--dry-run] [--batch 240]; resumable: recorded requests are skipped.
 
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { loadPack, packDirs } from "../../src/engine/pack.ts";
 import { Session } from "../../src/engine/session.ts";
 import { DEFAULT_MODEL } from "../../src/engine/config.ts";
-import { ROOT, WAVE2, key, loadCases, neutralNames, orderPlan } from "./lib.mjs";
+import { ROOT, SOURCES, WAVE2, key, loadCases, neutralNames, orderPlan } from "./lib.mjs";
 
 const args = process.argv.slice(2);
 const flag = (name, fallback) => (args.includes(name) ? args[args.indexOf(name) + 1] : fallback);
@@ -16,7 +16,7 @@ const only = flag("--only", null);
 const limit = Number(flag("--limit", "0"));
 const batchSize = Number(flag("--batch", "240"));
 const dry = args.includes("--dry-run");
-if (!["main", "rename", "screen", "wave2"].includes(stage)) throw new Error("--stage must be main, rename, screen or wave2");
+if (!["main", "rename", "screen", "wave2", "rep"].includes(stage)) throw new Error("--stage must be main, rename, screen, wave2 or rep");
 
 const dir = join(ROOT, "jev-evals", "decide-scale");
 const recordedPath = join(dir, `recorded-${stage}.jsonl`);
@@ -28,10 +28,10 @@ const best = pack.questions["decide.best"];
 const packRef = { name: pack.name, version: `${pack.version}+${pack.hash}`, redact: pack.redact };
 
 const keptPath = join(dir, "screen-kept.json");
-let cases = stage === "screen" || stage === "wave2" ? loadCases(WAVE2) : loadCases();
-if (stage === "wave2") {
+let cases = stage === "screen" || stage === "wave2" ? loadCases(WAVE2) : stage === "rep" ? loadCases([...SOURCES, ...WAVE2]) : loadCases();
+if (stage === "wave2" || stage === "rep") {
   const kept = new Set(JSON.parse(readFileSync(keptPath, "utf8")).kept);
-  cases = cases.filter((c) => kept.has(c.id));
+  cases = cases.filter((c) => !c.wave2 || kept.has(c.id));
 }
 if (only) cases = cases.filter((c) => c.src === only);
 if (stage === "rename") cases = cases.filter((c) => ["close", "a", "b"].includes(c.src));
@@ -55,7 +55,7 @@ for (const c of cases) {
 }
 console.log(`${cases.length} decisions, ${tasks.length} requests to send (${done.size} already recorded), stage ${stage}`);
 
-const sessionOptions = () => ({ command: `decide-scale-${stage}`, env: process.env, cwd: ROOT, home: homedir(), platform: process.platform, now: () => Date.now(), pack: packRef, deadlineMs: 900_000 });
+const sessionOptions = () => ({ command: `decide-scale-${stage}`, env: process.env, cwd: ROOT, home: homedir(), platform: process.platform, now: () => Date.now(), pack: packRef, deadlineMs: 900_000, ...(stage === "rep" ? { fresh: true } : {}) });
 
 if (dry) {
   const session = new Session(sessionOptions());

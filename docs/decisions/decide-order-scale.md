@@ -125,3 +125,13 @@ Cost: 640 screening requests plus about 36 to 60 requests per kept case.
 |---|---|
 | `jev-evals/decide-scale/cases-c.jsonl` | `f963f11e36d6180b313d84c458b836d9566d46864207f54547a62c3285bc97de` |
 | `jev-evals/decide-scale/cases-d.jsonl` | `ed782df54f3668b13c78f0967e85da58120a595feab9901229be747fd9a143aa` |
+
+## Extension 2: independent replicate reference (registered after the wave 1 and wave 2 requests, before any replicate request)
+
+Why: reading the wave 1, wave 2 and pooled tables showed that the registered leave-out reference is not equally good for every policy. For n = 4 the complement of a balanced design (the Latin square, its reversal) is itself balanced, while the complement of a random draw is not, and with 12 random orders in the policy only 12 are left for the reference. A balanced policy is therefore compared with a cleaner reference than a random policy of the same size, and it looks better for that reason alone (`latin_rev` 0.94 against `rand12` 0.80 on pooled near-ties, with `latin_rev` agreeing in 49 of 49 wave 2 decisions). The full-set reference has the opposite flaw (overlap favours big policies). Neither is wrong to report; neither is a fair common yardstick.
+
+Fix: ask every pool order of every decision a second time (all of S1 to S4 and the kept wave 2 cases, about 5,900 requests, `Session` with `fresh: true` so the cache cannot return the first answer), recorded in `recorded-rep.jsonl`. New variant **replicate reference**: policies use the first-run answers only; the reference (leader, probabilities, verdict) is the mean over the whole pool of the second run, the same for every policy. It carries no answer from the policy's own run and does not depend on which orders the policy took; the cost is that policy orders are also among the reference's orders (the target is "the mean over the pool of orders", so that is the estimand rather than leakage), and for n >= 5 the target is the 24-order random pool R, not all n! orders. Near-tie membership stays defined from the first-run full-set margin (< 0.08), so it is the same set as before.
+
+The decision rule is applied to the replicate-reference variant as well, in all three data sets (wave 1, wave 2, pooled). The recommendation is the one that holds under the replicate reference, and it states whether the leave-out and full-set variants agree. This replaces the leave-out variant as the one the recommendation rests on, a change decided after seeing the results, which is why all variants are reported side by side.
+
+Cost: about 5,900 requests, about $0.12.

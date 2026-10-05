@@ -359,7 +359,7 @@ const noiseResult = {
   },
 };
 
-const receipts = ["main", "rename"].flatMap((s) => (existsSync(join(ROOT, `jev-evals/decide-scale/receipts-${s}.json`)) ? JSON.parse(readFileSync(join(ROOT, `jev-evals/decide-scale/receipts-${s}.json`), "utf8")).map((r) => ({ stage: s, ...r })) : []));
+const receipts = ["main", "rename", "screen", "wave2"].flatMap((s) => (existsSync(join(ROOT, `jev-evals/decide-scale/receipts-${s}.json`)) ? JSON.parse(readFileSync(join(ROOT, `jev-evals/decide-scale/receipts-${s}.json`), "utf8")).map((r) => ({ stage: s, ...r })) : []));
 const cost = { receipts: receipts.length, requests: receipts.reduce((s, r) => s + r.requests, 0), cached: receipts.reduce((s, r) => s + r.cached, 0), input_tokens: receipts.reduce((s, r) => s + r.input_tokens, 0), cost_usd: r4(receipts.reduce((s, r) => s + r.cost_usd, 0)), replaced: receipts.reduce((s, r) => s + (r.replaced ?? 0), 0), stopped: receipts.reduce((s, r) => s + (r.stopped ?? 0), 0) };
 
 const marginBins = [[0, 0.04], [0.04, 0.08], [0.08, 0.2], [0.2, 1.01]];
