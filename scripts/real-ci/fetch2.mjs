@@ -1,5 +1,5 @@
 // Fetches the second real-log sample (docs/decisions/done-v2-real-logs-2.md): other repositories, runs from 2026-10-04, cap 3 cases per repo.
-// Resumable like fetch.mjs. Usage: node fetch2.mjs --out DIR --exclude SPLIT.json [--per-lang 8] [--extra-per-lang 6]
+// Resumable like fetch.mjs. Usage: node fetch2.mjs --out DIR --exclude SPLIT.json [--per-lang 8] [--extra-per-lang 6] [--langs A,B] [--aggregate] [--topup]
 
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
@@ -12,6 +12,9 @@ const OUT = flag("out");
 const EXCLUDE = flag("exclude");
 const PER_LANG = Number(flag("per-lang", "8"));
 const EXTRA = Number(flag("extra-per-lang", "6"));
+const ONLY = flag("langs") ? flag("langs").split(",") : null;
+const AGGREGATE = args.includes("--aggregate");
+const TOPUP = args.includes("--topup");
 if (!OUT || !EXCLUDE) throw new Error("--out DIR and --exclude SPLIT.json are required");
 const LANGS = ["JavaScript", "TypeScript", "Python", "Go", "Rust", "Java", "Ruby", "PHP", "C#", "C++", "C", "Swift", "Kotlin"];
 const EXTRA_LANGS = ["Dart", "Elixir", "Scala", "Shell"];
@@ -22,7 +25,7 @@ const SINCE = Date.parse("2026-10-04T00:00:00Z");
 const MAX_RUNS = 6;
 const MAX_JOBS = 6;
 const CAP = { total: 3, failed: 2 };
-for (const dir of ["repos", "logs", "lists"]) mkdirSync(join(OUT, dir), { recursive: true });
+for (const dir of ["repos", "logs", "lists", "picks"]) mkdirSync(join(OUT, dir), { recursive: true });
 
 let calls = 0;
 const sleep = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
@@ -174,24 +177,119 @@ function processRepo(meta, bucket) {
   return record;
 }
 
+// Amendment 1 of the registration: failed-only top-up on accepted repositories; adds failed steps only, up to 2 failed and 5 cases per repository.
+function topupRepo(record) {
+  if (record.topup || record.cases.filter((c) => c.failed).length >= 2) return record;
+  const file = join(OUT, "repos", `${slug(record.repo)}.json`);
+  const failed = runList(record.repo, "failure").sort(byHash((r) => String(r.databaseId))).filter((r) => !record.inspectedRuns.includes(r.databaseId));
+  const seen = new Set(record.cases.map((c) => `${c.workflow}|${c.step_name}`));
+  const drop = (reason) => (record.dropped[reason] = (record.dropped[reason] ?? 0) + 1);
+  record.topup = true;
+  record.topup_added = 0;
+  let inspected = 0;
+  for (const run of failed) {
+    if (inspected >= MAX_RUNS || record.cases.filter((c) => c.failed).length >= CAP.failed || record.cases.length >= 5) break;
+    inspected += 1;
+    record.inspectedRuns.push(run.databaseId);
+    const jobsJson = gh(["api", `repos/${record.repo}/actions/runs/${run.databaseId}/jobs?per_page=100`], { allowFail: true });
+    if (!jobsJson) continue;
+    const jobs = JSON.parse(jobsJson).jobs.filter((j) => j.conclusion === "failure").sort(byHash((j) => String(j.id))).slice(0, MAX_JOBS);
+    for (const job of jobs) {
+      const raw = jobLog(record.repo, job.id);
+      if (raw === null) {
+        drop("log_expired");
+        continue;
+      }
+      const segments = splitSegments(stripTransport(raw));
+      const steps = job.steps.filter((s) => s.conclusion !== "skipped" && s.name !== "Set up job" && s.name !== "Complete job" && !s.name.startsWith("Post "));
+      if (segments.length !== steps.length) {
+        drop("segment_mismatch");
+        continue;
+      }
+      for (const [i, step] of steps.entries()) {
+        const segment = segments[i];
+        if (segment.uses || step.conclusion !== "failure" && !(step.conclusion === "success" && segment.exits.some((c) => c !== 0))) continue;
+        const kind = classify(step.name, segment.script);
+        if (kind.excluded) {
+          if (kind.excluded === "multi-purpose") drop("multi_purpose");
+          continue;
+        }
+        const key = `${run.workflowName}|${step.name}`;
+        if (seen.has(key)) continue;
+        const evidence = buildEvidence(segment);
+        if (evidence.exit === 0) {
+          drop("failed_no_exit_marker");
+          continue;
+        }
+        if (record.cases.filter((c) => c.failed).length >= CAP.failed || record.cases.length >= 5) break;
+        seen.add(key);
+        record.topup_added += 1;
+        record.cases.push({
+          id: `rl-${sha256(`${record.repo}/${job.id}/${step.number}`).slice(0, 8)}`,
+          repo: record.repo,
+          language: record.bucket,
+          license: record.license,
+          stars: record.stars,
+          workflow: run.workflowName,
+          run_id: run.databaseId,
+          job_id: job.id,
+          step_number: step.number,
+          step_name: step.name,
+          purpose: kind.purpose,
+          criterion: criterionOf(kind.purpose),
+          tool: wrapperTool(evidence.text, refineTool(kind.tool, evidence.text)),
+          conclusion: step.conclusion,
+          failed: true,
+          exit_code: evidence.exit,
+          evidence: evidence.text,
+          evidence_sha256: sha256(evidence.text),
+          chars: evidence.text.length,
+        });
+      }
+    }
+  }
+  writeFileSync(file, JSON.stringify(record));
+  return record;
+}
+
 const accepted = {};
 const picked = new Set();
 const buckets = [...LANGS.map((l) => [l, PER_LANG]), ...EXTRA_LANGS.map((l) => [l, EXTRA])];
-for (const [lang, quota] of buckets) {
-  accepted[lang] = 0;
-  for (const meta of candidates(lang)) {
-    if (accepted[lang] >= quota) break;
-    if (EXCLUDED.has(meta.fullName) || picked.has(meta.fullName)) {
-      bump("excluded_candidates");
-      continue;
+if (TOPUP) {
+  for (const [lang] of buckets.filter(([l]) => !ONLY || ONLY.includes(l))) {
+    const f = join(OUT, "picks", `${lang.replace(/\W/g, "_")}.json`);
+    for (const repo of existsSync(f) ? readJson(f) : []) {
+      const rec = topupRepo(readJson(join(OUT, "repos", `${slug(repo)}.json`)));
+      console.error(`topup ${lang} ${repo}: +${rec.topup_added ?? 0}`);
     }
-    const record = processRepo(meta, lang);
-    console.error(`${lang} ${meta.fullName}: ${record.cases.length} cases (${calls} calls)`);
-    if (record.cases.length > 0) {
-      accepted[lang] += 1;
-      picked.add(meta.fullName);
-    } else bump("repos_without_cases");
   }
+  process.exit(0);
+}
+if (!AGGREGATE) {
+  for (const [lang, quota] of buckets.filter(([l]) => !ONLY || ONLY.includes(l))) {
+    accepted[lang] = 0;
+    const mine = [];
+    for (const meta of candidates(lang)) {
+      if (accepted[lang] >= quota) break;
+      if (EXCLUDED.has(meta.fullName)) {
+        bump("excluded_candidates");
+        continue;
+      }
+      const record = processRepo(meta, lang);
+      console.error(`${lang} ${meta.fullName}: ${record.cases.length} cases (${calls} calls)`);
+      if (record.cases.length > 0) {
+        accepted[lang] += 1;
+        mine.push(meta.fullName);
+      } else bump("repos_without_cases");
+    }
+    writeFileSync(join(OUT, "picks", `${lang.replace(/\W/g, "_")}.json`), JSON.stringify(mine));
+  }
+  if (ONLY) process.exit(0);
+}
+for (const [lang] of buckets) {
+  const f = join(OUT, "picks", `${lang.replace(/\W/g, "_")}.json`);
+  accepted[lang] = existsSync(f) ? readJson(f).length : 0;
+  if (existsSync(f)) for (const r of readJson(f)) picked.add(r);
 }
 
 const pickedFiles = readdirSync(join(OUT, "repos")).filter((f) => picked.has(readJson(join(OUT, "repos", f)).repo));
