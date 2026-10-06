@@ -311,3 +311,103 @@ test("queue render never auto-focuses a label button", () => {
   assert.match(APP_JS, /card\.tabIndex = -1/);
   assert.match(APP_JS, /card\.focus\(\)/);
 });
+
+test("bidi control characters in excerpts reach the page as visible code points; the store keeps them", async () => {
+  const dataDir = tempDir();
+  const cwd = tempDir();
+  const home = tempDir();
+  appendStop(dataDir, stop("sbidi", projectId(cwd), { task_excerpt: "fix ‮gnirts desrever‬ here", final_excerpt: "ok ⁧x⁩ ‏؜‎" }));
+  const ui = await startUi({ dataDir, cwd, home, env: { HOME: home }, now: () => 0 });
+  try {
+    const r = await raw(ui.port, { path: "/api/queue", headers: { host: `127.0.0.1:${ui.port}`, "x-referee-token": ui.token } });
+    const first = (JSON.parse(r.body) as { stops: { task_excerpt: string; final_excerpt: string }[] }).stops[0];
+    assert.equal(first?.task_excerpt, "fix [U+202E]gnirts desrever[U+202C] here");
+    assert.equal(first?.final_excerpt, "ok [U+2067]x[U+2069] [U+200F][U+061C][U+200E]");
+    assert.equal(readStops(dataDir)[0]?.task_excerpt, "fix ‮gnirts desrever‬ here");
+  } finally {
+    await ui.close();
+  }
+});
+
+class FakeNode {
+  children: FakeNode[] = [];
+  attrs: Record<string, string> = {};
+  className = "";
+  tabIndex = 0;
+  type = "";
+  private own = "";
+  readonly tag: string;
+  constructor(tag: string) {
+    this.tag = tag;
+  }
+  set textContent(v: string) {
+    this.own = v;
+    this.children = [];
+  }
+  get textContent(): string {
+    return this.own + this.children.map((c) => c.textContent).join(" ");
+  }
+  get firstChild(): FakeNode | null {
+    return this.children[0] ?? null;
+  }
+  appendChild(c: FakeNode): FakeNode {
+    this.children.push(c);
+    return c;
+  }
+  removeChild(c: FakeNode): FakeNode {
+    this.children.splice(this.children.indexOf(c), 1);
+    return c;
+  }
+  setAttribute(k: string, v: string): void {
+    this.attrs[k] = v;
+  }
+  addEventListener(): void {}
+  focus(): void {}
+}
+
+function fakePage(hash: string, queue: unknown) {
+  const nodes: Record<string, FakeNode> = { main: new FakeNode("main"), status: new FakeNode("p"), tabs: new FakeNode("nav") };
+  const on: Record<string, (() => void)[]> = {};
+  const location = { hash, pathname: "/" };
+  const fetched: { path: string; token: string }[] = [];
+  new Script(APP_JS).runInNewContext({
+    URLSearchParams,
+    setTimeout,
+    location,
+    history: { replaceState: () => void (location.hash = "") },
+    document: { getElementById: (id: string) => nodes[id], createElement: (tag: string) => new FakeNode(tag), addEventListener: () => undefined, body: new FakeNode("body") },
+    window: { addEventListener: (type: string, f: () => void) => void (on[type] ??= []).push(f) },
+    fetch: (path: string, init: { headers: Record<string, string> }) => {
+      fetched.push({ path, token: init.headers["X-Referee-Token"] ?? "" });
+      return Promise.resolve({ status: 200, ok: true, json: () => Promise.resolve(queue) });
+    },
+  });
+  return { main: nodes["main"] as FakeNode, location, fetched, fire: (type: string) => (on[type] ?? []).forEach((f) => f()) };
+}
+
+const settle = () => new Promise((resolve) => setImmediate(resolve));
+
+test("the tokened URL opened again in the same tab is picked up without a reload; other hashes are ignored", async () => {
+  const page = fakePage("", { total: 0, stops: [] });
+  assert.match(page.main.textContent, /No session token/);
+  page.location.hash = "#main";
+  page.fire("hashchange");
+  await settle();
+  assert.equal(page.fetched.length, 0);
+  page.location.hash = "#t=abc123";
+  page.fire("hashchange");
+  await settle();
+  assert.deepEqual(page.fetched, [{ path: "/api/queue", token: "abc123" }]);
+  assert.equal(page.location.hash, "");
+  assert.match(page.main.textContent, /Nothing to label/);
+});
+
+test("the queue card counts edits and checks in the singular and the plural", async () => {
+  const card = (edits: number, checks: number) => ({ id: "s1", ts: "2026-10-06T06:00:00.000Z", edits, checks, claims_done: 0.9, claims_verified: 0.1, task_excerpt: "t", final_excerpt: "f", suggestion: null });
+  const one = fakePage("#t=tok", { total: 1, stops: [card(1, 1)] });
+  await settle();
+  assert.match(one.main.textContent, /- 1 edit, 1 check - done score 0\.90/);
+  const many = fakePage("#t=tok", { total: 1, stops: [card(2, 0)] });
+  await settle();
+  assert.match(many.main.textContent, /- 2 edits, 0 checks - done score 0\.90/);
+});

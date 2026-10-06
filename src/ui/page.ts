@@ -154,7 +154,7 @@ function renderQueue(total) {
   var card = el("section", null, "card");
   card.tabIndex = -1;
   card.setAttribute("aria-label", "Stop " + (index + 1) + " of " + items.length);
-  add(card, el("p", "Stop " + (index + 1) + " of " + items.length + " - " + s.ts + " - " + s.edits + " edits, " + s.checks + " checks - done score " + (s.claims_done === null ? "n/a" : s.claims_done.toFixed(2)), "meta"));
+  add(card, el("p", "Stop " + (index + 1) + " of " + items.length + " - " + s.ts + " - " + s.edits + (s.edits === 1 ? " edit, " : " edits, ") + s.checks + (s.checks === 1 ? " check" : " checks") + " - done score " + (s.claims_done === null ? "n/a" : s.claims_done.toFixed(2)), "meta"));
   add(card, el("p", "Task (start of the prompt)", "label"), el("pre", s.task_excerpt || "(none stored)"));
   add(card, el("p", "Claude's final message (end)", "label"), el("pre", s.final_excerpt || "(none stored)"));
   if (s.suggestion) {
@@ -205,6 +205,14 @@ document.addEventListener("keydown", function (e) {
   else if (k === "b" || e.key === "ArrowLeft") move(-1);
   else return;
   e.preventDefault();
+});
+
+window.addEventListener("hashchange", function () {
+  var t = new URLSearchParams(location.hash.slice(1)).get("t");
+  if (!t) return;
+  token = t;
+  history.replaceState(null, "", location.pathname);
+  show("queue");
 });
 
 function renderOverview(d) {

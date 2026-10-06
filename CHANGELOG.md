@@ -12,6 +12,13 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - The `verify` skill recipe no longer says that `npx claude-referee` fails with a 404 until the npm publish, and no longer points to the README alias that 0.2.1 removed; the package is on npm (0.2.0 to 0.2.2). The roadmap status table follows the releases and npm, and cites the rewritten commits instead of seven hashes that are no longer in `main`.
 
+### Fixed
+
+- `ui`: bidi control characters (U+061C, U+200E, U+200F, U+202A to U+202E, U+2066 to U+2069) in stored excerpts are shown in the labelling queue as code points such as `[U+202E]`, so a reversed or reordered excerpt can no longer show the labeller other text than what was stored; `stops.jsonl` and the export keep the original text.
+- `ui`: opening the printed URL again in the same tab (after a reload dropped the token from the address bar) now loads the dashboard; before, only the hash changed and the page stayed on "No session token".
+- `ui`: the queue card says "1 edit" and "1 check" in the singular.
+- Found by the first run of `ui` in a real browser (headless Chrome 145 through agent-browser, 2026-10-06, synthetic stops): labelling by key and by click, overview, privacy, the three exports, dark mode and a 375 px width worked, with no console or page errors.
+
 ### Measured
 
 - Second look at the second real-log sample (`docs/measurements-real-logs-3.md`): on the frozen hold-out half, wrong `met` went from 0 of 52 to 1 of 52, `met` recall among parsed from 23 of 29 to 26 of 35 (0.743), parsed coverage from 41.7% to 49.6%. Its aggregate bars were already seen, so this is not an unseen test; `done` v2 stays not measured on its original bar.

@@ -30,6 +30,11 @@ const WINDOW_DAYS = 30;
 const QUEUE_LIMIT = 50;
 const EXCERPT_CHARS = 2000;
 const STOP_ID = /^[A-Za-z0-9_-]{1,40}$/;
+const BIDI_CONTROL = /[؜‎‏‪-‮⁦-⁩]/g;
+
+function visible(text: string): string {
+  return text.replace(BIDI_CONTROL, (c) => `[U+${c.charCodeAt(0).toString(16).toUpperCase().padStart(4, "0")}]`);
+}
 
 function projectStops(ctx: UiContext): StopRecord[] {
   const project = projectId(ctx.cwd);
@@ -57,8 +62,8 @@ export function queue(ctx: UiContext) {
       checks: r.checks,
       claims_done: r.decision?.claims_done ?? null,
       claims_verified: r.decision?.claims_verified ?? null,
-      task_excerpt: r.task_excerpt?.slice(0, EXCERPT_CHARS) ?? "",
-      final_excerpt: r.final_excerpt?.slice(0, EXCERPT_CHARS) ?? "",
+      task_excerpt: visible(r.task_excerpt?.slice(0, EXCERPT_CHARS) ?? ""),
+      final_excerpt: visible(r.final_excerpt?.slice(0, EXCERPT_CHARS) ?? ""),
       suggestion: hints.get(r.id) ?? null,
     })),
   };
