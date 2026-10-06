@@ -1,9 +1,12 @@
 // Circuit breaker: three Jev failures in a row silence the hook's Jev calls for the rest of that session.
+// One file per session, so parallel sessions never lose each other's counts.
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { spawn } from "node:child_process";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 import { breakerOpen, recordBreaker } from "../src/engine/breaker.ts";
 import { isRefereeError } from "../src/engine/errors.ts";
 import { Session, type Planned } from "../src/engine/session.ts";
@@ -24,12 +27,46 @@ test("breaker opens after three failures in a row and a success resets it", () =
   assert.equal(breakerOpen(dir, "s2"), false);
 });
 
-test("breaker prunes sessions older than a day", () => {
+test("breaker prunes sessions older than a day, keeps files it cannot read and removes the old breaker.json", () => {
   const dir = tempDir();
+  writeFileSync(join(dir, "breaker.json"), JSON.stringify({ sessions: { s0: { failures: 2, ts: NOW } } }));
   recordBreaker(dir, "old", false, NOW - 25 * 3_600_000);
+  writeFileSync(join(dir, "breaker", "half-written"), "");
   recordBreaker(dir, "new", false, NOW);
-  const state = JSON.parse(readFileSync(join(dir, "breaker.json"), "utf8")) as { sessions: Record<string, unknown> };
-  assert.deepEqual(Object.keys(state.sessions), ["new"]);
+  const files = readdirSync(join(dir, "breaker")).sort();
+  assert.equal(files.length, 2);
+  assert.ok(files.includes("half-written"));
+  const own = files.find((f) => f !== "half-written") ?? "";
+  assert.match(own, /^[0-9a-f]{32}$/);
+  assert.equal(readFileSync(join(dir, "breaker", own), "utf8"), `1 ${NOW}`);
+  assert.equal(existsSync(join(dir, "breaker.json")), false);
+  recordBreaker(dir, "new", true, NOW);
+  assert.deepEqual(readdirSync(join(dir, "breaker")), ["half-written"]);
+});
+
+test("a success with no breaker state creates nothing", () => {
+  const dir = tempDir();
+  recordBreaker(dir, "s1", true, NOW);
+  assert.deepEqual(readdirSync(dir), []);
+});
+
+test("parallel sessions keep every failure count: 16 sessions failing three times each all open", async () => {
+  const dir = tempDir();
+  const worker = join(tempDir(), "fail.ts");
+  const breaker = fileURLToPath(new URL("../src/engine/breaker.ts", import.meta.url));
+  writeFileSync(worker, `import { recordBreaker } from ${JSON.stringify(breaker)};\nconst [dir, id] = process.argv.slice(2);\nfor (let i = 0; i < 3; i++) recordBreaker(dir, id, false, ${NOW});\n`);
+  const ids = Array.from({ length: 16 }, (_, i) => `s${i}`);
+  const codes = await Promise.all(ids.map((id) => new Promise<number | null>((resolve) => spawn(process.execPath, [worker, dir, id], { stdio: "ignore" }).on("close", resolve))));
+  assert.deepEqual(codes, ids.map(() => 0));
+  for (const id of ids) assert.equal(breakerOpen(dir, id), true, id);
+  assert.equal(readdirSync(join(dir, "breaker")).filter((f) => f.endsWith(".tmp")).length, 0);
+});
+
+test("recordBreaker never throws on an unwritable data directory", () => {
+  const base = tempDir();
+  writeFileSync(join(base, "file"), "x");
+  assert.doesNotThrow(() => recordBreaker(join(base, "file", "sub"), "s1", false, NOW));
+  assert.equal(breakerOpen(join(base, "file", "sub"), "s1"), false);
 });
 
 const planned: Planned = { id: "p", state: { text: "x" }, questions: { q: { type: "noul", instructions: "Is it fine?" } } };

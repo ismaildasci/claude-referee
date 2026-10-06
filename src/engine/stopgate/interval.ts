@@ -1,5 +1,6 @@
 // Exact binomial (Clopper-Pearson) interval and the done-gate threshold suggestion built on human labels only.
 // No dependencies: the interval inverts the binomial tail sums by bisection; the suggestion can only raise claims_done, never loosen it.
+// log C(n, k) does not depend on p, so each interval sums it once per k (same arithmetic as before, bit-identical) and reuses it across the bisection.
 
 import type { StopRecord } from "./types.ts";
 
@@ -12,15 +13,13 @@ function logChoose(n: number, k: number): number {
   return sum;
 }
 
-function pmf(n: number, k: number, p: number): number {
-  if (p <= 0) return k === 0 ? 1 : 0;
-  if (p >= 1) return k === n ? 1 : 0;
-  return Math.exp(logChoose(n, k) + k * Math.log(p) + (n - k) * Math.log1p(-p));
-}
-
-function cdf(n: number, x: number, p: number): number {
+function cdf(n: number, x: number, p: number, logC: Float64Array): number {
+  if (p <= 0) return 1;
+  if (p >= 1) return x >= n ? 1 : 0;
+  const lp = Math.log(p);
+  const lq = Math.log1p(-p);
   let sum = 0;
-  for (let k = 0; k <= x; k++) sum += pmf(n, k, p);
+  for (let k = 0; k <= x; k++) sum += Math.exp((logC[k] ?? 0) + k * lp + (n - k) * lq);
   return Math.min(1, sum);
 }
 
@@ -39,8 +38,10 @@ function bisect(f: (p: number) => number, target: number, increasing: boolean): 
 export function clopperPearson(x: number, n: number, confidence = 0.95): { readonly lower: number; readonly upper: number } {
   if (!Number.isInteger(x) || !Number.isInteger(n) || n < 1 || x < 0 || x > n || !(confidence > 0 && confidence < 1)) throw new RangeError("clopperPearson needs integers 0 <= x <= n, n >= 1");
   const alpha = (1 - confidence) / 2;
-  const lower = x === 0 ? 0 : bisect((p) => 1 - cdf(n, x - 1, p), alpha, true);
-  const upper = x === n ? 1 : bisect((p) => cdf(n, x, p), alpha, false);
+  const logC = new Float64Array(x + 1);
+  for (let k = 1; k <= x; k++) logC[k] = logChoose(n, k);
+  const lower = x === 0 ? 0 : bisect((p) => 1 - cdf(n, x - 1, p, logC), alpha, true);
+  const upper = x === n ? 1 : bisect((p) => cdf(n, x, p, logC), alpha, false);
   return { lower, upper };
 }
 

@@ -1,4 +1,6 @@
 // Clopper-Pearson interval against published values, the threshold suggestion gate, and the weak next-message hint.
+// referenceInterval is the interval as computed before log C(n, k) was reused across the bisection: the reference for bit-identical results.
+// The hint reads past a prompt that is only a pasted image: it is neither the next prompt nor the turn's prompt.
 
 import assert from "node:assert/strict";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -10,7 +12,7 @@ import { projectId } from "../src/engine/datadir.ts";
 import { clopperPearson, suggestThreshold } from "../src/engine/stopgate/interval.ts";
 import { appendStop, labelStop, readStops } from "../src/engine/stopgate/stops.ts";
 import type { StopRecord } from "../src/engine/stopgate/types.ts";
-import { classifyNext } from "../src/engine/stopgate/weak.ts";
+import { classifyNext, suggestFromTranscript } from "../src/engine/stopgate/weak.ts";
 import { memoryIo, tempDir } from "./helpers.ts";
 
 const near = (a: number, b: number, eps = 5e-4) => assert.ok(Math.abs(a - b) < eps, `${a} vs ${b}`);
@@ -34,6 +36,48 @@ test("clopperPearson matches known 95% values", () => {
   assert.ok(narrow.lower > clopperPearson(5, 10).lower && narrow.upper < clopperPearson(5, 10).upper);
   assert.throws(() => clopperPearson(11, 10), RangeError);
   assert.throws(() => clopperPearson(0, 0), RangeError);
+});
+
+function referenceInterval(x: number, n: number, confidence = 0.95): { lower: number; upper: number } {
+  const logChoose = (k: number) => {
+    let sum = 0;
+    for (let i = 1; i <= k; i++) sum += Math.log((n - k + i) / i);
+    return sum;
+  };
+  const pmf = (k: number, p: number) => (p <= 0 ? (k === 0 ? 1 : 0) : p >= 1 ? (k === n ? 1 : 0) : Math.exp(logChoose(k) + k * Math.log(p) + (n - k) * Math.log1p(-p)));
+  const cdf = (upTo: number, p: number) => {
+    let sum = 0;
+    for (let k = 0; k <= upTo; k++) sum += pmf(k, p);
+    return Math.min(1, sum);
+  };
+  const bisect = (f: (p: number) => number, target: number, increasing: boolean) => {
+    let lo = 0;
+    let hi = 1;
+    for (let i = 0; i < 100; i++) {
+      const mid = (lo + hi) / 2;
+      if (f(mid) < target === increasing) lo = mid;
+      else hi = mid;
+    }
+    return (lo + hi) / 2;
+  };
+  const alpha = (1 - confidence) / 2;
+  return { lower: x === 0 ? 0 : bisect((p) => 1 - cdf(x - 1, p), alpha, true), upper: x === n ? 1 : bisect((p) => cdf(x, p), alpha, false) };
+}
+
+test("clopperPearson is bit-identical to the previous computation on a grid", () => {
+  const grid: [number, number, number?][] = [];
+  for (let n = 1; n <= 40; n++) for (let x = 0; x <= n; x++) grid.push([x, n]);
+  grid.push([95, 100], [180, 200], [3, 200], [100, 100], [0, 150], [7, 30, 0.9], [29, 30, 0.99]);
+  for (const [x, n, confidence] of grid) assert.deepEqual(clopperPearson(x, n, confidence), referenceInterval(x, n, confidence), `${x}/${n}`);
+});
+
+test("clopperPearson stays fast on large n (it took about 20 s at 5000 of 10000)", () => {
+  const t0 = performance.now();
+  const ci = clopperPearson(5000, 10000);
+  const ms = performance.now() - t0;
+  near(ci.lower, 0.4902);
+  near(ci.upper, 0.5098);
+  assert.ok(ms < 2000, `took ${ms.toFixed(0)} ms`);
 });
 
 function stop(id: string, label: "right" | "wrong" | undefined, claimsDone: number, extra: Partial<StopRecord> = {}): StopRecord {
@@ -120,6 +164,26 @@ test("classifyNext does not hint on negated, hypothetical, instruction or positi
 function transcriptLine(type: string, ts: string, content: unknown): string {
   return JSON.stringify({ type, timestamp: ts, message: { role: type, content } });
 }
+
+test("the hint reads past an image-only prompt, after the stop and as the turn's prompt", () => {
+  const image = [{ type: "image", source: { type: "base64", media_type: "image/png", data: "iVBORw0KGgo=" } }];
+  const after = [
+    transcriptLine("user", "2026-09-29T09:00:00.000Z", "add a login page"),
+    transcriptLine("assistant", "2026-09-29T09:05:00.000Z", [{ type: "text", text: "done" }]),
+    transcriptLine("user", "2026-09-29T09:10:00.000Z", image),
+    transcriptLine("user", "2026-09-29T09:11:00.000Z", "it still doesn't work"),
+  ].join("\n");
+  assert.deepEqual(suggestFromTranscript(after, "2026-09-29T09:06:00.000Z"), { label: "right", reason: "reported_broken", source: "next_message" });
+  const turn = [
+    transcriptLine("user", "2026-09-29T09:00:00.000Z", "add a login page with email and password"),
+    transcriptLine("assistant", "2026-09-29T09:05:00.000Z", [{ type: "text", text: "done" }]),
+    transcriptLine("user", "2026-09-29T09:10:00.000Z", image),
+    transcriptLine("assistant", "2026-09-29T09:14:00.000Z", [{ type: "text", text: "done" }]),
+    transcriptLine("user", "2026-09-29T09:20:00.000Z", "please add a login page with email and password"),
+  ].join("\n");
+  assert.deepEqual(suggestFromTranscript(turn, "2026-09-29T09:15:00.000Z"), { label: "right", reason: "repeated_request", source: "next_message" });
+  assert.equal(suggestFromTranscript(turn.split("\n").slice(0, 4).join("\n"), "2026-09-29T09:15:00.000Z"), null);
+});
 
 test("receipts --stops shows the hint for unlabelled would_block stops, never for labelled, never the text", async () => {
   const dataDir = tempDir();

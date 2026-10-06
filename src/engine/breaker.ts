@@ -1,7 +1,10 @@
 // Circuit breaker for hooks that call Jev: three failures in a row in one session skip Jev for the rest of it.
-// State lives in <dataDir>/breaker.json keyed by session id; writes are best-effort and day-old sessions are pruned.
+// One file per session, <dataDir>/breaker/<hash of the session id>, holding "<failures> <ts>" and written by temp file + rename.
+// A session's stops run one at a time, so no lock is needed and parallel sessions never overwrite each other's counts.
+// Writes are best-effort; files of sessions idle for a day are pruned, unreadable ones are left alone, and the old breaker.json is removed.
 
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { ErrorCode } from "./errors.ts";
 
@@ -10,31 +13,39 @@ const STALE_MS = 24 * 60 * 60 * 1000;
 
 export const BREAKER_CODES: ReadonlySet<ErrorCode> = new Set<ErrorCode>(["timeout", "service_unavailable", "rate_limited"]);
 
-interface State {
-  sessions: Record<string, { failures: number; ts: number }>;
-}
+const breakerDir = (dataDir: string): string => join(dataDir, "breaker");
+const sessionFile = (dataDir: string, sessionId: string): string => join(breakerDir(dataDir), createHash("sha256").update(sessionId).digest("hex").slice(0, 32));
 
-function read(dataDir: string): State {
+function read(file: string): { failures: number; ts: number } | null {
   try {
-    const state = JSON.parse(readFileSync(join(dataDir, "breaker.json"), "utf8")) as State;
-    return state && typeof state.sessions === "object" && state.sessions !== null ? state : { sessions: {} };
+    const [failures = Number.NaN, ts = Number.NaN] = readFileSync(file, "utf8").split(" ").map(Number);
+    return Number.isInteger(failures) && failures > 0 && ts > 0 ? { failures, ts } : null;
   } catch {
-    return { sessions: {} };
+    return null;
   }
 }
 
 export function breakerOpen(dataDir: string, sessionId: string): boolean {
-  return (read(dataDir).sessions[sessionId]?.failures ?? 0) >= LIMIT;
+  return (read(sessionFile(dataDir, sessionId))?.failures ?? 0) >= LIMIT;
 }
 
 export function recordBreaker(dataDir: string, sessionId: string, ok: boolean, now: number): void {
-  const state = read(dataDir);
-  for (const [id, entry] of Object.entries(state.sessions)) if (now - entry.ts > STALE_MS) delete state.sessions[id];
-  if (ok) delete state.sessions[sessionId];
-  else state.sessions[sessionId] = { failures: (state.sessions[sessionId]?.failures ?? 0) + 1, ts: now };
   try {
-    mkdirSync(dataDir, { recursive: true });
-    writeFileSync(join(dataDir, "breaker.json"), JSON.stringify(state));
+    const dir = breakerDir(dataDir);
+    const own = sessionFile(dataDir, sessionId);
+    for (const name of existsSync(dir) ? readdirSync(dir) : []) {
+      const entry = read(join(dir, name));
+      if (entry && now - entry.ts > STALE_MS) rmSync(join(dir, name), { force: true });
+    }
+    rmSync(join(dataDir, "breaker.json"), { force: true });
+    if (ok) {
+      rmSync(own, { force: true });
+      return;
+    }
+    mkdirSync(dir, { recursive: true });
+    const tmp = `${own}.${process.pid}.tmp`;
+    writeFileSync(tmp, `${(read(own)?.failures ?? 0) + 1} ${now}`);
+    renameSync(tmp, own);
   } catch {
     return;
   }

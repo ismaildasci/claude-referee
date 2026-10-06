@@ -1,12 +1,18 @@
 // Local store of the Stop done-gate in shadow mode: one JSON line per stop in <dataDir>/stops.jsonl.
 // Best-effort writes that never throw; labels are appended to labels.jsonl and merged on read, so labelling never rewrites the stops; stats feed the precision measurement.
+// Past 2 MB, a stop whose oldest record is a day beyond the 90-day retention prunes the file: under a lock taken without waiting (skip on contention),
+// via temp file + rename, copying lines other sessions appended meanwhile. Pruning leaves no record older than the retention, so it runs at most about once a day.
+// An append that reached the renamed-away file is written again; the copy that may cause is collapsed by id on read and on pruning (first wins).
 
-import { appendFileSync, chmodSync, existsSync, mkdirSync, readFileSync, renameSync, statSync, writeFileSync } from "node:fs";
+import { appendFileSync, chmodSync, closeSync, existsSync, fstatSync, mkdirSync, openSync, readFileSync, readSync, renameSync, statSync, unlinkSync, writeFileSync, writeSync } from "node:fs";
 import { join } from "node:path";
 import type { StopRecord } from "./types.ts";
 
 const MAX_BYTES = 2_000_000;
 const RETENTION_MS = 90 * 86_400_000;
+const SLACK_MS = 86_400_000;
+const HEAD_BYTES = 16_384;
+const LOCK_STALE_MS = 30_000;
 
 export interface StopStats {
   readonly stops: number;
@@ -42,11 +48,14 @@ export function newStopId(now: number, random: () => number = Math.random): stri
 
 function parseLines(text: string): StopRecord[] {
   const out: StopRecord[] = [];
+  const seen = new Set<string>();
   for (const line of text.split("\n")) {
     if (!line.trim()) continue;
     try {
       const value = JSON.parse(line) as unknown;
-      if (value !== null && typeof value === "object" && !Array.isArray(value) && typeof (value as StopRecord).id === "string") out.push(value as StopRecord);
+      if (value === null || typeof value !== "object" || Array.isArray(value) || typeof (value as StopRecord).id !== "string" || seen.has((value as StopRecord).id)) continue;
+      seen.add((value as StopRecord).id);
+      out.push(value as StopRecord);
     } catch {
       continue;
     }
@@ -54,28 +63,88 @@ function parseLines(text: string): StopRecord[] {
   return out;
 }
 
-function writeAtomic(file: string, records: readonly StopRecord[]): void {
+function readRange(fd: number, from: number, to: number): Buffer {
+  const buf = Buffer.alloc(Math.max(0, to - from));
+  let got = 0;
+  while (got < buf.length) {
+    const n = readSync(fd, buf, got, buf.length - got, from + got);
+    if (n <= 0) break;
+    got += n;
+  }
+  return buf.subarray(0, got);
+}
+
+function copyTail(fd: number, dest: string, from: number): number {
+  const tail = readRange(fd, from, fstatSync(fd).size);
+  const end = tail.lastIndexOf(10) + 1;
+  if (end > 0) appendFileSync(dest, tail.subarray(0, end));
+  return from + end;
+}
+
+function pruneDue(file: string, before: string): boolean {
+  const fd = openSync(file, "r");
+  try {
+    const head = readRange(fd, 0, HEAD_BYTES).toString("utf8");
+    const end = head.lastIndexOf("\n");
+    if (end < 0) return false;
+    const first = parseLines(head.slice(0, end + 1))[0];
+    return typeof first?.ts !== "string" || first.ts < before;
+  } finally {
+    closeSync(fd);
+  }
+}
+
+function compact(file: string, now: number): void {
+  const lock = `${file}.lock`;
+  let held: number;
+  try {
+    held = openSync(lock, "wx", 0o600);
+  } catch {
+    if (now - statSync(lock).mtimeMs > LOCK_STALE_MS) unlinkSync(lock);
+    return;
+  }
   const tmp = `${file}.${process.pid}.tmp`;
-  writeFileSync(tmp, records.map((r) => JSON.stringify(r)).join("\n") + (records.length ? "\n" : ""), { mode: 0o600 });
-  renameSync(tmp, file);
+  let fd: number | undefined;
+  try {
+    fd = openSync(file, "r");
+    const all = readRange(fd, 0, fstatSync(fd).size);
+    const end = all.lastIndexOf(10) + 1;
+    const cutoff = new Date(now - RETENTION_MS).toISOString();
+    const kept = parseLines(all.subarray(0, end).toString("utf8")).filter((r) => typeof r.ts === "string" && r.ts >= cutoff);
+    writeFileSync(tmp, kept.map((r) => JSON.stringify(r) + "\n").join(""), { mode: 0o600 });
+    const copied = copyTail(fd, tmp, end);
+    renameSync(tmp, file);
+    copyTail(fd, file, copied);
+  } finally {
+    if (fd !== undefined) closeSync(fd);
+    if (existsSync(tmp)) unlinkSync(tmp);
+    closeSync(held);
+    unlinkSync(lock);
+  }
 }
 
 export function appendStop(dataDir: string, record: StopRecord): void {
   try {
     mkdirSync(dataDir, { recursive: true });
     const file = stopsFile(dataDir);
-    appendFileSync(file, JSON.stringify(record) + "\n", { mode: 0o600 });
+    const line = JSON.stringify(record) + "\n";
+    const fd = openSync(file, "a", 0o600);
+    let ino: number;
+    try {
+      writeSync(fd, line);
+      ino = fstatSync(fd).ino;
+    } finally {
+      closeSync(fd);
+    }
+    if (statSync(file).ino !== ino) appendFileSync(file, line, { mode: 0o600 });
     try {
       chmodSync(file, 0o600);
     } catch {
       void 0;
     }
-    const size = statSync(file).size;
-    if (size > MAX_BYTES) {
-      const cutoff = new Date(Date.now() - RETENTION_MS).toISOString();
-      const kept = parseLines(readFileSync(file, "utf8")).filter((r) => r.ts >= cutoff);
-      if (statSync(file).size === size) writeAtomic(file, kept);
-    }
+    if (statSync(file).size <= MAX_BYTES) return;
+    const now = Date.now();
+    if (pruneDue(file, new Date(now - RETENTION_MS - SLACK_MS).toISOString())) compact(file, now);
   } catch {
     return;
   }

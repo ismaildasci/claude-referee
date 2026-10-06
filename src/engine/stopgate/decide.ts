@@ -2,12 +2,13 @@
 // No I/O and no project or store access, so the eval command can use it without pulling in the hook.
 
 import type { Questions } from "@typesafe-ai/sdk";
+import { RefereeError } from "../errors.ts";
 import { threshold, thresholdBelow, type Pack } from "../pack.ts";
 import type { StopDecision, StopFacts, StopSkip } from "./types.ts";
 
 function question(pack: Pack, id: string): Questions[string] {
   const q = pack.questions[id];
-  if (!q) throw new Error(`pack has no question ${id}`);
+  if (!q) throw new RefereeError("bad_pack", `Pack ${pack.name} has no question ${id}.`);
   return q as unknown as Questions[string];
 }
 

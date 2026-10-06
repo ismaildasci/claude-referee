@@ -1,5 +1,6 @@
 // Reads a Claude Code transcript (JSON lines) and reports the current turn: edits and checks since the last real user prompt.
 // Scans backwards for that prompt and forwards from it; only content-free facts are kept, never throws. Marks: truncated checks, subagent reports, a pass from the previous turn.
+// An edit Claude Code refused before applying it (a <tool_use_error> or a denial) is not an edit; other errors still count. An image-only prompt starts a turn.
 
 import { parseEvidence } from "../runners/index.ts";
 import type { CheckRun, CheckStatus, StopFacts } from "./types.ts";
@@ -46,6 +47,11 @@ interface Pending {
   seq: number;
   status: CheckStatus;
   truncated: boolean;
+}
+interface EditUse {
+  path: string;
+  seq: number;
+  rejected: boolean;
 }
 
 function withoutHeredocs(command: string): string {
@@ -202,8 +208,9 @@ function promptText(entry: Entry | null): string | null {
   if (Array.isArray(content) && (content as Block[]).some((b) => b && b.type === "tool_result")) return null;
   const text = textOf(content);
   const trimmed = text.trim();
-  if (!trimmed || trimmed.startsWith("<local-command-") || trimmed.startsWith("[Request interrupted")) return null;
   if (isNotification(entry, trimmed)) return null;
+  if (!trimmed) return Array.isArray(content) && (content as Block[]).some((b) => b && b.type === "image") ? "" : null;
+  if (trimmed.startsWith("<local-command-") || trimmed.startsWith("[Request interrupted")) return null;
   return text;
 }
 
@@ -241,7 +248,7 @@ function firstPrompt(text: string): string {
     const line = text.slice(pos, end);
     if (isPromptCandidate(line)) {
       const found = promptText(parseLine(line));
-      if (found !== null) return found;
+      if (found) return found;
     }
     pos = end + 1;
   }
@@ -287,6 +294,8 @@ function isDenied(full: string, isError: boolean, denialKind: unknown): boolean 
   return (typeof denialKind === "string" && denialKind !== "") || DENIAL_TEXT.some((re) => re.test(full.trimStart()));
 }
 
+const editRejected = (full: string, isError: boolean, denialKind: unknown): boolean => isError && (/^\s*<tool_use_error>/.test(full) || isDenied(full, isError, denialKind));
+
 function statusOf(full: string, isError: boolean, silent: boolean, denialKind?: unknown): { status: CheckStatus; truncated: boolean } {
   if (isDenied(full, isError, denialKind)) return { status: "denied", truncated: false };
   const truncated = isTruncated(full);
@@ -316,6 +325,8 @@ interface Scan {
 function scanTurn(text: string, from: number, to: number): Scan {
   const out: Scan = { edits: [], calls: [], finalMessage: "", lastEdit: -1, subagentCalls: 0, subagentReports: 0 };
   const byId = new Map<string, Pending>();
+  const editById = new Map<string, EditUse>();
+  const editUses: EditUse[] = [];
   const seen = new Set<string>();
   let seq = 0;
   let pos = from;
@@ -327,12 +338,15 @@ function scanTurn(text: string, from: number, to: number): Scan {
     if (!line.trim()) continue;
     if (TOOL_RESULT_LINE.test(line)) {
       let wanted = false;
-      for (const m of line.matchAll(TOOL_USE_ID)) if (byId.has(m[1] ?? "")) wanted = true;
+      for (const m of line.matchAll(TOOL_USE_ID)) if (byId.has(m[1] ?? "") || editById.has(m[1] ?? "")) wanted = true;
       if (!wanted) continue;
       const entry = parseLine(line);
       if (!entry || entry.isSidechain === true || !Array.isArray(entry.message?.content)) continue;
       for (const block of entry.message.content as Block[]) {
-        const call = block && block.type === "tool_result" && typeof block.tool_use_id === "string" ? byId.get(block.tool_use_id) : undefined;
+        const useId = block && block.type === "tool_result" && typeof block.tool_use_id === "string" ? block.tool_use_id : "";
+        const edit = editById.get(useId);
+        if (edit) edit.rejected = editRejected(fullResultText(block.content), block.is_error === true, entry.toolDenialKind);
+        const call = byId.get(useId);
         if (!call) continue;
         const result = statusOf(fullResultText(block.content), block.is_error === true, call.silent, entry.toolDenialKind);
         call.status = result.status;
@@ -359,8 +373,9 @@ function scanTurn(text: string, from: number, to: number): Scan {
       if (EDIT_TOOLS.has(block.name)) {
         const path = block.name === "NotebookEdit" ? (block.input?.notebook_path ?? block.input?.file_path) : block.input?.file_path;
         if (typeof path === "string" && path) {
-          if (!out.edits.includes(path)) out.edits.push(path);
-          out.lastEdit = seq++;
+          const use: EditUse = { path, seq: seq++, rejected: false };
+          editUses.push(use);
+          if (id) editById.set(id, use);
         }
       } else if (SUBAGENT_TOOLS.has(block.name)) {
         out.subagentCalls++;
@@ -372,6 +387,11 @@ function scanTurn(text: string, from: number, to: number): Scan {
         if (id) byId.set(id, call);
       }
     }
+  }
+  for (const use of editUses) {
+    if (use.rejected) continue;
+    if (!out.edits.includes(use.path)) out.edits.push(use.path);
+    out.lastEdit = use.seq;
   }
   return out;
 }

@@ -1,9 +1,14 @@
 // Stop done-gate store and labelling CLI: append/read, label rewrite, stats arithmetic, receipts --stops, --unlabelled, --label.
+// Pruning past 2 MB: throttled by the oldest record, a lock taken without waiting, and lines appended during the rewrite are kept.
+// An append that reached the renamed-away file is written again, and a stop id stored twice reads and counts once.
 
 import assert from "node:assert/strict";
-import { appendFileSync, existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { spawn } from "node:child_process";
+import fs, { appendFileSync, existsSync, readdirSync, readFileSync, statSync, utimesSync, writeFileSync } from "node:fs";
+import { syncBuiltinESMExports } from "node:module";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 import { commands } from "../src/cli/commands/index.ts";
 import { run } from "../src/cli/run.ts";
 import { projectId } from "../src/engine/datadir.ts";
@@ -258,4 +263,181 @@ test("records written before the marks existed still read and count", () => {
   assert.equal(stops.length, 2);
   assert.equal(stopStats(stops).would_block, 2);
   assert.equal(stops[1]?.stale_pass, true);
+});
+
+const DAY = 86_400_000;
+const isoAgo = (ms: number) => new Date(Date.now() - ms).toISOString();
+const fill = (prefix: string, count: number, ts: () => string) => Array.from({ length: count }, (_, i) => JSON.stringify(rec(`${prefix}${i}`, { ts: ts(), task_excerpt: "x".repeat(1000) }))).join("\n") + "\n";
+const leftovers = (dir: string) => readdirSync(dir).filter((f) => f !== "stops.jsonl");
+
+test("past 2 MB with only fresh records an append never rewrites the file", () => {
+  const dir = tempDir();
+  writeFileSync(stopsFile(dir), fill("f", 2100, () => isoAgo(DAY)));
+  const inode = statSync(stopsFile(dir)).ino;
+  appendStop(dir, rec("new", { ts: new Date().toISOString() }));
+  appendStop(dir, rec("new2", { ts: new Date().toISOString() }));
+  assert.equal(statSync(stopsFile(dir)).ino, inode);
+  assert.equal(readStops(dir).length, 2102);
+  assert.deepEqual(leftovers(dir), []);
+});
+
+test("a first record longer than the head that is read never makes every append rewrite the file", () => {
+  const dir = tempDir();
+  writeFileSync(stopsFile(dir), JSON.stringify(rec("big", { ts: isoAgo(DAY), task_excerpt: "y".repeat(20_000) })) + "\n" + fill("f", 2100, () => isoAgo(DAY)));
+  const inode = statSync(stopsFile(dir)).ino;
+  appendStop(dir, rec("new", { ts: new Date().toISOString() }));
+  assert.equal(statSync(stopsFile(dir)).ino, inode);
+  assert.equal(readStops(dir).length, 2102);
+});
+
+test("pruning keeps fresh records, runs once, and is not repeated until the oldest record ages a day past retention", () => {
+  const dir = tempDir();
+  writeFileSync(stopsFile(dir), fill("old", 1000, () => "2020-01-01T00:00:00.000Z") + fill("edge", 5, () => isoAgo(90 * DAY - 3_600_000)) + fill("f", 2100, () => isoAgo(DAY)));
+  const before = statSync(stopsFile(dir)).ino;
+  appendStop(dir, rec("new", { ts: new Date().toISOString() }));
+  const after = statSync(stopsFile(dir));
+  assert.notEqual(after.ino, before);
+  const ids = readStops(dir).map((r) => r.id);
+  assert.equal(ids.length, 2106);
+  assert.equal(ids.filter((id) => id.startsWith("old")).length, 0);
+  assert.equal(ids.at(-1), "new");
+  assert.deepEqual(leftovers(dir), []);
+  if (process.platform !== "win32") assert.equal(after.mode & 0o777, 0o600);
+  appendStop(dir, rec("new2", { ts: new Date().toISOString() }));
+  assert.equal(statSync(stopsFile(dir)).ino, after.ino);
+});
+
+test("another session holding the lock means no pruning now; a stale lock is cleared for the next append", () => {
+  const dir = tempDir();
+  writeFileSync(stopsFile(dir), fill("old", 2100, () => "2020-01-01T00:00:00.000Z"));
+  const lock = `${stopsFile(dir)}.lock`;
+  writeFileSync(lock, "");
+  appendStop(dir, rec("a", { ts: new Date().toISOString() }));
+  assert.equal(readStops(dir).length, 2101);
+  assert.ok(existsSync(lock));
+  const minuteAgo = new Date(Date.now() - 60_000);
+  utimesSync(lock, minuteAgo, minuteAgo);
+  appendStop(dir, rec("b", { ts: new Date().toISOString() }));
+  assert.equal(readStops(dir).length, 2102);
+  assert.equal(existsSync(lock), false);
+  appendStop(dir, rec("c", { ts: new Date().toISOString() }));
+  assert.deepEqual(readStops(dir).map((r) => r.id), ["a", "b", "c"]);
+});
+
+test("lines another session appends while the file is rewritten are kept", () => {
+  const dir = tempDir();
+  const file = stopsFile(dir);
+  writeFileSync(file, fill("old", 2100, () => "2020-01-01T00:00:00.000Z"));
+  const realRename = fs.renameSync;
+  fs.renameSync = (from: fs.PathLike, to: fs.PathLike) => {
+    if (String(to) !== file) return realRename(from, to);
+    appendFileSync(file, JSON.stringify(rec("before-swap", { ts: new Date().toISOString() })) + "\n");
+    const late = fs.openSync(file, "a");
+    realRename(from, to);
+    fs.writeSync(late, JSON.stringify(rec("after-swap", { ts: new Date().toISOString() })) + "\n");
+    fs.closeSync(late);
+  };
+  syncBuiltinESMExports();
+  try {
+    appendStop(dir, rec("trigger", { ts: new Date().toISOString() }));
+  } finally {
+    fs.renameSync = realRename;
+    syncBuiltinESMExports();
+  }
+  assert.deepEqual(readStops(dir).map((r) => r.id), ["trigger", "before-swap", "after-swap"]);
+  assert.deepEqual(leftovers(dir), []);
+});
+
+function aroundAppend(id: string, around: (write: () => void) => void, body: () => void): void {
+  const realWrite = fs.writeSync;
+  let fired = false;
+  fs.writeSync = ((...args: unknown[]) => {
+    const data = args[1];
+    if (fired || typeof data !== "string" || !data.includes(`"id":"${id}"`)) return Reflect.apply(realWrite, fs, args) as number;
+    fired = true;
+    let written = 0;
+    around(() => {
+      written = Reflect.apply(realWrite, fs, args) as number;
+    });
+    return written;
+  }) as typeof fs.writeSync;
+  syncBuiltinESMExports();
+  try {
+    body();
+  } finally {
+    fs.writeSync = realWrite;
+    syncBuiltinESMExports();
+  }
+  assert.ok(fired, `no write of ${id}`);
+}
+
+test("an append that lands on the file another session's pruning renamed away is written again", () => {
+  const dir = tempDir();
+  writeFileSync(stopsFile(dir), fill("old", 2100, () => "2020-01-01T00:00:00.000Z"));
+  aroundAppend(
+    "late",
+    (write) => {
+      appendStop(dir, rec("trigger", { ts: new Date().toISOString() }));
+      write();
+    },
+    () => appendStop(dir, rec("late", { ts: new Date().toISOString() })),
+  );
+  assert.deepEqual(readStops(dir).map((r) => r.id), ["trigger", "late"]);
+  assert.deepEqual(leftovers(dir), []);
+});
+
+test("a stop the pruning copied and the append wrote again is read and counted once", () => {
+  const dir = tempDir();
+  writeFileSync(stopsFile(dir), fill("old", 2100, () => "2020-01-01T00:00:00.000Z"));
+  aroundAppend(
+    "late",
+    (write) => {
+      write();
+      appendStop(dir, rec("trigger", { ts: new Date().toISOString() }));
+    },
+    () => appendStop(dir, rec("late", { ts: new Date().toISOString(), block: true })),
+  );
+  const raw = readFileSync(stopsFile(dir), "utf8").split("\n").filter(Boolean).map((l) => (JSON.parse(l) as StopRecord).id);
+  assert.deepEqual(raw, ["late", "trigger", "late"]);
+  assert.equal(labelStop(dir, "late", "right", "2026-10-06T12:00:00.000Z"), true);
+  const stops = readStops(dir);
+  assert.deepEqual(stops.map((r) => r.id), ["late", "trigger"]);
+  const s = stopStats(stops);
+  assert.equal(s.stops, 2);
+  assert.equal(s.would_block, 1);
+  assert.equal(s.labelled, 1);
+});
+
+test("pruning writes a stop id stored twice once", () => {
+  const dir = tempDir();
+  const twice = JSON.stringify(rec("d", { ts: new Date().toISOString() })) + "\n";
+  writeFileSync(stopsFile(dir), fill("old", 2100, () => "2020-01-01T00:00:00.000Z") + twice + twice);
+  appendStop(dir, rec("t", { ts: new Date().toISOString() }));
+  const raw = readFileSync(stopsFile(dir), "utf8").split("\n").filter(Boolean).map((l) => (JSON.parse(l) as StopRecord).id);
+  assert.deepEqual(raw, ["d", "t"]);
+});
+
+test("parallel sessions appending past 2 MB lose no record", async () => {
+  const dir = tempDir();
+  writeFileSync(stopsFile(dir), fill("f", 2100, () => isoAgo(DAY)));
+  const worker = join(tempDir(), "append.ts");
+  const stops = fileURLToPath(new URL("../src/engine/stopgate/stops.ts", import.meta.url));
+  writeFileSync(worker, `import { appendStop } from ${JSON.stringify(stops)};\nconst [dir, tag] = process.argv.slice(2);\nfor (let i = 0; i < 40; i++) appendStop(dir, { id: tag + "-" + i, ts: new Date().toISOString(), session_id: tag, project: "p", mode: "shadow", skipped: "no_edits", edits: 0, checks: 0, ms: 1 });\n`);
+  const tags = Array.from({ length: 8 }, (_, i) => `w${i}`);
+  const codes = await Promise.all(tags.map((tag) => new Promise<number | null>((resolve) => spawn(process.execPath, [worker, dir, tag], { stdio: "ignore" }).on("close", resolve))));
+  assert.deepEqual(codes, tags.map(() => 0));
+  const ids = new Set(readStops(dir).map((r) => r.id));
+  for (const tag of tags) for (let i = 0; i < 40; i++) assert.ok(ids.has(`${tag}-${i}`), `${tag}-${i}`);
+  assert.equal(ids.size, 2100 + 320);
+});
+
+test("stats and readers tolerate skip reasons they do not know, old or new", () => {
+  const dir = tempDir();
+  writeFileSync(stopsFile(dir), [rec("h", { skipped: "hooks_off" as never }), rec("c", { skipped: "credential", error: "credential_in_state" }), rec("k", { skipped: "no_key", error: "no_api_key" }), rec("g", { skipped: "config_error", error: "pack_not_found" }), rec("j", { skipped: "jev_error", error: "timeout", ms: 2000 }), rec("a", { block: true, ms: 300 })].map((r) => JSON.stringify(r)).join("\n") + "\n");
+  const s = stopStats(readStops(dir));
+  assert.equal(s.stops, 6);
+  assert.deepEqual(s.skipped_by_reason, { hooks_off: 1, credential: 1, no_key: 1, config_error: 1, jev_error: 1 });
+  assert.equal(s.errors, 1);
+  assert.equal(s.error_rate, 1 / 2);
+  assert.equal(s.p95_all_ms, 2000);
 });

@@ -1,8 +1,10 @@
 // Transcript marks (truncated checks, subagent reports, a pass from the previous turn) built from shapes seen in real Claude Code transcripts.
+// Errored edits seen there (25 of 1030 edit calls) were <tool_use_error> validation failures and permission denials; nothing was applied.
 // Seen in ~/.claude/projects: Bash results starting "<persisted-output>\nOutput too large (47.9KB). Full output saved to: ...", middle cuts "... [7003 characters truncated] ...", task-notification user entries.
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { stopSkipReason } from "../src/engine/stopgate/decide.ts";
 import { analyzeTranscript } from "../src/engine/stopgate/transcript.ts";
 
 const JEST_PASS = "Tests:       5 passed, 5 total\nTest Suites: 1 passed, 1 total\n";
@@ -191,4 +193,35 @@ test("a real failure that merely mentions approval stays failed, and an earlier 
   const f = analyzeTranscript(new T().user("go").edit("/a.ts").bash("npm test", "Exit code 1\nError: needs approval of the PR\nTests: 1 failed, 1 total", true).bash("npm run lint", "Exit code 0", false).bash("npm test", "This command requires approval", true).text());
   assert.deepEqual(f.checks.map((c) => c.status), ["failed", "passed", "denied"]);
   assert.equal(f.passedCheckAfterLastEdit, true);
+});
+
+const NOT_FOUND = "<tool_use_error>String to replace not found in file.\nString: const a = 1;</tool_use_error>";
+
+test("an edit Claude Code refused before applying it is not an edit", () => {
+  const denied = analyzeTranscript(new T().user("go").tool("Edit", { file_path: "/a.ts", old_string: "a", new_string: "b" }, "The user doesn't want to proceed with this tool use. The tool use was rejected (eg. if it was a file edit, the new_string was NOT written to the file). STOP what you are doing and wait for the user to tell you how to proceed.", true).say("ok").text());
+  assert.deepEqual(denied.edits, []);
+  assert.equal(stopSkipReason(denied), "no_edits");
+  for (const text of [NOT_FOUND, "<tool_use_error>File has been modified since read, either by the user or by a linter. Read it again before attempting to write it.</tool_use_error>", "<tool_use_error>File has not been read yet. Read it first before writing to it.</tool_use_error>"]) {
+    assert.deepEqual(analyzeTranscript(new T().user("go").tool("Write", { file_path: "/w.ts", content: "x" }, text, true).text()).edits, [], text);
+  }
+});
+
+test("a failed edit after a passing check keeps the pass, also for the previous turn", () => {
+  const f = analyzeTranscript(new T().user("go").edit("/a.ts").bash("npm test", JEST_PASS).tool("Edit", { file_path: "/a.ts", old_string: "x", new_string: "y" }, NOT_FOUND, true).say("done").text());
+  assert.deepEqual(f.edits, ["/a.ts"]);
+  assert.equal(f.passedCheckAfterLastEdit, true);
+  const stale = analyzeTranscript(new T().user("first").edit("/a.ts").bash("npm test", JEST_PASS).tool("Edit", { file_path: "/a.ts" }, NOT_FOUND, true).say("ok").user("second").edit("/b.ts").say("done").text());
+  assert.equal(stale.marks.stalePass, true);
+});
+
+test("a denial kind on the result entry marks a refused edit; an unknown edit error still counts", () => {
+  const t = new T().user("go");
+  t.lines.push(JSON.stringify({ type: "assistant", isSidechain: false, message: { role: "assistant", content: [{ type: "tool_use", id: "toolu_w", name: "Write", input: { file_path: "/w.ts", content: "x" } }] } }));
+  t.lines.push(JSON.stringify({ type: "user", isSidechain: false, toolDenialKind: "permission-rule", message: { role: "user", content: [{ type: "tool_result", tool_use_id: "toolu_w", content: "Nope", is_error: true }] } }));
+  assert.deepEqual(analyzeTranscript(t.text()).edits, []);
+  const unknown = analyzeTranscript(new T().user("go").tool("Edit", { file_path: "/a.ts" }, "Something else went wrong", true).text());
+  assert.deepEqual(unknown.edits, ["/a.ts"]);
+  const cut = analyzeTranscript(new T().user("go").edit("/a.ts").bash("npm test", JEST_PASS).text() + JSON.stringify({ type: "assistant", message: { content: [{ type: "tool_use", id: "t_cut", name: "Edit", input: { file_path: "/b.ts" } }] } }) + "\n");
+  assert.deepEqual(cut.edits, ["/a.ts", "/b.ts"]);
+  assert.equal(cut.passedCheckAfterLastEdit, false);
 });

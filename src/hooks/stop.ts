@@ -1,10 +1,11 @@
 // Stop done-gate, shadow mode: after a turn with edits and no passing check, asks Jev whether Claude claimed success it didn't verify.
 // It records the decision (stops.jsonl) and never blocks; "soft" also returns a systemMessage JSON line (a user-visible warning), "shadow" prints nothing.
-// Fails open. Off unless .claude/referee.json sets hooks.stopGate.
+// Fails open: a failure is recorded with its error code (and a receipt once a Session exists); "active" is not built and runs as shadow, marked configured.
+// Off unless .claude/referee.json sets hooks.stopGate.
 
 import { readFileSync } from "node:fs";
 import { projectId, resolveDataDir } from "../engine/datadir.ts";
-import { isRefereeError } from "../engine/errors.ts";
+import { RefereeError, isRefereeError, type ErrorCode } from "../engine/errors.ts";
 import { loadPack, packDirs } from "../engine/pack.ts";
 import { loadProject } from "../engine/project.ts";
 import { Session, type Outcome } from "../engine/session.ts";
@@ -24,6 +25,7 @@ interface StopInput {
 }
 
 const EXCERPT = 200;
+const LOCAL_SKIP: Partial<Record<ErrorCode, StopSkip>> = { credential_in_state: "credential", no_api_key: "no_key", invalid_api_key: "no_key", pack_not_found: "config_error", bad_pack: "config_error" };
 
 export { decideStop };
 
@@ -45,7 +47,7 @@ export async function stopGate(io: HookIo, _pluginRoot: string): Promise<string 
   if (!project || project.hooks.stopGate === "off") return;
   const sessionId = typeof input.session_id === "string" ? input.session_id : "unknown";
   const dataDir = resolveDataDir(env, io.home, cwd);
-  const base = { id: newStopId(started), ts: new Date(started).toISOString(), session_id: sessionId, project: projectId(cwd), mode: project.hooks.stopGate === "soft" ? ("soft" as const) : ("shadow" as const) };
+  const base = { id: newStopId(started), ts: new Date(started).toISOString(), session_id: sessionId, project: projectId(cwd), mode: project.hooks.stopGate === "soft" ? ("soft" as const) : ("shadow" as const), ...(project.hooks.stopGate === "active" ? { configured: "active" as const } : {}) };
   const finish = (skipped: StopSkip | undefined, rest: Partial<StopRecord> = {}): undefined => {
     appendStop(dataDir, { ...base, ...(skipped ? { skipped } : {}), edits: 0, checks: 0, ms: Math.max(0, io.now() - started), ...rest } as StopRecord);
     return undefined;
@@ -74,9 +76,11 @@ export async function stopGate(io: HookIo, _pluginRoot: string): Promise<string 
   if (skip) return finish(skip, counts);
   const finalMessage = typeof input.last_assistant_message === "string" && input.last_assistant_message.trim() ? input.last_assistant_message.slice(-2_000) : facts.finalMessage;
 
+  let session: Session | undefined;
   try {
     const pack = loadPack(project.pack, packDirs(env));
-    const session = new Session({
+    const questions = stopQuestions(pack);
+    session = new Session({
       command: "stop-gate",
       env,
       cwd,
@@ -87,14 +91,17 @@ export async function stopGate(io: HookIo, _pluginRoot: string): Promise<string 
       profile: "hook",
       sessionId,
     });
-    const [outcome] = (await session.run([{ id: "stop", state: stopState(facts, finalMessage), questions: stopQuestions(pack) }])) as Outcome[];
+    const [outcome] = (await session.run([{ id: "stop", state: stopState(facts, finalMessage), questions }])) as Outcome[];
     session.record({ verdict: base.mode });
     const decision = decideStop(outcome?.answers ?? null, pack, project.thresholds);
     if (!decision) return finish("jev_error", counts);
     finish(undefined, { ...counts, decision, task_excerpt: facts.task.slice(0, EXCERPT), final_excerpt: finalMessage.slice(0, EXCERPT) });
     if (project.hooks.stopGate === "soft" && decision.would_block) return JSON.stringify({ systemMessage: SOFT_NOTE }) + "\n";
   } catch (error) {
-    return finish(isRefereeError(error) && error.code === "breaker_open" ? "breaker_open" : "jev_error", counts);
+    const known = isRefereeError(error) ? error : new RefereeError("internal", "Unexpected error in the Stop hook.");
+    if (known.code === "breaker_open") return finish("breaker_open", counts);
+    session?.record({ error: known });
+    return finish(LOCAL_SKIP[known.code] ?? "jev_error", { ...counts, error: known.code });
   }
   return undefined;
 }

@@ -1,4 +1,7 @@
 // Shared types of the Stop done-gate (shadow mode): facts read from a transcript, Jev's decision and the stored stop record.
+// Skips credential, no_key and config_error never reached Jev (redaction stop, no usable key, pack that does not load); only jev_error and breaker_open are Jev errors.
+
+import type { ErrorCode } from "../errors.ts";
 
 export type CheckStatus = "passed" | "failed" | "unknown" | "denied";
 // denied: Claude Code refused the command before running it (permission or hook denial); never a pass, never a fail.
@@ -33,7 +36,7 @@ export interface StopDecision {
   readonly would_block: boolean;
 }
 
-export type StopSkip = "stop_hook_active" | "background_tasks" | "hooks_off" | "project_off" | "no_edits" | "check_passed_after_edit" | "breaker_open" | "no_transcript" | "jev_error";
+export type StopSkip = "stop_hook_active" | "background_tasks" | "no_edits" | "check_passed_after_edit" | "breaker_open" | "no_transcript" | "jev_error" | "credential" | "no_key" | "config_error";
 
 export interface StopRecord {
   readonly id: string;
@@ -41,7 +44,9 @@ export interface StopRecord {
   readonly session_id: string;
   readonly project: string;
   readonly mode: "shadow" | "soft";
+  readonly configured?: "active";
   readonly skipped?: StopSkip;
+  readonly error?: ErrorCode;
   readonly edits: number;
   readonly checks: number;
   readonly truncated_checks?: number;

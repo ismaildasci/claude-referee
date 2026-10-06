@@ -1,5 +1,6 @@
 // Weak label hint for a stop from the user's NEXT prompt in the session transcript: a fixed enum reason only, never the message text.
 // It can only suggest "right" (the block would have been correct), is computed on read, stored nowhere and never replaces a human label.
+// A prompt that is only a pasted image has no text to read, so it is neither the turn's prompt nor the next one here.
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -77,7 +78,7 @@ export function classifyNext(next: string, previous: string): WeakReason | null 
 // The prompt of the turn that stopped at stopTs and the first real prompt after it.
 export function suggestFromTranscript(transcript: string, stopTs: string): WeakSuggestion | null {
   try {
-    const prompts = userPrompts(transcript);
+    const prompts = userPrompts(transcript).filter((p) => p.text.trim());
     const next = prompts.find((p) => p.ts > stopTs);
     if (!next) return null;
     const before = prompts.filter((p) => p.ts <= stopTs);

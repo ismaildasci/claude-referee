@@ -2,7 +2,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { analyzeTranscript } from "../src/engine/stopgate/transcript.ts";
+import { analyzeTranscript, userPrompts } from "../src/engine/stopgate/transcript.ts";
 
 const JEST_PASS = "Tests:       5 passed, 5 total\nTest Suites: 1 passed, 1 total\n";
 const JEST_FAIL = "Tests:       1 failed, 4 passed, 5 total\nTest Suites: 1 failed, 1 total\n";
@@ -198,6 +198,40 @@ test("a prompt given as text blocks counts as real", () => {
   t.push({ type: "user", message: { role: "user", content: [{ type: "text", text: "second" }] } });
   t.edit("/new.ts");
   assert.deepEqual(analyzeTranscript(t.text()).edits, ["/new.ts"]);
+});
+
+const IMAGE = { type: "image", source: { type: "base64", media_type: "image/png", data: "iVBORw0KGgo=" } };
+
+test("an image-only prompt starts a new turn; the task stays the first text prompt", () => {
+  for (const content of [[IMAGE], [IMAGE, { type: "text", text: "" }], [{ type: "text", text: "  " }, IMAGE]]) {
+    const t = new T().user("first task").edit("/old.ts").say("Fixed.");
+    t.push({ type: "user", isSidechain: false, message: { role: "user", content } });
+    t.say("The screenshot shows the dashboard.");
+    const f = analyzeTranscript(t.text());
+    assert.deepEqual(f.edits, [], JSON.stringify(content));
+    assert.equal(f.task, "first task");
+    assert.equal(f.finalMessage, "The screenshot shows the dashboard.");
+  }
+  const first = new T().push({ type: "user", message: { role: "user", content: [IMAGE] } }).user("now fix it").edit("/a.ts");
+  assert.equal(analyzeTranscript(first.text()).task, "now fix it");
+});
+
+test("a pasted image with its [Image #1] text is a prompt; an image inside a tool_result is not", () => {
+  const t = new T().user("first").edit("/old.ts");
+  t.push({ type: "user", message: { role: "user", content: [{ type: "text", text: "[Image #1]" }, IMAGE] } });
+  t.edit("/new.ts");
+  assert.deepEqual(analyzeTranscript(t.text()).edits, ["/new.ts"]);
+  const read = new T().user("go").edit("/a.ts").tool("Read", { file_path: "/shot.png" }, { content: [IMAGE] }).edit("/b.ts");
+  assert.deepEqual(analyzeTranscript(read.text()).edits, ["/a.ts", "/b.ts"]);
+});
+
+test("userPrompts lists an image-only prompt with empty text", () => {
+  const t = new T().user("fix it", { timestamp: "2026-10-01T10:00:00.000Z" });
+  t.push({ type: "user", timestamp: "2026-10-01T10:05:00.000Z", message: { role: "user", content: [IMAGE] } });
+  assert.deepEqual(userPrompts(t.text()), [
+    { ts: "2026-10-01T10:00:00.000Z", text: "fix it" },
+    { ts: "2026-10-01T10:05:00.000Z", text: "" },
+  ]);
 });
 
 test("Write, MultiEdit and NotebookEdit paths are collected, paths only and distinct", () => {

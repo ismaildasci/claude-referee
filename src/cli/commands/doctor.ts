@@ -1,13 +1,15 @@
 // doctor: Node and Claude Code versions, where the key comes from (never the key), data dir, packs and model.
 // --online also lists the models the key can use, which checks the key without spending tokens.
+// In a project it also loads the project file and its pack (and the stop.* questions when the done-gate is on) and names the gate mode.
 
 import { listModels } from "../../engine/client.ts";
 import { DEFAULT_BASE_URL, PROFILES, VERSION, resolveModel } from "../../engine/config.ts";
 import { dirSize, resolveDataDir, tildify } from "../../engine/datadir.ts";
 import { isRefereeError } from "../../engine/errors.ts";
 import { isTypeSafeHost, noKeyNextStep, resolveEndpointKey, runCommand, type KeySource } from "../../engine/key.ts";
-import { listPacks, packDirs } from "../../engine/pack.ts";
-import { findProjectFile } from "../../engine/project.ts";
+import { listPacks, loadPack, packDirs } from "../../engine/pack.ts";
+import { findProjectFile, loadProject } from "../../engine/project.ts";
+import { stopQuestions } from "../../engine/stopgate/decide.ts";
 import type { Command } from "../types.ts";
 
 function shownBaseUrl(raw: string | undefined): string | undefined {
@@ -42,6 +44,8 @@ export const doctor: Command = {
       key_source: "Where the key was found: REFEREE_BASE_URL_KEY (only for another host), plugin_setting, TYPESAFE_API_KEY, EVAL_TYPESAFE_API_KEY, TYPESAFE_API_KEY_CMD or keychain. Never the key.",
       packs: "Installed packs with version, content hash and source.",
       base_url: "Only when TYPESAFE_BASE_URL points somewhere other than the default; credentials and query are removed.",
+      project_error: "Only when the project file or its pack does not load from this shell (bad_project, pack_not_found or bad_pack). A packs_dir plugin setting reaches hooks, not the shell, so the verdict stays as it is.",
+      stop_gate: "The done-gate mode the project file sets, when not off. active is not built yet and runs as shadow; stop_gate_note says so.",
       next_step: "What to fix when not ready.",
     },
     errors: ["bad_input"],
@@ -75,6 +79,18 @@ export const doctor: Command = {
     const baseUrl = shownBaseUrl(io.env["TYPESAFE_BASE_URL"]);
     const dataDir = resolveDataDir(io.env, io.home, io.cwd, flags.dataDir);
     const projectFile = findProjectFile(io.cwd);
+    let projectError: string | undefined;
+    let stopGate: string | undefined;
+    try {
+      const project = loadProject(io.cwd);
+      if (project) {
+        const pack = loadPack(project.pack, packDirs(io.env));
+        if (project.hooks.stopGate !== "off") stopGate = project.hooks.stopGate;
+        if (stopGate) stopQuestions(pack);
+      }
+    } catch (error) {
+      projectError = isRefereeError(error) ? error.code : "internal";
+    }
     const ready = nodeOk(node) && keySource !== null && (online === null || online === "ok");
     const nextStep = !nodeOk(node)
       ? "Install Node 20.3 or later on the PATH Claude Code uses."
@@ -86,7 +102,9 @@ export const doctor: Command = {
           ? "The stored key is malformed; store it again."
           : online && online !== "ok"
             ? `The key check failed (${online}).`
-            : undefined;
+            : projectError
+              ? `The project file or its pack does not load (${projectError}): check .claude/referee.json, referee.local.json, the pack name and packs_dir.`
+              : undefined;
     return {
       ok: true,
       verdict: ready ? "ready" : "not_ready",
@@ -103,6 +121,9 @@ export const doctor: Command = {
       data_bytes: dirSize(dataDir),
       packs: listPacks(packDirs(io.env)),
       project: projectFile ? tildify(projectFile, io.home) : null,
+      ...(projectError ? { project_error: projectError } : {}),
+      ...(stopGate ? { stop_gate: stopGate } : {}),
+      ...(stopGate === "active" ? { stop_gate_note: "active is not built yet and runs as shadow." } : {}),
       next_step: nextStep,
     };
   },
