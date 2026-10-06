@@ -58,3 +58,21 @@ The rewording is fitted to the first hold-out's failure and to this sample's dev
 
 - **Choice by the registered rule: `i18n-w1`** (every candidate qualifies; `i18n-w1` has the most correct `no`). It ties the old wording on correct `no` (3 and 3) and has two fewer definite answers, so on dev no candidate improves the `no` band: the rewordings lower the answers on technical strings but not to 0.10 or below. The hold-out runs as registered and decides.
 - **Frozen**: `docs/data/i18n-real-2/wordings/i18n-w1`, SHA-256 of `questions/judge.json` `ca6b886f3cdaecbd921da34361693c6499f4071c2b973ef6af4b8b86dc937b7c`, of `thresholds.json` `cc7711cff39fcabed9480f0e5bf0e8e703287180b65cbec2ecc9d0efbf45fef8` (identical to the shipped pack's).
+
+## Hold-out result, 2026-10-06: the new wording is not adopted; the shipped pack held its bar
+
+Order: hold-out labels 1c4c7e1, cases c5a09f3 (pushed), then the three recordings, each once, no `--fresh`: the old wording on `jev-evals/judge-i18n-real-2` (116 requests, receipt `rmuwnjc80h40r`), `i18n-w1` on the same cases (`docs/data/i18n-real-2/holdout-w1`, 116, `rmuwnjh2ycrbx`) and `i18n-w1` on the synthetic hold-out (`synthetic-w1`, 95, `rmuwnjlsbw9oi`). Pack hashes checked just before: `i18n@0.1.0` question file `7c78a570...`, `i18n-w1` `ca6b886f...` and thresholds `cc7711cf...`, as frozen. Scored by `scripts/i18n-real/compare.mjs` (`holdout-compare.json`); `eval score` gives the same totals for the old wording.
+
+- **Hold-out labels**: 120 items (40 Y, 80 O), agreement 118 of 120 (kappa 0.91); two Y items got `no` from both labellers and two O items disagreed, all four dropped. Scored: **116, 107 `yes` and 9 `no`**. Only 9 technical items: the `no` side of every number below is thin.
+
+| Wording | Verdicts yes / review / no | Wrong `yes` of 9 | Wrong `no` of 107 | Correct `no` | Coverage (exact 95%) | Median answer, `no` / `yes` items |
+|---|---|---|---|---|---|---|
+| `i18n@0.1.0` (old) | 16 / 98 / 2 | 0 | 0 | 2 | 0.155 (0.095 to 0.234) | 0.40 / 0.77 |
+| `i18n-w1` (new) | 12 / 102 / 2 | 0 | 0 | 2 | 0.121 (0.068 to 0.194) | 0.21 / 0.74 |
+
+- **Adoption checks**: no wrong `no` (met), wrong `yes` not higher (met), more correct `no` (**not met**, 2 and 2), synthetic bar kept (met: 0 wrong `yes` of 46, 0 wrong `no` of 49, 26 `yes`, 43 `review`, 26 `no`). **`i18n-w1` is not adopted; the shipped wording stays.**
+- **The shipped pack on a second real sample**: 0 wrong `yes` and 0 wrong `no`, so the registered bar of the pack holds here, with exact one-sided 95% upper bounds of 0.28 on wrong `yes` (9 items) and 0.028 on wrong `no`. It decided 18 of 116 and reached the `no` band on 2 of 9 technical items. By framework: React 12 definite of 58, Vue 6 of 58, no wrong answer in either.
+- **The braced-mustache shape** that caused every wrong `yes` of the first sample: 0 of the 242 sampled items of this sample are only a mustache holding a translation call (the fixed `extract`, e08ace1). Two dev items hold a dynamic call next to untranslated words ("Brace: {{ $t(...) }}"), which are real candidates.
+- **Recall** (all nine repositories, registered rule): 2,124 of 2,790 removed calls found (0.761, exact 95% 0.745 to 0.777; amended rule 0.768). JSX text 690 of 713, Vue text 727 of 739, JSX attributes 213 of 250, Vue attributes 129 of 179, other expressions 365 of 717, strings left in Vue bindings 0 of 151, HTML 0 of 41 (Node-RED `<script>` templates, not read).
+
+What it means: rewording the question lowered Jev's answers on technical strings (median 0.40 to 0.21 here, 0.54 to 0.435 on dev) without bringing more of them to 0.10 or below, and it cost definite `yes` answers; so the cause of the missing `no` band is not the wording alone, and the old wording stays. With the extractor defect fixed, the shipped pack made no wrong call on a second, unseen real sample, but that sample had only 9 technical items, so it bounds the wrong-`yes` rate weakly; coverage on real code stays low (0.155 here, 0.204 on the first sample).

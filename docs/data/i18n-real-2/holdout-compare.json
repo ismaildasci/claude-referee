@@ -1,0 +1,182 @@
+{
+ "old": {
+  "n": 116,
+  "expected_yes": 107,
+  "expected_no": 9,
+  "verdicts": {
+   "yes": 16,
+   "review": 98,
+   "no": 2
+  },
+  "wrong_yes": 0,
+  "wrong_yes_upper95": 0.2831288355631135,
+  "wrong_no": 0,
+  "wrong_no_upper95": 0.02760920016690939,
+  "correct_no": 2,
+  "correct_yes": 16,
+  "coverage": 0.155,
+  "coverage_ci95": {
+   "lo": 0.09463558448806697,
+   "hi": 0.23410886796631453
+  },
+  "median_p_no": 0.4,
+  "median_p_yes": 0.77,
+  "wrong_ids": [],
+  "by_framework": {
+   "react": {
+    "n": 58,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 0,
+    "definite": 12
+   },
+   "vue": {
+    "n": 58,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 2,
+    "definite": 6
+   }
+  },
+  "by_origin": {
+   "O": {
+    "n": 78,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 2,
+    "definite": 7
+   },
+   "Y": {
+    "n": 38,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 0,
+    "definite": 11
+   }
+  }
+ },
+ "new": {
+  "n": 116,
+  "expected_yes": 107,
+  "expected_no": 9,
+  "verdicts": {
+   "yes": 12,
+   "review": 102,
+   "no": 2
+  },
+  "wrong_yes": 0,
+  "wrong_yes_upper95": 0.2831288355631135,
+  "wrong_no": 0,
+  "wrong_no_upper95": 0.02760920016690939,
+  "correct_no": 2,
+  "correct_yes": 12,
+  "coverage": 0.121,
+  "coverage_ci95": {
+   "lo": 0.06757875114919051,
+   "hi": 0.1942004728498346
+  },
+  "median_p_no": 0.21,
+  "median_p_yes": 0.74,
+  "wrong_ids": [],
+  "by_framework": {
+   "react": {
+    "n": 58,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 0,
+    "definite": 10
+   },
+   "vue": {
+    "n": 58,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 2,
+    "definite": 4
+   }
+  },
+  "by_origin": {
+   "O": {
+    "n": 78,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 2,
+    "definite": 6
+   },
+   "Y": {
+    "n": 38,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 0,
+    "definite": 8
+   }
+  }
+ },
+ "synthetic_new": {
+  "n": 95,
+  "expected_yes": 49,
+  "expected_no": 46,
+  "verdicts": {
+   "yes": 26,
+   "review": 43,
+   "no": 26
+  },
+  "wrong_yes": 0,
+  "wrong_yes_upper95": 0.06304930167405448,
+  "wrong_no": 0,
+  "wrong_no_upper95": 0.05930601418969707,
+  "correct_no": 26,
+  "correct_yes": 26,
+  "coverage": 0.547,
+  "coverage_ci95": {
+   "lo": 0.4419129549189309,
+   "hi": 0.6497900529422811
+  },
+  "median_p_no": 0.08,
+  "median_p_yes": 0.9,
+  "wrong_ids": [],
+  "by_framework": {
+   "html": {
+    "n": 13,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 1,
+    "definite": 4
+   },
+   "js": {
+    "n": 8,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 3,
+    "definite": 4
+   },
+   "react": {
+    "n": 25,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 0,
+    "definite": 12
+   },
+   "ts": {
+    "n": 40,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 22,
+    "definite": 27
+   },
+   "vue": {
+    "n": 9,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 0,
+    "definite": 5
+   }
+  }
+ },
+ "checks": {
+  "new_no_wrong_no": true,
+  "new_wrong_yes_not_higher": true,
+  "new_more_correct_no": false,
+  "synthetic_bar_kept": true
+ },
+ "adopted": false
+}
