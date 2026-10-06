@@ -5,6 +5,7 @@ import { parsers as compiled } from "./compiled.ts";
 import { parsers as builds } from "./builds.ts";
 import { parsers as js } from "./js.ts";
 import { parsers as more } from "./more.ts";
+import { parsers as moreTools } from "./more-tools.ts";
 import { parsers as native } from "./native.ts";
 import { parsers as phpRuby } from "./php-ruby.ts";
 import { parsers as python } from "./python.ts";
@@ -25,7 +26,7 @@ export interface ParsedEvidence {
   readonly lines: number;
 }
 
-const PARSERS: readonly RunnerParser[] = [...python, ...js, ...compiled, ...phpRuby, ...more, ...suites, ...scenarios, ...builds, ...native];
+const PARSERS: readonly RunnerParser[] = [...python, ...js, ...compiled, ...phpRuby, ...more, ...suites, ...scenarios, ...builds, ...native, ...moreTools];
 
 export function parseEvidence(text: string): ParsedEvidence {
   const runners = PARSERS.map((p) => p.parse(text)).filter((r): r is RunnerFacts => r !== null);

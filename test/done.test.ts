@@ -319,7 +319,7 @@ test("done never says met when the log itself says no tests ran, even with an ex
 test("a log that says '0 tests failed' or runs 10 tests is not read as no tests", async () => {
   const server = await fakeJev(nouls(0.97));
   try {
-    const out = io(server, "100% tests passed, 0 tests failed out of 10\nTests run: 10, Failures: 0\nctest exit code: 0\n");
+    const out = io(server, "100% tests passed, 0 tests failed out of 10\n\nTotal Test time (real) =   1.20 sec\nTests run: 10, Failures: 0\nctest exit code: 0\n");
     await run(["done", "--criteria", "all tests pass", "--evidence", "-"], out, commands);
     assert.equal(out.json()["verdict"], "met");
   } finally {
