@@ -40,3 +40,21 @@ This registration; the content filter result and the chosen repositories; the sp
 ## Limits, stated now
 
 The rewording is fitted to the first hold-out's failure and to this sample's dev half; labels by two sessions of one model family; one model version; a dozen repositories at most, chosen from GitHub code search; per-framework numbers are small and are given as counts.
+
+## Setup and dev result, 2026-10-06 (before any hold-out request)
+
+- **Repositories** (content filter, `docs/data/i18n-real-2/content-filter.json`): React `TO-Bus/to-bus-ca`, `caudal-labs/caudalflow`, `EmmaStoneX/NetPulse`, `wzdavid/openclaw-desktop`; Vue `WTWB-none/void`, `taovc/pr-cockpit`, `pa001024/riven-mirror`, `omvjro/DOL-pancake`; HTML `joeartsea/node-red-contrib-ftp`, the only one of seven looked at under the lower floor that has an English JSON locale and 20 keys. Split (`split.json`): dev `caudalflow`, `NetPulse`, `void`, `riven-mirror`, `node-red-contrib-ftp`; hold-out `to-bus-ca`, `openclaw-desktop`, `pr-cockpit`, `DOL-pancake`. So **the hold-out has no HTML repository**.
+- **HTML**: `extract` found none of the 41 removed `data-i18n` keys, because Node-RED keeps its editor HTML inside `<script type="text/x-red">` templates and `extract` does not read text inside `<script>`. The HTML repository adds 2 O items to dev and nothing else.
+- **Dev labels**: 122 items (40 Y, 82 O), two fresh blind subagents, agreement 121 of 122 (kappa 0.97); scored 121, **99 `yes` and 22 `no`** (`dev/`). Most O items in these repositories are untranslated UI strings (59 of 82 labelled `yes` by one labeller), so dev has few technical items.
+- **Wordings**: five drafts were written; `i18n-w3` was dropped before any request because `lint-pack` flags its question as compound. Four candidates and the old wording were recorded on the 121 new dev items and the 40 synthetic dev items (`dev-recordings/`).
+
+| Wording | New dev: wrong `yes` / wrong `no` | correct `no` of 22 | definite of 121 | median answer on `no` items | Synthetic dev: wrong / correct `no` of 20 / definite of 40 |
+|---|---|---|---|---|---|
+| `i18n@0.1.0` (old) | 0 / 0 | 3 | 26 | 0.54 | 0 / 13 / 26 |
+| `i18n-w1` | 0 / 0 | 3 | 24 | 0.435 | 0 / 13 / 26 |
+| `i18n-w2` | 0 / 0 | 1 | 36 | 0.375 | 0 / 7 / 20 |
+| `i18n-w4` | 0 / 0 | 0 | 34 | 0.335 | 0 / 8 / 21 |
+| `i18n-w5` | 0 / 0 | 1 | 22 | 0.39 | 0 / 12 / 24 |
+
+- **Choice by the registered rule: `i18n-w1`** (every candidate qualifies; `i18n-w1` has the most correct `no`). It ties the old wording on correct `no` (3 and 3) and has two fewer definite answers, so on dev no candidate improves the `no` band: the rewordings lower the answers on technical strings but not to 0.10 or below. The hold-out runs as registered and decides.
+- **Frozen**: `docs/data/i18n-real-2/wordings/i18n-w1`, SHA-256 of `questions/judge.json` `ca6b886f3cdaecbd921da34361693c6499f4071c2b973ef6af4b8b86dc937b7c`, of `thresholds.json` `cc7711cff39fcabed9480f0e5bf0e8e703287180b65cbec2ecc9d0efbf45fef8` (identical to the shipped pack's).

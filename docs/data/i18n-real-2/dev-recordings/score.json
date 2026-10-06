@@ -1,0 +1,136 @@
+{
+ "packs": {
+  "i18n": {
+   "newdev": {
+    "n": 121,
+    "missing": 0,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 3,
+    "correct_yes": 23,
+    "definite": 26,
+    "median_p_no": 0.54,
+    "median_p_yes": 0.83
+   },
+   "syndev": {
+    "n": 40,
+    "missing": 0,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 13,
+    "correct_yes": 13,
+    "definite": 26,
+    "median_p_no": 0.065,
+    "median_p_yes": 0.925
+   },
+   "chars": null,
+   "qualifies": true
+  },
+  "i18n-w1": {
+   "newdev": {
+    "n": 121,
+    "missing": 0,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 3,
+    "correct_yes": 21,
+    "definite": 24,
+    "median_p_no": 0.435,
+    "median_p_yes": 0.83
+   },
+   "syndev": {
+    "n": 40,
+    "missing": 0,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 13,
+    "correct_yes": 13,
+    "definite": 26,
+    "median_p_no": 0.07,
+    "median_p_yes": 0.93
+   },
+   "chars": 807,
+   "qualifies": true
+  },
+  "i18n-w2": {
+   "newdev": {
+    "n": 121,
+    "missing": 0,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 1,
+    "correct_yes": 35,
+    "definite": 36,
+    "median_p_no": 0.375,
+    "median_p_yes": 0.85
+   },
+   "syndev": {
+    "n": 40,
+    "missing": 0,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 7,
+    "correct_yes": 13,
+    "definite": 20,
+    "median_p_no": 0.13,
+    "median_p_yes": 0.925
+   },
+   "chars": 790,
+   "qualifies": true
+  },
+  "i18n-w4": {
+   "newdev": {
+    "n": 121,
+    "missing": 0,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 0,
+    "correct_yes": 34,
+    "definite": 34,
+    "median_p_no": 0.335,
+    "median_p_yes": 0.85
+   },
+   "syndev": {
+    "n": 40,
+    "missing": 0,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 8,
+    "correct_yes": 13,
+    "definite": 21,
+    "median_p_no": 0.125,
+    "median_p_yes": 0.94
+   },
+   "chars": 912,
+   "qualifies": true
+  },
+  "i18n-w5": {
+   "newdev": {
+    "n": 121,
+    "missing": 0,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 1,
+    "correct_yes": 21,
+    "definite": 22,
+    "median_p_no": 0.39,
+    "median_p_yes": 0.8
+   },
+   "syndev": {
+    "n": 40,
+    "missing": 0,
+    "wrong_yes": 0,
+    "wrong_no": 0,
+    "correct_no": 12,
+    "correct_yes": 12,
+    "definite": 24,
+    "median_p_no": 0.07,
+    "median_p_yes": 0.93
+   },
+   "chars": 929,
+   "qualifies": true
+  }
+ },
+ "chosen": "i18n-w1",
+ "rule": "no wrong yes or no on both dev sets; then most correct no on new dev, most definite, shorter text"
+}
