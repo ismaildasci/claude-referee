@@ -1,0 +1,219 @@
+[
+ {
+  "tool": "make",
+  "purpose": "build",
+  "cases": 5,
+  "expected_met": 5,
+  "repos": 3
+ },
+ {
+  "tool": "npm build -> build",
+  "purpose": "build",
+  "cases": 4,
+  "expected_met": 4,
+  "repos": 3
+ },
+ {
+  "tool": "mix test",
+  "purpose": "test",
+  "cases": 5,
+  "expected_met": 2,
+  "repos": 3
+ },
+ {
+  "tool": "rubocop",
+  "purpose": "lint",
+  "cases": 3,
+  "expected_met": 2,
+  "repos": 2
+ },
+ {
+  "tool": "npm lint -> lint",
+  "purpose": "lint",
+  "cases": 2,
+  "expected_met": 2,
+  "repos": 2
+ },
+ {
+  "tool": "phpstan",
+  "purpose": "lint",
+  "cases": 2,
+  "expected_met": 2,
+  "repos": 2
+ },
+ {
+  "tool": "npm test",
+  "purpose": "test",
+  "cases": 2,
+  "expected_met": 2,
+  "repos": 1
+ },
+ {
+  "tool": "cmake build",
+  "purpose": "build",
+  "cases": 6,
+  "expected_met": 1,
+  "repos": 5
+ },
+ {
+  "tool": "clang-tidy",
+  "purpose": "lint",
+  "cases": 5,
+  "expected_met": 1,
+  "repos": 4
+ },
+ {
+  "tool": "make test",
+  "purpose": "test",
+  "cases": 3,
+  "expected_met": 1,
+  "repos": 3
+ },
+ {
+  "tool": "go build",
+  "purpose": "build",
+  "cases": 2,
+  "expected_met": 1,
+  "repos": 2
+ },
+ {
+  "tool": "pylint",
+  "purpose": "lint",
+  "cases": 2,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "npm test -> test:smoke",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "npm test -> test:cv-visual",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "hadolint",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "npm build -> prebuild",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "make lint",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "npm lint",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "make -> :build-logic:convention:checkKotlinGradlePluginConfigurationErrors SKIPPED",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "dotnet build",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "gradle build",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "ctest",
+  "purpose": "test",
+  "cases": 4,
+  "expected_met": 0,
+  "repos": 2
+ },
+ {
+  "tool": "dotnet test",
+  "purpose": "test",
+  "cases": 3,
+  "expected_met": 0,
+  "repos": 2
+ },
+ {
+  "tool": "ruff",
+  "purpose": "lint",
+  "cases": 2,
+  "expected_met": 0,
+  "repos": 2
+ },
+ {
+  "tool": "shellcheck",
+  "purpose": "lint",
+  "cases": 2,
+  "expected_met": 0,
+  "repos": 2
+ },
+ {
+  "tool": "cargo fmt",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "docker build",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "npm test -> /home/runner/work/mermaid/mermaid",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "go test",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "php-cs-fixer",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "pytest",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ }
+]
