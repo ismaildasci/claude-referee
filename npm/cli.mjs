@@ -7562,7 +7562,8 @@ function queue(ctx) {
       claims_verified: r.decision?.claims_verified ?? null,
       task_excerpt: visible(r.task_excerpt?.slice(0, EXCERPT_CHARS) ?? ""),
       final_excerpt: visible(r.final_excerpt?.slice(0, EXCERPT_CHARS) ?? ""),
-      suggestion: hints.get(r.id) ?? null
+      suggestion: hints.get(r.id) ?? null,
+      marks: { truncated_checks: r.truncated_checks ?? 0, subagent_calls: r.subagent_calls ?? 0, subagent_reports: r.subagent_reports ?? 0, stale_pass: r.stale_pass === true }
     }))
   };
 }
@@ -7743,6 +7744,17 @@ function say(text) { statusEl.textContent = text; }
 function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
 function pct(v) { return v === null || v === undefined ? "n/a" : (Math.round(v * 1000) / 10) + "%"; }
 function ci(pair) { return pair ? "[" + pct(pair[0]) + ", " + pct(pair[1]) + "]" : "n/a"; }
+function int(n) { return typeof n === "number" && Number.isInteger(n) ? String(n).replace(/\\B(?=(\\d{3})+(?!\\d))/g, ",") : n; }
+function plural(n, one, many) { return int(n) + " " + (n === 1 ? one : many); }
+function marksText(m) {
+  if (!m) return "";
+  var parts = [];
+  if (m.truncated_checks > 0) parts.push(plural(m.truncated_checks, "check", "checks") + " with cut-off output");
+  if (m.subagent_calls > 0) parts.push(plural(m.subagent_calls, "subagent call", "subagent calls"));
+  if (m.subagent_reports > 0) parts.push(plural(m.subagent_reports, "subagent or background task", "subagents or background tasks") + " finished");
+  if (m.stale_pass) parts.push("a check passed in the previous turn, none after this turn's edits");
+  return parts.length ? "Marks (read in code, not sent to Jev): " + parts.join("; ") : "";
+}
 function bytes(n) { return n < 1024 ? n + " B" : n < 1048576 ? (n / 1024).toFixed(1) + " KiB" : (n / 1048576).toFixed(1) + " MiB"; }
 
 function request(path, init) {
@@ -7811,6 +7823,8 @@ function renderQueue(total) {
   card.tabIndex = -1;
   card.setAttribute("aria-label", "Stop " + (index + 1) + " of " + items.length);
   add(card, el("p", "Stop " + (index + 1) + " of " + items.length + " - " + s.ts + " - " + s.edits + (s.edits === 1 ? " edit, " : " edits, ") + s.checks + (s.checks === 1 ? " check" : " checks") + " - done score " + (s.claims_done === null ? "n/a" : s.claims_done.toFixed(2)), "meta"));
+  var marks = marksText(s.marks);
+  if (marks) add(card, el("p", marks, "meta"));
   add(card, el("p", "Task (start of the prompt)", "label"), el("pre", s.task_excerpt || "(none stored)"));
   add(card, el("p", "Claude's final message (end)", "label"), el("pre", s.final_excerpt || "(none stored)"));
   if (s.suggestion) {
@@ -7876,21 +7890,21 @@ function renderOverview(d) {
   var r = d.receipts;
   var s = d.stops;
   add(main, el("h2", "Receipts, last " + d.days + " days, this project"));
-  add(main, table(["Runs", "Requests", "Cache hits", "Input tokens", "Cost (USD)"], [[r.runs, r.requests, r.cached, r.input_tokens, r.cost_usd.toFixed(4)]]));
+  add(main, table(["Runs", "Requests", "Cache hits", "Input tokens", "Cost (USD)"], [[int(r.runs), int(r.requests), int(r.cached), int(r.input_tokens), r.cost_usd.toFixed(4)]]));
   var cmds = Object.keys(r.by_command).sort();
-  if (cmds.length) add(main, table(["Command", "Runs"], cmds.map(function (c) { return [c, r.by_command[c]]; })));
+  if (cmds.length) add(main, table(["Command", "Runs"], cmds.map(function (c) { return [c, int(r.by_command[c])]; })));
   add(main, el("h2", "Done-gate stops"));
   add(main, table(["Measure", "Value", "95% interval"], [
-    ["Stops", s.stops, ""],
-    ["Asked Jev", s.asked, ""],
-    ["Would block", s.would_block, ""],
-    ["Labelled (of would block)", s.labelled, ""],
-    ["Right / wrong", s.right + " / " + s.wrong, ""],
+    ["Stops", int(s.stops), ""],
+    ["Asked Jev", int(s.asked), ""],
+    ["Would block", int(s.would_block), ""],
+    ["Labelled (of would block)", int(s.labelled), ""],
+    ["Right / wrong", int(s.right) + " / " + int(s.wrong), ""],
     ["Precision", pct(s.precision), ci(s.precision_ci95)],
     ["False block rate", pct(s.false_block_rate), ci(s.false_block_rate_ci95)],
-    ["p95 latency, answered (ms)", s.p95_ms === null ? "n/a" : s.p95_ms, ""],
+    ["p95 latency, answered (ms)", s.p95_ms === null ? "n/a" : int(s.p95_ms), ""],
     ["Error rate", pct(s.error_rate), ""],
-    ["Unlabelled would block", s.unlabelled_would_block, ""]
+    ["Unlabelled would block", int(s.unlabelled_would_block), ""]
   ]));
   var t = d.threshold_suggestion;
   add(main, el("h2", "Threshold suggestion"));
@@ -7907,11 +7921,11 @@ function renderPrivacy(d) {
   add(main, el("p", d.data_dir + " - " + bytes(d.total_bytes) + " in total", "meta"));
   add(main, table(["Item", "Size"], d.stored.map(function (f) { return [f.name, bytes(f.bytes)]; })));
   add(main, table(["Count", "Value"], [
-    ["Receipts, this project", d.counts.receipts_this_project],
-    ["Receipts, all projects", d.counts.receipts_all_projects],
-    ["Stops, this project", d.counts.stops_this_project],
-    ["Stops, all projects", d.counts.stops_all_projects],
-    ["Labelled stops, this project", d.counts.labelled_this_project]
+    ["Receipts, this project", int(d.counts.receipts_this_project)],
+    ["Receipts, all projects", int(d.counts.receipts_all_projects)],
+    ["Stops, this project", int(d.counts.stops_this_project)],
+    ["Stops, all projects", int(d.counts.stops_all_projects)],
+    ["Labelled stops, this project", int(d.counts.labelled_this_project)]
   ]));
   add(main, table(["File", "Holds"], d.stores_text.map(function (x) { return [x.name, x.holds]; })));
   add(main, el("h2", "What would be sent to TypeSafe, and when"));

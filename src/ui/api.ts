@@ -65,6 +65,7 @@ export function queue(ctx: UiContext) {
       task_excerpt: visible(r.task_excerpt?.slice(0, EXCERPT_CHARS) ?? ""),
       final_excerpt: visible(r.final_excerpt?.slice(0, EXCERPT_CHARS) ?? ""),
       suggestion: hints.get(r.id) ?? null,
+      marks: { truncated_checks: r.truncated_checks ?? 0, subagent_calls: r.subagent_calls ?? 0, subagent_reports: r.subagent_reports ?? 0, stale_pass: r.stale_pass === true },
     })),
   };
 }

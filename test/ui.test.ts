@@ -361,11 +361,17 @@ class FakeNode {
   setAttribute(k: string, v: string): void {
     this.attrs[k] = v;
   }
-  addEventListener(): void {}
+  listeners: Record<string, (() => void)[]> = {};
+  addEventListener(type: string, f: () => void): void {
+    (this.listeners[type] ??= []).push(f);
+  }
+  click(): void {
+    (this.listeners["click"] ?? []).forEach((f) => f());
+  }
   focus(): void {}
 }
 
-function fakePage(hash: string, queue: unknown) {
+function fakePage(hash: string, queue: unknown, routes: Record<string, unknown> = {}) {
   const nodes: Record<string, FakeNode> = { main: new FakeNode("main"), status: new FakeNode("p"), tabs: new FakeNode("nav") };
   const on: Record<string, (() => void)[]> = {};
   const location = { hash, pathname: "/" };
@@ -379,10 +385,10 @@ function fakePage(hash: string, queue: unknown) {
     window: { addEventListener: (type: string, f: () => void) => void (on[type] ??= []).push(f) },
     fetch: (path: string, init: { headers: Record<string, string> }) => {
       fetched.push({ path, token: init.headers["X-Referee-Token"] ?? "" });
-      return Promise.resolve({ status: 200, ok: true, json: () => Promise.resolve(queue) });
+      return Promise.resolve({ status: 200, ok: true, json: () => Promise.resolve(path in routes ? routes[path] : queue) });
     },
   });
-  return { main: nodes["main"] as FakeNode, location, fetched, fire: (type: string) => (on[type] ?? []).forEach((f) => f()) };
+  return { main: nodes["main"] as FakeNode, tabs: nodes["tabs"] as FakeNode, location, fetched, fire: (type: string) => (on[type] ?? []).forEach((f) => f()) };
 }
 
 const settle = () => new Promise((resolve) => setImmediate(resolve));
@@ -410,4 +416,57 @@ test("the queue card counts edits and checks in the singular and the plural", as
   const many = fakePage("#t=tok", { total: 1, stops: [card(2, 0)] });
   await settle();
   assert.match(many.main.textContent, /- 2 edits, 0 checks - done score 0\.90/);
+});
+
+test("the queue API carries the stored stop marks, zero when a stop has none", async () => {
+  const dataDir = tempDir();
+  const cwd = tempDir();
+  const home = tempDir();
+  appendStop(dataDir, stop("smarks", projectId(cwd), { ts: "2026-09-29T10:00:00.000Z", truncated_checks: 2, subagent_calls: 1, subagent_reports: 3, stale_pass: true }));
+  appendStop(dataDir, stop("splain", projectId(cwd)));
+  const ui = await startUi({ dataDir, cwd, home, env: { HOME: home }, now: () => 0 });
+  try {
+    const r = await raw(ui.port, { path: "/api/queue", headers: { host: `127.0.0.1:${ui.port}`, "x-referee-token": ui.token } });
+    const stops = (JSON.parse(r.body) as { stops: { id: string; marks: unknown }[] }).stops;
+    assert.deepEqual(stops.find((x) => x.id === "smarks")?.marks, { truncated_checks: 2, subagent_calls: 1, subagent_reports: 3, stale_pass: true });
+    assert.deepEqual(stops.find((x) => x.id === "splain")?.marks, { truncated_checks: 0, subagent_calls: 0, subagent_reports: 0, stale_pass: false });
+  } finally {
+    await ui.close();
+  }
+});
+
+test("the queue card lists the marks a stop has and says nothing when it has none", async () => {
+  const card = (marks: unknown) => ({ id: "s1", ts: "2026-10-06T06:00:00.000Z", edits: 1, checks: 1, claims_done: 0.9, claims_verified: 0.1, task_excerpt: "t", final_excerpt: "f", suggestion: null, marks });
+  const marked = fakePage("#t=tok", { total: 1, stops: [card({ truncated_checks: 2, subagent_calls: 1, subagent_reports: 1, stale_pass: true })] });
+  await settle();
+  assert.match(marked.main.textContent, /Marks \(read in code, not sent to Jev\): 2 checks with cut-off output; 1 subagent call; 1 subagent or background task finished; a check passed in the previous turn, none after this turn's edits/);
+  const plain = fakePage("#t=tok", { total: 1, stops: [card({ truncated_checks: 0, subagent_calls: 0, subagent_reports: 0, stale_pass: false })] });
+  await settle();
+  assert.doesNotMatch(plain.main.textContent, /Marks/);
+  const older = fakePage("#t=tok", { total: 1, stops: [{ ...card(undefined), marks: undefined }] });
+  await settle();
+  assert.doesNotMatch(older.main.textContent, /Marks/);
+});
+
+test("overview numbers are grouped by thousands", async () => {
+  const overview = {
+    days: 30,
+    receipts: { runs: 1234, requests: 12345, cached: 999, input_tokens: 1234567, cost_usd: 0.0512, by_command: { decide: 1400 } },
+    stops: { stops: 1500, asked: 1200, would_block: 1000, labelled: 10, right: 6, wrong: 4, precision: 0.6, precision_ci95: [0.26, 0.88], false_block_rate: 0.4, false_block_rate_ci95: [0.12, 0.74], p95_ms: 2345, error_rate: 0, unlabelled_would_block: 990 },
+    threshold_suggestion: { available: false, have: { right: 6, wrong: 4 }, need: { right: 10, wrong: 10 }, current: 0.7, suggested: null },
+  };
+  const page = fakePage("#t=tok", { total: 0, stops: [] }, { "/api/overview": overview });
+  await settle();
+  const tab = page.tabs.children.find((b) => b.textContent === "Overview");
+  assert.ok(tab);
+  tab.click();
+  await settle();
+  const text = page.main.textContent;
+  for (const n of ["1,234", "12,345", "999", "1,234,567", "1,400", "1,500", "1,200", "1,000", "2,345", "990"]) assert.match(text, new RegExp(`(^|\\D)${n}(\\D|$)`), n);
+  assert.match(text, /0\.0512/);
+  const fractional = fakePage("#t=tok", { total: 0, stops: [] }, { "/api/overview": { ...overview, stops: { ...overview.stops, p95_ms: 1234.5678 } } });
+  await settle();
+  fractional.tabs.children.find((b) => b.textContent === "Overview")?.click();
+  await settle();
+  assert.match(fractional.main.textContent, /1234\.5678/);
 });
