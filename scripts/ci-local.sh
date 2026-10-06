@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Runs the steps of .github/workflows/ci.yml locally, as close to CI as one machine allows: no API key, a foreign HOME, a clean bundle check.
-# Run it after committing and before pushing. Not covered: Node 20.3, 22 and 24 (this machine's Node is used) and macOS vs Linux.
+# Run it after committing and before pushing. Node 22 and 20.3 are downloaded once into ~/.cache; not covered: Node 24 and Linux, and the hook latency timing.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 step() { printf '\n== %s\n' "$1"; }
@@ -10,6 +10,9 @@ clean_env() { env -u TYPESAFE_API_KEY -u EVAL_TYPESAFE_API_KEY -u TYPESAFE_API_K
 
 step "typecheck"; npm run typecheck --silent
 step "tests without a key, under a foreign HOME"; clean_env npm test --silent 2>&1 | grep -E "^ℹ (tests|pass|fail)"; test "${PIPESTATUS[0]}" -eq 0
+step "tests on Node 22, as the CI matrix (cached download, checksum verified)"
+n22="$(bash scripts/ci-node.sh 22.23.3)"; "$n22" --version
+PATH="$(dirname "$n22"):$PATH" clean_env "$n22" --test --test-reporter=spec "test/**/*.test.ts" 2>&1 | grep -E "^ℹ (tests|pass|fail)"; test "${PIPESTATUS[0]}" -eq 0
 step "build, then the committed bundle and npm copy must match"; npm run build --silent >/dev/null
 git diff --exit-code HEAD -- plugins/claude-referee/dist npm >/dev/null || { echo "bundle or npm copy differs from HEAD: commit the rebuilt files"; exit 1; }
 
@@ -21,6 +24,15 @@ done
 echo 'not json' | clean_env node "$tmp/claude-referee/dist/hook.mjs" session-start
 echo '{}' | clean_env node "$tmp/claude-referee/dist/hook.mjs" stop
 test "$(wc -c < "$tmp/claude-referee/dist/cli.mjs")" -lt 400000
+
+step "bundle on Node 20.3, as the CI bundle job (cached download, checksum verified)"
+n20="$(bash scripts/ci-node.sh 20.3.0)"; "$n20" --version
+for c in done decide judge claims verify receipts doctor eval; do
+  clean_env "$n20" "$cli" "$c" --describe | "$n20" -e 'JSON.parse(require("fs").readFileSync(0, "utf8"))' || { echo "describe failed on Node 20.3: $c"; exit 1; }
+done
+echo 'not json' | clean_env "$n20" "$tmp/claude-referee/dist/hook.mjs" session-start
+echo '{}' | clean_env "$n20" "$tmp/claude-referee/dist/hook.mjs" stop
+env -u TYPESAFE_API_KEY -u EVAL_TYPESAFE_API_KEY -u TYPESAFE_API_KEY_CMD HOME=/home/runner "$n20" plugins/claude-referee/dist/cli.mjs eval score --suite all --fail-on violated | cut -c1-120
 test "$(wc -c < "$tmp/claude-referee/dist/hook.mjs")" -lt 200000
 
 step "recorded evals score offline with CI's HOME"
