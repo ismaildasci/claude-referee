@@ -1,0 +1,135 @@
+{"id":"i-d01","label":"yes","low_confidence":false,"why":"submit button text"}
+{"id":"i-d02","label":"yes","low_confidence":false,"why":"page heading greeting"}
+{"id":"i-d03","label":"yes","low_confidence":false,"why":"search placeholder"}
+{"id":"i-d04","label":"yes","low_confidence":false,"why":"aria-label for icon button"}
+{"id":"i-d05","label":"yes","low_confidence":false,"why":"image alt text"}
+{"id":"i-d06","label":"yes","low_confidence":false,"why":"button tooltip"}
+{"id":"i-d07","label":"yes","low_confidence":false,"why":"button text"}
+{"id":"i-d08","label":"yes","low_confidence":false,"why":"empty state message"}
+{"id":"i-d09","label":"yes","low_confidence":false,"why":"section heading"}
+{"id":"i-d10","label":"yes","low_confidence":false,"why":"input placeholder shown to users"}
+{"id":"i-d11","label":"yes","low_confidence":false,"why":"alert shown to user"}
+{"id":"i-d12","label":"yes","low_confidence":false,"why":"error toast"}
+{"id":"i-d13","label":"yes","low_confidence":false,"why":"navigation menu label"}
+{"id":"i-d14","label":"yes","low_confidence":false,"why":"notification description"}
+{"id":"i-d15","label":"yes","low_confidence":false,"why":"loading indicator text"}
+{"id":"i-d16","label":"yes","low_confidence":false,"why":"footer link text"}
+{"id":"i-d17","label":"yes","low_confidence":false,"why":"button tooltip"}
+{"id":"i-d18","label":"yes","low_confidence":false,"why":"empty state message"}
+{"id":"i-d19","label":"yes","low_confidence":false,"why":"confirm dialog message"}
+{"id":"i-d20","label":"yes","low_confidence":false,"why":"info toast with placeholders"}
+{"id":"i-d21","label":"no","low_confidence":false,"why":"SQL statement"}
+{"id":"i-d22","label":"no","low_confidence":false,"why":"log message"}
+{"id":"i-d23","label":"no","low_confidence":false,"why":"test case name"}
+{"id":"i-d24","label":"no","low_confidence":true,"why":"id-like aria-label, though announced"}
+{"id":"i-d25","label":"no","low_confidence":false,"why":"translation key or field path"}
+{"id":"i-d26","label":"no","low_confidence":false,"why":"network error code"}
+{"id":"i-d27","label":"no","low_confidence":false,"why":"shell command in code block"}
+{"id":"i-d28","label":"no","low_confidence":false,"why":"date format pattern"}
+{"id":"i-d29","label":"no","low_confidence":false,"why":"cron expression"}
+{"id":"i-d30","label":"no","low_confidence":false,"why":"JSONPath expression"}
+{"id":"i-d31","label":"no","low_confidence":false,"why":"CSS selector in e2e test"}
+{"id":"i-d32","label":"no","low_confidence":false,"why":"server console log"}
+{"id":"i-d33","label":"no","low_confidence":false,"why":"feature flag identifier"}
+{"id":"i-d34","label":"no","low_confidence":false,"why":"HTTP header name"}
+{"id":"i-d35","label":"no","low_confidence":false,"why":"access log line"}
+{"id":"i-d36","label":"no","low_confidence":false,"why":"regular expression"}
+{"id":"i-d37","label":"no","low_confidence":false,"why":"console error log"}
+{"id":"i-d38","label":"no","low_confidence":false,"why":"CSS selector in e2e test"}
+{"id":"i-d39","label":"no","low_confidence":false,"why":"git branch name"}
+{"id":"i-d40","label":"no","low_confidence":false,"why":"debug log message"}
+{"id":"i-h01","label":"yes","low_confidence":false,"why":"submit button text"}
+{"id":"i-h02","label":"yes","low_confidence":false,"why":"link text on login page"}
+{"id":"i-h03","label":"yes","low_confidence":false,"why":"form field label"}
+{"id":"i-h04","label":"yes","low_confidence":false,"why":"textarea placeholder"}
+{"id":"i-h05","label":"yes","low_confidence":false,"why":"aria-label for menu button"}
+{"id":"i-h06","label":"yes","low_confidence":false,"why":"button tooltip visible to users"}
+{"id":"i-h07","label":"yes","low_confidence":false,"why":"image alt text"}
+{"id":"i-h08","label":"yes","low_confidence":false,"why":"pagination text"}
+{"id":"i-h09","label":"yes","low_confidence":false,"why":"visible error alert"}
+{"id":"i-h10","label":"yes","low_confidence":false,"why":"dialog button text"}
+{"id":"i-h11","label":"yes","low_confidence":false,"why":"button text"}
+{"id":"i-h12","label":"yes","low_confidence":false,"why":"visible warning text"}
+{"id":"i-h13","label":"yes","low_confidence":false,"why":"confirmation heading"}
+{"id":"i-h14","label":"yes","low_confidence":false,"why":"button text"}
+{"id":"i-h15","label":"yes","low_confidence":false,"why":"aria-label for search landmark"}
+{"id":"i-h16","label":"yes","low_confidence":false,"why":"page heading"}
+{"id":"i-h17","label":"yes","low_confidence":false,"why":"chat input placeholder"}
+{"id":"i-h18","label":"yes","low_confidence":false,"why":"menu link text"}
+{"id":"i-h19","label":"yes","low_confidence":false,"why":"button text via mustache"}
+{"id":"i-h20","label":"yes","low_confidence":false,"why":"aria-label for pagination button"}
+{"id":"i-h21","label":"yes","low_confidence":false,"why":"link text"}
+{"id":"i-h22","label":"yes","low_confidence":false,"why":"page title in browser tab"}
+{"id":"i-h23","label":"yes","low_confidence":false,"why":"submit button text"}
+{"id":"i-h24","label":"yes","low_confidence":false,"why":"visible select option"}
+{"id":"i-h25","label":"yes","low_confidence":false,"why":"form field label"}
+{"id":"i-h26","label":"yes","low_confidence":true,"why":"meta description seen in search previews"}
+{"id":"i-h27","label":"yes","low_confidence":false,"why":"image alt text"}
+{"id":"i-h28","label":"yes","low_confidence":false,"why":"table column header"}
+{"id":"i-h29","label":"yes","low_confidence":false,"why":"success toast"}
+{"id":"i-h30","label":"yes","low_confidence":false,"why":"alert shown to user"}
+{"id":"i-h31","label":"yes","low_confidence":false,"why":"notification message"}
+{"id":"i-h32","label":"yes","low_confidence":false,"why":"document title shown in browser tab"}
+{"id":"i-h33","label":"yes","low_confidence":false,"why":"confirm dialog message"}
+{"id":"i-h34","label":"yes","low_confidence":false,"why":"snackbar greeting"}
+{"id":"i-h35","label":"yes","low_confidence":false,"why":"date field placeholder"}
+{"id":"i-h36","label":"yes","low_confidence":false,"why":"password helper text"}
+{"id":"i-h37","label":"yes","low_confidence":false,"why":"action tooltip"}
+{"id":"i-h38","label":"yes","low_confidence":false,"why":"form validation message"}
+{"id":"i-h39","label":"yes","low_confidence":false,"why":"form section title"}
+{"id":"i-h40","label":"yes","low_confidence":false,"why":"visible editor hint"}
+{"id":"i-h41","label":"yes","low_confidence":false,"why":"page heading"}
+{"id":"i-h42","label":"yes","low_confidence":false,"why":"section heading"}
+{"id":"i-h43","label":"yes","low_confidence":false,"why":"skip link text"}
+{"id":"i-h44","label":"yes","low_confidence":false,"why":"toast message"}
+{"id":"i-h45","label":"yes","low_confidence":false,"why":"settings option label"}
+{"id":"i-h46","label":"yes","low_confidence":false,"why":"accessible chart description"}
+{"id":"i-h47","label":"yes","low_confidence":false,"why":"section heading"}
+{"id":"i-h48","label":"yes","low_confidence":false,"why":"link tooltip"}
+{"id":"i-h49","label":"yes","low_confidence":false,"why":"aria-label read to screen reader users"}
+{"id":"i-h50","label":"no","low_confidence":false,"why":"templated identifier in aria-label"}
+{"id":"i-h51","label":"no","low_confidence":false,"why":"install command in code element"}
+{"id":"i-h52","label":"no","low_confidence":false,"why":"server error log"}
+{"id":"i-h53","label":"no","low_confidence":false,"why":"developer console warning"}
+{"id":"i-h54","label":"no","low_confidence":false,"why":"test case name"}
+{"id":"i-h55","label":"no","low_confidence":false,"why":"test suite name"}
+{"id":"i-h56","label":"no","low_confidence":false,"why":"SQL statement"}
+{"id":"i-h57","label":"no","low_confidence":false,"why":"HTTP header name"}
+{"id":"i-h58","label":"no","low_confidence":false,"why":"cron expression"}
+{"id":"i-h59","label":"no","low_confidence":false,"why":"file name"}
+{"id":"i-h60","label":"no","low_confidence":false,"why":"content-type value"}
+{"id":"i-h61","label":"no","low_confidence":false,"why":"system error code"}
+{"id":"i-h62","label":"no","low_confidence":false,"why":"HTTP header name"}
+{"id":"i-h63","label":"no","low_confidence":false,"why":"identifier in title attribute"}
+{"id":"i-h64","label":"no","low_confidence":false,"why":"placeholder identifier in alt"}
+{"id":"i-h65","label":"no","low_confidence":false,"why":"test identifier in aria-label"}
+{"id":"i-h66","label":"no","low_confidence":false,"why":"inline JavaScript code"}
+{"id":"i-h67","label":"no","low_confidence":false,"why":"git command in pre block"}
+{"id":"i-h68","label":"no","low_confidence":false,"why":"OAuth protocol error code"}
+{"id":"i-h69","label":"no","low_confidence":false,"why":"dismiss argument, not displayed"}
+{"id":"i-h70","label":"no","low_confidence":true,"why":"variant name, likely internal design token"}
+{"id":"i-h71","label":"no","low_confidence":false,"why":"audit log message"}
+{"id":"i-h72","label":"no","low_confidence":false,"why":"expected runtime error in test"}
+{"id":"i-h73","label":"no","low_confidence":false,"why":"test case name"}
+{"id":"i-h74","label":"no","low_confidence":false,"why":"identifier in title attribute"}
+{"id":"i-h75","label":"no","low_confidence":false,"why":"URL template"}
+{"id":"i-h76","label":"no","low_confidence":false,"why":"analytics event identifier"}
+{"id":"i-h77","label":"no","low_confidence":false,"why":"locale code"}
+{"id":"i-h78","label":"no","low_confidence":false,"why":"internal developer error"}
+{"id":"i-h79","label":"no","low_confidence":false,"why":"log message"}
+{"id":"i-h80","label":"no","low_confidence":false,"why":"dev script console log"}
+{"id":"i-h81","label":"no","low_confidence":false,"why":"process signal name"}
+{"id":"i-h82","label":"no","low_confidence":false,"why":"git ref name"}
+{"id":"i-h83","label":"no","low_confidence":false,"why":"database query"}
+{"id":"i-h84","label":"no","low_confidence":false,"why":"SQL statement"}
+{"id":"i-h85","label":"no","low_confidence":false,"why":"system error message"}
+{"id":"i-h86","label":"no","low_confidence":false,"why":"worker console log"}
+{"id":"i-h87","label":"no","low_confidence":false,"why":"server log message"}
+{"id":"i-h88","label":"no","low_confidence":false,"why":"identifier misused as aria-label"}
+{"id":"i-h89","label":"no","low_confidence":false,"why":"curl command in pre block"}
+{"id":"i-h90","label":"no","low_confidence":false,"why":"already a translation key"}
+{"id":"i-h91","label":"no","low_confidence":false,"why":"feature flag constant"}
+{"id":"i-h92","label":"no","low_confidence":false,"why":"test selector"}
+{"id":"i-h93","label":"no","low_confidence":false,"why":"test case name"}
+{"id":"i-h94","label":"no","low_confidence":false,"why":"MIME type"}
+{"id":"i-h95","label":"no","low_confidence":false,"why":"server log message"}
