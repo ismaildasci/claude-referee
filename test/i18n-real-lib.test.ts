@@ -14,6 +14,8 @@ test("metadata filter follows the registered order of reasons", () => {
   assert.equal(metadataVerdict({ ...ok, stars: 24 }).why, "stars");
   assert.equal(metadataVerdict({ ...ok, pushed_at: "2023-10-05T23:59:59Z" }).why, "pushed");
   assert.equal(metadataVerdict({ gone: true }).why, "gone");
+  assert.equal(metadataVerdict({ ...ok, stars: 5 }, 5).pass, true);
+  assert.equal(metadataVerdict({ ...ok, stars: 4 }, 5).why, "stars");
 });
 
 test("locale namespaces come from the file name", () => {

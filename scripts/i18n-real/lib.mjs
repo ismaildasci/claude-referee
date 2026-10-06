@@ -13,12 +13,12 @@ export const SEED = "i18n-real-v1";
 
 export const sha256 = (text) => createHash("sha256").update(text).digest("hex");
 
-export function metadataVerdict(m) {
+export function metadataVerdict(m, minStars = MIN_STARS) {
   if (!m || m.gone) return { pass: false, why: "gone" };
   if (m.fork) return { pass: false, why: "fork" };
   if (m.archived) return { pass: false, why: "archived" };
   if (!LICENSES.has(m.license)) return { pass: false, why: "license" };
-  if (!(m.stars >= MIN_STARS)) return { pass: false, why: "stars" };
+  if (!(m.stars >= minStars)) return { pass: false, why: "stars" };
   if (!(m.pushed_at >= PUSHED_SINCE)) return { pass: false, why: "pushed" };
   return { pass: true, why: "ok" };
 }

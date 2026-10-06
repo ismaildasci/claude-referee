@@ -10,7 +10,7 @@ export const MIN_SITES: number;
 export const PER_ORIGIN: number;
 export const SEED: string;
 export function sha256(text: string): string;
-export function metadataVerdict(m: unknown): { pass: boolean; why: string };
+export function metadataVerdict(m: unknown, minStars?: number): { pass: boolean; why: string };
 export function localeNamespace(rel: string): string | null;
 export function resolveKey(key: string, namespaces: { name: string; data: unknown }[], file?: { ns?: string; keyPrefix?: string }): Resolved;
 export function fileNamespace(source: string): { ns?: string; keyPrefix?: string };
