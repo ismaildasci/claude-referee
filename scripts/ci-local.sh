@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Runs the steps of .github/workflows/ci.yml locally, as close to CI as one machine allows: no API key, a foreign HOME, a clean bundle check.
-# Run it after committing and before pushing. Node 22 and 20.3 are downloaded once into ~/.cache; not covered: Node 24 and Linux, and the hook latency timing.
+# Run it after committing and before pushing. Node 22, 24 and 20.3 are downloaded once into ~/.cache; not covered: Linux and the hook latency timing.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 step() { printf '\n== %s\n' "$1"; }
@@ -10,9 +10,11 @@ clean_env() { env -u TYPESAFE_API_KEY -u EVAL_TYPESAFE_API_KEY -u TYPESAFE_API_K
 
 step "typecheck"; npm run typecheck --silent
 step "tests without a key, under a foreign HOME"; clean_env npm test --silent 2>&1 | grep -E "^ℹ (tests|pass|fail)"; test "${PIPESTATUS[0]}" -eq 0
-step "tests on Node 22, as the CI matrix (cached download, checksum verified)"
-n22="$(bash scripts/ci-node.sh 22.23.3)"; "$n22" --version
-PATH="$(dirname "$n22"):$PATH" clean_env "$n22" --test --test-reporter=spec "test/**/*.test.ts" 2>&1 | grep -E "^ℹ (tests|pass|fail)"; test "${PIPESTATUS[0]}" -eq 0
+for v in 22.23.3 24.21.0; do
+  step "tests on Node $v, as the CI matrix (cached download, checksum verified)"
+  nv="$(bash scripts/ci-node.sh "$v")"; "$nv" --version
+  PATH="$(dirname "$nv"):$PATH" clean_env "$nv" --test --test-reporter=spec "test/**/*.test.ts" 2>&1 | grep -E "^ℹ (tests|pass|fail)"; test "${PIPESTATUS[0]}" -eq 0
+done
 step "build, then the committed bundle and npm copy must match"; npm run build --silent >/dev/null
 git diff --exit-code HEAD -- plugins/claude-referee/dist npm >/dev/null || { echo "bundle or npm copy differs from HEAD: commit the rebuilt files"; exit 1; }
 
