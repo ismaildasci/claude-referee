@@ -12,6 +12,7 @@ interface Counts {
   passed: number;
   failed: number;
   skipped: number;
+  expected: number;
 }
 
 interface Tally {
@@ -39,18 +40,19 @@ function listFailing(ids: Iterable<string>): string[] {
 }
 
 function countsOf(body: string): Counts {
-  const c: Counts = { passed: 0, failed: 0, skipped: 0 };
-  for (const m of body.matchAll(/(\d+)\s+(failed|passed|skipped|todo|pending|total)\b/g)) {
+  const c: Counts = { passed: 0, failed: 0, skipped: 0, expected: 0 };
+  for (const m of body.matchAll(/(\d+)\s+(expected fail|failed|passed|skipped|todos?|pending|risky|incomplete|total)\b/g)) {
     const n = Number(m[1]);
     if (m[2] === "failed") c.failed += n;
     else if (m[2] === "passed") c.passed += n;
+    else if (m[2] === "expected fail") c.expected += n;
     else if (m[2] !== "total") c.skipped += n;
   }
   return c;
 }
 
 function tally(lines: readonly string[], re: RegExp): Tally {
-  const t: Tally = { line: null, last: { passed: 0, failed: 0, skipped: 0 }, failedMax: 0 };
+  const t: Tally = { line: null, last: { passed: 0, failed: 0, skipped: 0, expected: 0 }, failedMax: 0 };
   for (const l of lines) {
     const m = re.exec(l);
     if (m === null) continue;
@@ -62,12 +64,13 @@ function tally(lines: readonly string[], re: RegExp): Tally {
 }
 
 function facts(runner: string, f: Omit<RunnerFacts, "runner" | "failing" | "summary_line"> & { failing: Iterable<string>; summary: string | null }): RunnerFacts {
-  return { runner, passed: f.passed, failed: f.failed, errors: f.errors, skipped: f.skipped, failing: listFailing(f.failing), summary_line: clip(f.summary) };
+  const extra = { ...(f.expected_failures ? { expected_failures: f.expected_failures } : {}), ...(f.incomplete ? { incomplete: true } : {}) };
+  return { runner, passed: f.passed, failed: f.failed, errors: f.errors, skipped: f.skipped, ...extra, failing: listFailing(f.failing), summary_line: clip(f.summary) };
 }
 
 function parseJest(text: string): RunnerFacts | null {
   const lines = toLines(text);
-  const tests = tally(lines, /^\s*Tests:\s+(?=.*\b\d+\s+(?:failed|passed|skipped|todo|total)\b)(\d.*)$/);
+  const tests = tally(lines, /^\s*Tests:\s+(?=.*\b\d+\s+(?:failed|passed|skipped|todos?|risky|incomplete|total)\b)(\d.*)$/);
   const suites = tally(lines, /^\s*Test Suites:\s+(\d.*)$/);
   const noTests = lines.find((l) => /^\s*No tests found\b/.test(l)) ?? null;
   const ids = new Set<string>();
@@ -131,6 +134,7 @@ function parseVitest(text: string): RunnerFacts | null {
     failed,
     errors,
     skipped: tests.last.skipped,
+    expected_failures: tests.last.expected,
     failing: ids.size + loadFails.size > 0 ? [...ids, ...loadFails] : markedFiles,
     summary: tests.line ?? files.line ?? noFiles,
   });
@@ -211,6 +215,11 @@ function parseEslint(text: string): RunnerFacts | null {
   return { ...facts("eslint", { passed: 0, failed: 0, errors: Math.max(errorsMax, entries.size), skipped: 0, failing: entries, summary }), warnings: Math.max(warningsMax, warned.size) };
 }
 
+const TSC_LEAD = String.raw`^\s*(?:[\w@/.-]+(?:[: ][\w:-]+)?:\s+|\[[^\]]+\]:?\s+|[\w.-]+\s+\|\s+|#\d+ [\d.]+ |\d{4}-\d\d-\d\dT[\d:.]+Z |ERROR in\s+)?`;
+const TSC_PLAIN = new RegExp(String.raw`${TSC_LEAD}(\S+?)\((\d+),(\d+)\):\s+error\s+((?:TS|NG)\d+):`);
+const TSC_PRETTY = new RegExp(String.raw`${TSC_LEAD}(\S+?):(\d+):(\d+)\s+-\s+error\s+((?:TS|NG)\d+):`);
+const TSC_GLOBAL = new RegExp(String.raw`${TSC_LEAD}error\s+(TS\d+):`);
+
 function parseTsc(text: string): RunnerFacts | null {
   const lines = toLines(text);
   let summary: string | null = null;
@@ -223,12 +232,12 @@ function parseTsc(text: string): RunnerFacts | null {
       errorsMax = Math.max(errorsMax, Number(s[1]));
       continue;
     }
-    const a = /^\s*(\S+?)\((\d+),(\d+)\):\s+error\s+(TS\d+):/.exec(l) ?? /^\s*(\S+?):(\d+):(\d+)\s+-\s+error\s+(TS\d+):/.exec(l);
+    const a = TSC_PLAIN.exec(l) ?? TSC_PRETTY.exec(l);
     if (a !== null) {
       entries.add(`${a[1]}:${a[2]}:${a[3]} ${a[4]}`);
       continue;
     }
-    const g = /^\s*error\s+(TS\d+):/.exec(l);
+    const g = TSC_GLOBAL.exec(l);
     if (g !== null) entries.add(g[1] ?? "");
   }
   const build = lines.some((l) => /^\s*(?:\[[^\]]*\]\s*)?(?:Projects in this build:|Building project ')/.test(l));
@@ -246,19 +255,34 @@ function parseNodeTest(text: string): RunnerFacts | null {
   const tests = num("tests");
   const pass = num("pass");
   const fail = num("fail");
+  const cancelled = num("cancelled") ?? 0;
   const ids = new Set<string>();
   let inFailing = false;
+  let empty = false;
+  let bare = false;
+  let expected = 0;
   for (const l of lines) {
-    if (/^✖ failing tests:\s*$/.test(l)) inFailing = true;
-    const m = /^✖ (.+?) \(\d+(?:\.\d+)?ms\)\s*$/.exec(l);
-    if (m !== null && !inFailing) ids.add(m[1] as string);
+    if (/^✖ failing tests:\s*$/.test(l)) {
+      bare ||= inFailing && empty;
+      inFailing = empty = true;
+      continue;
+    }
+    if (inFailing && !/^(?:\s|[✖⚠] |test at |$)/.test(l)) {
+      bare ||= empty;
+      inFailing = false;
+    }
+    if (inFailing && /^[✖⚠] /.test(l)) empty = false;
+    const m = (inFailing ? /^✖ (.+?)(?: \(\d+(?:\.\d+)?ms\))?\s*$/ : /^✖ (.+?) \(\d+(?:\.\d+)?ms\)\s*$/).exec(l);
+    if (m !== null) ids.add(m[1] as string);
     const tap = /^not ok \d+ - (.+?)\s*$/.exec(l);
-    if (tap !== null) ids.add(tap[1] as string);
+    if (tap !== null && !/\s# (?:TODO|SKIP)\b/i.test(tap[1] as string)) ids.add(tap[1] as string);
+    if (/^\s*(?:✔ |ok \d+ - ).*\s# EXPECTED FAILURE\b/.test(l)) expected++;
   }
+  bare ||= inFailing && empty;
   const summary = tests !== null && pass !== null && fail !== null ? lines.filter((l) => /^(?:ℹ|#) (?:tests|pass|fail) \d+\s*$/.test(l)).slice(-3).join(" ") : null;
-  const failed = Math.max(fail ?? 0, ids.size);
+  const failed = Math.max((fail ?? 0) + cancelled, ids.size, bare ? 1 : 0);
   if (summary === null && failed === 0) return null;
-  return facts("node:test", { passed: pass ?? 0, failed, errors: 0, skipped: num("skipped") ?? 0, failing: ids, summary });
+  return facts("node:test", { passed: pass ?? 0, failed, errors: 0, skipped: (num("skipped") ?? 0) + (num("todo") ?? 0), expected_failures: expected, incomplete: cancelled > 0, failing: ids, summary });
 }
 
 export const parsers: readonly RunnerParser[] = [

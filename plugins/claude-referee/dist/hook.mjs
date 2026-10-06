@@ -1920,6 +1920,7 @@ var CARGO_TEST = /^test (.+?) \.\.\. (ok|FAILED|ignored)\b/;
 var CARGO_STDOUT = /^---- (.+?) stdout ----$/;
 var CARGO_COMPILE = /^error\[E\d+\]/;
 var CARGO_LIST_ITEM = /^ {4}([\w:]+|\S+ - .+ \(line \d+\))$/;
+var CARGO_TARGETS_FAILED = /^error: (\d+) targets? failed:/;
 var cargo = {
   name: "cargo test",
   parse(text) {
@@ -1935,6 +1936,7 @@ var cargo = {
     let failedFirst = null;
     let couldNotCompile = false;
     let testFailedLine = false;
+    let targetsFailed = 0;
     for (let i = 0; i < lines3.length; i++) {
       const line = lines3[i];
       const r = CARGO_RESULT.exec(line);
@@ -1971,9 +1973,10 @@ var cargo = {
       if (CARGO_COMPILE.test(line)) compile2.add(line);
       else if (/^error: could not compile /.test(line)) couldNotCompile = true;
       else if (/^error: test failed, to rerun pass/.test(line)) testFailedLine = true;
+      else targetsFailed = Math.max(targetsFailed, Number(CARGO_TARGETS_FAILED.exec(line)?.[1] ?? 0));
     }
     const errors = compile2.size > 0 ? compile2.size : couldNotCompile ? 1 : 0;
-    const failed = Math.max(failedSum, failedIds.size, failedStatus || testFailedLine ? 1 : 0);
+    const failed = Math.max(failedSum, failedIds.size, targetsFailed, failedStatus || testFailedLine ? 1 : 0);
     if (results.length === 0 && failed === 0 && errors === 0) return null;
     const summary = results.length === 0 ? null : failedFirst ?? results[results.length - 1];
     return facts("cargo test", results.length > 0 ? passed : okLines, failed, errors, ignored, failedIds, summary);
@@ -2052,7 +2055,7 @@ var dotnet = {
         passedLines++;
         continue;
       }
-      if (/\berror [A-Z]{2,4}\d{3,5}:/.test(line)) {
+      if (/:\s+error (?!TS\d)[A-Z]{2,4}\d{3,5}:/.test(line)) {
         buildErrors.add((DOTNET_ERROR.exec(line)?.[1] ?? line).trim());
         continue;
       }
@@ -2093,13 +2096,33 @@ function mk(runner, counts3, failing, summary, incomplete) {
 }
 __name(mk, "mk");
 var buildOnly = /* @__PURE__ */ __name((facts3) => ({ ...facts3, build_only: true }), "buildOnly");
+var EXIT_PHRASE = /^(.{0,60}?)\bexit (?:code|status)\s*[:=]?\s*(0[xX][\da-fA-F]+|-?\d+)(?![\dxX])/gim;
+var EXIT_GUTTER = /^\s*(?:[>❯]\s*)?\d+\s*\|/;
+var EXIT_TITLE = /^\s*(?:[✔✓√○↓﹣▶]|\((?:pass|skip|todo)\)|ok \d+\b|# Subtest:)/;
+var EXIT_FAIL_LEAD = /^\s*(?:[✗✕✖×✘●⚠]|\(fail\)|not ok \d+\b)/;
+var EXIT_ASSERT = /\b(?:expected|expect(?:s|ing)?|should|want(?:ed)?|assert\w*)\s*$/i;
+var EXIT_GOT = /^[ \t]*[,;]?[ \t]*(?:but[ \t]+)?(?:got|received|actual|want(?:ed)?|expected)\b/i;
+function insideQuote(prefix) {
+  const bare = prefix.replace(new RegExp("(?<=\\p{L})['’](?=\\p{L})", "gu"), "");
+  return [/"/g, /'/g, /`/g].some((q) => (bare.match(q)?.length ?? 0) % 2 === 1);
+}
+__name(insideQuote, "insideQuote");
+function restOfLine(text, m) {
+  const from = m.index + m[0].length;
+  const end = text.indexOf("\n", from);
+  return text.slice(from, end === -1 ? void 0 : end);
+}
+__name(restOfLine, "restOfLine");
+function exitMatches(text) {
+  return [...text.matchAll(EXIT_PHRASE)].filter((m) => {
+    const prefix = m[1] ?? "";
+    if (EXIT_GUTTER.test(m[0]) || EXIT_TITLE.test(m[0]) || insideQuote(prefix) || EXIT_ASSERT.test(prefix) || EXIT_GOT.test(restOfLine(text, m))) return false;
+    return !(EXIT_FAIL_LEAD.test(m[0]) && Number(m[2]) === 0);
+  });
+}
+__name(exitMatches, "exitMatches");
 function exitCodes(lines3) {
-  const out = [];
-  for (const line of lines3) {
-    const m = /^.{0,60}?\bexit (?:code|status)\s*[:=]?\s*(-?\d+)/i.exec(line);
-    if (m) out.push(Number(m[1]));
-  }
-  return out;
+  return lines3.flatMap((line) => exitMatches(line).slice(0, 1).map((m) => Number(m[2])));
 }
 __name(exitCodes, "exitCodes");
 
@@ -2217,18 +2240,19 @@ function listFailing(ids) {
 }
 __name(listFailing, "listFailing");
 function countsOf(body) {
-  const c = { passed: 0, failed: 0, skipped: 0 };
-  for (const m of body.matchAll(/(\d+)\s+(failed|passed|skipped|todo|pending|total)\b/g)) {
+  const c = { passed: 0, failed: 0, skipped: 0, expected: 0 };
+  for (const m of body.matchAll(/(\d+)\s+(expected fail|failed|passed|skipped|todos?|pending|risky|incomplete|total)\b/g)) {
     const n = Number(m[1]);
     if (m[2] === "failed") c.failed += n;
     else if (m[2] === "passed") c.passed += n;
+    else if (m[2] === "expected fail") c.expected += n;
     else if (m[2] !== "total") c.skipped += n;
   }
   return c;
 }
 __name(countsOf, "countsOf");
 function tally(lines3, re) {
-  const t = { line: null, last: { passed: 0, failed: 0, skipped: 0 }, failedMax: 0 };
+  const t = { line: null, last: { passed: 0, failed: 0, skipped: 0, expected: 0 }, failedMax: 0 };
   for (const l of lines3) {
     const m = re.exec(l);
     if (m === null) continue;
@@ -2240,12 +2264,13 @@ function tally(lines3, re) {
 }
 __name(tally, "tally");
 function facts2(runner, f) {
-  return { runner, passed: f.passed, failed: f.failed, errors: f.errors, skipped: f.skipped, failing: listFailing(f.failing), summary_line: clip2(f.summary) };
+  const extra = { ...f.expected_failures ? { expected_failures: f.expected_failures } : {}, ...f.incomplete ? { incomplete: true } : {} };
+  return { runner, passed: f.passed, failed: f.failed, errors: f.errors, skipped: f.skipped, ...extra, failing: listFailing(f.failing), summary_line: clip2(f.summary) };
 }
 __name(facts2, "facts");
 function parseJest(text) {
   const lines3 = toLines(text);
-  const tests = tally(lines3, /^\s*Tests:\s+(?=.*\b\d+\s+(?:failed|passed|skipped|todo|total)\b)(\d.*)$/);
+  const tests = tally(lines3, /^\s*Tests:\s+(?=.*\b\d+\s+(?:failed|passed|skipped|todos?|risky|incomplete|total)\b)(\d.*)$/);
   const suites = tally(lines3, /^\s*Test Suites:\s+(\d.*)$/);
   const noTests = lines3.find((l) => /^\s*No tests found\b/.test(l)) ?? null;
   const ids = /* @__PURE__ */ new Set();
@@ -2309,6 +2334,7 @@ function parseVitest(text) {
     failed,
     errors,
     skipped: tests.last.skipped,
+    expected_failures: tests.last.expected,
     failing: ids.size + loadFails.size > 0 ? [...ids, ...loadFails] : markedFiles,
     summary: tests.line ?? files.line ?? noFiles
   });
@@ -2389,6 +2415,10 @@ function parseEslint(text) {
   return { ...facts2("eslint", { passed: 0, failed: 0, errors: Math.max(errorsMax, entries.size), skipped: 0, failing: entries, summary }), warnings: Math.max(warningsMax, warned.size) };
 }
 __name(parseEslint, "parseEslint");
+var TSC_LEAD = String.raw`^\s*(?:[\w@/.-]+(?:[: ][\w:-]+)?:\s+|\[[^\]]+\]:?\s+|[\w.-]+\s+\|\s+|#\d+ [\d.]+ |\d{4}-\d\d-\d\dT[\d:.]+Z |ERROR in\s+)?`;
+var TSC_PLAIN = new RegExp(String.raw`${TSC_LEAD}(\S+?)\((\d+),(\d+)\):\s+error\s+((?:TS|NG)\d+):`);
+var TSC_PRETTY = new RegExp(String.raw`${TSC_LEAD}(\S+?):(\d+):(\d+)\s+-\s+error\s+((?:TS|NG)\d+):`);
+var TSC_GLOBAL = new RegExp(String.raw`${TSC_LEAD}error\s+(TS\d+):`);
 function parseTsc(text) {
   const lines3 = toLines(text);
   let summary = null;
@@ -2401,12 +2431,12 @@ function parseTsc(text) {
       errorsMax = Math.max(errorsMax, Number(s[1]));
       continue;
     }
-    const a = /^\s*(\S+?)\((\d+),(\d+)\):\s+error\s+(TS\d+):/.exec(l) ?? /^\s*(\S+?):(\d+):(\d+)\s+-\s+error\s+(TS\d+):/.exec(l);
+    const a = TSC_PLAIN.exec(l) ?? TSC_PRETTY.exec(l);
     if (a !== null) {
       entries.add(`${a[1]}:${a[2]}:${a[3]} ${a[4]}`);
       continue;
     }
-    const g2 = /^\s*error\s+(TS\d+):/.exec(l);
+    const g2 = TSC_GLOBAL.exec(l);
     if (g2 !== null) entries.add(g2[1] ?? "");
   }
   const build = lines3.some((l) => /^\s*(?:\[[^\]]*\]\s*)?(?:Projects in this build:|Building project ')/.test(l));
@@ -2424,19 +2454,34 @@ function parseNodeTest(text) {
   const tests = num("tests");
   const pass = num("pass");
   const fail = num("fail");
+  const cancelled = num("cancelled") ?? 0;
   const ids = /* @__PURE__ */ new Set();
   let inFailing = false;
+  let empty = false;
+  let bare = false;
+  let expected = 0;
   for (const l of lines3) {
-    if (/^✖ failing tests:\s*$/.test(l)) inFailing = true;
-    const m = /^✖ (.+?) \(\d+(?:\.\d+)?ms\)\s*$/.exec(l);
-    if (m !== null && !inFailing) ids.add(m[1]);
+    if (/^✖ failing tests:\s*$/.test(l)) {
+      bare ||= inFailing && empty;
+      inFailing = empty = true;
+      continue;
+    }
+    if (inFailing && !/^(?:\s|[✖⚠] |test at |$)/.test(l)) {
+      bare ||= empty;
+      inFailing = false;
+    }
+    if (inFailing && /^[✖⚠] /.test(l)) empty = false;
+    const m = (inFailing ? /^✖ (.+?)(?: \(\d+(?:\.\d+)?ms\))?\s*$/ : /^✖ (.+?) \(\d+(?:\.\d+)?ms\)\s*$/).exec(l);
+    if (m !== null) ids.add(m[1]);
     const tap = /^not ok \d+ - (.+?)\s*$/.exec(l);
-    if (tap !== null) ids.add(tap[1]);
+    if (tap !== null && !/\s# (?:TODO|SKIP)\b/i.test(tap[1])) ids.add(tap[1]);
+    if (/^\s*(?:✔ |ok \d+ - ).*\s# EXPECTED FAILURE\b/.test(l)) expected++;
   }
+  bare ||= inFailing && empty;
   const summary = tests !== null && pass !== null && fail !== null ? lines3.filter((l) => /^(?:ℹ|#) (?:tests|pass|fail) \d+\s*$/.test(l)).slice(-3).join(" ") : null;
-  const failed = Math.max(fail ?? 0, ids.size);
+  const failed = Math.max((fail ?? 0) + cancelled, ids.size, bare ? 1 : 0);
   if (summary === null && failed === 0) return null;
-  return facts2("node:test", { passed: pass ?? 0, failed, errors: 0, skipped: num("skipped") ?? 0, failing: ids, summary });
+  return facts2("node:test", { passed: pass ?? 0, failed, errors: 0, skipped: (num("skipped") ?? 0) + (num("todo") ?? 0), expected_failures: expected, incomplete: cancelled > 0, failing: ids, summary });
 }
 __name(parseNodeTest, "parseNodeTest");
 var parsers3 = [
@@ -3880,9 +3925,9 @@ var parsers10 = [nextest, dart, julia, kaocha];
 var PARSERS = [...parsers8, ...parsers3, ...parsers, ...parsers7, ...parsers4, ...parsers10, ...parsers9, ...parsers2, ...parsers6, ...parsers5];
 function parseEvidence(text) {
   const runners = PARSERS.map((p) => p.parse(text)).filter((r) => r !== null);
-  const exitMatches = [...text.matchAll(/^.{0,60}?\bexit (?:code|status)\s*[:=]?\s*(-?\d+)/gim)];
-  const exit = exitMatches.map((m) => Number(m[1]));
-  const exit_lines = exitMatches.slice(0, 3).map((m) => m[0].trim().slice(0, 80));
+  const hits = exitMatches(text);
+  const exit = hits.map((m) => Number(m[2]));
+  const exit_lines = hits.slice(0, 3).map((m) => m[0].trim().slice(0, 80));
   const exit_code = exit.length === 0 ? null : exit.some((c) => c !== 0) ? exit.find((c) => c !== 0) : 0;
   const conflict = runners.some((r) => r.failed + r.errors > 0) && (runners.some((r) => r.failed + r.errors === 0 && r.passed > 0) || exit_code === 0);
   const trust = runners.length > 0 ? "parsed" : exit_code !== null ? "exit_code" : "unparsed";

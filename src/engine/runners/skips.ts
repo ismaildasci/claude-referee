@@ -3,17 +3,18 @@
 
 const ANSI = /\u001b(?:\[[0-?]*[ -/]*[@-~]|\][^\u0007\u001b]*(?:\u0007|\u001b\\)?)/g;
 
-const SKIP_WORD = "(?:skipped|skip|pending|todo|xfailed|xfail|ignored|disabled|inconclusive|notrun)";
+const SKIP_WORD = "(?:skipped|skip|pending|todos?|xfailed|xfail|ignored|disabled|inconclusive|notrun|risky|incomplete|expected fail(?:ures?)?)";
 const SKIP_WORD_RE = new RegExp(`^${SKIP_WORD}$`, "i");
 const LABEL = /^(?:test result:? \w+\.?[:\s]|(?:total tests|tests?|test files?|test suites?|test cases?|suites?|specs?|examples?|results?|summary|totals?|ran|run|snapshots?|checks?|files?)\b)[:\s]*/i;
 const LEVEL = /^\[(?:INFO|WARNING|WARN|ERROR)\]\s*/;
 const DURATION = /\s*[-,;|]?\s*(?:in|duration:?|time elapsed:?|time:?|finished in|elapsed:?)\s+[\d.,]+\s*(?:ms|s|sec|secs|seconds?|m|min)\b.*$/i;
-const COUNT_TOKEN = /^(?:(\d+)\s+(filtered out|[A-Za-z][A-Za-z-]*)|([A-Za-z][A-Za-z-]*)(?::\s*|\s+)(\d+))(?:\s*[,;|.·]\s*|\s+|$)/;
+const COUNT_TOKEN = /^(?:(\d+)\s+(filtered out|expected fail(?:ures?)?|[A-Za-z][A-Za-z-]*)|([A-Za-z][A-Za-z-]*)(?::\s*|\s+)(\d+))(?:\s*[,;|.·]\s*|\s+|$)/;
 const ECHO = /^(?:\$ |> |\+ |Run |shell: |##\[|::|\[command\])/;
 
 const DIRECTIVES: readonly RegExp[] = [
   /^(?:#\s*)?(?:not )?ok\s+\d+\b.*\s#\s*(?:skip(?:ped)?|todo)\b/i,
   /\s# (?:SKIP|TODO)\b/,
+  /\s# EXPECTED FAILURE\b/,
   /\((?:skipped|todo|pending)(?::[^)]*)?\)\s*$/i,
   /\(\d+ tests? \| (?:\d+ \w+ \| )*[1-9]\d* (?:skipped|todo|pending)\b/,
   /^\S+\.py::\S+\s+(?:SKIPPED|XFAIL)\b/,
@@ -33,7 +34,7 @@ const DIRECTIVES: readonly RegExp[] = [
 ];
 
 function skipTokens(line: string): number {
-  let rest = line.replace(LEVEL, "").replace(/^[#=\s-]+/, "").replace(LABEL, "").replace(DURATION, "").replace(/\s*\([^)]*\)/g, "").replace(/[\s=-]+$/, "");
+  let rest = line.replace(LEVEL, "").replace(/^[#=ℹ\s-]+/, "").replace(LABEL, "").replace(DURATION, "").replace(/\s*\([^)]*\)/g, "").replace(/[\s=-]+$/, "");
   if (rest === "") return 0;
   let total = 0;
   let tokens = 0;

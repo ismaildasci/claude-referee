@@ -12,6 +12,7 @@ import { parsers as python } from "./python.ts";
 import { parsers as scenarios } from "./scenarios.ts";
 import { parsers as suites } from "./suites.ts";
 import type { RunnerFacts, RunnerParser } from "./types.ts";
+import { exitMatches } from "./util.ts";
 
 export type { RunnerFacts, RunnerParser } from "./types.ts";
 
@@ -30,9 +31,9 @@ const PARSERS: readonly RunnerParser[] = [...python, ...js, ...compiled, ...phpR
 
 export function parseEvidence(text: string): ParsedEvidence {
   const runners = PARSERS.map((p) => p.parse(text)).filter((r): r is RunnerFacts => r !== null);
-  const exitMatches = [...text.matchAll(/^.{0,60}?\bexit (?:code|status)\s*[:=]?\s*(-?\d+)/gim)];
-  const exit = exitMatches.map((m) => Number(m[1]));
-  const exit_lines = exitMatches.slice(0, 3).map((m) => m[0].trim().slice(0, 80));
+  const hits = exitMatches(text);
+  const exit = hits.map((m) => Number(m[2]));
+  const exit_lines = hits.slice(0, 3).map((m) => m[0].trim().slice(0, 80));
   const exit_code = exit.length === 0 ? null : exit.some((c) => c !== 0) ? (exit.find((c) => c !== 0) as number) : 0;
   const conflict = runners.some((r) => r.failed + r.errors > 0) && (runners.some((r) => r.failed + r.errors === 0 && r.passed > 0) || exit_code === 0);
   const trust: Trust = runners.length > 0 ? "parsed" : exit_code !== null ? "exit_code" : "unparsed";

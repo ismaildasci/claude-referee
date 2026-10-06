@@ -117,6 +117,7 @@ const CARGO_TEST = /^test (.+?) \.\.\. (ok|FAILED|ignored)\b/;
 const CARGO_STDOUT = /^---- (.+?) stdout ----$/;
 const CARGO_COMPILE = /^error\[E\d+\]/;
 const CARGO_LIST_ITEM = /^ {4}([\w:]+|\S+ - .+ \(line \d+\))$/;
+const CARGO_TARGETS_FAILED = /^error: (\d+) targets? failed:/;
 
 const cargo: RunnerParser = {
   name: "cargo test",
@@ -133,6 +134,7 @@ const cargo: RunnerParser = {
     let failedFirst: string | null = null;
     let couldNotCompile = false;
     let testFailedLine = false;
+    let targetsFailed = 0;
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i] as string;
       const r = CARGO_RESULT.exec(line);
@@ -169,9 +171,10 @@ const cargo: RunnerParser = {
       if (CARGO_COMPILE.test(line)) compile.add(line);
       else if (/^error: could not compile /.test(line)) couldNotCompile = true;
       else if (/^error: test failed, to rerun pass/.test(line)) testFailedLine = true;
+      else targetsFailed = Math.max(targetsFailed, Number(CARGO_TARGETS_FAILED.exec(line)?.[1] ?? 0));
     }
     const errors = compile.size > 0 ? compile.size : couldNotCompile ? 1 : 0;
-    const failed = Math.max(failedSum, failedIds.size, failedStatus || testFailedLine ? 1 : 0);
+    const failed = Math.max(failedSum, failedIds.size, targetsFailed, failedStatus || testFailedLine ? 1 : 0);
     if (results.length === 0 && failed === 0 && errors === 0) return null;
     const summary = results.length === 0 ? null : (failedFirst ?? (results[results.length - 1] as string));
     return facts("cargo test", results.length > 0 ? passed : okLines, failed, errors, ignored, failedIds, summary);
@@ -252,7 +255,7 @@ const dotnet: RunnerParser = {
         passedLines++;
         continue;
       }
-      if (/\berror [A-Z]{2,4}\d{3,5}:/.test(line)) {
+      if (/:\s+error (?!TS\d)[A-Z]{2,4}\d{3,5}:/.test(line)) {
         buildErrors.add((DOTNET_ERROR.exec(line)?.[1] ?? line).trim());
         continue;
       }

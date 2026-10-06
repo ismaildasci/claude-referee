@@ -1,5 +1,6 @@
 // Shared helpers for the runner parsers added after the first set: ANSI stripping, clipping and fact construction.
 // Formats and sources are recorded in docs/decisions/runner-parsers-met-recall.md, not in code.
+// exitMatches is the one exit-line rule (source frames, test titles, open quotes and assertion messages rejected; hex read as its value), see docs/decisions/parser-defects-2026-10-06.md.
 
 import type { RunnerFacts } from "./types.ts";
 
@@ -34,11 +35,32 @@ export function mk(
 
 export const buildOnly = (facts: RunnerFacts): RunnerFacts => ({ ...facts, build_only: true });
 
+const EXIT_PHRASE = /^(.{0,60}?)\bexit (?:code|status)\s*[:=]?\s*(0[xX][\da-fA-F]+|-?\d+)(?![\dxX])/gim;
+const EXIT_GUTTER = /^\s*(?:[>❯]\s*)?\d+\s*\|/;
+const EXIT_TITLE = /^\s*(?:[✔✓√○↓﹣▶]|\((?:pass|skip|todo)\)|ok \d+\b|# Subtest:)/;
+const EXIT_FAIL_LEAD = /^\s*(?:[✗✕✖×✘●⚠]|\(fail\)|not ok \d+\b)/;
+const EXIT_ASSERT = /\b(?:expected|expect(?:s|ing)?|should|want(?:ed)?|assert\w*)\s*$/i;
+const EXIT_GOT = /^[ \t]*[,;]?[ \t]*(?:but[ \t]+)?(?:got|received|actual|want(?:ed)?|expected)\b/i;
+
+function insideQuote(prefix: string): boolean {
+  const bare = prefix.replace(/(?<=\p{L})['’](?=\p{L})/gu, "");
+  return [/"/g, /'/g, /`/g].some((q) => (bare.match(q)?.length ?? 0) % 2 === 1);
+}
+
+function restOfLine(text: string, m: RegExpExecArray): string {
+  const from = m.index + m[0].length;
+  const end = text.indexOf("\n", from);
+  return text.slice(from, end === -1 ? undefined : end);
+}
+
+export function exitMatches(text: string): RegExpExecArray[] {
+  return [...text.matchAll(EXIT_PHRASE)].filter((m) => {
+    const prefix = m[1] ?? "";
+    if (EXIT_GUTTER.test(m[0]) || EXIT_TITLE.test(m[0]) || insideQuote(prefix) || EXIT_ASSERT.test(prefix) || EXIT_GOT.test(restOfLine(text, m))) return false;
+    return !(EXIT_FAIL_LEAD.test(m[0]) && Number(m[2]) === 0);
+  });
+}
+
 export function exitCodes(lines: readonly string[]): number[] {
-  const out: number[] = [];
-  for (const line of lines) {
-    const m = /^.{0,60}?\bexit (?:code|status)\s*[:=]?\s*(-?\d+)/i.exec(line);
-    if (m) out.push(Number(m[1]));
-  }
-  return out;
+  return lines.flatMap((line) => exitMatches(line).slice(0, 1).map((m) => Number(m[2])));
 }
