@@ -1,0 +1,114 @@
+{
+ "react": [
+  {
+   "repo": "hamster1963/nezha-dash-v2",
+   "framework": "react",
+   "sha": "74a52e8cb063587328988f0672bd729a4e703023",
+   "locale_files": [
+    "src/locales/en/translation.json"
+   ],
+   "files_read": 102,
+   "sites_read": 134,
+   "sites_unread": 0,
+   "skips_read": {
+    "multi_line": 2,
+    "dynamic_key": 4,
+    "key_not_found": 1
+   },
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "repo": "Hccake/skill-deck",
+   "framework": "react",
+   "sha": "c874d1a767172a53b94498218a4c87db7ac51fa1",
+   "locale_files": [
+    "src/i18n/locales/en.json"
+   ],
+   "files_read": 214,
+   "sites_read": 1043,
+   "sites_unread": 0,
+   "skips_read": {
+    "multi_line": 60,
+    "dynamic_key": 160,
+    "key_not_found": 9
+   },
+   "pass": true,
+   "why": "ok"
+  }
+ ],
+ "vue": [
+  {
+   "repo": "Hanziness/FocusTide",
+   "framework": "vue",
+   "sha": "439d4307176278cd1f7445c23c0451a06f58fc14",
+   "locale_files": [
+    "i18n/en.json"
+   ],
+   "files_read": 83,
+   "sites_read": 64,
+   "sites_unread": 0,
+   "skips_read": {
+    "dynamic_key": 7
+   },
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "repo": "JDArmy/RTASS",
+   "framework": "vue",
+   "sha": "3bc4a3d655b36b05de9ed11fd57607e5bf21127f",
+   "locale_files": [
+    "src/i18n/en/doc.json",
+    "src/i18n/en/index.json"
+   ],
+   "files_read": 28,
+   "sites_read": 11,
+   "sites_unread": 0,
+   "skips_read": {
+    "multi_line": 6,
+    "dynamic_key": 113,
+    "key_not_found": 45
+   },
+   "pass": false,
+   "why": "too_few_sites"
+  },
+  {
+   "repo": "alfg/opendrinks",
+   "framework": "vue",
+   "sha": "f446f0e9356b9b43155d207b4f7c5214d9da91ab",
+   "locale_files": [],
+   "pass": false,
+   "why": "no_english_json"
+  },
+  {
+   "repo": "openbmc/webui-vue",
+   "framework": "vue",
+   "sha": "85248e05cf5c44fc2a77135f829ae33b0d485e2f",
+   "locale_files": [
+    "src/env/locales/nvidia/en-US.json",
+    "src/locales/en-US.json"
+   ],
+   "files_read": 213,
+   "sites_read": 1222,
+   "sites_unread": 4,
+   "skips_read": {
+    "multi_line": 125,
+    "dynamic_key": 2,
+    "key_ambiguous": 1
+   },
+   "pass": true,
+   "why": "ok"
+  }
+ ],
+ "html": [
+  {
+   "repo": "babutree/TTS-API",
+   "framework": "html",
+   "sha": "7082cfd94e252ddd50ac184ea81b3564cfe19f4d",
+   "locale_files": [],
+   "pass": false,
+   "why": "no_english_json"
+  }
+ ]
+}

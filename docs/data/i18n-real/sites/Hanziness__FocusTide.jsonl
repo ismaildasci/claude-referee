@@ -1,0 +1,64 @@
+{"file":"app.vue","line":104,"position":"expr","key":"ready","value":"Done","read":true}
+{"file":"components/appBar.vue","line":33,"position":"vue-attr","key":"appbar.todo","value":"Open task list","read":true}
+{"file":"components/appBar.vue","line":40,"position":"vue-attr","key":"appbar.settings","value":"Open settings","read":true}
+{"file":"components/error/errorActionBar.vue","line":60,"position":"vue-binding","key":"errorpage.suggestions.primary","value":"You can","read":true}
+{"file":"components/error/errorActionBar.vue","line":64,"position":"vue-binding","key":"errorpage.suggestions.secondary","value":"or if those didn't help","read":true}
+{"file":"components/settings/aboutTab.vue","line":22,"position":"vue-binding","key":"settings.about.madeby","value":"Made by Imre Gera","read":true}
+{"file":"components/settings/aboutTab.vue","line":26,"position":"vue-binding","key":"settings.about.supportBody","value":"I develop FocusTide in my free time. It would mean a lot to me if you could help me keep working on it!","read":true}
+{"file":"components/settings/aboutTab.vue","line":28,"position":"vue-binding","key":"settings.about.mobileSupport","value":"Due to the rules enforced by the Google Play Store, I cannot show you any links inside the mobile app to donate to the project.","read":true}
+{"file":"components/settings/aboutTab.vue","line":43,"position":"vue-binding","key":"settings.about.source","value":"Source code","read":true}
+{"file":"components/settings/aboutTab.vue","line":57,"position":"vue-binding","key":"settings.about.support","value":"Support the project","read":true}
+{"file":"components/settings/aboutTab.vue","line":67,"position":"vue-binding","key":"settings.about.support","value":"Support the project","read":true}
+{"file":"components/settings/aboutTab.vue","line":71,"position":"vue-binding","key":"settings.about.share","value":"or share the app on social media:","read":true}
+{"file":"components/settings/aboutTab.vue","line":84,"position":"vue-attr","key":"support.share.twitter","value":"Follow the app on Twitter","read":true}
+{"file":"components/settings/aboutTab.vue","line":97,"position":"vue-attr","key":"support.share.facebook","value":"Share the app on Facebook","read":true}
+{"file":"components/settings/aboutTab.vue","line":110,"position":"vue-attr","key":"support.share.reddit","value":"Share the app on Reddit","read":true}
+{"file":"components/settings/exportButton.vue","line":28,"position":"vue-binding","key":"settings.manage.buttons.save","value":"Save","read":true}
+{"file":"components/settings/importButton.vue","line":56,"position":"vue-binding","key":"settings.manage.buttons.load","value":"Load","read":true}
+{"file":"components/settings/settingsPanel.vue","line":46,"position":"vue-text","key":"settings.heading","value":"Settings","read":true}
+{"file":"components/settings/settingsPanel.vue","line":48,"position":"vue-attr","key":"settings.buttons.close","value":"Close","read":true}
+{"file":"components/settings/settingsPanel.vue","line":56,"position":"vue-attr","key":"settings.buttons.close","value":"Close","read":true}
+{"file":"components/settings/settingsPanel.vue","line":142,"position":"vue-binding","key":"settings.scheduleMinTime","value":"The minimum allowed time is 5 seconds","read":true}
+{"file":"components/settings/settingsPanel.vue","line":178,"position":"vue-attr","key":"settings.tabs.main","value":"Main","read":true}
+{"file":"components/settings/settingsPanel.vue","line":183,"position":"vue-attr","key":"settings.tabs.timer","value":"Schedule","read":true}
+{"file":"components/settings/settingsPanel.vue","line":188,"position":"vue-attr","key":"settings.tabs.display","value":"Display","read":true}
+{"file":"components/settings/settingsPanel.vue","line":193,"position":"vue-attr","key":"settings.tabs.about","value":"About","read":true}
+{"file":"components/settings/theme/themeSettings.vue","line":45,"position":"vue-attr","key":"settings.values.visuals.theme.custom","value":"Custom","read":true}
+{"file":"components/socialButtons/supportButton.vue","line":22,"position":"expr","key":"settings.about.source","value":"Source code","read":true}
+{"file":"components/socialButtons/supportButton.vue","line":29,"position":"expr","key":"settings.about.support","value":"Support the project","read":true}
+{"file":"components/timer/controls/controlsNew.vue","line":36,"position":"vue-attr","key":"controls.stop","value":"Reset timer","read":true}
+{"file":"components/timer/controls/controlsNew.vue","line":43,"position":"vue-attr","key":"controls.play","value":"Start or pause the timer","read":true}
+{"file":"components/timer/controls/controlsNew.vue","line":56,"position":"vue-attr","key":"controls.advance","value":"Go to next section","read":true}
+{"file":"components/timer/display/timerApproximate.vue","line":20,"position":"expr","key":"timer.approximate.hours","value":"hour | hours","read":true}
+{"file":"components/timer/display/timerApproximate.vue","line":23,"position":"expr","key":"timer.approximate.minutes","value":"minute | minutes","read":true}
+{"file":"components/todoList/addTask.vue","line":62,"position":"vue-attr","key":"tasks.addPlaceholder","value":"Enter something you need to do","read":true}
+{"file":"components/todoList/todoList.vue","line":68,"position":"vue-binding","key":"tasks.title","value":"Tasks","read":true}
+{"file":"components/todoList/todoList.vue","line":75,"position":"vue-binding","key":"tasks.empty","value":"No tasks yet","read":true}
+{"file":"components/tutorial/onboarding/page0_welcome.vue","line":15,"position":"vue-binding","key":"tutorials.onboarding.pages.0.title","value":"Welcome to FocusTide!","read":true}
+{"file":"components/tutorial/onboarding/page0_welcome.vue","line":18,"position":"vue-binding","key":"tutorials.onboarding.pages.0.onboarding_invite","value":"Let's set you up for the first time. You can change everything in the settings menu later.","read":true}
+{"file":"components/tutorial/onboarding/page0_welcome.vue","line":20,"position":"vue-attr","key":"tutorials.onboarding.pages.0.heading","value":"Choose your language","read":true}
+{"file":"components/tutorial/onboarding/page1_timer.vue","line":13,"position":"vue-attr","key":"tutorials.onboarding.pages.1.heading","value":"Set your timers","read":true}
+{"file":"components/tutorial/onboarding/page1_timer.vue","line":17,"position":"vue-binding","key":"tutorials.onboarding.pages.1.text","value":"Choose a predefined setup for the lengths of your timers. You can customize them later in the settings.","read":true}
+{"file":"components/tutorial/onboarding/page2_theme.vue","line":16,"position":"vue-attr","key":"tutorials.onboarding.pages.2.theme.heading","value":"Choose a theme","read":true}
+{"file":"components/tutorial/onboarding/page2_theme.vue","line":22,"position":"vue-attr","key":"tutorials.onboarding.pages.2.display.heading","value":"Choose a display","read":true}
+{"file":"components/tutorial/onboarding/page3_extras.vue","line":9,"position":"vue-attr","key":"tutorials.onboarding.pages.3.heading","value":"Remember","read":true}
+{"file":"components/tutorial/onboarding/page3_extras.vue","line":13,"position":"vue-binding","key":"tutorials.onboarding.pages.3.text","value":"You can always change these (and more) in the settings menu!","read":true}
+{"file":"components/tutorial/onboarding/page4_support.vue","line":9,"position":"vue-attr","key":"tutorials.onboarding.pages.support.heading","value":"Support the project","read":true}
+{"file":"components/tutorial/onboarding/page4_support.vue","line":13,"position":"vue-binding","key":"tutorials.onboarding.pages.support.text","value":"If this project has helped you, consider buying the author a coffee.","read":true}
+{"file":"components/tutorial/onboarding/page4_support.vue","line":15,"position":"vue-binding","key":"tutorials.onboarding.pages.support.hint","value":"You can also find support options in the Settings > About page.","read":true}
+{"file":"components/tutorial/tutorialOldDomain.vue","line":19,"position":"vue-binding","key":"tutorials.olddomain.heading","value":"AnotherPomodoro is now FocusTide","read":true}
+{"file":"components/tutorial/tutorialOldDomain.vue","line":20,"position":"vue-binding","key":"tutorials.olddomain.warning","value":"We have detected that you might be coming from the old domain another-pomodoro.app, which will expire by the end of 2023.","read":true}
+{"file":"components/tutorial/tutorialOldDomain.vue","line":21,"position":"vue-binding","key":"tutorials.olddomain.action","value":"Please update your bookmark or hyperlink to focustide.app.","read":true}
+{"file":"components/tutorial/tutorialOldDomain.vue","line":23,"position":"vue-text","key":"tutorials.olddomain.button","value":"OK","read":true}
+{"file":"components/tutorial/tutorialOnboarding.vue","line":33,"position":"vue-text","key":"tutorials.onboarding.buttons.close","value":"Close","read":true}
+{"file":"components/tutorial/tutorialOnboarding.vue","line":36,"position":"vue-text","key":"tutorials.onboarding.buttons.start","value":"Start setup","read":true}
+{"file":"components/tutorial/tutorialOnboarding.vue","line":39,"position":"vue-text","key":"tutorials.onboarding.buttons.next","value":"Next","read":true}
+{"file":"components/tutorial/tutorialOnboarding.vue","line":51,"position":"vue-text","key":"tutorials.onboarding.buttons.support","value":"Support the project","read":true}
+{"file":"error.vue","line":163,"position":"vue-binding","key":"errorpage.showError.main","value":"Show me the error message!","read":true}
+{"file":"error.vue","line":164,"position":"vue-binding","key":"errorpage.showError.sub","value":"I'll use it to report an issue or ask if others experience it, too.","read":true}
+{"file":"error.vue","line":177,"position":"vue-binding","key":"errorpage.action.reset","value":"Reset the app","read":true}
+{"file":"error.vue","line":181,"position":"vue-binding","key":"errorpage.action.reload","value":"Reload the page","read":true}
+{"file":"error.vue","line":185,"position":"vue-binding","key":"errorpage.action.home","value":"Go back to the home page","read":true}
+{"file":"error.vue","line":189,"position":"vue-binding","key":"errorpage.action.githubIssue","value":"File a bug report","read":true}
+{"file":"error.vue","line":193,"position":"vue-binding","key":"errorpage.action.githubDiscussion","value":"Ask others if they have the same issue","read":true}
+{"file":"error.vue","line":197,"position":"vue-binding","key":"errorpage.action.twitter","value":"Write a friendly tweet","read":true}

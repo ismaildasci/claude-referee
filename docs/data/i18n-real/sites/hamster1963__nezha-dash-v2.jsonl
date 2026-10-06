@@ -1,0 +1,134 @@
+{"file":"src/components/billingInfo.tsx","line":42,"position":"jsx-text","key":"billingInfo.error","value":"error","read":true}
+{"file":"src/components/billingInfo.tsx","line":42,"position":"jsx-text","key":"billingInfo.remaining","value":"Remaining","read":true}
+{"file":"src/components/billingInfo.tsx","line":55,"position":"jsx-text","key":"billingInfo.price","value":"Price","read":true}
+{"file":"src/components/billingInfo.tsx","line":60,"position":"jsx-text","key":"billingInfo.free","value":"Free","read":true}
+{"file":"src/components/billingInfo.tsx","line":64,"position":"jsx-text","key":"billingInfo.usage-baseed","value":"Usage-based","read":true}
+{"file":"src/components/billingInfo.tsx","line":69,"position":"jsx-text","key":"billingInfo.remaining","value":"Remaining","read":true}
+{"file":"src/components/billingInfo.tsx","line":71,"position":"expr","key":"billingInfo.indefinite","value":"Indefinite","read":true}
+{"file":"src/components/billingInfo.tsx","line":72,"position":"jsx-text","key":"billingInfo.days","value":"days","read":true}
+{"file":"src/components/billingInfo.tsx","line":88,"position":"jsx-text","key":"billingInfo.price","value":"Price","read":true}
+{"file":"src/components/billingInfo.tsx","line":93,"position":"jsx-text","key":"billingInfo.free","value":"Free","read":true}
+{"file":"src/components/billingInfo.tsx","line":97,"position":"jsx-text","key":"billingInfo.usage-baseed","value":"Usage-based","read":true}
+{"file":"src/components/billingInfo.tsx","line":101,"position":"jsx-text","key":"billingInfo.expired","value":"Expired","read":true}
+{"file":"src/components/billingInfo.tsx","line":102,"position":"jsx-text","key":"billingInfo.days","value":"days","read":true}
+{"file":"src/components/CycleTransferStatsClient.tsx","line":85,"position":"jsx-text","key":"cycleTransfer.nextUpdate","value":"next update","read":true}
+{"file":"src/components/DashCommand.tsx","line":51,"position":"expr","key":"Home","value":"Home","read":true}
+{"file":"src/components/DashCommand.tsx","line":57,"position":"expr","key":"ToggleLightMode","value":"Toggle Light Mode","read":true}
+{"file":"src/components/DashCommand.tsx","line":63,"position":"expr","key":"ToggleDarkMode","value":"Toggle Dark Mode","read":true}
+{"file":"src/components/DashCommand.tsx","line":69,"position":"expr","key":"ToggleSystemMode","value":"Toggle System Mode","read":true}
+{"file":"src/components/DashCommand.tsx","line":94,"position":"jsx-attr","key":"TypeCommand","value":"Type a command or search...","read":true}
+{"file":"src/components/DashCommand.tsx","line":99,"position":"jsx-text","key":"NoResults","value":"No results found.","read":true}
+{"file":"src/components/DashCommand.tsx","line":101,"position":"jsx-attr","key":"Servers","value":"Servers","read":true}
+{"file":"src/components/DashCommand.tsx","line":124,"position":"jsx-attr","key":"Shortcuts","value":"Shortcuts","read":true}
+{"file":"src/components/Footer.tsx","line":40,"position":"jsx-text","key":"footer.themeBy","value":"Theme by ","read":true}
+{"file":"src/components/GlobalMap.tsx","line":82,"position":"jsx-text","key":"map.Regions","value":"Regions","read":true}
+{"file":"src/components/GlobalMap.tsx","line":82,"position":"jsx-text","key":"map.Distributions","value":"Servers are distributed in","read":true}
+{"file":"src/components/GroupSwitch.tsx","line":132,"position":"expr","key":"group.all","value":"All","read":true}
+{"file":"src/components/Header.tsx","line":74,"position":"expr","key":"nezha","value":"Nezha Monitoring","read":true}
+{"file":"src/components/Header.tsx","line":187,"position":"expr","key":"offline","value":"Offline","read":true}
+{"file":"src/components/Header.tsx","line":187,"position":"expr","key":"online","value":"Online","read":true}
+{"file":"src/components/Header.tsx","line":278,"position":"jsx-text","key":"refreshing","value":"Refreshing","read":true}
+{"file":"src/components/Header.tsx","line":338,"position":"expr","key":"login","value":"Login","read":true}
+{"file":"src/components/Header.tsx","line":339,"position":"expr","key":"dashboard","value":"Dashboard","read":true}
+{"file":"src/components/Header.tsx","line":356,"position":"jsx-text","key":"overview","value":"Overview","read":true}
+{"file":"src/components/Header.tsx","line":358,"position":"jsx-text","key":"whereTheTimeIs","value":"Where the time is","read":true}
+{"file":"src/components/LanguageSwitcher.tsx","line":30,"position":"expr","key":"language.zh-CN","value":"简体中文","read":true}
+{"file":"src/components/LanguageSwitcher.tsx","line":31,"position":"expr","key":"language.zh-TW","value":"繁體中文","read":true}
+{"file":"src/components/LanguageSwitcher.tsx","line":32,"position":"expr","key":"language.en-US","value":"English","read":true}
+{"file":"src/components/LanguageSwitcher.tsx","line":33,"position":"expr","key":"language.ru-RU","value":"Русский","read":true}
+{"file":"src/components/LanguageSwitcher.tsx","line":34,"position":"expr","key":"language.es-ES","value":"Español","read":true}
+{"file":"src/components/LanguageSwitcher.tsx","line":35,"position":"expr","key":"language.de-DE","value":"Deutsch","read":true}
+{"file":"src/components/LanguageSwitcher.tsx","line":36,"position":"expr","key":"language.ta-IN","value":"தமிழ்","read":true}
+{"file":"src/components/LanguageSwitcher.tsx","line":37,"position":"expr","key":"language.fr","value":"Français","read":true}
+{"file":"src/components/LanguageSwitcher.tsx","line":38,"position":"expr","key":"language.gl","value":"Galego","read":true}
+{"file":"src/components/LanguageSwitcher.tsx","line":39,"position":"expr","key":"language.id","value":"Bahasa Indonesia","read":true}
+{"file":"src/components/LanguageSwitcher.tsx","line":40,"position":"expr","key":"language.ja","value":"日本語","read":true}
+{"file":"src/components/LanguageSwitcher.tsx","line":41,"position":"expr","key":"language.pt_BR","value":"Português (Brasil)","read":true}
+{"file":"src/components/LanguageSwitcher.tsx","line":42,"position":"expr","key":"language.ro","value":"Română","read":true}
+{"file":"src/components/LanguageSwitcher.tsx","line":43,"position":"expr","key":"language.uk","value":"Українська","read":true}
+{"file":"src/components/MapTooltip.tsx","line":42,"position":"jsx-text","key":"map.Servers","value":"servers","read":true}
+{"file":"src/components/NetworkChart.tsx","line":170,"position":"jsx-text","key":"monitor.noData","value":"No server monitor data, please add a service monitor first","read":true}
+{"file":"src/components/NetworkChart.tsx","line":203,"position":"expr","key":"monitor.avgDelay","value":"Latency","read":true}
+{"file":"src/components/NetworkChart.tsx","line":255,"position":"expr","key":"monitor.period1d","value":"1 Day","read":true}
+{"file":"src/components/NetworkChart.tsx","line":256,"position":"expr","key":"monitor.period7d","value":"7 Days","read":true}
+{"file":"src/components/NetworkChart.tsx","line":257,"position":"expr","key":"monitor.period30d","value":"30 Days","read":true}
+{"file":"src/components/NetworkChart.tsx","line":640,"position":"jsx-text","key":"monitor.loginRequired","value":"Please login to view","read":true}
+{"file":"src/components/NetworkChart.tsx","line":657,"position":"jsx-text","key":"monitor.peakCut","value":"Peak cut","read":true}
+{"file":"src/components/NetworkChart.tsx","line":672,"position":"jsx-text","key":"monitor.monitorCount","value":"Services","read":true}
+{"file":"src/components/NetworkChart.tsx","line":684,"position":"jsx-text","key":"monitor.clearSelections","value":"Clear","read":true}
+{"file":"src/components/NetworkChart.tsx","line":777,"position":"expr","key":"monitor.packetLoss","value":"Packet Loss","read":true}
+{"file":"src/components/NetworkChart.tsx","line":780,"position":"expr","key":"monitor.avgDelay","value":"Latency","read":true}
+{"file":"src/components/ServerCard.tsx","line":141,"position":"jsx-text","key":"serverCard.system","value":"System","read":true}
+{"file":"src/components/ServerCard.tsx","line":160,"position":"jsx-text","key":"serverCard.mem","value":"MEM","read":true}
+{"file":"src/components/ServerCard.tsx","line":169,"position":"jsx-text","key":"serverCard.stg","value":"STG","read":true}
+{"file":"src/components/ServerCard.tsx","line":178,"position":"jsx-text","key":"serverCard.upload","value":"Upload","read":true}
+{"file":"src/components/ServerCard.tsx","line":190,"position":"jsx-text","key":"serverCard.download","value":"Download","read":true}
+{"file":"src/components/ServerCard.tsx","line":207,"position":"jsx-text","key":"serverCard.upload","value":"Upload","read":true}
+{"file":"src/components/ServerCard.tsx","line":213,"position":"jsx-text","key":"serverCard.download","value":"Download","read":true}
+{"file":"src/components/ServerCardInline.tsx","line":112,"position":"jsx-text","key":"serverCard.system","value":"System","read":true}
+{"file":"src/components/ServerCardInline.tsx","line":123,"position":"jsx-text","key":"serverCard.uptime","value":"Uptime","read":true}
+{"file":"src/components/ServerCardInline.tsx","line":127,"position":"jsx-text","key":"serverCard.days","value":"Days","read":true}
+{"file":"src/components/ServerCardInline.tsx","line":128,"position":"jsx-text","key":"serverCard.hours","value":"Hours","read":true}
+{"file":"src/components/ServerCardInline.tsx","line":140,"position":"jsx-text","key":"serverCard.mem","value":"MEM","read":true}
+{"file":"src/components/ServerCardInline.tsx","line":149,"position":"jsx-text","key":"serverCard.stg","value":"STG","read":true}
+{"file":"src/components/ServerCardInline.tsx","line":158,"position":"jsx-text","key":"serverCard.upload","value":"Upload","read":true}
+{"file":"src/components/ServerCardInline.tsx","line":170,"position":"jsx-text","key":"serverCard.download","value":"Download","read":true}
+{"file":"src/components/ServerCardInline.tsx","line":182,"position":"jsx-text","key":"serverCard.totalUpload","value":"Upload","read":true}
+{"file":"src/components/ServerCardInline.tsx","line":190,"position":"jsx-text","key":"serverCard.totalDownload","value":"Download","read":true}
+{"file":"src/components/ServerDetailChart.tsx","line":111,"position":"expr","key":"serverDetailChart.realtime","value":"Realtime","read":true}
+{"file":"src/components/ServerDetailChart.tsx","line":112,"position":"expr","key":"serverDetailChart.period1d","value":"1 Day","read":true}
+{"file":"src/components/ServerDetailChart.tsx","line":113,"position":"expr","key":"serverDetailChart.period7d","value":"7 Days","read":true}
+{"file":"src/components/ServerDetailChart.tsx","line":114,"position":"expr","key":"serverDetailChart.period30d","value":"30 Days","read":true}
+{"file":"src/components/ServerDetailChart.tsx","line":945,"position":"jsx-text","key":"serverDetailChart.process","value":"Process","read":true}
+{"file":"src/components/ServerDetailChart.tsx","line":997,"position":"jsx-text","key":"serverDetailChart.process","value":"Process","read":true}
+{"file":"src/components/ServerDetailChart.tsx","line":1207,"position":"jsx-text","key":"serverDetailChart.mem","value":"Mem","read":true}
+{"file":"src/components/ServerDetailChart.tsx","line":1222,"position":"jsx-text","key":"serverDetailChart.swap","value":"Swap","read":true}
+{"file":"src/components/ServerDetailChart.tsx","line":1301,"position":"expr","key":"serverDetailChart.mem","value":"Mem","read":true}
+{"file":"src/components/ServerDetailChart.tsx","line":1302,"position":"expr","key":"serverDetailChart.swap","value":"Swap","read":true}
+{"file":"src/components/ServerDetailChart.tsx","line":1460,"position":"jsx-text","key":"serverDetailChart.disk","value":"Disk","read":true}
+{"file":"src/components/ServerDetailChart.tsx","line":1528,"position":"jsx-text","key":"serverDetailChart.disk","value":"Disk","read":true}
+{"file":"src/components/ServerDetailChart.tsx","line":1740,"position":"jsx-text","key":"serverDetailChart.upload","value":"Upload","read":true}
+{"file":"src/components/ServerDetailChart.tsx","line":1755,"position":"jsx-text","key":"serverDetailChart.download","value":"Download","read":true}
+{"file":"src/components/ServerDetailChart.tsx","line":1821,"position":"expr","key":"serverDetailChart.upload","value":"Upload","read":true}
+{"file":"src/components/ServerDetailChart.tsx","line":1822,"position":"expr","key":"serverDetailChart.download","value":"Download","read":true}
+{"file":"src/components/ServerDetailOverview.tsx","line":124,"position":"jsx-text","key":"serverDetail.status","value":"Status","read":true}
+{"file":"src/components/ServerDetailOverview.tsx","line":135,"position":"expr","key":"serverDetail.offline","value":"Offline","read":true}
+{"file":"src/components/ServerDetailOverview.tsx","line":135,"position":"expr","key":"serverDetail.online","value":"Online","read":true}
+{"file":"src/components/ServerDetailOverview.tsx","line":145,"position":"jsx-text","key":"serverDetail.uptime","value":"Uptime","read":true}
+{"file":"src/components/ServerDetailOverview.tsx","line":150,"position":"jsx-text","key":"serverDetail.hours","value":"Hours","read":true}
+{"file":"src/components/ServerDetailOverview.tsx","line":150,"position":"jsx-text","key":"serverDetail.days","value":"Days","read":true}
+{"file":"src/components/ServerDetailOverview.tsx","line":151,"position":"jsx-text","key":"serverDetail.hours","value":"Hours","read":true}
+{"file":"src/components/ServerDetailOverview.tsx","line":164,"position":"jsx-text","key":"serverDetail.version","value":"Version","read":true}
+{"file":"src/components/ServerDetailOverview.tsx","line":176,"position":"jsx-text","key":"serverDetail.arch","value":"Arch","read":true}
+{"file":"src/components/ServerDetailOverview.tsx","line":189,"position":"jsx-text","key":"serverDetail.mem","value":"Mem","read":true}
+{"file":"src/components/ServerDetailOverview.tsx","line":202,"position":"jsx-text","key":"serverDetail.disk","value":"Disk","read":true}
+{"file":"src/components/ServerDetailOverview.tsx","line":218,"position":"jsx-text","key":"serverDetail.region","value":"Region","read":true}
+{"file":"src/components/ServerDetailOverview.tsx","line":248,"position":"jsx-text","key":"serverDetail.system","value":"System","read":true}
+{"file":"src/components/ServerDetailOverview.tsx","line":306,"position":"jsx-text","key":"serverDetail.upload","value":"Upload","read":true}
+{"file":"src/components/ServerDetailOverview.tsx","line":314,"position":"jsx-text","key":"serverDetail.unknown","value":"Unknown","read":true}
+{"file":"src/components/ServerDetailOverview.tsx","line":325,"position":"jsx-text","key":"serverDetail.download","value":"Download","read":true}
+{"file":"src/components/ServerDetailOverview.tsx","line":333,"position":"jsx-text","key":"serverDetail.unknown","value":"Unknown","read":true}
+{"file":"src/components/ServerDetailOverview.tsx","line":347,"position":"jsx-text","key":"serverDetail.temperature","value":"Temperature","read":true}
+{"file":"src/components/ServerDetailOverview.tsx","line":370,"position":"jsx-text","key":"serverDetail.bootTime","value":"Boot time","read":true}
+{"file":"src/components/ServerDetailOverview.tsx","line":382,"position":"jsx-text","key":"serverDetail.lastActive","value":"Last active time","read":true}
+{"file":"src/components/ServerOverview.tsx","line":61,"position":"jsx-text","key":"serverOverview.totalServers","value":"Total Servers","read":true}
+{"file":"src/components/ServerOverview.tsx","line":90,"position":"jsx-text","key":"serverOverview.onlineServers","value":"Online Servers","read":true}
+{"file":"src/components/ServerOverview.tsx","line":120,"position":"jsx-text","key":"serverOverview.offlineServers","value":"Offline Servers","read":true}
+{"file":"src/components/ServerOverview.tsx","line":144,"position":"jsx-text","key":"serverOverview.network","value":"Network","read":true}
+{"file":"src/components/ServiceTracker.tsx","line":63,"position":"jsx-text","key":"serviceTracker.loading","value":"Loading...","read":true}
+{"file":"src/components/ServiceTracker.tsx","line":75,"position":"jsx-text","key":"serviceTracker.noService","value":"No service data","read":true}
+{"file":"src/components/ServiceTrackerClient.tsx","line":93,"position":"jsx-text","key":"serviceTracker.uptime","value":"Uptime","read":true}
+{"file":"src/components/ServiceTrackerClient.tsx","line":122,"position":"jsx-text","key":"serviceTracker.uptime","value":"Uptime","read":true}
+{"file":"src/components/ServiceTrackerClient.tsx","line":135,"position":"jsx-text","key":"serviceTracker.delay","value":"Delay","read":true}
+{"file":"src/components/ServiceTrackerClient.tsx","line":159,"position":"jsx-text","key":"serviceTracker.daysAgo","value":"days ago","read":true}
+{"file":"src/components/ServiceTrackerClient.tsx","line":160,"position":"jsx-text","key":"serviceTracker.today","value":"Today","read":true}
+{"file":"src/components/ThemeSwitcher.tsx","line":52,"position":"jsx-text","key":"theme.light","value":"Light","read":true}
+{"file":"src/components/ThemeSwitcher.tsx","line":61,"position":"jsx-text","key":"theme.dark","value":"Dark","read":true}
+{"file":"src/components/ThemeSwitcher.tsx","line":70,"position":"jsx-text","key":"theme.system","value":"System","read":true}
+{"file":"src/pages/NotFound.tsx","line":14,"position":"jsx-text","key":"error.pageNotFound","value":"Page not found","read":true}
+{"file":"src/pages/NotFound.tsx","line":17,"position":"jsx-text","key":"error.backToHome","value":"Back to home","read":true}
+{"file":"src/pages/Server.tsx","line":62,"position":"jsx-text","key":"error.backendUnavailableTitle","value":"Backend API unavailable","read":true}
+{"file":"src/pages/Server.tsx","line":65,"position":"jsx-text","key":"error.backendUnavailableDescription","value":"The page is still available, but data cannot be loaded right now.","read":true}
+{"file":"src/pages/Server.tsx","line":419,"position":"jsx-text","key":"info.websocketConnecting","value":"WebSocket connecting","read":true}
+{"file":"src/pages/Server.tsx","line":428,"position":"jsx-text","key":"info.processing","value":"Processing...","read":true}
+{"file":"src/pages/Server.tsx","line":545,"position":"jsx-text","key":"sort.label","value":"Sort","read":true}

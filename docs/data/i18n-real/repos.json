@@ -1,0 +1,34 @@
+[
+ {
+  "framework": "react",
+  "repo": "hamster1963/nezha-dash-v2",
+  "sha": "74a52e8cb063587328988f0672bd729a4e703023",
+  "license": "Apache-2.0",
+  "stars": 137,
+  "url": "https://github.com/hamster1963/nezha-dash-v2"
+ },
+ {
+  "framework": "react",
+  "repo": "Hccake/skill-deck",
+  "sha": "c874d1a767172a53b94498218a4c87db7ac51fa1",
+  "license": "Apache-2.0",
+  "stars": 30,
+  "url": "https://github.com/Hccake/skill-deck"
+ },
+ {
+  "framework": "vue",
+  "repo": "Hanziness/FocusTide",
+  "sha": "439d4307176278cd1f7445c23c0451a06f58fc14",
+  "license": "MIT",
+  "stars": 403,
+  "url": "https://github.com/Hanziness/FocusTide"
+ },
+ {
+  "framework": "vue",
+  "repo": "openbmc/webui-vue",
+  "sha": "85248e05cf5c44fc2a77135f829ae33b0d485e2f",
+  "license": "Apache-2.0",
+  "stars": 77,
+  "url": "https://github.com/openbmc/webui-vue"
+ }
+]

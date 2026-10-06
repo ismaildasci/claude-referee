@@ -1,0 +1,1043 @@
+{"file":"src/App.tsx","line":32,"position":"jsx-text","key":"common.loading","value":"Loading...","read":true}
+{"file":"src/components/agents/selection/AgentSelectionModeControl.tsx","line":39,"position":"jsx-text","key":"agentSelection.modeTitle","value":"Installation method","read":true}
+{"file":"src/components/agents/selection/AgentSelectionModeControl.tsx","line":46,"position":"jsx-attr","key":"agentSelection.modeHelp","value":"Choose how to install this Skill in the selected Agent directories. Copy-only Agents are not affected.","read":true}
+{"file":"src/components/agents/selection/AgentSelectionModeControl.tsx","line":52,"position":"jsx-text","key":"agentSelection.modeHelp","value":"Choose how to install this Skill in the selected Agent directories. Copy-only Agents are not affected.","read":true}
+{"file":"src/components/agents/selection/AgentSelectionModeControl.tsx","line":60,"position":"jsx-attr","key":"agentSelection.modeTitle","value":"Installation method","read":true}
+{"file":"src/components/agents/selection/AgentSelectionModeControl.tsx","line":66,"position":"jsx-attr","key":"agentSelection.linkRecommended","value":"Link (recommended)","read":true}
+{"file":"src/components/agents/selection/AgentSelectionModeControl.tsx","line":67,"position":"jsx-attr","key":"agentSelection.copy","value":"Copy","read":true}
+{"file":"src/components/agents/selection/AgentSelectionPanel.tsx","line":69,"position":"jsx-text","key":"common.retry","value":"Retry","read":true}
+{"file":"src/components/agents/selection/AgentSelectionPanel.tsx","line":79,"position":"jsx-text","key":"common.loading","value":"Loading...","read":true}
+{"file":"src/components/agents/selection/AgentSelectionPanel.tsx","line":90,"position":"jsx-text","key":"agentSelection.selectionChanged","value":"Agent status has changed. Review the current selection before continuing.","read":true}
+{"file":"src/components/agents/selection/AgentSelectionPanel.tsx","line":99,"position":"jsx-text","key":"agentSelection.confirmCurrentSelection","value":"Confirm current selection","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":154,"position":"jsx-attr","key":"agentSelection.selectedTitle","value":"Selected","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":158,"position":"jsx-text","key":"agentSelection.selectedTitle","value":"Selected","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":184,"position":"jsx-attr","key":"agentSelection.removeSelected","value":"Deselect {{agent}}","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":216,"position":"jsx-text","key":"agentSelection.otherAgents","value":"Other selectable Agents ({{count}})","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":243,"position":"jsx-text","key":"agentSelection.unknownNotice","value":"Skill Deck has no read or detection information for {{agents}}, so they will not be processed during this installation.","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":394,"position":"expr","key":"agentSelection.moreAgents","value":"+ {{count}} more","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":430,"position":"jsx-text","key":"agentSelection.moreAgentsDescription","value":"These Agents also read the common Skill directory, but their detection state is not confirmed.","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":512,"position":"jsx-attr","key":"agentSelection.toggleGroup","value":"Expand or collapse {{agent}}","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":518,"position":"jsx-text","key":"agentSelection.copyOnly","value":"Copy only","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":685,"position":"jsx-attr","key":"agentSelection.viewMembers","value":"View members","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":686,"position":"jsx-text","key":"agentSelection.memberCount","value":"{{count}} Agents","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":689,"position":"jsx-attr","key":"agentSelection.viewMembers","value":"View members","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":690,"position":"jsx-attr","key":"common.close","value":"Close","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":694,"position":"jsx-text","key":"agentSelection.sharedPlacementDescription","value":"These Agents share the same Skill location and will be handled together when selected.","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":740,"position":"jsx-text","key":"agentSelection.copy","value":"Copy","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":783,"position":"jsx-text","key":"agentSelection.detectedCount","value":"{{detected}}/{{total}} detected","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":806,"position":"expr","key":"agentSelection.current.library","value":"Available from a Skill Library","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":813,"position":"expr","key":"agentSelection.current.copy","value":"Copy","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":814,"position":"expr","key":"agentSelection.current.link","value":"Link","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":830,"position":"expr","key":"agentSelection.effect.restoreLibrary","value":"Will use the Skill Library version","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":833,"position":"expr","key":"agentSelection.effect.remove","value":"Will remove","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":838,"position":"expr","key":"agentSelection.effect.createCopy","value":"Will create copy","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":839,"position":"expr","key":"agentSelection.effect.repair","value":"Will repair","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":843,"position":"expr","key":"agentSelection.effect.copy","value":"Will copy","read":true}
+{"file":"src/components/agents/selection/AgentSelectionView.tsx","line":861,"position":"expr","key":"agentSelection.mergedAgentNamesMore","value":"{{names}}, and others","read":true}
+{"file":"src/components/agents/selection/useAgentSelectionPresentation.ts","line":31,"position":"expr","key":"agentSelection.selectable.title","value":"Available when selected","read":true}
+{"file":"src/components/agents/selection/useAgentSelectionPresentation.ts","line":32,"position":"expr","key":"agentSelection.selectable.help","value":"These Agents do not read the common Skill directory. Select an Agent to create a link or copy in its Skill directory.","read":true}
+{"file":"src/components/agents/selection/useAgentSelectionPresentation.ts","line":35,"position":"expr","key":"agentSelection.ownDirectory.title","value":"Also install in each Agent’s own Skill directory (optional)","read":true}
+{"file":"src/components/agents/selection/useAgentSelectionPresentation.ts","line":36,"position":"expr","key":"agentSelection.ownDirectory.selectedCount","value":"{{count}} Agents selected","read":true}
+{"file":"src/components/layout/GlobalEnvironmentSwitcher.tsx","line":45,"position":"expr","key":"context.environmentWslName","value":"WSL · {{environment}}","read":true}
+{"file":"src/components/layout/GlobalEnvironmentSwitcher.tsx","line":86,"position":"jsx-attr","key":"context.environmentMenuLabel","value":"System: {{environment}}","read":true}
+{"file":"src/components/layout/GlobalEnvironmentSwitcher.tsx","line":103,"position":"jsx-text","key":"context.environmentConnectingTo","value":"Connecting to {{environment}}…","read":true}
+{"file":"src/components/layout/GlobalEnvironmentSwitcher.tsx","line":116,"position":"jsx-text","key":"context.environmentLabel","value":"System","read":true}
+{"file":"src/components/layout/GlobalEnvironmentSwitcher.tsx","line":144,"position":"jsx-text","key":"context.environmentUnavailable","value":"Unavailable","read":true}
+{"file":"src/components/layout/GlobalEnvironmentSwitcher.tsx","line":156,"position":"jsx-text","key":"context.environmentConnectionFailed","value":"Could not connect to {{environment}}. Retry when the distribution is available.","read":true}
+{"file":"src/components/layout/GlobalEnvironmentSwitcher.tsx","line":164,"position":"jsx-text","key":"context.environmentRetry","value":"Retry","read":true}
+{"file":"src/components/layout/GlobalEnvironmentSwitcher.tsx","line":174,"position":"jsx-text","key":"context.environmentDiscoveryFailed","value":"WSL environments could not be refreshed. Windows remains available.","read":true}
+{"file":"src/components/layout/GlobalEnvironmentSwitcher.tsx","line":182,"position":"jsx-text","key":"context.environmentRetry","value":"Retry","read":true}
+{"file":"src/components/layout/Header.tsx","line":56,"position":"jsx-text","key":"app.name","value":"Skill Deck","read":true}
+{"file":"src/components/layout/Header.tsx","line":62,"position":"jsx-attr","key":"nav.skills","value":"Skills","read":true}
+{"file":"src/components/layout/Header.tsx","line":64,"position":"jsx-text","key":"nav.skills","value":"Skills","read":true}
+{"file":"src/components/layout/Header.tsx","line":66,"position":"jsx-attr","key":"nav.libraries","value":"Libraries","read":true}
+{"file":"src/components/layout/Header.tsx","line":68,"position":"jsx-text","key":"nav.libraries","value":"Libraries","read":true}
+{"file":"src/components/layout/Header.tsx","line":70,"position":"jsx-attr","key":"nav.discover","value":"Discover","read":true}
+{"file":"src/components/layout/Header.tsx","line":72,"position":"jsx-text","key":"nav.discover","value":"Discover","read":true}
+{"file":"src/components/layout/Header.tsx","line":74,"position":"jsx-attr","key":"nav.settings","value":"Settings","read":true}
+{"file":"src/components/layout/Header.tsx","line":76,"position":"jsx-text","key":"nav.settings","value":"Settings","read":true}
+{"file":"src/components/layout/InstallWizardSessionGate.tsx","line":32,"position":"jsx-text","key":"installWizardSession.startupDescription","value":"Preparing…","read":true}
+{"file":"src/components/layout/InstallWizardStatusControl.tsx","line":47,"position":"expr","key":"installWizardSession.focusFailed","value":"The installation window could not be opened. Try again.","read":true}
+{"file":"src/components/layout/MutationInterruptionDialog.tsx","line":57,"position":"expr","key":"mutation.interruption.unknownStatus","value":"Skill operation","read":true}
+{"file":"src/components/layout/MutationInterruptionDialog.tsx","line":69,"position":"jsx-text","key":"mutation.interruption.continueWaiting","value":"Continue waiting","read":true}
+{"file":"src/components/layout/MutationInterruptionDialog.tsx","line":76,"position":"jsx-text","key":"mutation.interruption.cancelling","value":"Cancelling operation...","read":true}
+{"file":"src/components/layout/MutationStatusBar.tsx","line":54,"position":"expr","key":"libraries.title","value":"Skill Libraries","read":true}
+{"file":"src/components/layout/MutationStatusBar.tsx","line":58,"position":"expr","key":"context.global","value":"Global","read":true}
+{"file":"src/components/layout/MutationStatusBar.tsx","line":93,"position":"jsx-text","key":"mutation.cancelling","value":"Cancelling...","read":true}
+{"file":"src/components/layout/MutationStatusBar.tsx","line":104,"position":"jsx-text","key":"mutation.cancel","value":"Cancel operation","read":true}
+{"file":"src/components/library/DeleteLibraryDialog.tsx","line":38,"position":"expr","key":"libraries.lockedDelete","value":"A library in use cannot be deleted","read":true}
+{"file":"src/components/library/DeleteLibraryDialog.tsx","line":53,"position":"expr","key":"libraries.deleteLibraryAlreadyMissing","value":"This Skill Library no longer exists. The list was refreshed.","read":true}
+{"file":"src/components/library/DeleteLibraryDialog.tsx","line":76,"position":"jsx-text","key":"libraries.deleteLibraryTitle","value":"Delete {{name}}","read":true}
+{"file":"src/components/library/DeleteLibraryDialog.tsx","line":84,"position":"jsx-text","key":"libraries.deleteLibraryIrreversible","value":"This action cannot be undone.","read":true}
+{"file":"src/components/library/DeleteLibraryDialog.tsx","line":93,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":90,"position":"jsx-attr","key":"common.close","value":"Close","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":135,"position":"jsx-text","key":"libraries.addFlow.title","value":"Add to “{{library}}”","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":145,"position":"jsx-attr","key":"libraries.addFlow.steps.label","value":"Add Skill steps","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":189,"position":"expr","key":"addSkill.source.status.connecting","value":"Connecting to source...","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":195,"position":"expr","key":"libraries.addFlow.source.loading","value":"Reading Source…","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":201,"position":"jsx-text","key":"addSkill.source.tabs.search","value":"Search online","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":204,"position":"jsx-text","key":"addSkill.source.tabs.manual","value":"Manual","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":222,"position":"jsx-attr","key":"libraries.addFlow.source.add","value":"Add","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":227,"position":"jsx-text","key":"libraries.addFlow.source.label","value":"Skill source","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":243,"position":"jsx-attr","key":"libraries.sourcePlaceholder","value":"Git repository, local folder, or URL…","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":255,"position":"jsx-text","key":"libraries.addFlow.source.read","value":"Read Source","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":258,"position":"jsx-text","key":"addSkill.source.hint","value":"Supports GitHub (owner/repo), URLs, local paths, or skills install commands","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":268,"position":"jsx-text","key":"common.retry","value":"Retry","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":281,"position":"expr","key":"libraries.addFlow.selection.alreadyInLibrary","value":"Already in Library","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":289,"position":"jsx-text","key":"libraries.addFlow.selection.agentIntentIgnored","value":"Agent options in this command do not apply to a Skill Library. Apply the Library from the Skills page after adding.","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":294,"position":"jsx-text","key":"libraries.addFlow.selection.allExisting","value":"Every Skill from this Source is already in this Library.","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":304,"position":"expr","key":"libraries.addFlow.selection.title","value":"Choose Skills","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":305,"position":"expr","key":"libraries.addFlow.selection.count","value":"{{selected}} / {{available}} selected","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":306,"position":"expr","key":"addSkill.skills.search","value":"Search skills...","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":307,"position":"expr","key":"libraries.addFlow.selection.selectAll","value":"Select visible","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":308,"position":"expr","key":"addSkill.skills.clear","value":"Clear","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":309,"position":"expr","key":"addSkill.skills.empty","value":"No matching skills","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":310,"position":"expr","key":"skills.pluginGroup.general","value":"Ungrouped","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":339,"position":"jsx-text","key":"libraries.addFlow.review.summary","value":"To add · {{count}} Skills","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":345,"position":"jsx-text","key":"libraries.addFlow.review.syncCount","value":"Sync {{count}} locations","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":357,"position":"jsx-text","key":"libraries.membership.inventoryIncomplete","value":"{{count}} locations were identified; others cannot currently be verified","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":362,"position":"jsx-text","key":"libraries.membership.impact.unverified","value":"{{count}} cannot be verified","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":468,"position":"expr","key":"libraries.addFlow.result.succeeded","value":"Added {{count}} Skills","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":469,"position":"expr","key":"libraries.addFlow.result.partial","value":"{{succeeded}} added, {{failed}} failed","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":520,"position":"expr","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":520,"position":"expr","key":"common.close","value":"Close","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":520,"position":"expr","key":"libraries.addFlow.result.done","value":"Done","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":525,"position":"jsx-text","key":"addSkill.actions.back","value":"Back","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":535,"position":"jsx-text","key":"libraries.addFlow.selection.review","value":"Next","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":548,"position":"jsx-text","key":"libraries.addFlow.review.confirm","value":"Confirm Add","read":true}
+{"file":"src/components/library/LibraryAddDialog.tsx","line":559,"position":"jsx-text","key":"libraries.addFlow.result.retry","value":"Retry Failed","read":true}
+{"file":"src/components/library/LibrarySidebar.tsx","line":45,"position":"expr","key":"libraries.usage.appliedWithPending","value":"Applied in {{count}} places · adjustment unfinished","read":true}
+{"file":"src/components/library/LibrarySidebar.tsx","line":47,"position":"expr","key":"libraries.usage.applied","value":"Applied in {{count}} places","read":true}
+{"file":"src/components/library/LibrarySidebar.tsx","line":48,"position":"expr","key":"libraries.usage.pendingOnly","value":"Application adjustment unfinished","read":true}
+{"file":"src/components/library/LibrarySidebar.tsx","line":49,"position":"expr","key":"libraries.usage.unapplied","value":"Not applied","read":true}
+{"file":"src/components/library/LibrarySidebar.tsx","line":66,"position":"expr","key":"libraries.lockedDeleteAppliedWithPending","value":"This Library is in use and has an unfinished application adjustment. Continue it and remove the applications from the Skills page first.","read":true}
+{"file":"src/components/library/LibrarySidebar.tsx","line":68,"position":"expr","key":"libraries.lockedDeletePending","value":"This Library has an unfinished application adjustment. Continue it from the Skills page first.","read":true}
+{"file":"src/components/library/LibrarySidebar.tsx","line":70,"position":"expr","key":"libraries.lockedDeleteApplied","value":"This Library is in use. Remove its global or project applications from the Skills page first.","read":true}
+{"file":"src/components/library/LibrarySidebar.tsx","line":112,"position":"jsx-attr","key":"libraries.renameNamed","value":"Rename {{name}}","read":true}
+{"file":"src/components/library/LibrarySidebar.tsx","line":113,"position":"jsx-attr","key":"libraries.rename","value":"Rename Library","read":true}
+{"file":"src/components/library/LibrarySidebar.tsx","line":130,"position":"jsx-attr","key":"libraries.deleteNamed","value":"Delete {{name}}","read":true}
+{"file":"src/components/library/LibrarySidebar.tsx","line":138,"position":"expr","key":"libraries.deleteLibrary","value":"Delete Library","read":true}
+{"file":"src/components/library/LibrarySidebar.tsx","line":162,"position":"jsx-text","key":"libraries.title","value":"Skill Libraries","read":true}
+{"file":"src/components/library/LibrarySidebar.tsx","line":166,"position":"jsx-text","key":"libraries.noLibraries","value":"Create a Library to start collecting Skills.","read":true}
+{"file":"src/components/library/LibrarySidebar.tsx","line":191,"position":"jsx-attr","key":"libraries.create","value":"Create Library","read":true}
+{"file":"src/components/library/LibrarySidebar.tsx","line":195,"position":"jsx-text","key":"libraries.create","value":"Create Library","read":true}
+{"file":"src/components/library/LibrarySkillCard.tsx","line":63,"position":"expr","key":"skills.updateStatusLabel.localSource","value":"Local Skill","read":true}
+{"file":"src/components/library/LibrarySkillCard.tsx","line":134,"position":"jsx-text","key":"skills.updateDone","value":"Updated","read":true}
+{"file":"src/components/library/LibrarySkillCard.tsx","line":136,"position":"jsx-text","key":"skills.updateFailed","value":"Failed","read":true}
+{"file":"src/components/library/LibrarySkillCard.tsx","line":138,"position":"jsx-attr","key":"skills.updateStatusLabel.available","value":"New version available","read":true}
+{"file":"src/components/library/LibrarySkillCard.tsx","line":159,"position":"jsx-text","key":"skills.refBadge","value":"branch: {{ref}}","read":true}
+{"file":"src/components/library/LibrarySkillCard.tsx","line":168,"position":"jsx-text","key":"skills.updated","value":"Updated {{time}}","read":true}
+{"file":"src/components/library/LibrarySkillCard.tsx","line":187,"position":"jsx-attr","key":"libraries.update","value":"Update","read":true}
+{"file":"src/components/library/LibrarySkillCard.tsx","line":188,"position":"jsx-attr","key":"libraries.update","value":"Update","read":true}
+{"file":"src/components/library/LibrarySkillCard.tsx","line":206,"position":"jsx-attr","key":"libraries.removeSkill","value":"Remove {{name}} from Library","read":true}
+{"file":"src/components/library/LibrarySkillCard.tsx","line":218,"position":"jsx-text","key":"libraries.removeSkillTitle","value":"Remove {{name}}","read":true}
+{"file":"src/components/library/LibrarySkillDetailPanel.tsx","line":97,"position":"jsx-attr","key":"skills.updateStatusLabel.available","value":"New version available","read":true}
+{"file":"src/components/library/LibrarySkillDetailPanel.tsx","line":107,"position":"jsx-attr","key":"libraries.update","value":"Update","read":true}
+{"file":"src/components/library/LibrarySkillDetailPanel.tsx","line":108,"position":"jsx-attr","key":"libraries.update","value":"Update","read":true}
+{"file":"src/components/library/LibrarySkillDetailPanel.tsx","line":121,"position":"jsx-attr","key":"libraries.removeSkill","value":"Remove {{name}} from Library","read":true}
+{"file":"src/components/library/LibrarySkillDetailPanel.tsx","line":122,"position":"jsx-attr","key":"libraries.removeSkillTitle","value":"Remove {{name}}","read":true}
+{"file":"src/components/library/LibrarySkillDetailPanel.tsx","line":135,"position":"jsx-attr","key":"common.close","value":"Close","read":true}
+{"file":"src/components/library/LibrarySkillDetailPanel.tsx","line":150,"position":"jsx-text","key":"skills.updateStatusLabel.localSource","value":"Local Skill","read":true}
+{"file":"src/components/library/LibrarySkillDetailPanel.tsx","line":158,"position":"jsx-attr","key":"skills.detail.updated","value":"Updated","read":true}
+{"file":"src/components/library/LibrarySkillDetailPanel.tsx","line":163,"position":"jsx-attr","key":"libraries.pluginName","value":"Plugin","read":true}
+{"file":"src/components/library/LibrarySkillDetailPanel.tsx","line":168,"position":"jsx-attr","key":"libraries.refName","value":"Ref","read":true}
+{"file":"src/components/library/LibrarySkillDetailPanel.tsx","line":179,"position":"expr","key":"libraries.contentError","value":"This Skill content could not be read.","read":true}
+{"file":"src/components/library/LibraryUsageIdentity.tsx","line":17,"position":"expr","key":"libraries.usage.globalLocation","value":"Global Skills","read":true}
+{"file":"src/components/library/LibraryUsageLine.tsx","line":69,"position":"jsx-text","key":"libraries.usage.unapplied","value":"Not applied","read":true}
+{"file":"src/components/library/LibraryUsageLine.tsx","line":72,"position":"jsx-text","key":"libraries.unappliedHint","value":"Apply this library from the global or project area on the Skills page so Agents can read its Skills.","read":true}
+{"file":"src/components/library/LibraryUsageLine.tsx","line":80,"position":"expr","key":"libraries.usage.globalLocation","value":"Global Skills","read":true}
+{"file":"src/components/library/LibraryUsageLine.tsx","line":81,"position":"expr","key":"libraries.usage.appliedToLocation","value":"Applied to {{location}}","read":true}
+{"file":"src/components/library/LibraryUsageLine.tsx","line":89,"position":"jsx-attr","key":"libraries.usage.viewDetails","value":"{{summary}}. View all usage locations","read":true}
+{"file":"src/components/library/LibraryUsageLine.tsx","line":92,"position":"jsx-text","key":"libraries.appliedTo","value":"Applied to","read":true}
+{"file":"src/components/library/LibraryUsageLine.tsx","line":101,"position":"jsx-text","key":"libraries.usage.applied","value":"Applied in {{count}} places","read":true}
+{"file":"src/components/library/LibraryUsageLine.tsx","line":107,"position":"jsx-attr","key":"libraries.appliedTo","value":"Applied to","read":true}
+{"file":"src/components/library/LibraryUsageLine.tsx","line":114,"position":"expr","key":"libraries.usage.applied","value":"Applied in {{count}} places","read":true}
+{"file":"src/components/library/LibraryUsageLine.tsx","line":115,"position":"expr","key":"libraries.usage.pendingOnly","value":"Application adjustment unfinished","read":true}
+{"file":"src/components/library/LibraryUsageLine.tsx","line":117,"position":"expr","key":"libraries.usage.appliedWithPending","value":"Applied in {{count}} places · adjustment unfinished","read":true}
+{"file":"src/components/library/LibraryUsageLine.tsx","line":127,"position":"jsx-attr","key":"libraries.usage.viewDetails","value":"{{summary}}. View all usage locations","read":true}
+{"file":"src/components/library/LibraryUsageLine.tsx","line":137,"position":"jsx-attr","key":"libraries.appliedTo","value":"Applied to","read":true}
+{"file":"src/components/library/LibraryUsageLine.tsx","line":138,"position":"jsx-attr","key":"libraries.pendingAdjustment","value":"Application adjustment unfinished","read":true}
+{"file":"src/components/library/LibraryUsageLine.tsx","line":141,"position":"jsx-text","key":"libraries.pendingAdjustmentDescription","value":"The last library application change did not finish, so these locations may not match the target yet.","read":true}
+{"file":"src/components/library/MembershipOutcomeSummary.tsx","line":45,"position":"jsx-text","key":"libraries.membership.snapshotError","value":"The Library was saved, but its latest display snapshot could not be loaded.","read":true}
+{"file":"src/components/projects/RemoveProjectDialog.tsx","line":62,"position":"jsx-text","key":"context.removeConfirm.title","value":"Remove Project","read":true}
+{"file":"src/components/projects/RemoveProjectDialog.tsx","line":65,"position":"jsx-text","key":"context.removeConfirm.description","value":"Remove \"{{name}}\" from Skill Deck? This will not delete local files.","read":true}
+{"file":"src/components/projects/RemoveProjectDialog.tsx","line":67,"position":"jsx-text","key":"context.removeConfirm.unregisterOnly","value":"Skill Deck first removes managed Library links and the application record, then unregisters the Project. Directly installed Skills and other Project files remain unchanged.","read":true}
+{"file":"src/components/projects/RemoveProjectDialog.tsx","line":72,"position":"jsx-text","key":"context.removeConfirm.removeError","value":"The Project could not be removed and remains registered. Library application cleanup may already be complete; check the Project and try again.","read":true}
+{"file":"src/components/projects/RemoveProjectDialog.tsx","line":77,"position":"jsx-text","key":"context.removeConfirm.cancel","value":"Cancel","read":true}
+{"file":"src/components/recovery/RecoveryActions.tsx","line":133,"position":"expr","key":"recovery.title","value":"Recovery required","read":true}
+{"file":"src/components/recovery/RecoveryActions.tsx","line":146,"position":"expr","key":"recovery.projectScope","value":"Project","read":true}
+{"file":"src/components/recovery/RecoveryActions.tsx","line":147,"position":"expr","key":"context.global","value":"Global","read":true}
+{"file":"src/components/recovery/RecoveryActions.tsx","line":175,"position":"expr","key":"recovery.loading","value":"Checking recovery state...","read":true}
+{"file":"src/components/recovery/RecoveryActions.tsx","line":203,"position":"jsx-text","key":"recovery.refreshError","value":"Recovery state could not be refreshed. The recovery data has been preserved.","read":true}
+{"file":"src/components/recovery/RecoveryActions.tsx","line":204,"position":"jsx-text","key":"recovery.openError","value":"The review folder could not be opened. Try again later.","read":true}
+{"file":"src/components/recovery/RecoveryActions.tsx","line":221,"position":"jsx-text","key":"recovery.refresh","value":"Refresh","read":true}
+{"file":"src/components/recovery/RecoveryActions.tsx","line":231,"position":"jsx-text","key":"recovery.cleanup","value":"Finish Review","read":true}
+{"file":"src/components/recovery/RecoveryActions.tsx","line":239,"position":"jsx-text","key":"recovery.cleanupTitle","value":"Delete the backup and finish?","read":true}
+{"file":"src/components/recovery/RecoveryActions.tsx","line":240,"position":"jsx-text","key":"recovery.cleanupDescription","value":"This deletes the backup retained by this operation and its review record. Files at the current target are not deleted.","read":true}
+{"file":"src/components/recovery/RecoveryActions.tsx","line":243,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/components/recovery/RecoveryActions.tsx","line":248,"position":"jsx-text","key":"recovery.confirmCleanup","value":"Delete Backup & Finish","read":true}
+{"file":"src/components/recovery/RecoveryCenter.tsx","line":46,"position":"jsx-attr","key":"recovery.center.open","value":"View issues requiring attention","read":true}
+{"file":"src/components/recovery/RecoveryCenter.tsx","line":47,"position":"jsx-attr","key":"recovery.center.open","value":"View issues requiring attention","read":true}
+{"file":"src/components/recovery/RecoveryCenter.tsx","line":55,"position":"jsx-attr","key":"common.close","value":"Close","read":true}
+{"file":"src/components/recovery/RecoveryCenter.tsx","line":58,"position":"jsx-text","key":"recovery.center.title","value":"Operations Requiring Attention","read":true}
+{"file":"src/components/recovery/RecoveryCenter.tsx","line":59,"position":"jsx-text","key":"recovery.center.description","value":"Skill Deck could not confirm the file state for these operations. Finish reviewing them before running the original operation again.","read":true}
+{"file":"src/components/recovery/RecoveryCenter.tsx","line":76,"position":"jsx-text","key":"recovery.center.refreshAll","value":"Recheck All","read":true}
+{"file":"src/components/recovery/RecoveryCenter.tsx","line":84,"position":"jsx-text","key":"recovery.center.loadError","value":"Recovery items could not be loaded","read":true}
+{"file":"src/components/settings/AboutTab.tsx","line":65,"position":"jsx-text","key":"settings.aboutSections.tagline","value":"Desktop Agent Manager","read":true}
+{"file":"src/components/settings/AboutTab.tsx","line":77,"position":"jsx-text","key":"settings.links.openSource","value":"OPEN SOURCE","read":true}
+{"file":"src/components/settings/AboutTab.tsx","line":79,"position":"jsx-text","key":"settings.links.githubTitle","value":"GitHub Repo","read":true}
+{"file":"src/components/settings/AboutTab.tsx","line":88,"position":"jsx-text","key":"settings.links.feedback","value":"FEEDBACK","read":true}
+{"file":"src/components/settings/AboutTab.tsx","line":90,"position":"jsx-text","key":"settings.links.issuesTitle","value":"Submit Issue","read":true}
+{"file":"src/components/settings/AboutTab.tsx","line":99,"position":"jsx-text","key":"settings.links.cliReferenceVersion","value":"skills CLI reference version","read":true}
+{"file":"src/components/settings/AboutTab.tsx","line":101,"position":"jsx-text","key":"settings.links.vercelSkills","value":"Vercel Skills","read":true}
+{"file":"src/components/settings/AboutTab.tsx","line":122,"position":"jsx-text","key":"settings.update.checking","value":"Checking...","read":true}
+{"file":"src/components/settings/AboutTab.tsx","line":129,"position":"jsx-text","key":"settings.update.viewProgress","value":"View download progress","read":true}
+{"file":"src/components/settings/AboutTab.tsx","line":141,"position":"jsx-text","key":"settings.update.restartNow","value":"Restart Now","read":true}
+{"file":"src/components/settings/AboutTab.tsx","line":144,"position":"jsx-text","key":"settings.update.readyToRestart","value":"v{{version}} ready, restart to update","read":true}
+{"file":"src/components/settings/AboutTab.tsx","line":155,"position":"jsx-text","key":"settings.update.viewUpdate","value":"View Update","read":true}
+{"file":"src/components/settings/AboutTab.tsx","line":160,"position":"jsx-text","key":"settings.update.updateAvailable","value":"v{{version}} available","read":true}
+{"file":"src/components/settings/AboutTab.tsx","line":163,"position":"jsx-text","key":"settings.update.installError","value":"The update could not be downloaded or installed.","read":true}
+{"file":"src/components/settings/AboutTab.tsx","line":174,"position":"jsx-text","key":"settings.update.checkForUpdates","value":"Check for Updates","read":true}
+{"file":"src/components/settings/AboutTab.tsx","line":178,"position":"jsx-text","key":"settings.update.checkError","value":"Failed to check for updates","read":true}
+{"file":"src/components/settings/AboutTab.tsx","line":182,"position":"jsx-text","key":"settings.update.upToDate","value":"You're up to date","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":155,"position":"expr","key":"settings.agents.pathLoading","value":"Resolving…","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":157,"position":"expr","key":"settings.agents.pathUnavailable","value":"Unavailable on this system","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":158,"position":"expr","key":"settings.agents.pathUnavailable","value":"Unavailable on this system","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":163,"position":"jsx-attr","key":"settings.agents.standardDirectories.title","value":"Common Skill directories","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":167,"position":"jsx-text","key":"settings.agents.standardDirectories.title","value":"Common Skill directories","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":172,"position":"jsx-text","key":"settings.agents.global.title","value":"Global","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":180,"position":"jsx-text","key":"settings.agents.project.title","value":"Project","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":241,"position":"expr","key":"settings.agents.pathLoading","value":"Resolving…","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":242,"position":"expr","key":"settings.agents.pathUnavailable","value":"Unavailable on this system","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":251,"position":"jsx-attr","key":"settings.agents.directoryKind.private","value":"Agent-specific Skill directory","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":265,"position":"jsx-text","key":"settings.agents.standardDirectories.cardLabel","value":"Common directory","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":270,"position":"jsx-text","key":"settings.agents.standardDirectories.cardLabel","value":"Common directory","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":291,"position":"jsx-text","key":"settings.agents.pathFallback","value":"fallback","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":295,"position":"jsx-text","key":"settings.agents.pathFallback","value":"fallback","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":328,"position":"expr","key":"settings.agents.detection.eve","value":"Detection uses the Eve package and Agent configuration in the current Project.","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":329,"position":"expr","key":"settings.agents.pathUnavailable","value":"Unavailable on this system","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":375,"position":"jsx-attr","key":"settings.agents.editNamed","value":"Edit {{name}}","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":381,"position":"jsx-text","key":"settings.agents.editNamed","value":"Edit {{name}}","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":391,"position":"jsx-attr","key":"settings.agents.deleteNamed","value":"Delete {{name}}","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":397,"position":"jsx-text","key":"settings.agents.deleteNamed","value":"Delete {{name}}","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":406,"position":"jsx-attr","key":"settings.agents.skillReading.title","value":"Skill reading","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":409,"position":"jsx-text","key":"settings.agents.skillReading.title","value":"Skill reading","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":429,"position":"jsx-attr","key":"settings.agents.installDetection.title","value":"Agent detection","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":434,"position":"jsx-text","key":"settings.agents.installDetection.title","value":"Agent detection","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":438,"position":"jsx-text","key":"settings.agents.installDetection.cardHint","value":"Any location exists","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":454,"position":"jsx-attr","key":"settings.agents.detection.morePaths","value":"{{count}} more detection paths","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":520,"position":"jsx-text","key":"settings.agents.empty.clearSearch","value":"Clear search","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":532,"position":"jsx-text","key":"settings.agents.add","value":"Add Agent information","read":true}
+{"file":"src/components/settings/AgentCardGrid.tsx","line":542,"position":"jsx-attr","key":"settings.agents.listLabel","value":"Agent list","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":106,"position":"jsx-text","key":"settings.agents.skillReading.readMethod","value":"Read rule","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":137,"position":"jsx-text","key":"settings.agents.directoryKind.standard","value":"Common directory","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":148,"position":"jsx-text","key":"settings.agents.directoryKind.private","value":"Agent-specific Skill directory","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":158,"position":"jsx-attr","key":"settings.agents.directoryKind.private","value":"Agent-specific Skill directory","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":170,"position":"jsx-text","key":"settings.agents.absolutePathHint","value":"Absolute paths are resolved as written on the selected system.","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":215,"position":"jsx-text","key":"settings.agents.detection.added","value":"Detection path added","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":224,"position":"jsx-text","key":"settings.agents.detection.removed","value":"Detection path removed","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":252,"position":"jsx-text","key":"settings.agents.installDetection.title","value":"Agent detection","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":253,"position":"jsx-text","key":"settings.agents.installDetection.hint","value":"The Agent is considered detected when any Agent detection location exists.","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":258,"position":"jsx-text","key":"settings.agents.detection.pathLabel","value":"Detection path","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":274,"position":"jsx-text","key":"settings.agents.detection.directoryLocation","value":"Detection directory location","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":275,"position":"jsx-text","key":"settings.agents.detection.pathInput","value":"Detection path","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":289,"position":"jsx-text","key":"settings.agents.detection.remove","value":"Remove detection path","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":313,"position":"jsx-text","key":"settings.agents.detection.add","value":"Add detection path","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":354,"position":"jsx-text","key":"settings.agents.stale.deletedTitle","value":"This Agent information was deleted","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":355,"position":"jsx-text","key":"settings.agents.stale.deletedDescription","value":"The information being edited was not found after reloading. This draft will not overwrite the external deletion; return to the Agent list and add it again if needed.","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":359,"position":"jsx-text","key":"settings.agents.stale.title","value":"The Agent list changed elsewhere","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":361,"position":"jsx-text","key":"settings.agents.stale.description","value":"Reload the latest information and review this draft. Skill Deck will not overwrite external changes automatically.","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":363,"position":"jsx-text","key":"settings.agents.stale.reload","value":"Reload and review","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":370,"position":"jsx-text","key":"settings.agents.basicInfo.title","value":"Basic information","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":374,"position":"jsx-text","key":"settings.agents.fields.displayName","value":"Agent name","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":383,"position":"jsx-attr","key":"settings.agents.fields.displayName","value":"Agent name","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":408,"position":"jsx-text","key":"settings.agents.fields.id","value":"Agent ID","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":423,"position":"jsx-attr","key":"settings.agents.fields.id","value":"Agent ID","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":435,"position":"jsx-text","key":"settings.agents.skillReading.title","value":"Skill reading","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":510,"position":"jsx-attr","key":"settings.agents.backToList","value":"Back to Agent list","read":true}
+{"file":"src/components/settings/AgentDefinitionForm.tsx","line":536,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/components/settings/AgentDeleteDialog.tsx","line":55,"position":"jsx-text","key":"settings.agents.deleteTitle","value":"Delete {{name}}?","read":true}
+{"file":"src/components/settings/AgentDeleteDialog.tsx","line":56,"position":"jsx-text","key":"settings.agents.deleteDescription","value":"This removes the Agent information you added from Skill Deck.","read":true}
+{"file":"src/components/settings/AgentDeleteDialog.tsx","line":62,"position":"jsx-text","key":"settings.agents.deletePreviewLoading","value":"Checking what this deletion will affect…","read":true}
+{"file":"src/components/settings/AgentDeleteDialog.tsx","line":68,"position":"jsx-text","key":"settings.agents.deletePreviewError","value":"Could not inspect the effects of deleting this Agent information","read":true}
+{"file":"src/components/settings/AgentDeleteDialog.tsx","line":76,"position":"jsx-text","key":"settings.agents.deleteStale","value":"The Agent Registry changed. Review the refreshed impact and enter the Agent ID again.","read":true}
+{"file":"src/components/settings/AgentDeleteDialog.tsx","line":81,"position":"jsx-text","key":"settings.agents.deleteError","value":"Failed to delete Agent information","read":true}
+{"file":"src/components/settings/AgentDeleteDialog.tsx","line":86,"position":"jsx-text","key":"settings.agents.libraryUsageDeleteBlocked","value":"Remove this Agent from the Library application in these Scopes before deleting it.","read":true}
+{"file":"src/components/settings/AgentDeleteDialog.tsx","line":104,"position":"jsx-text","key":"settings.agents.deleteFilesSafe","value":"Installed Skill files and Agent directories will not be deleted.","read":true}
+{"file":"src/components/settings/AgentDeleteDialog.tsx","line":117,"position":"expr","key":"settings.agents.deletePathUnavailable","value":"This path cannot be resolved on the current system","read":true}
+{"file":"src/components/settings/AgentDeleteDialog.tsx","line":131,"position":"jsx-text","key":"settings.agents.deleteManagementWarning","value":"Skills currently associated with this Agent may no longer be detected or managed until the same information is added again.","read":true}
+{"file":"src/components/settings/AgentDeleteDialog.tsx","line":134,"position":"jsx-text","key":"settings.agents.deleteConfirmId","value":"Enter the Agent ID to confirm","read":true}
+{"file":"src/components/settings/AgentDeleteDialog.tsx","line":145,"position":"jsx-text","key":"settings.agents.deleteConfirmHint","value":"Enter {{id}}. This removes only the saved information, not files.","read":true}
+{"file":"src/components/settings/AgentDeleteDialog.tsx","line":152,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/components/settings/AgentDeleteDialog.tsx","line":155,"position":"jsx-text","key":"settings.agents.retryDeletePreview","value":"Retry preview","read":true}
+{"file":"src/components/settings/AgentPathRuleField.tsx","line":59,"position":"expr","key":"settings.agents.project.pathPrefix","value":"Project directory /","read":true}
+{"file":"src/components/settings/AgentPathRuleField.tsx","line":136,"position":"expr","key":"settings.agents.detection.absolutePlaceholder","value":"Enter a complete path on the current system","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":477,"position":"expr","key":"settings.agents.saved","value":"Agent information saved","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":492,"position":"expr","key":"settings.agents.saveError","value":"Failed to save Agent information","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":545,"position":"expr","key":"settings.agents.deleted","value":"Agent information deleted","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":572,"position":"expr","key":"settings.agents.deleted","value":"Agent information deleted","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":574,"position":"expr","key":"settings.agents.invalidDeleteError","value":"Failed to delete the invalid Agent record","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":589,"position":"jsx-text","key":"settings.agents.loadError","value":"Unable to load Agent information.","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":592,"position":"jsx-text","key":"common.retry","value":"Retry","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":602,"position":"jsx-text","key":"settings.agents.title","value":"Agents","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":603,"position":"jsx-text","key":"settings.agents.description","value":"Review which Skill directories each Agent reads and where Skill Deck detects it. You can also add information for Agents that are not yet included.","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":606,"position":"jsx-text","key":"common.loading","value":"Loading...","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":618,"position":"jsx-text","key":"settings.agents.libraryUsageTitle","value":"This Agent is used by Skill Library applications","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":619,"position":"jsx-text","key":"settings.agents.libraryUsageDescription","value":"The display name and detection settings can still change. Remove this Agent from the Library application in these Scopes before changing its ID or Global and Project read locations.","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":667,"position":"jsx-text","key":"settings.agents.title","value":"Agents","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":668,"position":"jsx-text","key":"settings.agents.description","value":"Review which Skill directories each Agent reads and where Skill Deck detects it. You can also add information for Agents that are not yet included.","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":672,"position":"jsx-text","key":"settings.agents.add","value":"Add Agent information","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":678,"position":"jsx-text","key":"settings.agents.refreshing","value":"Refreshing Agent information…","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":693,"position":"jsx-text","key":"settings.agents.refreshError","value":"Unable to refresh Agent information. Previously loaded data remains visible.","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":695,"position":"jsx-text","key":"common.retry","value":"Retry","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":704,"position":"jsx-text","key":"settings.agents.runtimeError","value":"Unable to resolve Agent paths and detection on the current system. Saved information remains available.","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":706,"position":"jsx-text","key":"common.retry","value":"Retry","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":714,"position":"jsx-text","key":"settings.agents.needsAttentionTitle","value":"Needs attention","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":722,"position":"jsx-text","key":"settings.agents.builtinConflict","value":"Uses the same ID as Agent {{name}}, which is included with Skill Deck. The information you added is inactive.","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":732,"position":"jsx-attr","key":"settings.agents.deleteNamed","value":"Delete {{name}}","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":739,"position":"jsx-text","key":"settings.agents.deleteNamed","value":"Delete {{name}}","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":756,"position":"jsx-attr","key":"settings.agents.reviewInvalid","value":"Review invalid Agent record","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":768,"position":"jsx-attr","key":"settings.agents.summary.label","value":"Agent summary","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":778,"position":"jsx-text","key":"settings.agents.summary.total","value":"Recorded","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":787,"position":"jsx-text","key":"settings.agents.summary.detected","value":"Detected","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":799,"position":"jsx-attr","key":"settings.agents.registryToolbar","value":"Agent list controls","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":805,"position":"jsx-attr","key":"settings.agents.sourceFilter.label","value":"Filter Agents by information source","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":852,"position":"jsx-text","key":"settings.agents.sourceFilter.count","value":"Agent count: {{count}}","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":881,"position":"jsx-attr","key":"settings.agents.search.clear","value":"Clear search","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":909,"position":"jsx-text","key":"settings.agents.dirtyNavigation.title","value":"Discard unsaved changes?","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":910,"position":"jsx-text","key":"settings.agents.dirtyNavigation.description","value":"Returning to the Agent list will discard this draft.","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":913,"position":"jsx-text","key":"settings.agents.dirtyNavigation.stay","value":"Keep editing","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":915,"position":"jsx-text","key":"settings.agents.dirtyNavigation.discard","value":"Discard and return","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":963,"position":"jsx-text","key":"settings.agents.invalidDetailTitle","value":"Review invalid Agent record","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":964,"position":"jsx-text","key":"settings.agents.invalidDetailDescription","value":"This raw record cannot be used as Agent information. Review it before deleting it.","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":972,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/components/settings/AgentSettingsPage.tsx","line":980,"position":"jsx-text","key":"settings.agents.confirmInvalidDelete","value":"Delete invalid record","read":true}
+{"file":"src/components/settings/GeneralTab.tsx","line":27,"position":"jsx-text","key":"settings.general.title","value":"General","read":true}
+{"file":"src/components/settings/GeneralTab.tsx","line":30,"position":"jsx-text","key":"settings.general.description","value":"Manage appearance, language, and platform features.","read":true}
+{"file":"src/components/settings/GeneralTab.tsx","line":39,"position":"jsx-text","key":"settings.general.appearanceTitle","value":"Theme","read":true}
+{"file":"src/components/settings/GeneralTab.tsx","line":42,"position":"jsx-text","key":"settings.general.appearanceDescription","value":"Choose the display style that fits your current workspace.","read":true}
+{"file":"src/components/settings/GeneralTab.tsx","line":84,"position":"jsx-text","key":"settings.general.languageTitle","value":"Language","read":true}
+{"file":"src/components/settings/GeneralTab.tsx","line":87,"position":"jsx-text","key":"settings.general.languageDescription","value":"Choose the interface language.","read":true}
+{"file":"src/components/settings/GitCloneTimeoutSection.tsx","line":41,"position":"expr","key":"settings.cloneTimeout.presets.60","value":"1 min","read":true}
+{"file":"src/components/settings/GitCloneTimeoutSection.tsx","line":43,"position":"expr","key":"settings.cloneTimeout.presets.120","value":"2 min","read":true}
+{"file":"src/components/settings/GitCloneTimeoutSection.tsx","line":45,"position":"expr","key":"settings.cloneTimeout.presets.300","value":"5 min","read":true}
+{"file":"src/components/settings/GitCloneTimeoutSection.tsx","line":47,"position":"expr","key":"settings.cloneTimeout.presets.600","value":"10 min","read":true}
+{"file":"src/components/settings/GitCloneTimeoutSection.tsx","line":147,"position":"expr","key":"settings.cloneTimeout.saveError","value":"Failed to save timeout setting","read":true}
+{"file":"src/components/settings/GitCloneTimeoutSection.tsx","line":164,"position":"expr","key":"settings.cloneTimeout.errors.invalidNumber","value":"Enter a valid number","read":true}
+{"file":"src/components/settings/GitCloneTimeoutSection.tsx","line":169,"position":"expr","key":"settings.cloneTimeout.errors.tooSmall","value":"Must be at least 30 seconds","read":true}
+{"file":"src/components/settings/GitCloneTimeoutSection.tsx","line":174,"position":"expr","key":"settings.cloneTimeout.errors.tooLarge","value":"Cannot exceed 3600 seconds","read":true}
+{"file":"src/components/settings/GitCloneTimeoutSection.tsx","line":201,"position":"expr","key":"settings.cloneTimeout.saved","value":"Saved","read":true}
+{"file":"src/components/settings/GitCloneTimeoutSection.tsx","line":212,"position":"jsx-text","key":"settings.cloneTimeout.title","value":"Remote Fetch Timeout","read":true}
+{"file":"src/components/settings/GitCloneTimeoutSection.tsx","line":215,"position":"jsx-text","key":"settings.cloneTimeout.description","value":"Controls how long remote Git installs and updates can wait before timing out. ","read":true}
+{"file":"src/components/settings/GitCloneTimeoutSection.tsx","line":237,"position":"expr","key":"settings.cloneTimeout.saved","value":"Saved","read":true}
+{"file":"src/components/settings/GitCloneTimeoutSection.tsx","line":264,"position":"jsx-text","key":"settings.cloneTimeout.custom","value":"Custom","read":true}
+{"file":"src/components/settings/GitCloneTimeoutSection.tsx","line":283,"position":"jsx-attr","key":"settings.cloneTimeout.restoreDefault","value":"Restore default","read":true}
+{"file":"src/components/settings/GitCloneTimeoutSection.tsx","line":297,"position":"jsx-text","key":"settings.cloneTimeout.customLabel","value":"Custom timeout","read":true}
+{"file":"src/components/settings/GitCloneTimeoutSection.tsx","line":302,"position":"jsx-attr","key":"settings.cloneTimeout.customLabel","value":"Custom timeout","read":true}
+{"file":"src/components/settings/GitCloneTimeoutSection.tsx","line":314,"position":"jsx-text","key":"settings.cloneTimeout.secondsUnit","value":"seconds","read":true}
+{"file":"src/components/settings/GitCloneTimeoutSection.tsx","line":324,"position":"jsx-text","key":"settings.cloneTimeout.saveButton","value":"Save","read":true}
+{"file":"src/components/settings/GitCloneTimeoutSection.tsx","line":343,"position":"expr","key":"settings.cloneTimeout.customHint","value":"Suggested range: 30–3600 seconds","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":161,"position":"expr","key":"settings.githubCredential.description","value":"Provides a higher request quota for GitHub update checks and access to repositories that require authorization.","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":168,"position":"expr","key":"settings.githubCredential.storageUnavailable","value":"No system secure storage was detected.","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":170,"position":"expr","key":"settings.githubCredential.description","value":"Provides a higher request quota for GitHub update checks and access to repositories that require authorization.","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":187,"position":"jsx-attr","key":"settings.githubCredential.title","value":"GitHub Token","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":207,"position":"jsx-text","key":"settings.githubCredential.title","value":"GitHub Token","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":214,"position":"jsx-attr","key":"settings.githubCredential.environmentHelpLabel","value":"Other ways to provide a GitHub Token","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":220,"position":"jsx-text","key":"settings.githubCredential.environmentHelp","value":"You can also use the GH_TOKEN or GITHUB_TOKEN environment variable. A saved token takes precedence.","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":258,"position":"jsx-text","key":"settings.githubCredential.replace","value":"Replace","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":269,"position":"jsx-text","key":"settings.githubCredential.remove","value":"Remove","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":280,"position":"jsx-text","key":"settings.githubCredential.configure","value":"Configure","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":288,"position":"jsx-attr","key":"common.close","value":"Close","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":307,"position":"jsx-text","key":"settings.githubCredential.dialogDescription","value":"After verification, the token will be stored in the system secure storage.","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":314,"position":"jsx-text","key":"settings.githubCredential.tokenLabel","value":"GitHub token","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":329,"position":"jsx-attr","key":"settings.githubCredential.tokenPlaceholder","value":"github_pat_…","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":338,"position":"jsx-text","key":"settings.githubCredential.savedTokenHidden","value":"The complete token will not be shown again after it is saved.","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":354,"position":"jsx-text","key":"settings.githubCredential.requestFailed","value":"GitHub token status is temporarily unavailable. Try again later.","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":362,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":369,"position":"jsx-text","key":"settings.githubCredential.verifyAndSave","value":"Verify and save","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":392,"position":"jsx-text","key":"settings.githubCredential.removeTitle","value":"Remove GitHub Token?","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":395,"position":"jsx-text","key":"settings.githubCredential.removeDescription","value":"The token will be removed from system secure storage and will no longer be used for GitHub requests.","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":399,"position":"jsx-text","key":"settings.githubCredential.feedback.clearFailed","value":"The token could not be removed from system secure storage.","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":404,"position":"jsx-text","key":"settings.githubCredential.requestFailed","value":"GitHub token status is temporarily unavailable. Try again later.","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":411,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":424,"position":"jsx-text","key":"settings.githubCredential.confirmRemove","value":"Remove token","read":true}
+{"file":"src/components/settings/GithubCredentialSection.tsx","line":442,"position":"jsx-text","key":"settings.githubCredential.requestFailed","value":"GitHub token status is temporarily unavailable. Try again later.","read":true}
+{"file":"src/components/settings/GitSettingsPage.tsx","line":12,"position":"jsx-text","key":"settings.git.title","value":"Git","read":true}
+{"file":"src/components/settings/GitSettingsPage.tsx","line":15,"position":"jsx-text","key":"settings.git.description","value":"Configure the GitHub Token and remote fetch behavior.","read":true}
+{"file":"src/components/settings/ProjectsTab.tsx","line":45,"position":"jsx-attr","key":"settings.removeProject","value":"Remove Project","read":true}
+{"file":"src/components/settings/ProjectsTab.tsx","line":71,"position":"expr","key":"context.environmentConnecting","value":"Connecting","read":true}
+{"file":"src/components/settings/ProjectsTab.tsx","line":73,"position":"expr","key":"context.environmentUnavailable","value":"Unavailable","read":true}
+{"file":"src/components/settings/ProjectsTab.tsx","line":81,"position":"expr","key":"settings.addProject","value":"Add Project","read":true}
+{"file":"src/components/settings/ProjectsTab.tsx","line":92,"position":"expr","key":"settings.addProjectError","value":"The project could not be added. Try again.","read":true}
+{"file":"src/components/settings/ProjectsTab.tsx","line":101,"position":"jsx-text","key":"settings.projects","value":"Projects","read":true}
+{"file":"src/components/settings/ProjectsTab.tsx","line":103,"position":"jsx-text","key":"settings.projectsHint","value":"Saved project paths for quick access to project-level skills","read":true}
+{"file":"src/components/settings/ProjectsTab.tsx","line":109,"position":"jsx-attr","key":"settings.addProject","value":"Add Project","read":true}
+{"file":"src/components/settings/ProjectsTab.tsx","line":118,"position":"jsx-text","key":"settings.addProject","value":"Add Project","read":true}
+{"file":"src/components/settings/ProjectsTab.tsx","line":137,"position":"jsx-text","key":"context.projectsLoadError","value":"Could not load projects on this system","read":true}
+{"file":"src/components/settings/ProjectsTab.tsx","line":143,"position":"jsx-text","key":"context.environmentRetry","value":"Retry","read":true}
+{"file":"src/components/settings/ProjectsTab.tsx","line":148,"position":"jsx-text","key":"common.loading","value":"Loading...","read":true}
+{"file":"src/components/settings/ProjectsTab.tsx","line":154,"position":"jsx-text","key":"context.projectsLoadError","value":"Could not load projects on this system","read":true}
+{"file":"src/components/settings/ProjectsTab.tsx","line":161,"position":"jsx-text","key":"context.environmentRetry","value":"Retry","read":true}
+{"file":"src/components/settings/ProjectsTab.tsx","line":170,"position":"jsx-text","key":"settings.projectsEmpty","value":"No projects added","read":true}
+{"file":"src/components/settings/ProjectsTab.tsx","line":172,"position":"jsx-text","key":"settings.projectsEmptyHint","value":"Add a project to manage project-level skills","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":149,"position":"expr","key":"settings.proxy.loadError","value":"Proxy settings could not be loaded.","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":173,"position":"expr","key":"settings.proxy.nativeEnvironment","value":"Native","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":227,"position":"expr","key":"settings.proxy.fileChanged","value":"Another operation changed the configuration file. Reload it and review your draft before saving again.","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":231,"position":"expr","key":"settings.proxy.errors.writeUnconfirmed","value":"The file may have been written, but saving could not be confirmed. Active connections are unchanged. Reload and review the settings.","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":252,"position":"expr","key":"settings.proxy.saved","value":"Proxy settings saved","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":306,"position":"expr","key":"settings.proxy.loadError","value":"Proxy settings could not be loaded.","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":317,"position":"jsx-text","key":"common.retry","value":"Retry","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":328,"position":"jsx-text","key":"settings.proxy.title","value":"Proxy settings","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":331,"position":"jsx-text","key":"settings.proxy.description","value":"Set the connection method for HTTP requests and Git operations.","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":337,"position":"jsx-text","key":"settings.proxy.configurationIssueTitle","value":"Proxy settings need attention","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":359,"position":"jsx-attr","key":"settings.proxy.modeTitle","value":"HTTP requests","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":360,"position":"jsx-attr","key":"settings.proxy.httpInfo","value":"View HTTP request scope","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":361,"position":"jsx-attr","key":"settings.proxy.httpInfoDescription","value":"Used to browse online Skills, retrieve source information, and check for and download updates. Online images use the system network settings.","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":363,"position":"jsx-attr","key":"settings.proxy.connectionMode","value":"Connection method","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":371,"position":"jsx-attr","key":"settings.proxy.address","value":"Proxy server URL","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":374,"position":"jsx-attr","key":"settings.proxy.httpProxyAddress","value":"HTTP request proxy server URL","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":385,"position":"jsx-attr","key":"settings.proxy.gitInfo","value":"View Git operation details","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":386,"position":"jsx-attr","key":"settings.proxy.gitInfoDescription","value":"Only affects Git operations started by the app and does not change Git configuration in any Environment.","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":388,"position":"jsx-attr","key":"settings.proxy.connectionMode","value":"Connection method","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":426,"position":"jsx-attr","key":"settings.proxy.wslInfo","value":"View {{distro}} Git details","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":427,"position":"jsx-attr","key":"settings.proxy.wslInfoDescription","value":"The proxy URL must be reachable from {{distro}}.","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":429,"position":"jsx-attr","key":"settings.proxy.connectionMode","value":"Connection method","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":447,"position":"jsx-attr","key":"settings.proxy.wslGitProxyAddress","value":"WSL · {{distro}} Git proxy server URL","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":476,"position":"jsx-attr","key":"settings.proxy.testTitle","value":"Connection test","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":477,"position":"jsx-attr","key":"settings.proxy.testInfo","value":"View connection test details","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":478,"position":"jsx-attr","key":"settings.proxy.testDescription","value":"The test uses the settings shown here without saving them.","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":495,"position":"expr","key":"settings.proxy.testConnection","value":"Test connection","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":495,"position":"expr","key":"settings.proxy.testing","value":"Testing","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":511,"position":"jsx-attr","key":"settings.proxy.actions","value":"Unsaved change actions","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":521,"position":"expr","key":"settings.proxy.unsavedChanges","value":"You have unsaved changes","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":530,"position":"jsx-text","key":"settings.proxy.reload","value":"Reload settings","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":539,"position":"jsx-text","key":"settings.proxy.discard","value":"Discard changes","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":553,"position":"expr","key":"settings.proxy.save","value":"Save changes","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":553,"position":"expr","key":"settings.proxy.saving","value":"Saving","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":565,"position":"expr","key":"settings.proxy.title","value":"Proxy settings","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":566,"position":"expr","key":"settings.proxy.modeTitle","value":"HTTP requests","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":568,"position":"expr","key":"settings.proxy.test.targets.wslGit","value":"WSL Git","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":656,"position":"jsx-attr","key":"settings.proxy.httpConnectionMode","value":"HTTP request connection method","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":771,"position":"jsx-attr","key":"settings.proxy.address","value":"Proxy server URL","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":780,"position":"jsx-attr","key":"settings.proxy.scopeTitle","value":"Applies to","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":782,"position":"jsx-attr","key":"settings.proxy.scopeLabel","value":"{{environment}} proxy scope","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":839,"position":"jsx-text","key":"settings.proxy.scope.githubOnly","value":"GitHub repositories only","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":840,"position":"jsx-text","key":"settings.proxy.scope.allHttpHttps","value":"All HTTP/HTTPS repositories","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":871,"position":"expr","key":"settings.proxy.test.targets.onlineServices","value":"HTTP request","read":true}
+{"file":"src/components/settings/ProxySettingsPage.tsx","line":941,"position":"jsx-text","key":"settings.proxy.test.wslProxyHint","value":"This test is using a WSL Git proxy. If WSL cannot reach this URL, change it or select Keep existing connection method.","read":true}
+{"file":"src/components/settings/WslIntegrationSection.tsx","line":60,"position":"jsx-text","key":"settings.general.wslTitle","value":"WSL support","read":true}
+{"file":"src/components/settings/WslIntegrationSection.tsx","line":63,"position":"jsx-text","key":"settings.general.wslDescription","value":"Discover installed WSL distributions and allow switching between Windows and WSL.","read":true}
+{"file":"src/components/settings/WslIntegrationSection.tsx","line":76,"position":"jsx-attr","key":"settings.general.wslSaving","value":"Updating WSL settings","read":true}
+{"file":"src/components/settings/WslIntegrationSection.tsx","line":85,"position":"jsx-attr","key":"settings.general.wslTitle","value":"WSL support","read":true}
+{"file":"src/components/settings/WslIntegrationSection.tsx","line":110,"position":"jsx-text","key":"settings.general.wslDisableTitle","value":"Disable WSL support?","read":true}
+{"file":"src/components/settings/WslIntegrationSection.tsx","line":123,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/components/skills/add-skill/CompleteStep.tsx","line":114,"position":"expr","key":"addSkill.complete.partial","value":"Installation completed with errors","read":true}
+{"file":"src/components/skills/add-skill/CompleteStep.tsx","line":115,"position":"expr","key":"addSkill.complete.success","value":"Installed {{count}} skill","read":true}
+{"file":"src/components/skills/add-skill/CompleteStep.tsx","line":164,"position":"jsx-attr","key":"addSkill.complete.errorDetails","value":"Error details","read":true}
+{"file":"src/components/skills/add-skill/CompleteStep.tsx","line":170,"position":"expr","key":"addSkill.complete.recoveryRequired","value":"Recovery required","read":true}
+{"file":"src/components/skills/add-skill/ConfirmStep.tsx","line":139,"position":"jsx-text","key":"addSkill.confirm.preparationFailed","value":"The install plan could not be prepared","read":true}
+{"file":"src/components/skills/add-skill/ConfirmStep.tsx","line":142,"position":"expr","key":"addSkill.confirm.sourceNeedsRefresh","value":"The source information or Skill content is no longer valid. Refresh the list and confirm your selection.","read":true}
+{"file":"src/components/skills/add-skill/ConfirmStep.tsx","line":152,"position":"jsx-text","key":"addSkill.confirm.libraryOverrideTitle","value":"Directly installed versions take priority","read":true}
+{"file":"src/components/skills/add-skill/ConfirmStep.tsx","line":153,"position":"jsx-text","key":"addSkill.confirm.libraryOverrideDescription","value":"{{count}} matching Skills are currently provided by Skill Libraries. The Library applications remain, while this direct installation becomes the active content.","read":true}
+{"file":"src/components/skills/add-skill/ConfirmStep.tsx","line":167,"position":"jsx-text","key":"addSkill.confirm.itemsTitle","value":"Install contents","read":true}
+{"file":"src/components/skills/add-skill/ConfirmStep.tsx","line":171,"position":"expr","key":"addSkill.confirm.summary","value":"Will install {{count}} skills. {{overwriteCount}} target directories already contain matching skills and will be overwritten.","read":true}
+{"file":"src/components/skills/add-skill/ConfirmStep.tsx","line":172,"position":"expr","key":"addSkill.confirm.summaryNoOverwrite","value":"Will install {{count}} skills.","read":true}
+{"file":"src/components/skills/add-skill/ConfirmStep.tsx","line":189,"position":"jsx-text","key":"addSkill.confirm.directDownloadConflict","value":"Cannot overwrite","read":true}
+{"file":"src/components/skills/add-skill/ConfirmStep.tsx","line":191,"position":"jsx-text","key":"addSkill.confirm.libraryOverrideBadge","value":"Overrides Library","read":true}
+{"file":"src/components/skills/add-skill/ConfirmStep.tsx","line":193,"position":"jsx-text","key":"addSkill.confirm.overwriteGroup","value":"Target exists","read":true}
+{"file":"src/components/skills/add-skill/ConfirmStep.tsx","line":195,"position":"jsx-text","key":"addSkill.confirm.trust.digestVerified","value":"digest verified","read":true}
+{"file":"src/components/skills/add-skill/ConfirmStep.tsx","line":203,"position":"jsx-text","key":"addSkill.confirm.installPlan","value":"Install plan","read":true}
+{"file":"src/components/skills/add-skill/ConfirmStep.tsx","line":205,"position":"jsx-attr","key":"addSkill.confirm.defaultLocation","value":"Install in the common Skill directory","read":true}
+{"file":"src/components/skills/add-skill/ConfirmStep.tsx","line":207,"position":"jsx-attr","key":"addSkill.confirm.createLinks","value":"Create links","read":true}
+{"file":"src/components/skills/add-skill/ConfirmStep.tsx","line":210,"position":"jsx-attr","key":"addSkill.confirm.createCopies","value":"Create copies","read":true}
+{"file":"src/components/skills/add-skill/ErrorStep.tsx","line":20,"position":"jsx-text","key":"addSkill.error.title","value":"Installation Failed","read":true}
+{"file":"src/components/skills/add-skill/ErrorStep.tsx","line":32,"position":"jsx-text","key":"addSkill.error.detailsLabel","value":"Details","read":true}
+{"file":"src/components/skills/add-skill/ErrorStep.tsx","line":53,"position":"jsx-text","key":"addSkill.error.suggestionsLabel","value":"Suggestions","read":true}
+{"file":"src/components/skills/add-skill/InstallingStep.tsx","line":121,"position":"expr","key":"addSkill.installing.preparing","value":"Preparing...","read":true}
+{"file":"src/components/skills/add-skill/InstallingStep.tsx","line":130,"position":"expr","key":"addSkill.installing.title","value":"Installing...","read":true}
+{"file":"src/components/skills/add-skill/InstallingStep.tsx","line":132,"position":"expr","key":"addSkill.installing.writingConfig","value":"Saving configuration...","read":true}
+{"file":"src/components/skills/add-skill/InstallingStep.tsx","line":134,"position":"expr","key":"addSkill.installing.title","value":"Installing...","read":true}
+{"file":"src/components/skills/add-skill/InstallingStep.tsx","line":158,"position":"jsx-text","key":"addSkill.installing.title","value":"Installing...","read":true}
+{"file":"src/components/skills/add-skill/OptionsStep.tsx","line":18,"position":"jsx-text","key":"agentSelection.title","value":"Linked Agents","read":true}
+{"file":"src/components/skills/add-skill/OptionsStep.tsx","line":22,"position":"jsx-attr","key":"agentSelection.installEmpty","value":"No Agents are currently available","read":true}
+{"file":"src/components/skills/add-skill/OptionsStep.tsx","line":30,"position":"jsx-text","key":"addSkill.agents.historyLoadWarning","value":"Recent confirmed Agent choices could not be loaded. You can still choose targets for this installation.","read":true}
+{"file":"src/components/skills/add-skill/OptionsStep.tsx","line":40,"position":"jsx-attr","key":"agentSelection.installTitle","value":"Select Agents","read":true}
+{"file":"src/components/skills/add-skill/OptionsStep.tsx","line":42,"position":"jsx-attr","key":"agentSelection.installEmpty","value":"No Agents are currently available","read":true}
+{"file":"src/components/skills/add-skill/ScopeBadge.tsx","line":38,"position":"jsx-text","key":"addSkill.scope.global","value":"Global","read":true}
+{"file":"src/components/skills/add-skill/ScopeStep.tsx","line":41,"position":"expr","key":"addSkill.scopeSelect.global","value":"Global","read":true}
+{"file":"src/components/skills/add-skill/ScopeStep.tsx","line":43,"position":"expr","key":"addSkill.scopeSelect.globalHint","value":"Install globally · {{path}}","read":true}
+{"file":"src/components/skills/add-skill/ScopeStep.tsx","line":44,"position":"expr","key":"addSkill.scopeSelect.environmentGlobalHint","value":"Install globally in {{environment}}","read":true}
+{"file":"src/components/skills/add-skill/ScopeStep.tsx","line":120,"position":"jsx-text","key":"addSkill.scopeSelect.title","value":"Choose a Skill location","read":true}
+{"file":"src/components/skills/add-skill/ScopeStep.tsx","line":123,"position":"jsx-text","key":"addSkill.scopeSelect.hint","value":"Install globally or in a specific Project.","read":true}
+{"file":"src/components/skills/add-skill/ScopeStep.tsx","line":147,"position":"jsx-text","key":"addSkill.scopeSelect.localProjects","value":"Projects","read":true}
+{"file":"src/components/skills/add-skill/ScopeStep.tsx","line":152,"position":"jsx-text","key":"context.projectsLoadError","value":"Could not load projects on this system","read":true}
+{"file":"src/components/skills/add-skill/ScopeStep.tsx","line":154,"position":"jsx-text","key":"context.environmentRetry","value":"Retry","read":true}
+{"file":"src/components/skills/add-skill/ScopeStep.tsx","line":161,"position":"jsx-text","key":"common.loading","value":"Loading...","read":true}
+{"file":"src/components/skills/add-skill/ScopeStep.tsx","line":168,"position":"jsx-text","key":"addSkill.scopeSelect.noProjects","value":"No projects have been added in this environment. Add a project on the Skills page.","read":true}
+{"file":"src/components/skills/add-skill/SkillsStep.tsx","line":28,"position":"expr","key":"addSkill.skills.title","value":"Select skills","read":true}
+{"file":"src/components/skills/add-skill/SkillsStep.tsx","line":29,"position":"expr","key":"addSkill.skills.selected","value":"{{count}} of {{total}} selected","read":true}
+{"file":"src/components/skills/add-skill/SkillsStep.tsx","line":30,"position":"expr","key":"addSkill.skills.search","value":"Search skills...","read":true}
+{"file":"src/components/skills/add-skill/SkillsStep.tsx","line":31,"position":"expr","key":"addSkill.skills.selectAll","value":"Select all","read":true}
+{"file":"src/components/skills/add-skill/SkillsStep.tsx","line":32,"position":"expr","key":"addSkill.skills.clear","value":"Clear","read":true}
+{"file":"src/components/skills/add-skill/SkillsStep.tsx","line":33,"position":"expr","key":"addSkill.skills.empty","value":"No matching skills","read":true}
+{"file":"src/components/skills/add-skill/SkillsStep.tsx","line":34,"position":"expr","key":"skills.pluginGroup.general","value":"Ungrouped","read":true}
+{"file":"src/components/skills/add-skill/SourceStep.tsx","line":112,"position":"expr","key":"addSkill.source.error.empty","value":"Please enter a source","read":true}
+{"file":"src/components/skills/add-skill/SourceStep.tsx","line":123,"position":"expr","key":"addSkill.source.error.empty","value":"Please enter a source","read":true}
+{"file":"src/components/skills/add-skill/SourceStep.tsx","line":188,"position":"expr","key":"addSkill.source.status.cloning","value":"Fetching source content...","read":true}
+{"file":"src/components/skills/add-skill/SourceStep.tsx","line":191,"position":"expr","key":"addSkill.source.status.connecting","value":"Connecting to source...","read":true}
+{"file":"src/components/skills/add-skill/SourceStep.tsx","line":198,"position":"expr","key":"addSkill.source.status.cloneDone","value":"Source loaded","read":true}
+{"file":"src/components/skills/add-skill/SourceStep.tsx","line":200,"position":"expr","key":"addSkill.source.status.cloning","value":"Fetching source content...","read":true}
+{"file":"src/components/skills/add-skill/SourceStep.tsx","line":210,"position":"jsx-text","key":"addSkill.source.tabs.search","value":"Search online","read":true}
+{"file":"src/components/skills/add-skill/SourceStep.tsx","line":213,"position":"jsx-text","key":"addSkill.source.tabs.manual","value":"Manual","read":true}
+{"file":"src/components/skills/add-skill/SourceStep.tsx","line":248,"position":"jsx-attr","key":"addSkill.source.label","value":"Source","read":true}
+{"file":"src/components/skills/add-skill/SourceStep.tsx","line":252,"position":"jsx-attr","key":"addSkill.source.placeholder","value":"e.g. vercel-labs/agent-skills","read":true}
+{"file":"src/components/skills/add-skill/SourceStep.tsx","line":261,"position":"jsx-text","key":"addSkill.source.actions.fetch","value":"Fetch Skills","read":true}
+{"file":"src/components/skills/add-skill/SourceStep.tsx","line":268,"position":"jsx-text","key":"addSkill.source.hint","value":"Supports GitHub (owner/repo), URLs, local paths, or skills install commands","read":true}
+{"file":"src/components/skills/add-skill/SourceStep.tsx","line":274,"position":"jsx-text","key":"addSkill.source.badges.ref","value":"branch: {{ref}}","read":true}
+{"file":"src/components/skills/add-skill/SourceStep.tsx","line":278,"position":"jsx-text","key":"addSkill.source.badges.skillFilter","value":"skill: {{filter}}","read":true}
+{"file":"src/components/skills/AgentFilterCombobox.tsx","line":66,"position":"expr","key":"skills.filter.allAgents","value":"All Agents","read":true}
+{"file":"src/components/skills/AgentFilterCombobox.tsx","line":146,"position":"jsx-attr","key":"skills.filter.agentLabel","value":"Filter Skills by Agent","read":true}
+{"file":"src/components/skills/AgentFilterCombobox.tsx","line":159,"position":"expr","key":"skills.filter.allAgents","value":"All Agents","read":true}
+{"file":"src/components/skills/AgentFilterCombobox.tsx","line":175,"position":"jsx-attr","key":"skills.filter.searchAgents","value":"Find Agent…","read":true}
+{"file":"src/components/skills/AgentFilterCombobox.tsx","line":182,"position":"jsx-attr","key":"skills.filter.searchAgents","value":"Find Agent…","read":true}
+{"file":"src/components/skills/AgentFilterCombobox.tsx","line":195,"position":"jsx-text","key":"skills.filter.noMatchingAgents","value":"No matching Agents","read":true}
+{"file":"src/components/skills/card/SkillCardPrimitives.tsx","line":78,"position":"expr","key":"skills.externalLink","value":"Open with the system default app","read":true}
+{"file":"src/components/skills/card/SkillCardPrimitives.tsx","line":88,"position":"expr","key":"skills.card.sourceOpenFailed","value":"Could not open the source. Try again later.","read":true}
+{"file":"src/components/skills/CompactSkillList.tsx","line":71,"position":"jsx-attr","key":"libraries.manage","value":"Manage Skill Libraries","read":true}
+{"file":"src/components/skills/CompactSkillList.tsx","line":71,"position":"jsx-attr","key":"libraries.manage","value":"Manage Skill Libraries","read":true}
+{"file":"src/components/skills/CompactSkillList.tsx","line":76,"position":"jsx-attr","key":"skills.add","value":"Add","read":true}
+{"file":"src/components/skills/CompactSkillList.tsx","line":76,"position":"jsx-attr","key":"skills.add","value":"Add","read":true}
+{"file":"src/components/skills/CompactSkillList.tsx","line":100,"position":"jsx-text","key":"skills.globalSkills","value":"Global Skills","read":true}
+{"file":"src/components/skills/CompactSkillList.tsx","line":105,"position":"jsx-attr","key":"libraries.manage","value":"Manage Skill Libraries","read":true}
+{"file":"src/components/skills/CompactSkillList.tsx","line":105,"position":"jsx-attr","key":"libraries.manage","value":"Manage Skill Libraries","read":true}
+{"file":"src/components/skills/CompactSkillList.tsx","line":110,"position":"jsx-attr","key":"skills.add","value":"Add","read":true}
+{"file":"src/components/skills/CompactSkillList.tsx","line":110,"position":"jsx-attr","key":"skills.add","value":"Add","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":54,"position":"jsx-text","key":"context.global","value":"Global","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":57,"position":"jsx-text","key":"context.globalSubtitle","value":"Available in every project","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":130,"position":"jsx-attr","key":"context.openInExplorer","value":"Open in Explorer","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":131,"position":"jsx-attr","key":"context.openInExplorer","value":"Open in Explorer","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":140,"position":"jsx-attr","key":"context.remove","value":"Remove","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":141,"position":"jsx-attr","key":"context.remove","value":"Remove","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":156,"position":"jsx-text","key":"context.openInExplorer","value":"Open in Explorer","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":165,"position":"jsx-text","key":"context.remove","value":"Remove","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":192,"position":"expr","key":"context.environmentConnecting","value":"Connecting","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":194,"position":"expr","key":"context.environmentUnavailable","value":"Unavailable","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":202,"position":"expr","key":"context.addProject","value":"Add Project","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":206,"position":"expr","key":"context.addProjectError","value":"The project could not be added. Try again.","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":209,"position":"expr","key":"context.addProjectError","value":"The project could not be added. Try again.","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":235,"position":"jsx-text","key":"context.sectionGlobal","value":"Global","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":243,"position":"jsx-text","key":"context.sectionProjects","value":"Projects","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":257,"position":"jsx-text","key":"context.projectsLoadError","value":"Could not load projects on this system","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":263,"position":"jsx-text","key":"context.environmentRetry","value":"Retry","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":267,"position":"jsx-text","key":"common.loading","value":"Loading...","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":272,"position":"jsx-text","key":"context.projectsLoadError","value":"Could not load projects on this system","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":278,"position":"jsx-text","key":"context.environmentRetry","value":"Retry","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":283,"position":"jsx-text","key":"context.noProjects","value":"No projects","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":311,"position":"jsx-attr","key":"context.addProject","value":"Add Project","read":true}
+{"file":"src/components/skills/ContextSidebar.tsx","line":320,"position":"jsx-text","key":"context.addProject","value":"Add Project","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":322,"position":"jsx-attr","key":"common.close","value":"Close","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":326,"position":"jsx-text","key":"skills.copyToProject.title","value":"Copy “{{name}}” to Other Projects","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":328,"position":"jsx-text","key":"skills.copyToProject.ariaDescription","value":"Configure target projects, associated Agents, and the installation method.","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":349,"position":"jsx-text","key":"skills.copyToProject.recoveryDescription","value":"This operation did not finish. Some files need to be checked before retrying.","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":360,"position":"expr","key":"skills.copyToProject.copyError","value":"Copy could not be completed. The selected projects are still available to retry.","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":367,"position":"jsx-text","key":"skills.copyToProject.recoveryDescription","value":"This operation did not finish. Some files need to be checked before retrying.","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":384,"position":"jsx-text","key":"skills.copyToProject.targetProjects","value":"Target projects","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":388,"position":"jsx-text","key":"skills.copyToProject.selectedProjects","value":"{{count}} selected","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":395,"position":"jsx-text","key":"skills.copyToProject.targetEnvironment","value":"Target system","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":409,"position":"jsx-attr","key":"skills.copyToProject.targetEnvironment","value":"Target system","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":411,"position":"jsx-attr","key":"skills.copyToProject.targetEnvironmentMissing","value":"The selected target system is no longer available. Select it again after it returns.","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":436,"position":"jsx-text","key":"skills.copyToProject.targetEnvironmentMissing","value":"The selected target system is no longer available. Select it again after it returns.","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":441,"position":"jsx-text","key":"common.loading","value":"Loading...","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":458,"position":"jsx-text","key":"common.retry","value":"Retry","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":467,"position":"jsx-attr","key":"skills.copyToProject.presenceUnknown","value":"Could not verify whether this Skill is already installed. Existing files may be overwritten.","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":472,"position":"jsx-text","key":"skills.copyToProject.presenceUnknown","value":"Could not verify whether this Skill is already installed. Existing files may be overwritten.","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":502,"position":"expr","key":"skills.copyToProject.copyError","value":"Copy could not be completed. The selected projects are still available to retry.","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":508,"position":"jsx-text","key":"skills.copyToProject.installed","value":"Installed","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":515,"position":"jsx-text","key":"skills.copyToProject.unknown","value":"Unknown","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":534,"position":"jsx-text","key":"skills.copyToProject.noProjects","value":"No other projects available","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":545,"position":"jsx-text","key":"agentSelection.copyTitle","value":"Associated Agents","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":555,"position":"jsx-attr","key":"agentSelection.installEmpty","value":"No Agents are currently available","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":560,"position":"jsx-text","key":"skills.copyToProject.agentSelectionDescription","value":"Agents are preselected from the source Skill. Existing target-project associations are preserved.","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":571,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":588,"position":"jsx-text","key":"common.loading","value":"Loading...","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":592,"position":"expr","key":"skills.copyToProject.retryFailed","value":"Retry failed projects","read":true}
+{"file":"src/components/skills/CopyToProjectDialog.tsx","line":593,"position":"expr","key":"skills.copyToProject.copy","value":"Copy to {{count}} project(s)","read":true}
+{"file":"src/components/skills/CrossStorageWarningBanner.tsx","line":45,"position":"expr","key":"crossStorage.nativeEnvironment","value":"Windows","read":true}
+{"file":"src/components/skills/CrossStorageWarningBanner.tsx","line":48,"position":"expr","key":"crossStorage.nativeEnvironment","value":"Windows","read":true}
+{"file":"src/components/skills/CrossStorageWarningBanner.tsx","line":62,"position":"expr","key":"crossStorage.dismissFailed","value":"Failed to save warning preference","read":true}
+{"file":"src/components/skills/CrossStorageWarningBanner.tsx","line":75,"position":"jsx-text","key":"crossStorage.title","value":"This project is accessed across system storage","read":true}
+{"file":"src/components/skills/CrossStorageWarningBanner.tsx","line":95,"position":"jsx-text","key":"crossStorage.switchToOwner","value":"Switch to {{owner}}","read":true}
+{"file":"src/components/skills/CrossStorageWarningBanner.tsx","line":106,"position":"jsx-text","key":"crossStorage.dismiss","value":"Don't show again","read":true}
+{"file":"src/components/skills/DeleteSkillDialog.tsx","line":40,"position":"expr","key":"context.projects","value":"Projects","read":true}
+{"file":"src/components/skills/DeleteSkillDialog.tsx","line":40,"position":"expr","key":"skills.installPath.project","value":"Project: {{name}}","read":true}
+{"file":"src/components/skills/DeleteSkillDialog.tsx","line":41,"position":"expr","key":"context.global","value":"Global","read":true}
+{"file":"src/components/skills/DeleteSkillDialog.tsx","line":73,"position":"jsx-attr","key":"common.close","value":"Close","read":true}
+{"file":"src/components/skills/DeleteSkillDialog.tsx","line":83,"position":"jsx-text","key":"skills.deleteConfirm.title","value":"Delete {{name}}","read":true}
+{"file":"src/components/skills/DeleteSkillDialog.tsx","line":101,"position":"expr","key":"skills.deleteConfirm.recoveryRequired","value":"Deletion did not finish. Some files need to be checked before continuing.","read":true}
+{"file":"src/components/skills/DeleteSkillDialog.tsx","line":124,"position":"jsx-attr","key":"skills.deleteConfirm.scopeLabel","value":"Deletion list","read":true}
+{"file":"src/components/skills/DeleteSkillDialog.tsx","line":130,"position":"jsx-text","key":"skills.deleteConfirm.standardDirSection","value":"Common directory","read":true}
+{"file":"src/components/skills/DeleteSkillDialog.tsx","line":147,"position":"expr","key":"skills.updatePlan.installLocation","value":"Location","read":true}
+{"file":"src/components/skills/DeleteSkillDialog.tsx","line":166,"position":"jsx-text","key":"skills.deleteConfirm.copyWarning","value":"Independent copies will also be deleted.","read":true}
+{"file":"src/components/skills/DeleteSkillDialog.tsx","line":167,"position":"jsx-text","key":"skills.deleteConfirm.restoresLibrary","value":"Eligible locations will use a library version after removal.","read":true}
+{"file":"src/components/skills/DeleteSkillDialog.tsx","line":182,"position":"expr","key":"skills.deleteConfirm.retryPreview","value":"Reload Scope","read":true}
+{"file":"src/components/skills/DeleteSkillDialog.tsx","line":184,"position":"expr","key":"skills.deleteConfirm.retryDelete","value":"Retry Delete","read":true}
+{"file":"src/components/skills/DeleteSkillDialog.tsx","line":185,"position":"expr","key":"skills.deleteConfirm.confirm","value":"Delete Skill","read":true}
+{"file":"src/components/skills/detail/DetailPrimitives.tsx","line":79,"position":"jsx-attr","key":"common.copy","value":"Copy","read":true}
+{"file":"src/components/skills/detail/DetailPrimitives.tsx","line":86,"position":"jsx-text","key":"common.copy","value":"Copy","read":true}
+{"file":"src/components/skills/detail/DetailPrimitives.tsx","line":137,"position":"expr","key":"skills.detail.emptyContent","value":"This skill has no content","read":true}
+{"file":"src/components/skills/detail/DetailPrimitives.tsx","line":142,"position":"jsx-text","key":"skills.detail.retry","value":"Retry","read":true}
+{"file":"src/components/skills/detail/DetailPrimitives.tsx","line":175,"position":"expr","key":"skills.externalLink","value":"Open with the system default app","read":true}
+{"file":"src/components/skills/detail/DetailPrimitives.tsx","line":180,"position":"expr","key":"skills.card.sourceOpenFailed","value":"Could not open the source. Try again later.","read":true}
+{"file":"src/components/skills/discover/DiscoverDetailPanel.tsx","line":207,"position":"jsx-attr","key":"skills.discover.weeklyInstalls","value":"Weekly Installs","read":true}
+{"file":"src/components/skills/discover/DiscoverDetailPanel.tsx","line":218,"position":"jsx-attr","key":"skills.discover.starsLabel","value":"Stars","read":true}
+{"file":"src/components/skills/discover/DiscoverDetailPanel.tsx","line":234,"position":"jsx-text","key":"skills.discover.install","value":"Install","read":true}
+{"file":"src/components/skills/discover/DiscoverDetailPanel.tsx","line":236,"position":"jsx-attr","key":"common.close","value":"Close","read":true}
+{"file":"src/components/skills/discover/DiscoverDetailPanel.tsx","line":265,"position":"jsx-text","key":"skills.discover.loadDetailErrorTitle","value":"Failed to load detailed information.","read":true}
+{"file":"src/components/skills/discover/DiscoverDetailPanel.tsx","line":266,"position":"jsx-text","key":"skills.discover.loadDetailErrorHint","value":"Please check your network or try again later.","read":true}
+{"file":"src/components/skills/discover/DiscoverDetailPanel.tsx","line":274,"position":"jsx-text","key":"skills.discover.overview","value":"Overview","read":true}
+{"file":"src/components/skills/discover/DiscoverDetailPanel.tsx","line":306,"position":"jsx-text","key":"skills.discover.skillContent","value":"Skill Content","read":true}
+{"file":"src/components/skills/discover/DiscoverDetailPanel.tsx","line":327,"position":"jsx-text","key":"skills.discover.installViaCli","value":"Install via CLI","read":true}
+{"file":"src/components/skills/discover/DiscoverDetailPanel.tsx","line":354,"position":"jsx-text","key":"skills.discover.installedWorkspaces","value":"Installed Workspaces","read":true}
+{"file":"src/components/skills/discover/DiscoverDetailPanel.tsx","line":361,"position":"jsx-text","key":"context.global","value":"Global","read":true}
+{"file":"src/components/skills/discover/DiscoverDetailPanel.tsx","line":377,"position":"jsx-text","key":"skills.discover.securityAudits","value":"Security Audits","read":true}
+{"file":"src/components/skills/discover/DiscoverDetailPanel.tsx","line":410,"position":"jsx-text","key":"skills.discover.installedOn","value":"Agent Installs","read":true}
+{"file":"src/components/skills/discover/DiscoverDetailPanel.tsx","line":430,"position":"jsx-text","key":"skills.discover.firstSeen","value":"First Seen","read":true}
+{"file":"src/components/skills/discover/DiscoverListPanel.tsx","line":97,"position":"jsx-attr","key":"skills.discover.official","value":"Official","read":true}
+{"file":"src/components/skills/discover/DiscoverListPanel.tsx","line":108,"position":"jsx-text","key":"skills.discover.installed","value":"Installed","read":true}
+{"file":"src/components/skills/discover/DiscoverListPanel.tsx","line":206,"position":"jsx-attr","key":"skills.discover.searchPlaceholder","value":"Search skills...","read":true}
+{"file":"src/components/skills/discover/DiscoverListPanel.tsx","line":238,"position":"jsx-text","key":"skills.discover.tabs.popular","value":"All Time","read":true}
+{"file":"src/components/skills/discover/DiscoverListPanel.tsx","line":245,"position":"jsx-text","key":"skills.discover.tabs.trending","value":"Trending","read":true}
+{"file":"src/components/skills/discover/DiscoverListPanel.tsx","line":252,"position":"jsx-text","key":"skills.discover.tabs.hot","value":"Hot","read":true}
+{"file":"src/components/skills/discover/DiscoverListPanel.tsx","line":261,"position":"expr","key":"skills.discover.searching","value":"Searching...","read":true}
+{"file":"src/components/skills/discover/DiscoverListPanel.tsx","line":285,"position":"jsx-text","key":"skills.discover.error","value":"Search failed","read":true}
+{"file":"src/components/skills/discover/DiscoverListPanel.tsx","line":288,"position":"jsx-text","key":"skills.discover.retry","value":"Retry","read":true}
+{"file":"src/components/skills/discover/DiscoverListPanel.tsx","line":293,"position":"jsx-text","key":"skills.discover.noResults","value":"No skills found","read":true}
+{"file":"src/components/skills/discover/DiscoverListPanel.tsx","line":294,"position":"jsx-text","key":"skills.discover.noResultsHint","value":"Try different keywords","read":true}
+{"file":"src/components/skills/EmptyStates.tsx","line":30,"position":"jsx-text","key":"skills.empty","value":"No skills installed","read":true}
+{"file":"src/components/skills/EmptyStates.tsx","line":33,"position":"jsx-text","key":"skills.emptyHint","value":"Click \"Add\" to install your first skill","read":true}
+{"file":"src/components/skills/EmptyStates.tsx","line":38,"position":"jsx-text","key":"skills.add","value":"Add","read":true}
+{"file":"src/components/skills/EmptyStates.tsx","line":60,"position":"jsx-text","key":"skills.empty","value":"No skills installed","read":true}
+{"file":"src/components/skills/EmptyStates.tsx","line":62,"position":"jsx-text","key":"skills.emptyHint","value":"Click \"Add\" to install your first skill","read":true}
+{"file":"src/components/skills/EmptyStates.tsx","line":67,"position":"jsx-text","key":"skills.add","value":"Add","read":true}
+{"file":"src/components/skills/EmptyStates.tsx","line":87,"position":"expr","key":"skills.filter.emptyCombined","value":"No Skills match the current filters","read":true}
+{"file":"src/components/skills/EmptyStates.tsx","line":89,"position":"expr","key":"skills.filter.emptyAgent","value":"No Skills available to {{name}}","read":true}
+{"file":"src/components/skills/EmptyStates.tsx","line":91,"position":"expr","key":"skills.filter.emptySearch","value":"No Skills match “{{query}}”","read":true}
+{"file":"src/components/skills/EmptyStates.tsx","line":92,"position":"expr","key":"skills.filter.emptyCombined","value":"No Skills match the current filters","read":true}
+{"file":"src/components/skills/EmptyStates.tsx","line":111,"position":"jsx-attr","key":"skills.projectUnavailableTitle","value":"Project skills unavailable","read":true}
+{"file":"src/components/skills/EmptyStates.tsx","line":119,"position":"jsx-text","key":"skills.projectUnavailableTitle","value":"Project skills unavailable","read":true}
+{"file":"src/components/skills/EmptyStates.tsx","line":122,"position":"jsx-text","key":"skills.projectUnavailableDescription","value":"The current system cannot access this project. Check its location, or switch to a system where the project has been added.","read":true}
+{"file":"src/components/skills/InstallPath.tsx","line":33,"position":"expr","key":"skills.installPath.copyFailed","value":"Could not copy the path. Please try again.","read":true}
+{"file":"src/components/skills/InstallPath.tsx","line":44,"position":"jsx-attr","key":"skills.installPath.viewFullPath","value":"View full path: {{path}}","read":true}
+{"file":"src/components/skills/InstallPath.tsx","line":60,"position":"jsx-attr","key":"skills.installPath.copyPath","value":"Copy path","read":true}
+{"file":"src/components/skills/InstallPath.tsx","line":64,"position":"jsx-text","key":"skills.installPath.copyPath","value":"Copy path","read":true}
+{"file":"src/components/skills/InstallPath.tsx","line":66,"position":"expr","key":"skills.installPath.copied","value":"Full path copied","read":true}
+{"file":"src/components/skills/LibraryIdentity.tsx","line":20,"position":"jsx-text","key":"libraries.skillCount","value":"{{count}} Skills","read":true}
+{"file":"src/components/skills/ManageAgentsDialog.tsx","line":76,"position":"jsx-attr","key":"common.close","value":"Close","read":true}
+{"file":"src/components/skills/ManageAgentsDialog.tsx","line":86,"position":"jsx-attr","key":"agentSelection.manageEmpty","value":"No Agents are currently available to manage","read":true}
+{"file":"src/components/skills/ManageAgentsDialog.tsx","line":176,"position":"jsx-text","key":"skills.manageAgents.failedDescription","value":"The change could not be completed. Your current selection is still available, so you can retry or continue viewing the Skill content.","read":true}
+{"file":"src/components/skills/ManageAgentsDialog.tsx","line":184,"position":"jsx-attr","key":"agentSelection.manageEmpty","value":"No Agents are currently available to manage","read":true}
+{"file":"src/components/skills/ManageAgentsDialog.tsx","line":193,"position":"jsx-text","key":"common.close","value":"Close","read":true}
+{"file":"src/components/skills/ManageAgentsDialog.tsx","line":197,"position":"jsx-text","key":"skills.manageAgents.discardConfirm","value":"Discard unsaved changes?","read":true}
+{"file":"src/components/skills/ManageAgentsDialog.tsx","line":200,"position":"expr","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/components/skills/ManageAgentsDialog.tsx","line":200,"position":"expr","key":"skills.manageAgents.discard","value":"Discard changes","read":true}
+{"file":"src/components/skills/ManageAgentsDialog.tsx","line":203,"position":"jsx-text","key":"skills.manageAgents.continueEditing","value":"Continue editing","read":true}
+{"file":"src/components/skills/ManageAgentsDialog.tsx","line":210,"position":"expr","key":"skills.manageAgents.save","value":"Save Changes","read":true}
+{"file":"src/components/skills/ManageAgentsDialog.tsx","line":210,"position":"expr","key":"skills.manageAgents.confirmRemoval","value":"Confirm removal","read":true}
+{"file":"src/components/skills/ManageAgentsDialog.tsx","line":222,"position":"expr","key":"skills.manageAgents.title","value":"Manage Agents Linked to “{{name}}”","read":true}
+{"file":"src/components/skills/ManageAgentsDialog.tsx","line":229,"position":"jsx-text","key":"skills.manageAgents.description","value":"Choose which Agents can use \"{{name}}\".","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":76,"position":"expr","key":"libraries.linkableAgents","value":"Associate when selected","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":77,"position":"expr","key":"libraries.linkableAgentsHelp","value":"The selected Skill Libraries are linked into these Agents' dedicated Skill directories.","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":93,"position":"expr","key":"libraries.manageGlobal","value":"Manage Global Skill Libraries","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":95,"position":"expr","key":"libraries.manageProject","value":"Manage Skill Libraries for “{{name}}”","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":96,"position":"expr","key":"libraries.manageProjectFallback","value":"Manage Project Skill Libraries","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":236,"position":"jsx-attr","key":"common.close","value":"Close","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":241,"position":"jsx-text","key":"libraries.manageDescription","value":"Choose and order the Skill Libraries used here, and select the Agents that need links. This location will keep following future member changes.","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":307,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":358,"position":"expr","key":"libraries.saveError","value":"Skill Library settings could not be saved. Try again.","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":424,"position":"jsx-text","key":"libraries.appliedSection","value":"Applied Skill Libraries","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":427,"position":"jsx-attr","key":"libraries.priorityHelp","value":"Skill Libraries closer to the top have higher priority.","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":431,"position":"jsx-text","key":"libraries.priorityHelp","value":"Skill Libraries closer to the top have higher priority.","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":435,"position":"jsx-text","key":"libraries.selectedCount","value":"{{count}} selected","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":440,"position":"jsx-attr","key":"libraries.priorityOrder","value":"Skill Library priority","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":453,"position":"jsx-text","key":"libraries.noneSelected","value":"No Skill Libraries selected","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":458,"position":"jsx-text","key":"libraries.availableSection","value":"Unapplied Skill Libraries","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":467,"position":"jsx-text","key":"libraries.noLibrariesAvailable","value":"No Skill Libraries are available","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":474,"position":"jsx-text","key":"agentSelection.copyTitle","value":"Associated Agents","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":476,"position":"jsx-text","key":"agentSelection.ownDirectory.selectedCount","value":"{{count}} Agents selected","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":481,"position":"jsx-text","key":"libraries.selectLibraryBeforeAgents","value":"Select a Skill Library to associate Agents","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":488,"position":"jsx-attr","key":"libraries.noLinkableAgents","value":"No Agents can be associated here","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":506,"position":"jsx-text","key":"libraries.copyOnlyUnsupported","value":"{{names}} require copied or transformed Skills and cannot be associated with Skill Libraries.","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":512,"position":"jsx-text","key":"libraries.unavailableSavedAgents","value":"Saved associations currently unavailable","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":540,"position":"jsx-text","key":"libraries.agentPathMigration","value":"Reapplying moves {{name}} Library links from {{from}} to {{to}}.","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":570,"position":"jsx-attr","key":"libraries.moveUp","value":"Raise priority for {{name}}","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":573,"position":"jsx-attr","key":"libraries.moveDown","value":"Lower priority for {{name}}","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":596,"position":"jsx-text","key":"common.loading","value":"Loading...","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":615,"position":"jsx-text","key":"libraries.selectionLoadError","value":"Skill Libraries or associated Agents could not be loaded.","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":616,"position":"jsx-text","key":"common.retry","value":"Retry","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":628,"position":"jsx-text","key":"libraries.pending","value":"Unfinished change","read":true}
+{"file":"src/components/skills/ManageLibraryApplicationDialog.tsx","line":629,"position":"jsx-text","key":"libraries.pendingDescription","value":"The previous Library change is unfinished. Skill Deck will continue toward the confirmed target from the current directory state.","read":true}
+{"file":"src/components/skills/skill-search/SkillSearch.tsx","line":77,"position":"jsx-text","key":"skills.discover.installed","value":"Installed","read":true}
+{"file":"src/components/skills/skill-search/SkillSearch.tsx","line":86,"position":"expr","key":"skills.discover.install","value":"Install","read":true}
+{"file":"src/components/skills/skill-search/SkillSearch.tsx","line":165,"position":"jsx-attr","key":"skills.discover.searchPlaceholder","value":"Search skills...","read":true}
+{"file":"src/components/skills/skill-search/SkillSearch.tsx","line":166,"position":"jsx-attr","key":"skills.discover.searchPlaceholder","value":"Search skills...","read":true}
+{"file":"src/components/skills/skill-search/SkillSearch.tsx","line":178,"position":"jsx-text","key":"skills.discover.minCharsHint","value":"Type keywords to search online skills","read":true}
+{"file":"src/components/skills/skill-search/SkillSearch.tsx","line":198,"position":"jsx-text","key":"skills.discover.error","value":"Search failed","read":true}
+{"file":"src/components/skills/skill-search/SkillSearch.tsx","line":201,"position":"jsx-text","key":"skills.discover.retry","value":"Retry","read":true}
+{"file":"src/components/skills/skill-search/SkillSearch.tsx","line":207,"position":"jsx-text","key":"skills.discover.noResults","value":"No skills found","read":true}
+{"file":"src/components/skills/skill-search/SkillSearch.tsx","line":208,"position":"jsx-text","key":"skills.discover.noResultsHint","value":"Try different keywords","read":true}
+{"file":"src/components/skills/SkillCard.tsx","line":90,"position":"expr","key":"skills.card.duplicateLocations","value":"Installed in both Global and Project","read":true}
+{"file":"src/components/skills/SkillCard.tsx","line":91,"position":"expr","key":"skills.card.duplicateAgentInstall","value":"Installed in both common and Agent-specific directories","read":true}
+{"file":"src/components/skills/SkillCard.tsx","line":95,"position":"expr","key":"skills.updateStatusLabel.localSource","value":"Local Skill","read":true}
+{"file":"src/components/skills/SkillCard.tsx","line":156,"position":"jsx-text","key":"skills.updateDone","value":"Updated","read":true}
+{"file":"src/components/skills/SkillCard.tsx","line":158,"position":"jsx-text","key":"skills.updateFailed","value":"Failed","read":true}
+{"file":"src/components/skills/SkillCard.tsx","line":186,"position":"jsx-text","key":"skills.refBadge","value":"branch: {{ref}}","read":true}
+{"file":"src/components/skills/SkillCard.tsx","line":195,"position":"jsx-text","key":"skills.updated","value":"Updated {{time}}","read":true}
+{"file":"src/components/skills/SkillCard.tsx","line":227,"position":"jsx-attr","key":"skills.actions.update","value":"Update","read":true}
+{"file":"src/components/skills/SkillCard.tsx","line":228,"position":"jsx-attr","key":"skills.actions.update","value":"Update","read":true}
+{"file":"src/components/skills/SkillCard.tsx","line":243,"position":"jsx-attr","key":"skills.actions.copyToProject","value":"Copy to Project","read":true}
+{"file":"src/components/skills/SkillCard.tsx","line":244,"position":"jsx-attr","key":"skills.actions.copyToProject","value":"Copy to Project","read":true}
+{"file":"src/components/skills/SkillCard.tsx","line":259,"position":"jsx-attr","key":"skills.manageAgents.action","value":"Manage linked Agents","read":true}
+{"file":"src/components/skills/SkillCard.tsx","line":260,"position":"jsx-attr","key":"skills.manageAgents.action","value":"Manage linked Agents","read":true}
+{"file":"src/components/skills/SkillCard.tsx","line":275,"position":"jsx-attr","key":"skills.actions.delete","value":"Delete","read":true}
+{"file":"src/components/skills/SkillCard.tsx","line":276,"position":"jsx-attr","key":"skills.actions.delete","value":"Delete","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":116,"position":"expr","key":"skills.card.sourceOpenFailed","value":"Could not open the source. Try again later.","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":179,"position":"jsx-attr","key":"skills.updateStatusLabel.available","value":"New version available","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":187,"position":"jsx-text","key":"skills.updateDone","value":"Updated","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":192,"position":"jsx-text","key":"skills.updateFailed","value":"Failed","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":200,"position":"jsx-attr","key":"skills.actions.update","value":"Update","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":211,"position":"jsx-attr","key":"skills.checkUpToDate","value":"Up to date","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":212,"position":"jsx-attr","key":"skills.checkUpToDate","value":"Up to date","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":225,"position":"expr","key":"skills.checkUpdates","value":"Check Updates","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":240,"position":"jsx-attr","key":"skills.actions.copyToProject","value":"Copy to Project","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":251,"position":"jsx-attr","key":"skills.manageAgents.action","value":"Manage linked Agents","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":261,"position":"jsx-attr","key":"skills.actions.delete","value":"Delete","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":271,"position":"jsx-attr","key":"common.close","value":"Close","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":285,"position":"jsx-text","key":"skills.detail.libraryVersions","value":"This scope also uses same-name library versions. Manage them in their libraries:","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":307,"position":"jsx-text","key":"skills.updateStatusLabel.localSource","value":"Local Skill","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":328,"position":"jsx-text","key":"skills.updateEvidence.actions.configureToken","value":"Check Git credentials","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":340,"position":"jsx-text","key":"skills.updateEvidence.actions.openSource","value":"Open source","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":352,"position":"jsx-text","key":"skills.updateEvidence.actions.retry","value":"Check again","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":362,"position":"jsx-attr","key":"skills.detail.installed","value":"Installed","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":367,"position":"jsx-attr","key":"skills.detail.updated","value":"Updated","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":372,"position":"jsx-attr","key":"skills.detail.installPath","value":"Install Path","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":386,"position":"jsx-text","key":"skills.detail.agents","value":"Associated Agents","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":401,"position":"jsx-text","key":"skills.detail.noAgents","value":"Not installed to any agent","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":411,"position":"jsx-text","key":"skills.detail.extraCopiesNamedHint","value":"also have this Skill installed in their own Skill directories.","read":true}
+{"file":"src/components/skills/SkillDetailPanel.tsx","line":414,"position":"expr","key":"skills.detail.extraCopiesCountHint","value":"This Skill is also installed in {{count}} Agent-specific Skill directories.","read":true}
+{"file":"src/components/skills/SkillLocationLabel.tsx","line":20,"position":"expr","key":"context.global","value":"Global","read":true}
+{"file":"src/components/skills/SkillLocationLabel.tsx","line":21,"position":"expr","key":"context.projects","value":"Projects","read":true}
+{"file":"src/components/skills/SkillLocationLabel.tsx","line":21,"position":"expr","key":"skills.installPath.project","value":"Project: {{name}}","read":true}
+{"file":"src/components/skills/SkillLocationLabel.tsx","line":23,"position":"expr","key":"skills.installPath.nativeEnvironment","value":"This device","read":true}
+{"file":"src/components/skills/SkillsPanel.tsx","line":420,"position":"jsx-text","key":"skills.loadError","value":"Unable to load skills","read":true}
+{"file":"src/components/skills/SkillsPanel.tsx","line":432,"position":"jsx-text","key":"skills.retry","value":"Retry","read":true}
+{"file":"src/components/skills/SkillsPanel.tsx","line":476,"position":"jsx-text","key":"skills.retry","value":"Retry","read":true}
+{"file":"src/components/skills/SkillsPanel.tsx","line":489,"position":"jsx-attr","key":"skills.projectSkills","value":"Project Skills","read":true}
+{"file":"src/components/skills/SkillsPanel.tsx","line":515,"position":"jsx-attr","key":"skills.projectSkills","value":"Project Skills","read":true}
+{"file":"src/components/skills/SkillsPanel.tsx","line":546,"position":"jsx-attr","key":"skills.globalSkills","value":"Global Skills","read":true}
+{"file":"src/components/skills/SkillsSection.tsx","line":156,"position":"expr","key":"skills.updateAllProgress","value":"Updating {{completed}}/{{total}}","read":true}
+{"file":"src/components/skills/SkillsSection.tsx","line":160,"position":"expr","key":"skills.updateCheckIncompleteCount","value":"{{count}} checks incomplete","read":true}
+{"file":"src/components/skills/SkillsSection.tsx","line":163,"position":"expr","key":"skills.uncheckableUpdateCount","value":"{{count}} cannot check updates yet","read":true}
+{"file":"src/components/skills/SkillsSection.tsx","line":169,"position":"expr","key":"skills.upToDate","value":"Everything is up to date","read":true}
+{"file":"src/components/skills/SkillsSection.tsx","line":173,"position":"expr","key":"skills.updateStatusLabel.checkIncomplete","value":"Update check incomplete","read":true}
+{"file":"src/components/skills/SkillsSection.tsx","line":193,"position":"expr","key":"skills.checking","value":"Checking...","read":true}
+{"file":"src/components/skills/SkillsSection.tsx","line":290,"position":"jsx-attr","key":"skills.updateStatusLabel.checkIncomplete","value":"Update check incomplete","read":true}
+{"file":"src/components/skills/SkillsSection.tsx","line":321,"position":"jsx-text","key":"skills.checking","value":"Checking...","read":true}
+{"file":"src/components/skills/SkillsSection.tsx","line":343,"position":"jsx-text","key":"skills.updateAll","value":"Update All","read":true}
+{"file":"src/components/skills/SkillsSection.tsx","line":350,"position":"jsx-text","key":"skills.checkCompleted","value":"Check complete","read":true}
+{"file":"src/components/skills/SkillsSection.tsx","line":365,"position":"jsx-text","key":"skills.checkUpdates","value":"Check Updates","read":true}
+{"file":"src/components/skills/SkillsSection.tsx","line":378,"position":"jsx-text","key":"libraries.manage","value":"Manage Skill Libraries","read":true}
+{"file":"src/components/skills/SkillsSection.tsx","line":394,"position":"jsx-text","key":"skills.add","value":"Add","read":true}
+{"file":"src/components/skills/SkillsToolbar.tsx","line":74,"position":"jsx-attr","key":"skills.search","value":"Search skills…","read":true}
+{"file":"src/components/skills/SkillsToolbar.tsx","line":77,"position":"jsx-attr","key":"skills.search","value":"Search skills…","read":true}
+{"file":"src/components/skills/SkillsToolbar.tsx","line":115,"position":"jsx-text","key":"skills.sync","value":"Refresh","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":116,"position":"expr","key":"skills.updatePlan.installLocation","value":"Location","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":116,"position":"expr","key":"skills.updatePlan.commonDirectory","value":"Common directory","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":158,"position":"jsx-text","key":"skills.updatePlan.noUpdateLocations","value":"No updatable locations","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":161,"position":"jsx-attr","key":"skills.updatePlan.updateLocations","value":"Locations to update","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":205,"position":"expr","key":"skills.updatePlan.stopping","value":"Stopping update…","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":209,"position":"expr","key":"skills.updatePlan.currentSkill","value":"Processing {{skillName}}","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":210,"position":"expr","key":"skills.updatePlan.executionDescription","value":"Fetching, validating, and writing the latest content.","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":216,"position":"jsx-text","key":"skills.updatePlan.progress","value":"{{current}} of {{total}} Skills processed.","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":310,"position":"expr","key":"skills.updatePlan.globalTitle","value":"Update Global Skills","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":311,"position":"expr","key":"skills.updatePlan.projectTitle","value":"Update Skills in {{project}}","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":312,"position":"expr","key":"skills.updatePlan.resultTitle","value":"Update results","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":345,"position":"jsx-attr","key":"common.close","value":"Close","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":350,"position":"jsx-text","key":"skills.updatePlan.readyDescription","value":"Review the locations to update.","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":359,"position":"jsx-text","key":"skills.updatePlan.loadingPreview","value":"Preparing content for the selected Skills...","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":366,"position":"expr","key":"skills.updatePlan.previewError","value":"Unable to prepare the update preview.","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":380,"position":"jsx-text","key":"libraries.redirectConfirmation","value":"The download redirected to {{host}}. Confirm to continue.","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":384,"position":"jsx-text","key":"skills.updatePlan.source","value":"Source","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":395,"position":"jsx-text","key":"skills.updatePlan.blocked","value":"Cannot update yet","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":422,"position":"expr","key":"skills.updatePlan.resultOutcome.failed","value":"Failed","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":430,"position":"jsx-text","key":"skills.updatePlan.resultSummary","value":"{{success}} succeeded, {{partial}} partial, {{failed}} failed, {{skipped}} not run or stopped","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":489,"position":"jsx-text","key":"skills.updatePlan.skippedCopies","value":"These copies were not updated:","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":496,"position":"jsx-text","key":"skills.updatePlan.preservedReferences","value":"Independent references were kept and excluded from this update.","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":509,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":511,"position":"jsx-text","key":"common.retry","value":"Retry","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":515,"position":"jsx-text","key":"common.close","value":"Close","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":517,"position":"jsx-text","key":"skills.updatePlan.preserveConflictDefault","value":"Selected copies will be overwritten. Unselected copies will not be updated.","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":518,"position":"jsx-text","key":"skills.updatePlan.blockedCount","value":"{{count}} unavailable","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":520,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":521,"position":"jsx-text","key":"common.retry","value":"Retry","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":523,"position":"jsx-text","key":"skills.updatePlan.confirm","value":"Confirm update","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":539,"position":"expr","key":"skills.updatePlan.stop","value":"Stop update","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":539,"position":"expr","key":"skills.updatePlan.stopping","value":"Stopping update…","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":556,"position":"jsx-text","key":"skills.updatePlan.retryFailed","value":"Retry failed","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":559,"position":"jsx-text","key":"common.close","value":"Close","read":true}
+{"file":"src/components/skills/UpdatePlanDialog.tsx","line":562,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/components/source-discovery/RedirectHostConfirmation.tsx","line":23,"position":"jsx-text","key":"addSkill.confirm.redirectTitle","value":"Download redirected to another site","read":true}
+{"file":"src/components/source-discovery/RedirectHostConfirmation.tsx","line":25,"position":"jsx-text","key":"addSkill.confirm.redirectBody","value":"The Skill content will be downloaded from {{host}}. Continue only if you trust this site.","read":true}
+{"file":"src/components/source-discovery/RedirectHostConfirmation.tsx","line":33,"position":"jsx-attr","key":"addSkill.confirm.redirectAcknowledge","value":"I trust this download site and want to continue","read":true}
+{"file":"src/components/source-discovery/RedirectHostConfirmation.tsx","line":36,"position":"jsx-text","key":"addSkill.confirm.redirectAcknowledge","value":"I trust this download site and want to continue","read":true}
+{"file":"src/components/update-dialog.tsx","line":50,"position":"jsx-attr","key":"common.close","value":"Close","read":true}
+{"file":"src/components/update-dialog.tsx","line":58,"position":"jsx-text","key":"settings.update.newVersionTitle","value":"New version v{{version}} available","read":true}
+{"file":"src/components/update-dialog.tsx","line":61,"position":"jsx-text","key":"settings.update.availableDesc","value":"Download and install the update to get the latest features and bug fixes.","read":true}
+{"file":"src/components/update-dialog.tsx","line":81,"position":"jsx-text","key":"settings.update.noReleaseNotes","value":"View details on GitHub","read":true}
+{"file":"src/components/update-dialog.tsx","line":93,"position":"jsx-text","key":"settings.update.later","value":"Later","read":true}
+{"file":"src/components/update-dialog.tsx","line":100,"position":"jsx-text","key":"settings.update.updateNow","value":"Update Now","read":true}
+{"file":"src/components/update-dialog.tsx","line":108,"position":"jsx-text","key":"settings.update.updatingTitle","value":"Updating to v{{version}}","read":true}
+{"file":"src/components/update-dialog.tsx","line":121,"position":"jsx-attr","key":"settings.update.downloadProgressLabel","value":"Application update download progress","read":true}
+{"file":"src/components/update-dialog.tsx","line":133,"position":"jsx-text","key":"settings.update.hide","value":"Hide","read":true}
+{"file":"src/components/update-dialog.tsx","line":142,"position":"expr","key":"settings.update.cancel","value":"Cancel","read":true}
+{"file":"src/components/update-dialog.tsx","line":149,"position":"jsx-text","key":"settings.update.updatingTitle","value":"Updating to v{{version}}","read":true}
+{"file":"src/components/update-dialog.tsx","line":157,"position":"jsx-text","key":"settings.update.hide","value":"Hide","read":true}
+{"file":"src/components/update-dialog.tsx","line":165,"position":"jsx-text","key":"settings.update.readyTitle","value":"Update Ready","read":true}
+{"file":"src/components/update-dialog.tsx","line":168,"position":"jsx-text","key":"settings.update.readyDesc","value":"v{{version}} has been downloaded. Restart the app to complete the update.","read":true}
+{"file":"src/components/update-dialog.tsx","line":178,"position":"jsx-text","key":"settings.update.laterRestart","value":"Restart Later","read":true}
+{"file":"src/components/update-dialog.tsx","line":185,"position":"jsx-text","key":"settings.update.restartNow","value":"Restart Now","read":true}
+{"file":"src/components/update-dialog.tsx","line":192,"position":"jsx-text","key":"settings.update.errorTitle","value":"Update could not be completed","read":true}
+{"file":"src/components/update-dialog.tsx","line":193,"position":"jsx-text","key":"settings.update.errorDescription","value":"Your current version is unchanged. You can hide this dialog and retry later.","read":true}
+{"file":"src/components/update-dialog.tsx","line":198,"position":"expr","key":"settings.update.installError","value":"The update could not be downloaded or installed.","read":true}
+{"file":"src/components/update-dialog.tsx","line":199,"position":"expr","key":"settings.update.checkError","value":"Failed to check for updates","read":true}
+{"file":"src/components/update-dialog.tsx","line":204,"position":"jsx-text","key":"settings.update.hide","value":"Hide","read":true}
+{"file":"src/components/update-dialog.tsx","line":210,"position":"jsx-text","key":"settings.update.retry","value":"Retry","read":true}
+{"file":"src/layouts/MainLayout.tsx","line":24,"position":"jsx-text","key":"common.loading","value":"Loading...","read":true}
+{"file":"src/lib/environments/presentation.ts","line":13,"position":"expr","key":"context.environmentWslName","value":"WSL · {{environment}}","read":true}
+{"file":"src/lib/environments/presentation.ts","line":23,"position":"expr","key":"context.environmentWslName","value":"WSL · {{environment}}","read":true}
+{"file":"src/lib/libraries/update-summary.ts","line":74,"position":"expr","key":"libraries.updateSummary.incomplete","value":"This check did not finish","read":true}
+{"file":"src/lib/libraries/update-summary.ts","line":88,"position":"expr","key":"libraries.updateSummary.allUpToDate","value":"All up to date","read":true}
+{"file":"src/lib/libraries/update-summary.ts","line":95,"position":"expr","key":"libraries.updateSummary.moreAttention","value":"{{count}} more need attention","read":true}
+{"file":"src/lib/libraries/update-summary.ts","line":101,"position":"expr","key":"libraries.updateSummary.incomplete","value":"This check did not finish","read":true}
+{"file":"src/lib/mutation-results.ts","line":42,"position":"expr","key":"mutation.result.errors.libraryContentTarget","value":"This target is a library member directory. Manage it from its library: {{path}}","read":true}
+{"file":"src/lib/mutation-results.ts","line":43,"position":"expr","key":"mutation.result.errors.installedSkillFormat","value":"The source Skill requires a valid name and description before copying or adding Agent associations: {{path}}","read":true}
+{"file":"src/lib/mutation-results.ts","line":44,"position":"expr","key":"mutation.result.errors.sharedSkillLinkSource","value":"This Skill has no shared installation to link to. Select copy mode.","read":true}
+{"file":"src/lib/mutation-results.ts","line":45,"position":"expr","key":"mutation.result.errors.eveSingleFile","value":"Only directory-based Eve Skills are supported. This single-file installation cannot be maintained: {{path}}","read":true}
+{"file":"src/lib/mutation-results.ts","line":46,"position":"expr","key":"mutation.result.errors.installedSkillSourceAmbiguous","value":"The Skill source or installation location is ambiguous: {{path}}","read":true}
+{"file":"src/lib/mutation-results.ts","line":47,"position":"expr","key":"addSkill.source.error.acquisitionReason.directoryLinksUnsupported","value":"Skill updates cannot locate source content through directory links. Use a real directory or import the content as a local Skill.","read":true}
+{"file":"src/lib/mutation-results.ts","line":48,"position":"expr","key":"mutation.result.errors.sourceContentCapacity","value":"The source exceeds the temporary content retention limit. Use a smaller source.","read":true}
+{"file":"src/lib/mutation-results.ts","line":49,"position":"expr","key":"mutation.result.errors.preparedContentCapacity","value":"The temporary content retention limit has been reached. Select fewer Skills or use a smaller source and try again.","read":true}
+{"file":"src/lib/mutationStatus.ts","line":12,"position":"expr","key":"mutation.activityWithSubject","value":"{{operation}} · {{phase}} · {{subject}}","read":true}
+{"file":"src/lib/mutationStatus.ts","line":13,"position":"expr","key":"mutation.activity","value":"{{operation}} · {{phase}}","read":true}
+{"file":"src/lifecycle/UnsavedChangesProvider.tsx","line":143,"position":"jsx-text","key":"settings.unsavedChanges.title","value":"Discard unsaved changes?","read":true}
+{"file":"src/lifecycle/UnsavedChangesProvider.tsx","line":145,"position":"jsx-text","key":"settings.unsavedChanges.description","value":"Changes on this page have not been saved. Leaving will discard them.","read":true}
+{"file":"src/lifecycle/UnsavedChangesProvider.tsx","line":150,"position":"jsx-text","key":"settings.unsavedChanges.stay","value":"Stay on this page","read":true}
+{"file":"src/lifecycle/UnsavedChangesProvider.tsx","line":153,"position":"jsx-text","key":"settings.unsavedChanges.discard","value":"Discard changes","read":true}
+{"file":"src/lifecycle/WindowLifecycleProvider.tsx","line":56,"position":"expr","key":"mutation.interruption.checkFailed","value":"Could not confirm the current operation status. Try again shortly.","read":true}
+{"file":"src/lifecycle/WindowLifecycleProvider.tsx","line":91,"position":"expr","key":"mutation.interruption.cancelFailed","value":"Could not cancel the operation. Try again shortly.","read":true}
+{"file":"src/pages/DiscoverPage.tsx","line":153,"position":"jsx-text","key":"skills.discover.emptyTitle","value":"Explore the Ecosystem","read":true}
+{"file":"src/pages/DiscoverPage.tsx","line":156,"position":"jsx-text","key":"skills.discover.emptyDescription","value":"Browse the directory or search for specific agent skills. Select an item from the list to preview its capabilities and install it into your agent deck.","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":278,"position":"expr","key":"context.environmentWslName","value":"WSL · {{environment}}","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":279,"position":"expr","key":"libraries.addFlow.environment.native","value":"Current system","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":447,"position":"jsx-attr","key":"libraries.updateCount","value":"Update {{count}}","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":451,"position":"jsx-text","key":"libraries.updateCount","value":"Update {{count}}","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":455,"position":"jsx-text","key":"libraries.updateCount","value":"Update {{count}}","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":463,"position":"jsx-text","key":"skills.checkUpToDate","value":"Up to date","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":474,"position":"jsx-attr","key":"libraries.checkUpdates","value":"Check for Updates","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":480,"position":"jsx-text","key":"libraries.checkUpdates","value":"Check for Updates","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":547,"position":"jsx-text","key":"libraries.loadError","value":"Skill Libraries could not be loaded.","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":557,"position":"jsx-text","key":"common.retry","value":"Retry","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":574,"position":"jsx-text","key":"libraries.loadError","value":"Skill Libraries could not be loaded.","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":580,"position":"jsx-text","key":"common.retry","value":"Retry","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":592,"position":"jsx-text","key":"libraries.skillCount","value":"{{count}} Skills","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":650,"position":"jsx-attr","key":"libraries.addSkill","value":"Add Skill","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":653,"position":"jsx-text","key":"libraries.addSkill","value":"Add Skill","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":691,"position":"jsx-attr","key":"libraries.searchSkills","value":"Search Library Skills…","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":692,"position":"jsx-attr","key":"libraries.searchSkills","value":"Search Library Skills…","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":747,"position":"jsx-text","key":"libraries.membership.retry","value":"Retry synchronization","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":760,"position":"jsx-text","key":"libraries.empty","value":"This Library has no Skills yet.","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":768,"position":"jsx-text","key":"libraries.addSkill","value":"Add Skill","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":773,"position":"jsx-text","key":"libraries.noSearchResults","value":"No Library Skills match this search.","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":839,"position":"jsx-text","key":"libraries.detailLoadError","value":"The selected Skill Library could not be loaded.","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":849,"position":"jsx-text","key":"common.retry","value":"Retry","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":857,"position":"jsx-text","key":"libraries.noLibraries","value":"Create a Library to start collecting Skills.","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":867,"position":"jsx-text","key":"libraries.create","value":"Create Library","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":883,"position":"jsx-text","key":"libraries.nameDialogDescription","value":"Set the Skill Library name in the current Environment.","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":886,"position":"jsx-text","key":"libraries.name","value":"Library name","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":907,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":908,"position":"jsx-text","key":"common.save","value":"Save","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":921,"position":"jsx-text","key":"libraries.confirmUpdateTitle","value":"Update Library Skills","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":922,"position":"expr","key":"libraries.confirmUpdateDescription","value":"{{count}} Skills will be updated. Scopes already using this Library will read the new content through their existing links.","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":922,"position":"expr","key":"skills.updatePlan.loadingPreview","value":"Preparing content for the selected Skills...","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":925,"position":"jsx-text","key":"libraries.redirectConfirmation","value":"The download redirected to {{host}}. Confirm to continue.","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":936,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":937,"position":"jsx-text","key":"libraries.update","value":"Update","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":951,"position":"jsx-text","key":"libraries.removeSkillTitle","value":"Remove {{name}}","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":952,"position":"jsx-text","key":"libraries.removeSkillDescription","value":"This Skill will leave the Library. Skill Deck synchronizes applied locations and removes the stored content after no references remain. Skills with the same name in other Libraries are unaffected.","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":957,"position":"expr","key":"libraries.membership.affectedScopes","value":"{{count}} applied locations will be synchronized","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":958,"position":"expr","key":"libraries.membership.inventoryIncomplete","value":"{{count}} locations were identified; others cannot currently be verified","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":968,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/pages/LibraryPage.tsx","line":969,"position":"jsx-text","key":"common.delete","value":"Delete","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":122,"position":"jsx-text","key":"settings.title","value":"Settings","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":172,"position":"jsx-attr","key":"settings.nav.about","value":"About","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":191,"position":"jsx-text","key":"settings.nav.about","value":"About","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":195,"position":"jsx-text","key":"settings.nav.about","value":"About","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":209,"position":"jsx-text","key":"common.loading","value":"Loading...","read":true}
+{"file":"src/pages/WizardPage.tsx","line":100,"position":"expr","key":"addSkill.title","value":"Install Skills","read":true}
+{"file":"src/pages/WizardPage.tsx","line":196,"position":"expr","key":"addSkill.agents.historySaveWarning","value":"The installation can continue, but the confirmed Agent choices could not be saved.","read":true}
+{"file":"src/pages/WizardPage.tsx","line":202,"position":"expr","key":"addSkill.agents.historySaveError","value":"Agent choices could not be confirmed. Try again.","read":true}
+{"file":"src/pages/WizardPage.tsx","line":378,"position":"jsx-text","key":"addSkill.title","value":"Install Skills","read":true}
+{"file":"src/pages/WizardPage.tsx","line":426,"position":"jsx-text","key":"addSkill.error.actions.close","value":"Close","read":true}
+{"file":"src/pages/WizardPage.tsx","line":429,"position":"jsx-text","key":"addSkill.error.actions.backToSource","value":"Back to Edit","read":true}
+{"file":"src/pages/WizardPage.tsx","line":433,"position":"jsx-text","key":"addSkill.error.actions.retry","value":"Retry","read":true}
+{"file":"src/pages/WizardPage.tsx","line":440,"position":"jsx-text","key":"addSkill.actions.retry","value":"Retry","read":true}
+{"file":"src/pages/WizardPage.tsx","line":443,"position":"jsx-text","key":"addSkill.actions.done","value":"Done","read":true}
+{"file":"src/pages/WizardPage.tsx","line":452,"position":"jsx-text","key":"addSkill.actions.cancel","value":"Cancel","read":true}
+{"file":"src/pages/WizardPage.tsx","line":460,"position":"jsx-text","key":"addSkill.actions.back","value":"Back","read":true}
+{"file":"src/pages/WizardPage.tsx","line":470,"position":"expr","key":"addSkill.actions.installWithOverwrite","value":"Confirm overwrite and continue","read":true}
+{"file":"src/pages/WizardPage.tsx","line":472,"position":"expr","key":"addSkill.actions.install","value":"Install","read":true}
+{"file":"src/pages/WizardPage.tsx","line":481,"position":"jsx-text","key":"addSkill.actions.next","value":"Next","read":true}
+{"file":"src/utils/cross-storage-guidance.ts","line":37,"position":"expr","key":"crossStorage.nativeEnvironment","value":"Windows","read":true}
+{"file":"src/utils/format-app-error.ts","line":21,"position":"expr","key":"addSkill.source.error.noSkills","value":"No skills found in this source","read":true}
+{"file":"src/utils/format-app-error.ts","line":27,"position":"expr","key":"addSkill.source.error.auth","value":"Authentication failed. Check your credentials or repository access.","read":true}
+{"file":"src/utils/format-app-error.ts","line":29,"position":"expr","key":"addSkill.source.error.notFound","value":"Repository not found","read":true}
+{"file":"src/utils/format-app-error.ts","line":31,"position":"expr","key":"addSkill.source.error.refNotFound","value":"Branch or tag not found","read":true}
+{"file":"src/utils/format-app-error.ts","line":40,"position":"expr","key":"addSkill.source.error.network","value":"Network error, please check your connection","read":true}
+{"file":"src/utils/format-app-error.ts","line":42,"position":"expr","key":"addSkill.source.error.invalidSource","value":"Invalid source format: {{value}}","read":true}
+{"file":"src/utils/format-app-error.ts","line":58,"position":"expr","key":"addSkill.source.error.downloadConflict","value":"A matching Skill already exists at this target, so direct download cannot replace it: {{target}}","read":true}
+{"file":"src/utils/format-app-error.ts","line":62,"position":"expr","key":"skills.discover.error","value":"Search failed","read":true}
+{"file":"src/utils/format-app-error.ts","line":64,"position":"expr","key":"addSkill.error.invalidAgent","value":"Invalid agent: {{agent}}","read":true}
+{"file":"src/utils/format-app-error.ts","line":68,"position":"expr","key":"addSkill.error.pathNotFound","value":"Path not found: {{path}}","read":true}
+{"file":"src/utils/format-app-error.ts","line":70,"position":"expr","key":"addSkill.error.redirectConfirmationRequired","value":"Confirm the download redirect to {{host}} before installation","read":true}
+{"file":"src/utils/format-app-error.ts","line":72,"position":"expr","key":"addSkill.error.mutationBusy","value":"Another change is already in progress","read":true}
+{"file":"src/utils/format-app-error.ts","line":74,"position":"expr","key":"addSkill.error.installWizardActive","value":"The install wizard is in progress. Return to the wizard to finish or close it before starting another operation.","read":true}
+{"file":"src/utils/format-app-error.ts","line":76,"position":"expr","key":"addSkill.error.installWizardSessionUnavailable","value":"This installation session is no longer available. Close this window and start again.","read":true}
+{"file":"src/utils/format-app-error.ts","line":78,"position":"expr","key":"addSkill.error.applicationTerminating","value":"The app is exiting and cannot start another operation","read":true}
+{"file":"src/utils/format-app-error.ts","line":89,"position":"expr","key":"addSkill.error.mutationCancelled","value":"The skill operation was cancelled","read":true}
+{"file":"src/utils/format-app-error.ts","line":91,"position":"expr","key":"addSkill.error.environmentDiscoveryFailed","value":"WSL environments could not be discovered","read":true}
+{"file":"src/utils/format-app-error.ts","line":93,"position":"expr","key":"addSkill.error.wslCommandTimedOut","value":"The WSL operation timed out","read":true}
+{"file":"src/utils/format-app-error.ts","line":104,"position":"expr","key":"addSkill.error.environmentUnavailable","value":"The selected system is unavailable","read":true}
+{"file":"src/utils/format-app-error.ts","line":112,"position":"expr","key":"settings.projectHomeConflict","value":"Your home directory is already used for global Skills. Choose a specific project directory.","read":true}
+{"file":"src/utils/format-app-error.ts","line":114,"position":"expr","key":"addSkill.error.configurationReadOnly","value":"Agent information is read-only because it uses an unsupported version.","read":true}
+{"file":"src/utils/format-app-error.ts","line":116,"position":"expr","key":"addSkill.error.payloadStorageRequiresCleanup","value":"Temporary Skill storage requires cleanup before another operation can start.","read":true}
+{"file":"src/utils/format-app-error.ts","line":126,"position":"expr","key":"addSkill.error.staleState","value":"The installation facts changed. Refresh the preview and confirm again.","read":true}
+{"file":"src/utils/format-app-error.ts","line":130,"position":"expr","key":"addSkill.error.storageUnsupported","value":"The selected storage location is not supported.","read":true}
+{"file":"src/utils/format-app-error.ts","line":132,"position":"expr","key":"mutation.result.errors.libraryContentTarget","value":"This target is a library member directory. Manage it from its library: {{path}}","read":true}
+{"file":"src/utils/format-app-error.ts","line":133,"position":"expr","key":"mutation.result.errors.installedSkillFormat","value":"The source Skill requires a valid name and description before copying or adding Agent associations: {{path}}","read":true}
+{"file":"src/utils/format-app-error.ts","line":134,"position":"expr","key":"mutation.result.errors.sharedSkillLinkSource","value":"This Skill has no shared installation to link to. Select copy mode.","read":true}
+{"file":"src/utils/format-app-error.ts","line":135,"position":"expr","key":"mutation.result.errors.eveSingleFile","value":"Only directory-based Eve Skills are supported. This single-file installation cannot be maintained: {{path}}","read":true}
+{"file":"src/utils/format-app-error.ts","line":136,"position":"expr","key":"mutation.result.errors.installedSkillSourceAmbiguous","value":"The Skill source or installation location is ambiguous: {{path}}","read":true}
+{"file":"src/utils/format-app-error.ts","line":137,"position":"expr","key":"addSkill.source.error.acquisitionReason.directoryLinksUnsupported","value":"Skill updates cannot locate source content through directory links. Use a real directory or import the content as a local Skill.","read":true}
+{"file":"src/utils/format-app-error.ts","line":138,"position":"expr","key":"mutation.result.errors.sourceContentCapacity","value":"The source exceeds the temporary content retention limit. Use a smaller source.","read":true}
+{"file":"src/utils/format-app-error.ts","line":139,"position":"expr","key":"mutation.result.errors.preparedContentCapacity","value":"The temporary content retention limit has been reached. Select fewer Skills or use a smaller source and try again.","read":true}
+{"file":"src/utils/format-app-error.ts","line":143,"position":"expr","key":"addSkill.error.runtimeMaintenance","value":"Runtime maintenance is not ready, so Skill operations are temporarily paused. Try again shortly.","read":true}
+{"file":"src/utils/format-app-error.ts","line":145,"position":"expr","key":"addSkill.error.storageUnsupported","value":"The selected storage location is not supported.","read":true}
+{"file":"src/utils/format-app-error.ts","line":147,"position":"expr","key":"addSkill.error.selfCopy","value":"The source and destination resolve to the same physical location.","read":true}
+{"file":"src/utils/format-app-error.ts","line":149,"position":"expr","key":"libraries.referenceConflict","value":"This action is blocked by {{count}} Skill Library applications. Remove the references from those Scopes first.","read":true}
+{"file":"src/utils/format-app-error.ts","line":157,"position":"expr","key":"libraries.updateStatus.nameChangeBlocked","value":"Upstream name changed; this Library member cannot be updated","read":true}
+{"file":"src/utils/format-app-error.ts","line":159,"position":"expr","key":"libraries.updateStatus.deletedUpstream","value":"Removed upstream","read":true}
+{"file":"src/utils/format-app-error.ts","line":161,"position":"expr","key":"mutation.result.errors.configurationWriteUnconfirmed","value":"The configuration write could not be confirmed. The application is still using its previous settings. Reload the configuration to check the result.","read":true}
+{"file":"src/utils/format-app-error.ts","line":168,"position":"expr","key":"libraries.recoveryIncomplete","value":"Skill Library recovery is incomplete. Restore access to this Environment and try again.","read":true}
+{"file":"src/utils/format-app-error.ts","line":172,"position":"expr","key":"addSkill.error.lockConflict","value":"{{skill}} changed. Refresh and try again.","read":true}
+{"file":"src/utils/format-app-error.ts","line":173,"position":"expr","key":"addSkill.error.agentDefaultsConflict","value":"The default Agent selection changed. Refresh and try again.","read":true}
+{"file":"src/utils/format-app-error.ts","line":184,"position":"expr","key":"addSkill.error.unknown","value":"An unknown error occurred","read":true}
+{"file":"src/utils/parse-install-error.ts","line":27,"position":"expr","key":"addSkill.error.suggestion.checkNetwork","value":"Check your network connection","read":true}
+{"file":"src/utils/parse-install-error.ts","line":36,"position":"expr","key":"addSkill.error.suggestion.checkSource","value":"Check that the source address and scoped path are correct","read":true}
+{"file":"src/utils/parse-install-error.ts","line":44,"position":"expr","key":"addSkill.source.error.downloadConflict","value":"A matching Skill already exists at this target, so direct download cannot replace it: {{target}}","read":true}
+{"file":"src/utils/parse-install-error.ts","line":50,"position":"expr","key":"addSkill.error.noSkillsFound","value":"No matching skills found","read":true}
+{"file":"src/utils/parse-install-error.ts","line":58,"position":"expr","key":"addSkill.error.suggestion.checkSkillName","value":"Check that the skill name is correct","read":true}
+{"file":"src/utils/parse-install-error.ts","line":59,"position":"expr","key":"addSkill.error.suggestion.reselect","value":"Go back and reselect skills","read":true}
+{"file":"src/utils/parse-install-error.ts","line":66,"position":"expr","key":"addSkill.error.gitFailed","value":"Git failed while reading the repository","read":true}
+{"file":"src/utils/parse-install-error.ts","line":69,"position":"expr","key":"addSkill.error.suggestion.checkRepo","value":"Verify the repository URL is correct","read":true}
+{"file":"src/utils/parse-install-error.ts","line":70,"position":"expr","key":"addSkill.error.suggestion.retryOrContact","value":"Check the error details and retry, or check logs if the issue persists","read":true}
+{"file":"src/utils/parse-install-error.ts","line":79,"position":"expr","key":"addSkill.error.networkFailed","value":"Network connection failed","read":true}
+{"file":"src/utils/parse-install-error.ts","line":82,"position":"expr","key":"addSkill.error.suggestion.checkNetwork","value":"Check your network connection","read":true}
+{"file":"src/utils/parse-install-error.ts","line":83,"position":"expr","key":"addSkill.error.suggestion.checkRepo","value":"Verify the repository URL is correct","read":true}
+{"file":"src/utils/parse-install-error.ts","line":84,"position":"expr","key":"addSkill.error.suggestion.checkPrivateRepo","value":"For private repos, configure SSH keys or access tokens","read":true}
+{"file":"src/utils/parse-install-error.ts","line":91,"position":"expr","key":"addSkill.error.suggestion.checkNetwork","value":"Check your network connection","read":true}
+{"file":"src/utils/parse-install-error.ts","line":96,"position":"expr","key":"skills.discover.error","value":"Search failed","read":true}
+{"file":"src/utils/parse-install-error.ts","line":97,"position":"expr","key":"addSkill.error.suggestion.checkNetwork","value":"Check your network connection","read":true}
+{"file":"src/utils/parse-install-error.ts","line":102,"position":"expr","key":"addSkill.error.authFailed","value":"Authentication failed","read":true}
+{"file":"src/utils/parse-install-error.ts","line":105,"position":"expr","key":"addSkill.error.suggestion.checkCredentials","value":"Check that SSH keys or access tokens are configured correctly","read":true}
+{"file":"src/utils/parse-install-error.ts","line":106,"position":"expr","key":"addSkill.error.suggestion.checkAccess","value":"Verify you have access to this repository","read":true}
+{"file":"src/utils/parse-install-error.ts","line":112,"position":"expr","key":"addSkill.error.repoNotFound","value":"Repository not found","read":true}
+{"file":"src/utils/parse-install-error.ts","line":115,"position":"expr","key":"addSkill.error.suggestion.checkRepo","value":"Verify the repository URL is correct","read":true}
+{"file":"src/utils/parse-install-error.ts","line":116,"position":"expr","key":"addSkill.error.suggestion.checkAccess","value":"Verify you have access to this repository","read":true}
+{"file":"src/utils/parse-install-error.ts","line":122,"position":"expr","key":"addSkill.error.refNotFound","value":"Branch or tag not found","read":true}
+{"file":"src/utils/parse-install-error.ts","line":125,"position":"expr","key":"addSkill.error.suggestion.checkRef","value":"Check that the branch or tag name is correct","read":true}
+{"file":"src/utils/parse-install-error.ts","line":126,"position":"expr","key":"addSkill.error.suggestion.useDefaultBranch","value":"Try using the default branch","read":true}
+{"file":"src/utils/parse-install-error.ts","line":132,"position":"expr","key":"addSkill.error.cloneTimeout","value":"Clone timed out","read":true}
+{"file":"src/utils/parse-install-error.ts","line":137,"position":"expr","key":"addSkill.error.suggestion.adjustCloneTimeout","value":"Increase the timeout in Settings > Git > Remote Fetch Timeout","read":true}
+{"file":"src/utils/parse-install-error.ts","line":138,"position":"expr","key":"addSkill.error.suggestion.checkNetwork","value":"Check your network connection","read":true}
+{"file":"src/utils/parse-install-error.ts","line":146,"position":"expr","key":"addSkill.error.suggestion.checkNetwork","value":"Check your network connection","read":true}
+{"file":"src/utils/parse-install-error.ts","line":147,"position":"expr","key":"addSkill.error.suggestion.checkRepo","value":"Verify the repository URL is correct","read":true}
+{"file":"src/utils/parse-install-error.ts","line":153,"position":"expr","key":"addSkill.error.ioFailed","value":"File operation failed","read":true}
+{"file":"src/utils/parse-install-error.ts","line":156,"position":"expr","key":"addSkill.error.suggestion.runAsAdmin","value":"Try running the app with administrator privileges","read":true}
+{"file":"src/utils/parse-install-error.ts","line":157,"position":"expr","key":"addSkill.error.suggestion.checkPermission","value":"Check write permissions for the target directory","read":true}
+{"file":"src/utils/parse-install-error.ts","line":163,"position":"expr","key":"addSkill.error.invalidAgent","value":"Invalid agent: {{agent}}","read":true}
+{"file":"src/utils/parse-install-error.ts","line":165,"position":"expr","key":"addSkill.error.suggestion.checkAgentName","value":"Check that the agent name is correct","read":true}
+{"file":"src/utils/parse-install-error.ts","line":166,"position":"expr","key":"addSkill.error.suggestion.reselectAgents","value":"Go back and reselect agents","read":true}
+{"file":"src/utils/parse-install-error.ts","line":173,"position":"expr","key":"addSkill.error.suggestion.reselectAgents","value":"Go back and reselect agents","read":true}
+{"file":"src/utils/parse-install-error.ts","line":178,"position":"expr","key":"addSkill.error.invalidSource","value":"Invalid source format: {{value}}","read":true}
+{"file":"src/utils/parse-install-error.ts","line":180,"position":"expr","key":"addSkill.error.suggestion.checkRepo","value":"Verify the repository URL is correct","read":true}
+{"file":"src/utils/parse-install-error.ts","line":186,"position":"expr","key":"addSkill.error.pathNotFound","value":"Path not found: {{path}}","read":true}
+{"file":"src/utils/parse-install-error.ts","line":188,"position":"expr","key":"addSkill.error.suggestion.checkPermission","value":"Check write permissions for the target directory","read":true}
+{"file":"src/utils/parse-install-error.ts","line":194,"position":"expr","key":"addSkill.error.redirectConfirmationRequired","value":"Confirm the download redirect to {{host}} before installation","read":true}
+{"file":"src/utils/parse-install-error.ts","line":196,"position":"expr","key":"addSkill.error.suggestion.reviewRedirectAndConfirm","value":"Go back to the confirmation step, review the download site, and confirm manually","read":true}
+{"file":"src/utils/parse-install-error.ts","line":202,"position":"expr","key":"addSkill.error.mutationBusy","value":"Another change is already in progress","read":true}
+{"file":"src/utils/parse-install-error.ts","line":204,"position":"expr","key":"addSkill.error.suggestion.retryOrContact","value":"Check the error details and retry, or check logs if the issue persists","read":true}
+{"file":"src/utils/parse-install-error.ts","line":210,"position":"expr","key":"addSkill.error.installWizardActive","value":"The install wizard is in progress. Return to the wizard to finish or close it before starting another operation.","read":true}
+{"file":"src/utils/parse-install-error.ts","line":215,"position":"expr","key":"addSkill.error.installWizardSessionUnavailable","value":"This installation session is no longer available. Close this window and start again.","read":true}
+{"file":"src/utils/parse-install-error.ts","line":220,"position":"expr","key":"addSkill.error.applicationTerminating","value":"The app is exiting and cannot start another operation","read":true}
+{"file":"src/utils/parse-install-error.ts","line":221,"position":"expr","key":"addSkill.error.suggestion.retryOrContact","value":"Check the error details and retry, or check logs if the issue persists","read":true}
+{"file":"src/utils/parse-install-error.ts","line":226,"position":"expr","key":"settings.general.wslBusyOperation","value":"A WSL operation is still running. Try again shortly.","read":true}
+{"file":"src/utils/parse-install-error.ts","line":227,"position":"expr","key":"addSkill.error.suggestion.retryOrContact","value":"Check the error details and retry, or check logs if the issue persists","read":true}
+{"file":"src/utils/parse-install-error.ts","line":232,"position":"expr","key":"addSkill.error.mutationCancelled","value":"The skill operation was cancelled","read":true}
+{"file":"src/utils/parse-install-error.ts","line":237,"position":"expr","key":"addSkill.error.environmentDiscoveryFailed","value":"WSL environments could not be discovered","read":true}
+{"file":"src/utils/parse-install-error.ts","line":239,"position":"expr","key":"addSkill.error.suggestion.retryOrContact","value":"Check the error details and retry, or check logs if the issue persists","read":true}
+{"file":"src/utils/parse-install-error.ts","line":244,"position":"expr","key":"addSkill.error.wslCommandTimedOut","value":"The WSL operation timed out","read":true}
+{"file":"src/utils/parse-install-error.ts","line":245,"position":"expr","key":"addSkill.error.suggestion.retryOrContact","value":"Check the error details and retry, or check logs if the issue persists","read":true}
+{"file":"src/utils/parse-install-error.ts","line":254,"position":"expr","key":"addSkill.error.suggestion.retryOrContact","value":"Check the error details and retry, or check logs if the issue persists","read":true}
+{"file":"src/utils/parse-install-error.ts","line":263,"position":"expr","key":"addSkill.error.suggestion.retryOrContact","value":"Check the error details and retry, or check logs if the issue persists","read":true}
+{"file":"src/utils/parse-install-error.ts","line":268,"position":"expr","key":"addSkill.error.environmentUnavailable","value":"The selected system is unavailable","read":true}
+{"file":"src/utils/parse-install-error.ts","line":270,"position":"expr","key":"addSkill.error.suggestion.retryOrContact","value":"Check the error details and retry, or check logs if the issue persists","read":true}
+{"file":"src/utils/parse-install-error.ts","line":278,"position":"expr","key":"addSkill.error.suggestion.chooseAccessiblePath","value":"Choose a path that is accessible from the selected system","read":true}
+{"file":"src/utils/parse-install-error.ts","line":284,"position":"expr","key":"addSkill.error.suggestion.retryOrContact","value":"Check the error details and retry, or check logs if the issue persists","read":true}
+{"file":"src/utils/parse-install-error.ts","line":288,"position":"expr","key":"settings.projectHomeConflict","value":"Your home directory is already used for global Skills. Choose a specific project directory.","read":true}
+{"file":"src/utils/parse-install-error.ts","line":292,"position":"expr","key":"addSkill.error.configurationReadOnly","value":"Agent information is read-only because it uses an unsupported version.","read":true}
+{"file":"src/utils/parse-install-error.ts","line":293,"position":"expr","key":"addSkill.error.suggestion.chooseWritableConfiguration","value":"Choose a system with writable Agent information","read":true}
+{"file":"src/utils/parse-install-error.ts","line":298,"position":"expr","key":"addSkill.error.payloadStorageRequiresCleanup","value":"Temporary Skill storage requires cleanup before another operation can start.","read":true}
+{"file":"src/utils/parse-install-error.ts","line":299,"position":"expr","key":"addSkill.error.suggestion.retryOrContact","value":"Check the error details and retry, or check logs if the issue persists","read":true}
+{"file":"src/utils/parse-install-error.ts","line":305,"position":"expr","key":"addSkill.error.suggestion.retryOrContact","value":"Check the error details and retry, or check logs if the issue persists","read":true}
+{"file":"src/utils/parse-install-error.ts","line":316,"position":"expr","key":"addSkill.error.staleState","value":"The installation facts changed. Refresh the preview and confirm again.","read":true}
+{"file":"src/utils/parse-install-error.ts","line":317,"position":"expr","key":"addSkill.error.suggestion.retryOrContact","value":"Check the error details and retry, or check logs if the issue persists","read":true}
+{"file":"src/utils/parse-install-error.ts","line":324,"position":"expr","key":"addSkill.error.storageUnsupported","value":"The selected storage location is not supported.","read":true}
+{"file":"src/utils/parse-install-error.ts","line":325,"position":"expr","key":"addSkill.error.suggestion.chooseAccessiblePath","value":"Choose a path that is accessible from the selected system","read":true}
+{"file":"src/utils/parse-install-error.ts","line":332,"position":"expr","key":"addSkill.error.runtimeMaintenance","value":"Runtime maintenance is not ready, so Skill operations are temporarily paused. Try again shortly.","read":true}
+{"file":"src/utils/parse-install-error.ts","line":333,"position":"expr","key":"addSkill.error.suggestion.retryOrContact","value":"Check the error details and retry, or check logs if the issue persists","read":true}
+{"file":"src/utils/parse-install-error.ts","line":337,"position":"expr","key":"addSkill.error.storageUnsupported","value":"The selected storage location is not supported.","read":true}
+{"file":"src/utils/parse-install-error.ts","line":338,"position":"expr","key":"addSkill.error.suggestion.chooseAccessiblePath","value":"Choose a path that is accessible from the selected system","read":true}
+{"file":"src/utils/parse-install-error.ts","line":342,"position":"expr","key":"addSkill.error.selfCopy","value":"The source and destination resolve to the same physical location.","read":true}
+{"file":"src/utils/parse-install-error.ts","line":345,"position":"expr","key":"mutation.result.errors.configurationWriteUnconfirmed","value":"The configuration write could not be confirmed. The application is still using its previous settings. Reload the configuration to check the result.","read":true}
+{"file":"src/utils/parse-install-error.ts","line":354,"position":"expr","key":"addSkill.error.suggestion.retryOrContact","value":"Check the error details and retry, or check logs if the issue persists","read":true}
+{"file":"src/utils/parse-install-error.ts","line":361,"position":"expr","key":"addSkill.error.lockConflict","value":"{{skill}} changed. Refresh and try again.","read":true}
+{"file":"src/utils/parse-install-error.ts","line":362,"position":"expr","key":"addSkill.error.agentDefaultsConflict","value":"The default Agent selection changed. Refresh and try again.","read":true}
+{"file":"src/utils/parse-install-error.ts","line":363,"position":"expr","key":"addSkill.error.suggestion.retryOrContact","value":"Check the error details and retry, or check logs if the issue persists","read":true}
+{"file":"src/utils/parse-install-error.ts","line":371,"position":"expr","key":"addSkill.error.suggestion.retryOrContact","value":"Check the error details and retry, or check logs if the issue persists","read":true}
+{"file":"src/utils/parse-install-error.ts","line":377,"position":"expr","key":"libraries.referenceConflict","value":"This action is blocked by {{count}} Skill Library applications. Remove the references from those Scopes first.","read":true}
+{"file":"src/utils/parse-install-error.ts","line":378,"position":"expr","key":"addSkill.error.suggestion.retryOrContact","value":"Check the error details and retry, or check logs if the issue persists","read":true}
+{"file":"src/utils/parse-install-error.ts","line":392,"position":"expr","key":"libraries.updateStatus.nameChangeBlocked","value":"Upstream name changed; this Library member cannot be updated","read":true}
+{"file":"src/utils/parse-install-error.ts","line":393,"position":"expr","key":"addSkill.error.suggestion.retryOrContact","value":"Check the error details and retry, or check logs if the issue persists","read":true}
+{"file":"src/utils/parse-install-error.ts","line":398,"position":"expr","key":"libraries.updateStatus.deletedUpstream","value":"Removed upstream","read":true}
+{"file":"src/utils/parse-install-error.ts","line":399,"position":"expr","key":"addSkill.error.suggestion.retryOrContact","value":"Check the error details and retry, or check logs if the issue persists","read":true}
+{"file":"src/utils/parse-install-error.ts","line":407,"position":"expr","key":"addSkill.error.parseFailed","value":"Parse failed","read":true}
+{"file":"src/utils/parse-install-error.ts","line":410,"position":"expr","key":"addSkill.error.suggestion.retryOrContact","value":"Check the error details and retry, or check logs if the issue persists","read":true}
+{"file":"src/utils/parse-install-error.ts","line":418,"position":"expr","key":"addSkill.error.unknown","value":"An unknown error occurred","read":true}
+{"file":"src/utils/parse-install-error.ts","line":420,"position":"expr","key":"addSkill.error.suggestion.retryOrContact","value":"Check the error details and retry, or check logs if the issue persists","read":true}
+{"file":"src/workflows/install-session-feedback.ts","line":37,"position":"expr","key":"installWizardSession.focusFailed","value":"The installation window could not be opened. Try again.","read":true}
+{"file":"src/workflows/install-session-feedback.ts","line":49,"position":"expr","key":"installWizardSession.operationNotRun","value":"This action was not completed. Finish or close the installation flow in the other window first.","read":true}
+{"file":"src/workflows/install-session-feedback.ts","line":52,"position":"expr","key":"installWizardSession.continueOperation","value":"Continue","read":true}
+{"file":"src/workflows/mutation-presentation.ts","line":52,"position":"expr","key":"context.global","value":"Global","read":true}
+{"file":"src/workflows/mutation-presentation.ts","line":58,"position":"expr","key":"mutation.result.scope.project","value":"Project","read":true}
+{"file":"src/workflows/mutation-presentation.ts","line":79,"position":"expr","key":"addSkill.error.unknown","value":"An unknown error occurred","read":true}
+{"file":"src/workflows/skill-manage-agents.ts","line":110,"position":"expr","key":"skills.manageAgents.success","value":"Linked Agents updated","read":true}
+{"file":"src/workflows/skill-remove.ts","line":116,"position":"expr","key":"skills.deleteSuccess","value":"\"{{name}}\" has been deleted","read":true}
