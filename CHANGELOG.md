@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- Dashboard: a Flow tab, now the first one. For this project it lists each call and done-gate stop of the last 1, 7 or 30 days as what was asked, what went to Jev (requests, cached answers, tokens, time) and the verdict, with Jev's stored answer to each question on demand. It reads the receipts, the answer cache and `stops.jsonl`; nothing new is stored or sent.
+
+### Changed
+
+- CI and `npm run ci:local` also run the tests on Node 26.
+
 ## [0.2.3] - 2026-10-06
 
 Fixes and additions that came out of testing on real code. `decide` asks a balanced set of option orders when its two orders tie; `extract` no longer lists already translated Vue mustaches (the cause of every wrong `yes` on the first real-code test of the `i18n` pack) and reads HTML templates inside `<script>`; new `done` parsers for `mix test`, `ctest` and `rubocop`; the dashboard shows stop marks and grouped numbers. The `i18n` pack failed its bar on the first real-code sample and held it on a second one (0 wrong answers on 116 candidates, only 9 of them technical, a definite answer on 18).

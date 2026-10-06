@@ -70,7 +70,7 @@ claude-referee never writes your API key anywhere: not to `CLAUDE_ENV_FILE`, rec
 
 ## The dashboard
 
-`npx claude-referee ui` serves a page from your own machine on 127.0.0.1 behind a random token. It makes no network call out, loads nothing from other hosts and sends no telemetry. It shows stop excerpts, so keep the URL it prints to yourself; the threats and defences are in [docs/decisions/ui-security.md](decisions/ui-security.md).
+`npx claude-referee ui` serves a page from your own machine on 127.0.0.1 behind a random token. It makes no network call out, loads nothing from other hosts and sends no telemetry. Its first tab, Flow, lists this project's calls and done-gate stops, newest first: the command, how many requests went to Jev or which answers came from the cache, the verdict, and on demand Jev's stored answer to each question. It reads the receipts, the answer cache and `stops.jsonl` and stores nothing new; the text that was sent to Jev is not shown, because it is never stored. It shows stop excerpts, so keep the URL it prints to yourself; the threats and defences are in [docs/decisions/ui-security.md](decisions/ui-security.md).
 
 ## Retention
 
