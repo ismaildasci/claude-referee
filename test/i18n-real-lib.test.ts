@@ -2,7 +2,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { amendedMatch, fileNamespace, localeNamespace, matchFound, metadataVerdict, normalizeForMatch, resolveKey, seededOrder, stripHtml, stripScript, vueSections } from "../scripts/i18n-real/lib.mjs";
+import { amendedMatch, fileNamespace, splitRepos, localeNamespace, matchFound, metadataVerdict, normalizeForMatch, resolveKey, seededOrder, stripHtml, stripScript, vueSections } from "../scripts/i18n-real/lib.mjs";
 
 const ok = { fork: false, archived: false, license: "MIT", stars: 40, pushed_at: "2025-01-01T00:00:00Z" };
 
@@ -166,4 +166,12 @@ test("amended found rule: nearest new candidate within 20 lines above, never one
   assert.equal(amendedMatch(site, [c(25, "Remove token")], new Set()), null);
   assert.equal(amendedMatch(site, [c(21, "Remove token", "b.tsx")], new Set()), null);
   assert.equal(amendedMatch(site, [c(24, "Remove token")], new Set(["a.tsx\u000024\u0000Remove token"])), null);
+});
+
+test("second-sample split: per framework by seeded hash, dev takes the odd one out", () => {
+  const repos = [{ framework: "vue", repo: "a/x" }, { framework: "vue", repo: "b/y" }, { framework: "vue", repo: "c/z" }, { framework: "html", repo: "d/w" }];
+  const split = splitRepos(repos);
+  assert.equal(Object.values(split).filter((v) => v === "dev").length, 3);
+  assert.equal(split["d/w"], "dev");
+  assert.deepEqual(splitRepos([...repos].reverse()), split);
 });

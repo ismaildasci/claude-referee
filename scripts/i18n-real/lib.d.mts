@@ -23,3 +23,4 @@ export function seededOrder(ids: string[], seed?: string): string[];
 export const AMENDED_WINDOW: number;
 export interface Cand { file: string; line: number; text: string; id: string }
 export function amendedMatch(site: Site, candidates: Cand[], unchanged: Set<string>): Cand[] | null;
+export function splitRepos(repos: { framework: string; repo: string }[], seed?: string): Record<string, "dev" | "holdout">;

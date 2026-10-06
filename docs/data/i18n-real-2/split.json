@@ -1,0 +1,29 @@
+{
+ "seed": "i18n-real-2-split-v1",
+ "rule": "within each framework, sha256(seed:repo) ascending; even positions dev, odd hold-out",
+ "split": {
+  "joeartsea/node-red-contrib-ftp": "dev",
+  "caudal-labs/caudalflow": "dev",
+  "TO-Bus/to-bus-ca": "holdout",
+  "EmmaStoneX/NetPulse": "dev",
+  "wzdavid/openclaw-desktop": "holdout",
+  "pa001024/riven-mirror": "dev",
+  "omvjro/DOL-pancake": "holdout",
+  "WTWB-none/void": "dev",
+  "taovc/pr-cockpit": "holdout"
+ },
+ "dev": [
+  "caudal-labs/caudalflow",
+  "EmmaStoneX/NetPulse",
+  "WTWB-none/void",
+  "pa001024/riven-mirror",
+  "joeartsea/node-red-contrib-ftp"
+ ],
+ "holdout": [
+  "TO-Bus/to-bus-ca",
+  "wzdavid/openclaw-desktop",
+  "taovc/pr-cockpit",
+  "omvjro/DOL-pancake"
+ ],
+ "holdout_hash": "e386eb482a65260a7d2b67eb09c4e4327978ae73c977b0ccccd5a8c6f48be3ff"
+}

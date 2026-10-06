@@ -292,3 +292,14 @@ export function amendedMatch(site, candidates, unchanged) {
   const nearest = Math.max(...hits.map((c) => c.line));
   return hits.filter((c) => c.line === nearest);
 }
+
+// Second sample split (docs/decisions/i18n-real-2.md): within each framework, repositories ordered by sha256(seed + ":" + repo);
+// even positions are dev, odd are hold-out, so an odd count gives dev the extra one.
+export function splitRepos(repos, seed = "i18n-real-2-split-v1") {
+  const out = {};
+  for (const fw of [...new Set(repos.map((r) => r.framework))].sort()) {
+    const ordered = repos.filter((r) => r.framework === fw).map((r) => r.repo).sort((a, b) => (sha256(`${seed}:${a}`) < sha256(`${seed}:${b}`) ? -1 : 1));
+    ordered.forEach((repo, i) => (out[repo] = i % 2 === 0 ? "dev" : "holdout"));
+  }
+  return out;
+}
