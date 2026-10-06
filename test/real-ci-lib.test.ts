@@ -68,6 +68,10 @@ test("exact intervals", () => {
   assert.ok(ci.lo !== null && ci.hi !== null && Math.abs(ci.lo - 0.2719) < 1e-3 && Math.abs(ci.hi - 0.7281) < 1e-3);
   assert.deepEqual(clopperPearson(0, 0), { lo: null, hi: null });
   assert.equal(clopperPearson(0, 5).lo, 0);
+  const large = clopperPearson(767, 1043);
+  assert.ok(large.lo !== null && large.hi !== null && Math.abs(large.lo - 0.7075) < 1e-3 && Math.abs(large.hi - 0.7619) < 1e-3);
+  const nearAll = clopperPearson(103, 104);
+  assert.ok(nearAll.hi !== null && Math.abs(nearAll.hi - 0.99976) < 1e-5);
 });
 
 test("kappa of perfect and chance agreement", () => {

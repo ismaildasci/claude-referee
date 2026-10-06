@@ -180,11 +180,14 @@ export function wrapperTool(text, tool) {
 
 // Exact (Clopper-Pearson) interval by bisection on the binomial tail.
 function binomCdf(k, n, p) {
-  let term = (1 - p) ** n;
-  let sum = k >= 0 ? term : 0;
+  if (k < 0) return 0;
+  if (p <= 0) return 1;
+  if (p >= 1) return k >= n ? 1 : 0;
+  let logTerm = n * Math.log1p(-p);
+  let sum = Math.exp(logTerm);
   for (let i = 1; i <= k; i += 1) {
-    term *= ((n - i + 1) / i) * (p / (1 - p));
-    sum += term;
+    logTerm += Math.log((n - i + 1) / i) + Math.log(p) - Math.log1p(-p);
+    sum += Math.exp(logTerm);
   }
   return Math.min(1, sum);
 }
