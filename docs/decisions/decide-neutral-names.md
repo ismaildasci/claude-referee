@@ -31,3 +31,20 @@ Seen: under author names the leader matched the author's label in 16 of 39 `deci
 ## Limits, stated now
 
 39 decisions, invented close calls in which several options are defensible by construction; labels by one author, who also wrote the options and names; one model version; the four runs share decisions, so they are not 156 independent observations.
+
+## Result, 2026-10-06: neither
+
+Order, checkable in the repository: this file and the `rename-rep` stage 3d9479a (pushed), the fresh neutral run abccb58 (936 requests, 0 cached, `jev-1.13.0`, 0.021 USD, receipts in `receipts-rename-rep.json`), then the analysis, `scripts/decide-scale/naming.mjs` (`jev-evals/decide-scale/results-naming.json`).
+
+**Self-check, run before the neutral column was read.** `results-adaptive.json` does not store leaders per decision, so the check was done against `adaptive.mjs` itself: a throwaway copy printed its S1 leaders, and the new script gave the same leader and the same trigger on 39 of 39 decisions of the `main` run; its first 8 triggered decisions equal the study's `gate2_candidates`. Author names, `main` run: 17 of 39 match the label, against 16 of 39 in the separate `decide-best` recording.
+
+| Policy | `main` | `rep` | `rename` | `rename-rep` | Author (mean) | Neutral (mean) | Neutral better / author better | Sign test p | Outcome |
+|---|---|---|---|---|---|---|---|---|---|
+| shipped `adaptive` (primary) | 17 | 16 | 17 | 18 | 16.5 | 17.5 | 7 / 6 | 1.0 | neither |
+| mean of 24 orders (secondary) | 18 | 18 | 17 | 18 | 18 | 17.5 | 5 / 6 | 1.0 | neither |
+
+- Floor: the two runs of one naming differ in label match on 1 decision (both namings, primary policy).
+- The name still moves the leader: under the primary policy the leader differs between `main` and `rename` in 15 of 39 decisions, against 1 between the two author-name runs and 3 between the two neutral runs. Those changes go both ways with respect to the label, so they leave agreement where it was.
+- Verdicts: 28 weak and 11 tie (`main`), 32 and 7 (`rep`), 28 and 11 (`rename`), 29 and 10 (`rename-rep`); the balanced orders fired on 14, 14, 12 and 12 decisions.
+
+What it means: on these 39 close calls, option names decide which defensible option leads in about four decisions in ten, but neither naming tracks the author's labelled best option better than the other. Nothing changes in `decide`. The name effect is real and has no measured direction here; a caller who wants no meaning in the names can pass string options, which `decide` names `o1..on`; that removes the cue, not the name effect itself.

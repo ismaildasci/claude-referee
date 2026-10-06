@@ -425,6 +425,14 @@ Three of six are met (stop count, on synthetic ground truth rather than human la
 
 `jev-evals/decide-best`, `jev-1.13.0`, 2026-10-02, `eval record` then `eval score` ([metric and record](decisions/decide-eval-metric.md)): the 39 close-call decisions of `decide-close`, each with one best option written by the repo author before any answer was recorded. The leader matched the label in 16 of 39 cases (0.41). The verdicts were 0 clear, 25 weak and 14 tie (with two orders; 0, 28 and 11 after the balanced orders on ties, [below](#decide-with-a-balanced-set-of-orders-on-ties)); the written and reversed orders picked different leaders in 12 cases. Several options are defensible in every case by construction and the labels are one author's judgement, so this is a description of how Jev behaves on close calls, not an accuracy and not a pass or fail result. (Measured)
 
+### decide with author names against neutral names
+
+Registered in [decide-neutral-names.md](decisions/decide-neutral-names.md) before the new run and before any neutral answer was compared with the labels. The 39 `decide-best` decisions (author labels written before any answer), four runs of all 24 orders each on `jev-1.13.0`: author names twice, neutral names `o1..o4` twice (one of them new, 2026-10-06). The shipped rule (two orders, the balanced set on a tie) replayed per run; agreement with the label averaged over the two runs of each naming.
+
+- **Neither naming agrees more with the labels:** 16.5 of 39 with author names, 17.5 with neutral names; 7 decisions favour neutral names and 6 author names (exact sign test p 1.0). The mean over 24 orders gives 18 and 17.5.
+- The names do move the leader: it differs between an author-name run and a neutral-name run in 15 of 39 decisions, against 1 between the two author-name runs and 3 between the two neutral ones; the changes go both ways with respect to the label.
+- Limits: 39 invented close calls with several defensible options, one author's labels (who also chose the names), one model version; with 13 decisions that differ, only a lopsided split could have been detected.
+
 ### decide with a balanced set of orders on ties
 
 Registered in [decide-balanced-near-ties.md](decisions/decide-balanced-near-ties.md) before the replay and before any code (83129ee). When the written and the reversed order tie and there are 3 to 6 options, `decide` now also asks the other 2n - 2 orders of a balanced set (the n rotations of the written order and their reverses) and takes lean and verdict from the mean of all 2n.

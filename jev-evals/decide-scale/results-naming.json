@@ -1,0 +1,1278 @@
+{
+ "decisions": 39,
+ "model": "jev-1.13.0",
+ "primary_adaptive": {
+  "counts": {
+   "main": 17,
+   "rep": 16,
+   "rename": 17,
+   "rename-rep": 18
+  },
+  "run_averaged": {
+   "author": 16.5,
+   "neutral": 17.5
+  },
+  "neutral_better": 7,
+  "author_better": 6,
+  "sign_test_p": 1,
+  "floor": {
+   "author_runs_differ": 1,
+   "neutral_runs_differ": 1
+  },
+  "leader_changes": {
+   "author_runs": 1,
+   "neutral_runs": 3,
+   "main_vs_rename": 15
+  },
+  "outcome": "neither",
+  "by_decision": [
+   "close/va1-flags-nobudget -0.5",
+   "close/vb1-secrets-norot -1",
+   "close/vb1-apiver-nonotice +1",
+   "close/vb1-alerting-cpuhit -1",
+   "close/ba1-cache-stampede +0.5",
+   "close/ba1-service-hosting +1",
+   "close/bb1-release-cadence -1",
+   "close/bb1-debt-allocation -1",
+   "close/va2-ratelimit-slowreview -1",
+   "close/vb2-secrets-vmmix +1",
+   "close/vb2-repo-cadence +1",
+   "close/ba2-region-failover +1",
+   "close/ba2-staging-envs +1"
+  ]
+ },
+ "secondary_mean24": {
+  "counts": {
+   "main": 18,
+   "rep": 18,
+   "rename": 17,
+   "rename-rep": 18
+  },
+  "run_averaged": {
+   "author": 18,
+   "neutral": 17.5
+  },
+  "neutral_better": 5,
+  "author_better": 6,
+  "sign_test_p": 1,
+  "floor": {
+   "author_runs_differ": 0,
+   "neutral_runs_differ": 1
+  },
+  "leader_changes": {
+   "author_runs": 0,
+   "neutral_runs": 1,
+   "main_vs_rename": 14
+  },
+  "outcome": "neither",
+  "by_decision": [
+   "close/va1-flags-nobudget -1",
+   "close/vb1-secrets-norot -1",
+   "close/vb1-apiver-nonotice +1",
+   "close/vb1-alerting-cpuhit -1",
+   "close/ba1-service-hosting +1",
+   "close/bb1-release-cadence -0.5",
+   "close/bb1-debt-allocation -1",
+   "close/va2-ratelimit-slowreview -1",
+   "close/vb2-secrets-vmmix +1",
+   "close/vb2-repo-cadence +1",
+   "close/ba2-region-failover +1"
+  ]
+ },
+ "verdicts": {
+  "main": {
+   "weak": 28,
+   "tie": 11
+  },
+  "rep": {
+   "weak": 32,
+   "tie": 7
+  },
+  "rename": {
+   "tie": 11,
+   "weak": 28
+  },
+  "rename-rep": {
+   "tie": 10,
+   "weak": 29
+  }
+ },
+ "triggered": {
+  "main": 14,
+  "rep": 14,
+  "rename": 12,
+  "rename-rep": 12
+ },
+ "rows": [
+  {
+   "id": "close/va1-flags-nobudget",
+   "label": "dbtable",
+   "runs": {
+    "main": {
+     "adaptive": "dbtable",
+     "verdict": "weak",
+     "triggered": true,
+     "mean24": "dbtable"
+    },
+    "rep": {
+     "adaptive": "dbtable",
+     "verdict": "weak",
+     "triggered": true,
+     "mean24": "dbtable"
+    },
+    "rename": {
+     "adaptive": "vendor",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "vendor"
+    },
+    "rename-rep": {
+     "adaptive": "dbtable",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "vendor"
+    }
+   }
+  },
+  {
+   "id": "close/vb1-secrets-norot",
+   "label": "kubesecrets",
+   "runs": {
+    "main": {
+     "adaptive": "kubesecrets",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "kubesecrets"
+    },
+    "rep": {
+     "adaptive": "kubesecrets",
+     "verdict": "weak",
+     "triggered": true,
+     "mean24": "kubesecrets"
+    },
+    "rename": {
+     "adaptive": "cloudsm",
+     "verdict": "weak",
+     "triggered": true,
+     "mean24": "cloudsm"
+    },
+    "rename-rep": {
+     "adaptive": "cloudsm",
+     "verdict": "weak",
+     "triggered": true,
+     "mean24": "cloudsm"
+    }
+   }
+  },
+  {
+   "id": "close/vb1-apiver-nonotice",
+   "label": "urlversion",
+   "runs": {
+    "main": {
+     "adaptive": "header",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "header"
+    },
+    "rep": {
+     "adaptive": "header",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "header"
+    },
+    "rename": {
+     "adaptive": "urlversion",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "urlversion"
+    },
+    "rename-rep": {
+     "adaptive": "urlversion",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "urlversion"
+    }
+   }
+  },
+  {
+   "id": "close/vb1-migration-window",
+   "label": "single",
+   "runs": {
+    "main": {
+     "adaptive": "batched",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "batched"
+    },
+    "rep": {
+     "adaptive": "batched",
+     "verdict": "weak",
+     "triggered": true,
+     "mean24": "batched"
+    },
+    "rename": {
+     "adaptive": "batched",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "batched"
+    },
+    "rename-rep": {
+     "adaptive": "batched",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "batched"
+    }
+   }
+  },
+  {
+   "id": "close/vb1-alerting-cpuhit",
+   "label": "cpu",
+   "runs": {
+    "main": {
+     "adaptive": "cpu",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "cpu"
+    },
+    "rep": {
+     "adaptive": "cpu",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "cpu"
+    },
+    "rename": {
+     "adaptive": "slo",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "slo"
+    },
+    "rename-rep": {
+     "adaptive": "slo",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "slo"
+    }
+   }
+  },
+  {
+   "id": "close/vb1-repo-rareshared",
+   "label": "polyrepo",
+   "runs": {
+    "main": {
+     "adaptive": "monorepo",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "monorepo"
+    },
+    "rep": {
+     "adaptive": "monorepo",
+     "verdict": "weak",
+     "triggered": true,
+     "mean24": "monorepo"
+    },
+    "rename": {
+     "adaptive": "monorepo",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "monorepo"
+    },
+    "rename-rep": {
+     "adaptive": "monorepo",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "monorepo"
+    }
+   }
+  },
+  {
+   "id": "close/vb1-alerting-nodefslo",
+   "label": "none",
+   "runs": {
+    "main": {
+     "adaptive": "slo",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "slo"
+    },
+    "rep": {
+     "adaptive": "slo",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "slo"
+    },
+    "rename": {
+     "adaptive": "slo",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "slo"
+    },
+    "rename-rep": {
+     "adaptive": "slo",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "slo"
+    }
+   }
+  },
+  {
+   "id": "close/ba1-metrics-retention",
+   "label": "hosted",
+   "runs": {
+    "main": {
+     "adaptive": "thanos",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "thanos"
+    },
+    "rep": {
+     "adaptive": "thanos",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "thanos"
+    },
+    "rename": {
+     "adaptive": "thanos",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "thanos"
+    },
+    "rename-rep": {
+     "adaptive": "thanos",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "thanos"
+    }
+   }
+  },
+  {
+   "id": "close/ba1-poison-message",
+   "label": "deadletter",
+   "runs": {
+    "main": {
+     "adaptive": "deadletter",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "deadletter"
+    },
+    "rep": {
+     "adaptive": "deadletter",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "deadletter"
+    },
+    "rename": {
+     "adaptive": "deadletter",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "deadletter"
+    },
+    "rename-rep": {
+     "adaptive": "deadletter",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "deadletter"
+    }
+   }
+  },
+  {
+   "id": "close/ba1-cache-stampede",
+   "label": "redislock",
+   "runs": {
+    "main": {
+     "adaptive": "redislock",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "redislock"
+    },
+    "rep": {
+     "adaptive": "earlyrefresh",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "redislock"
+    },
+    "rename": {
+     "adaptive": "redislock",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "redislock"
+    },
+    "rename-rep": {
+     "adaptive": "redislock",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "redislock"
+    }
+   }
+  },
+  {
+   "id": "close/ba1-tenant-isolation",
+   "label": "dbperbig",
+   "runs": {
+    "main": {
+     "adaptive": "schemaper",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "schemaper"
+    },
+    "rep": {
+     "adaptive": "schemaper",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "schemaper"
+    },
+    "rename": {
+     "adaptive": "sharedrls",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "sharedrls"
+    },
+    "rename-rep": {
+     "adaptive": "sharedrls",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "sharedrls"
+    }
+   }
+  },
+  {
+   "id": "close/ba1-mysql-postgres",
+   "label": "staymysql",
+   "runs": {
+    "main": {
+     "adaptive": "cdccutover",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "cdccutover"
+    },
+    "rep": {
+     "adaptive": "cdccutover",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "cdccutover"
+    },
+    "rename": {
+     "adaptive": "cdccutover",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "cdccutover"
+    },
+    "rename-rep": {
+     "adaptive": "cdccutover",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "cdccutover"
+    }
+   }
+  },
+  {
+   "id": "close/ba1-events-retention",
+   "label": "batchdelete",
+   "runs": {
+    "main": {
+     "adaptive": "partdrop",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "partdrop"
+    },
+    "rep": {
+     "adaptive": "partdrop",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "partdrop"
+    },
+    "rename": {
+     "adaptive": "partdrop",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "partdrop"
+    },
+    "rename-rep": {
+     "adaptive": "partdrop",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "partdrop"
+    }
+   }
+  },
+  {
+   "id": "close/ba1-service-hosting",
+   "label": "containersvc",
+   "runs": {
+    "main": {
+     "adaptive": "managedkube",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "managedkube"
+    },
+    "rep": {
+     "adaptive": "managedkube",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "managedkube"
+    },
+    "rename": {
+     "adaptive": "containersvc",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "containersvc"
+    },
+    "rename-rep": {
+     "adaptive": "containersvc",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "containersvc"
+    }
+   }
+  },
+  {
+   "id": "close/ba1-iac-apply",
+   "label": "nightly",
+   "runs": {
+    "main": {
+     "adaptive": "ciapply",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "ciapply"
+    },
+    "rep": {
+     "adaptive": "ciapply",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "ciapply"
+    },
+    "rename": {
+     "adaptive": "ciapply",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "ciapply"
+    },
+    "rename-rep": {
+     "adaptive": "ciapply",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "ciapply"
+    }
+   }
+  },
+  {
+   "id": "close/bb1-flaky-tests",
+   "label": "quarantine",
+   "runs": {
+    "main": {
+     "adaptive": "fakebroker",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "fakebroker"
+    },
+    "rep": {
+     "adaptive": "fakebroker",
+     "verdict": "weak",
+     "triggered": true,
+     "mean24": "fakebroker"
+    },
+    "rename": {
+     "adaptive": "fakebroker",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "fakebroker"
+    },
+    "rename-rep": {
+     "adaptive": "autoretry",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "fakebroker"
+    }
+   }
+  },
+  {
+   "id": "close/bb1-release-cadence",
+   "label": "train",
+   "runs": {
+    "main": {
+     "adaptive": "train",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "train"
+    },
+    "rep": {
+     "adaptive": "train",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "train"
+    },
+    "rename": {
+     "adaptive": "splitlane",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "splitlane"
+    },
+    "rename-rep": {
+     "adaptive": "splitlane",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "train"
+    }
+   }
+  },
+  {
+   "id": "close/bb1-recovery-policy",
+   "label": "flagoff",
+   "runs": {
+    "main": {
+     "adaptive": "flagoff",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "flagoff"
+    },
+    "rep": {
+     "adaptive": "flagoff",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "flagoff"
+    },
+    "rename": {
+     "adaptive": "flagoff",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "flagoff"
+    },
+    "rename-rep": {
+     "adaptive": "flagoff",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "flagoff"
+    }
+   }
+  },
+  {
+   "id": "close/bb1-big-refactor-review",
+   "label": "codemod",
+   "runs": {
+    "main": {
+     "adaptive": "codemod",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "codemod"
+    },
+    "rep": {
+     "adaptive": "codemod",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "codemod"
+    },
+    "rename": {
+     "adaptive": "codemod",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "codemod"
+    },
+    "rename-rep": {
+     "adaptive": "codemod",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "codemod"
+    }
+   }
+  },
+  {
+   "id": "close/bb1-product-rendering",
+   "label": "staticshell",
+   "runs": {
+    "main": {
+     "adaptive": "isr",
+     "verdict": "weak",
+     "triggered": true,
+     "mean24": "isr"
+    },
+    "rep": {
+     "adaptive": "isr",
+     "verdict": "weak",
+     "triggered": true,
+     "mean24": "isr"
+    },
+    "rename": {
+     "adaptive": "ssr",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "islands"
+    },
+    "rename-rep": {
+     "adaptive": "islands",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "islands"
+    }
+   }
+  },
+  {
+   "id": "close/bb1-mobile-api-style",
+   "label": "composite",
+   "runs": {
+    "main": {
+     "adaptive": "composite",
+     "verdict": "weak",
+     "triggered": true,
+     "mean24": "composite"
+    },
+    "rep": {
+     "adaptive": "composite",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "composite"
+    },
+    "rename": {
+     "adaptive": "composite",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "composite"
+    },
+    "rename-rep": {
+     "adaptive": "composite",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "composite"
+    }
+   }
+  },
+  {
+   "id": "close/bb1-advisory-handling",
+   "label": "autopatch",
+   "runs": {
+    "main": {
+     "adaptive": "reachable",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "reachable"
+    },
+    "rep": {
+     "adaptive": "reachable",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "reachable"
+    },
+    "rename": {
+     "adaptive": "reachable",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "reachable"
+    },
+    "rename-rep": {
+     "adaptive": "reachable",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "reachable"
+    }
+   }
+  },
+  {
+   "id": "close/bb1-secret-scanning",
+   "label": "cijob",
+   "runs": {
+    "main": {
+     "adaptive": "cijob",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "cijob"
+    },
+    "rep": {
+     "adaptive": "cijob",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "cijob"
+    },
+    "rename": {
+     "adaptive": "cijob",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "cijob"
+    },
+    "rename-rep": {
+     "adaptive": "cijob",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "cijob"
+    }
+   }
+  },
+  {
+   "id": "close/bb1-debt-allocation",
+   "label": "fixedshare",
+   "runs": {
+    "main": {
+     "adaptive": "fixedshare",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "fixedshare"
+    },
+    "rep": {
+     "adaptive": "fixedshare",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "fixedshare"
+    },
+    "rename": {
+     "adaptive": "boyscout",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "boyscout"
+    },
+    "rename-rep": {
+     "adaptive": "boyscout",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "boyscout"
+    }
+   }
+  },
+  {
+   "id": "close/va2-ratelimit-slowreview",
+   "label": "postgres",
+   "runs": {
+    "main": {
+     "adaptive": "postgres",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "postgres"
+    },
+    "rep": {
+     "adaptive": "postgres",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "postgres"
+    },
+    "rename": {
+     "adaptive": "redis",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "redis"
+    },
+    "rename-rep": {
+     "adaptive": "redis",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "redis"
+    }
+   }
+  },
+  {
+   "id": "close/va2-jobs-auditevents",
+   "label": "kafka",
+   "runs": {
+    "main": {
+     "adaptive": "kafka",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "kafka"
+    },
+    "rep": {
+     "adaptive": "kafka",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "kafka"
+    },
+    "rename": {
+     "adaptive": "kafka",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "kafka"
+    },
+    "rename-rep": {
+     "adaptive": "kafka",
+     "verdict": "weak",
+     "triggered": true,
+     "mean24": "kafka"
+    }
+   }
+  },
+  {
+   "id": "close/va2-flags-budgetpending",
+   "label": "vendor",
+   "runs": {
+    "main": {
+     "adaptive": "dbtable",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "dbtable"
+    },
+    "rep": {
+     "adaptive": "dbtable",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "dbtable"
+    },
+    "rename": {
+     "adaptive": "dbtable",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "dbtable"
+    },
+    "rename-rep": {
+     "adaptive": "dbtable",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "dbtable"
+    }
+   }
+  },
+  {
+   "id": "close/va2-flags-percentrollout",
+   "label": "vendor",
+   "runs": {
+    "main": {
+     "adaptive": "vendor",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "vendor"
+    },
+    "rep": {
+     "adaptive": "vendor",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "vendor"
+    },
+    "rename": {
+     "adaptive": "vendor",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "vendor"
+    },
+    "rename-rep": {
+     "adaptive": "vendor",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "vendor"
+    }
+   }
+  },
+  {
+   "id": "close/vb2-secrets-vmmix",
+   "label": "cloudsm",
+   "runs": {
+    "main": {
+     "adaptive": "kubesecrets",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "kubesecrets"
+    },
+    "rep": {
+     "adaptive": "kubesecrets",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "kubesecrets"
+    },
+    "rename": {
+     "adaptive": "cloudsm",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "cloudsm"
+    },
+    "rename-rep": {
+     "adaptive": "cloudsm",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "cloudsm"
+    }
+   }
+  },
+  {
+   "id": "close/vb2-migration-slot",
+   "label": "single",
+   "runs": {
+    "main": {
+     "adaptive": "batched",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "batched"
+    },
+    "rep": {
+     "adaptive": "batched",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "batched"
+    },
+    "rename": {
+     "adaptive": "batched",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "batched"
+    },
+    "rename-rep": {
+     "adaptive": "batched",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "batched"
+    }
+   }
+  },
+  {
+   "id": "close/vb2-email-internal",
+   "label": "gmail",
+   "runs": {
+    "main": {
+     "adaptive": "gmail",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "gmail"
+    },
+    "rep": {
+     "adaptive": "gmail",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "gmail"
+    },
+    "rename": {
+     "adaptive": "gmail",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "gmail"
+    },
+    "rename-rep": {
+     "adaptive": "gmail",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "gmail"
+    }
+   }
+  },
+  {
+   "id": "close/vb2-repo-cadence",
+   "label": "polyrepo",
+   "runs": {
+    "main": {
+     "adaptive": "monorepo",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "monorepo"
+    },
+    "rep": {
+     "adaptive": "monorepo",
+     "verdict": "weak",
+     "triggered": true,
+     "mean24": "monorepo"
+    },
+    "rename": {
+     "adaptive": "polyrepo",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "polyrepo"
+    },
+    "rename-rep": {
+     "adaptive": "polyrepo",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "polyrepo"
+    }
+   }
+  },
+  {
+   "id": "close/vb2-thumbs-paidcdn",
+   "label": "worker",
+   "runs": {
+    "main": {
+     "adaptive": "cdntransform",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "cdntransform"
+    },
+    "rep": {
+     "adaptive": "cdntransform",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "cdntransform"
+    },
+    "rename": {
+     "adaptive": "cdntransform",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "cdntransform"
+    },
+    "rename-rep": {
+     "adaptive": "cdntransform",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "cdntransform"
+    }
+   }
+  },
+  {
+   "id": "close/vb2-migration-midtable",
+   "label": "single",
+   "runs": {
+    "main": {
+     "adaptive": "batched",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "batched"
+    },
+    "rep": {
+     "adaptive": "batched",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "batched"
+    },
+    "rename": {
+     "adaptive": "batched",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "batched"
+    },
+    "rename-rep": {
+     "adaptive": "batched",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "batched"
+    }
+   }
+  },
+  {
+   "id": "close/vb2-secrets-handrotate",
+   "label": "kubesecrets",
+   "runs": {
+    "main": {
+     "adaptive": "kubesecrets",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "kubesecrets"
+    },
+    "rep": {
+     "adaptive": "kubesecrets",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "kubesecrets"
+    },
+    "rename": {
+     "adaptive": "kubesecrets",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "kubesecrets"
+    },
+    "rename-rep": {
+     "adaptive": "kubesecrets",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "kubesecrets"
+    }
+   }
+  },
+  {
+   "id": "close/ba2-region-failover",
+   "label": "pilot",
+   "runs": {
+    "main": {
+     "adaptive": "warm",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "warm"
+    },
+    "rep": {
+     "adaptive": "warm",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "warm"
+    },
+    "rename": {
+     "adaptive": "pilot",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "pilot"
+    },
+    "rename-rep": {
+     "adaptive": "pilot",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "pilot"
+    }
+   }
+  },
+  {
+   "id": "close/ba2-staging-envs",
+   "label": "squadns",
+   "runs": {
+    "main": {
+     "adaptive": "ephemeral",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "squadns"
+    },
+    "rep": {
+     "adaptive": "ephemeral",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "squadns"
+    },
+    "rename": {
+     "adaptive": "squadns",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "squadns"
+    },
+    "rename-rep": {
+     "adaptive": "squadns",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "squadns"
+    }
+   }
+  },
+  {
+   "id": "close/ba2-timeseries-store",
+   "label": "managed",
+   "runs": {
+    "main": {
+     "adaptive": "pgpart",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "pgpart"
+    },
+    "rep": {
+     "adaptive": "pgpart",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "pgpart"
+    },
+    "rename": {
+     "adaptive": "parquet",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "parquet"
+    },
+    "rename-rep": {
+     "adaptive": "parquet",
+     "verdict": "tie",
+     "triggered": true,
+     "mean24": "parquet"
+    }
+   }
+  },
+  {
+   "id": "close/ba2-scheduled-jobs",
+   "label": "cronjob",
+   "runs": {
+    "main": {
+     "adaptive": "cronjob",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "cronjob"
+    },
+    "rep": {
+     "adaptive": "cronjob",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "cronjob"
+    },
+    "rename": {
+     "adaptive": "cronjob",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "cronjob"
+    },
+    "rename-rep": {
+     "adaptive": "cronjob",
+     "verdict": "weak",
+     "triggered": false,
+     "mean24": "cronjob"
+    }
+   }
+  }
+ ]
+}
