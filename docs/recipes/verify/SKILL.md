@@ -14,10 +14,8 @@ Run this right before committing code changes.
 { npm test; echo "exit code: $?"; } 2>&1 | npx claude-referee done --criteria "all tests pass" --evidence - --fail-on missing,unsure
 ```
 
-   Until the package is on npm (early October 2026), `npx claude-referee` fails with a 404. If it does, use `claude-referee` instead of `npx claude-referee` when the user has the alias from the README install note.
-
 2. Read only the one-line JSON it prints.
    - `met`: commit.
    - `missing` or `unsure`: do not commit. Follow `next_step`, fix the cause, and run step 1 again.
-   - No JSON line (an npx 404, a missing key, a crash): there is no verdict. Do not retry in a loop and do not claim success. Tell the user the check could not run and why.
+   - No JSON line (npx could not run the package, a missing key, a crash): there is no verdict. Do not retry in a loop and do not claim success. Tell the user the check could not run and why.
 3. Do not paraphrase the test output to claim success. The verdict line is the evidence.

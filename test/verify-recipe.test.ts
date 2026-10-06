@@ -19,6 +19,7 @@ test("recipe frontmatter is valid and the skill is named verify", () => {
 test("recipe pipes test output to done and the docs link it", () => {
   assert.match(read("docs/recipes/verify/SKILL.md"), /echo "exit code: \$\?"; \} 2>&1 \| npx claude-referee done .*--evidence -/);
   assert.doesNotMatch(read("docs/verify-skill.md"), /Not on npm yet/);
+  assert.doesNotMatch(read("docs/recipes/verify/SKILL.md"), /Until the package is on npm|npx 404/);
   assert.match(read("docs/verify-skill.md"), /privacy\.md/);
   for (const f of ["README.md", "README.tr.md"]) assert.match(read(f), /docs\/verify-skill\.md/);
   assert.match(read("docs/verify-skill.md"), /recipes\/verify\/SKILL\.md/);

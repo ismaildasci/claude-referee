@@ -8,6 +8,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - `done` parsers for `mix test` (ExUnit summary, excluded tests count as skipped and cap `met`), `ctest` (summary, `Total Test time`, failed and not-run blocks) and `rubocop` (summary, offenses, corrected offenses, warnings and notices), written from the dev half of the second real-log sample (`docs/decisions/real-logs-2-split.md`, `docs/decisions/real-logs-2-parsers.md`). `cmake --build`, `make`, wrapper builds, `phpstan` and `xcodebuild` were skipped (too few dev examples, or no success marker in the tool's output). Five synthetic cases of `done-v2-h3` and `done-v2-h4` were re-recorded because their logs are now parsed; no suite allowance moved.
 
+### Changed
+
+- The `verify` skill recipe no longer says that `npx claude-referee` fails with a 404 until the npm publish, and no longer points to the README alias that 0.2.1 removed; the package is on npm (0.2.0 to 0.2.2). The roadmap status table follows the releases and npm, and cites the rewritten commits instead of seven hashes that are no longer in `main`.
+
 ### Measured
 
 - Second look at the second real-log sample (`docs/measurements-real-logs-3.md`): on the frozen hold-out half, wrong `met` went from 0 of 52 to 1 of 52, `met` recall among parsed from 23 of 29 to 26 of 35 (0.743), parsed coverage from 41.7% to 49.6%. Its aggregate bars were already seen, so this is not an unseen test; `done` v2 stays not measured on its original bar.
