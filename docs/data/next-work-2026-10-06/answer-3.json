@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "verdict": "weak",
+  "lean": "o1",
+  "p": {
+    "o1": 0.65,
+    "o2": 0.28,
+    "o3": 0.06
+  },
+  "order_disagrees": false,
+  "orders": 2,
+  "requests": 2,
+  "cached": 0,
+  "next_step": "Add the missing fact to context; if the decision is easy to undo, go with o1. Asking the same question again won't change it.",
+  "receipt": "rmuwjvbjaji60"
+}
