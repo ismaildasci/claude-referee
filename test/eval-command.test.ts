@@ -27,10 +27,10 @@ const CASES = [
   { id: "fail", split: "holdout", expected: "missing", evidence: "Tests: 1 failed, 11 passed\n" },
 ];
 
-async function record(root: string, extra: string[] = [], answer = byEvidence) {
+async function record(root: string, extra: string[] = [], answer = byEvidence, env: Record<string, string> = {}) {
   const server = await fakeJev(answer);
   try {
-    const io = memoryIo({ env: { TYPESAFE_API_KEY: "ts_test_secret_key_123", REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: tempDir() } });
+    const io = memoryIo({ env: { TYPESAFE_API_KEY: "ts_test_secret_key_123", REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: tempDir(), ...env } });
     const code = await run(["eval", "record", "--suite", "s1", "--evals-dir", root, ...extra], io, commands);
     return { code, out: io.json(), requests: server.requests.length };
   } finally {
@@ -139,6 +139,19 @@ test("eval record stops before the first request when the estimated cost is over
   assert.equal(requests, 0);
   const bad = await record(root, ["--max-requests", "many"]);
   assert.equal(bad.out["error"], "bad_input");
+});
+
+test("eval record refuses --max-usd for a model with no known price instead of skipping the cap", async () => {
+  const root = suite(CASES);
+  const { code, out, requests } = await record(root, ["--max-usd", "1"], byEvidence, { TYPESAFE_MODEL: "jev-unpriced" });
+  assert.equal(code, 1);
+  assert.equal(out["error"], "bad_input");
+  assert.match(String(out["message"]), /jev-unpriced/);
+  assert.match(String(out["message"]), /--max-usd/);
+  assert.equal(requests, 0);
+  const uncapped = await record(root, [], byEvidence, { TYPESAFE_MODEL: "jev-unpriced" });
+  assert.equal(uncapped.code, 0);
+  assert.equal(uncapped.requests, 2);
 });
 
 test("eval record counts only the cases still to record against the cap", async () => {

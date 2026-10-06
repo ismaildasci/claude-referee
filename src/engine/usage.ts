@@ -1,5 +1,5 @@
 // Claude-side usage: claude-referee (and the short-lived name evidence-referee) CLI calls counted from Claude Code's session transcripts, subagents included.
-// A call counts only in command position, each tool call once; nothing from the transcripts is echoed back.
+// A call counts only in command position (also behind env, timeout, nohup and xargs), each tool call once; nothing from the transcripts is echoed back.
 
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -77,9 +77,23 @@ function subcommand(token: string | undefined): string {
   return token && /^[a-z][a-z-]*$/.test(token) ? token : "other";
 }
 
+const WRAPPERS: Readonly<Record<string, readonly string[]>> = {
+  env: ["-u", "-C", "-S", "-P", "--unset", "--chdir", "--split-string"],
+  timeout: ["-s", "-k", "--signal", "--kill-after"],
+  nohup: [],
+  xargs: ["-I", "-n", "-P", "-L", "-d", "-s", "-E", "-a", "--arg-file", "--delimiter", "--max-args", "--max-procs", "--max-chars", "--process-slot-var"],
+};
+
 function callIn(segment: readonly string[]): string | null {
   let i = 0;
-  while (i < segment.length && (ASSIGNMENT.test(segment[i] ?? "") || ["{", "time", "exec", "command", "env"].includes(segment[i] ?? ""))) i++;
+  for (let w = segment[0] ?? ""; ; w = segment[i] ?? "") {
+    if (ASSIGNMENT.test(w) || ["{", "time", "exec", "command"].includes(w)) i++;
+    else if (Object.hasOwn(WRAPPERS, w)) {
+      i++;
+      while ((segment[i] ?? "").startsWith("-")) i += WRAPPERS[w]?.includes(segment[i] ?? "") ? 2 : 1;
+      if (w === "timeout") i++;
+    } else break;
+  }
   const first = segment[i];
   if (first !== undefined && NAMES.includes(first)) return subcommand(segment[i + 1]);
   if (first === "npx") {

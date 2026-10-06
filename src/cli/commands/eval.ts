@@ -264,6 +264,9 @@ async function record(context: Context, fallback: Pack, list: readonly Suite[]):
   if (!flags.dryRun && maxRequests !== undefined && most > maxRequests) {
     throw new RefereeError("bad_input", `Recording could send up to ${most} requests (including the balanced orders a tied decide case adds); --max-requests is ${maxRequests}. Nothing was sent.`, { next_step: "Record fewer cases (a smaller suite or --split) or raise the cap." });
   }
+  if (!flags.dryRun && maxUsd !== undefined && usd === null && most > 0) {
+    throw new RefereeError("bad_input", `No price is known for model ${session.model}, so --max-usd cannot be checked. Nothing was sent.`, { next_step: "Use --max-requests instead, or the default model." });
+  }
   if (!flags.dryRun && maxUsd !== undefined && usd !== null && usd > maxUsd) {
     throw new RefereeError("bad_input", `Recording would cost about ${usd.toFixed(6)} USD (an estimate from about ${tokens} input tokens); --max-usd is ${maxUsd}. Nothing was sent.`, { next_step: "Record fewer cases or raise the cap." });
   }
@@ -419,7 +422,7 @@ export const evalCommand: Command = {
       "--ablation <context|reversed>": "decide suites only. record: record answers with the context text left out of the request (reversed needs no new recording). score: rescore with that element removed and report the change against the full run; context needs those answers recorded first.",
       "--fresh": "record: record every case again, even ones already recorded for this question text, input and model.",
       "--max-requests <n>": "record: stop before the first request when recording could send more than n requests, counting the balanced orders a tied decide case may add.",
-      "--max-usd <x>": "record: stop before the first request when the estimated input cost, from a token estimate, is above x USD.",
+      "--max-usd <x>": "record: stop before the first request when the estimated input cost, from a token estimate, is above x USD, or when the model has no known price.",
     },
     outputs: {
       verdict: "record: recorded or partial; score: pass, or violated when wrong positives exceed the suite's max_wrong_positive or, when the suite sets max_wrong_negative, wrong negatives exceed that",
@@ -432,7 +435,7 @@ export const evalCommand: Command = {
       wrong_positive: "score: positive verdicts that should not be; the kill criterion",
       agreement: "score, decide suites: share of cases whose lean equals the labelled best option; no precision or recall and no pass or fail threshold",
       by_verdict: "score, decide suites: cases and agreeing cases per verdict (clear, weak, tie), raw counts",
-      order_disagrees: "score, decide suites: cases where the written and reversed orders picked different leaders",
+      order_disagrees: "score, decide suites: cases where the written and reversed orders picked different leaders, or either order had an exact tie at the top",
       leader_changed: "score with --ablation: cases whose lean differs from the full run; agree_delta is the change in agreeing cases and verdict_changed the cases with another verdict",
       wrong_negative: "score: expected positives that got a definite non-positive verdict (for a stop suite also a skip); enforced only when suite.json sets max_wrong_negative",
     },

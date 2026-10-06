@@ -4,18 +4,20 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
+import { writeCache } from "../src/engine/cache.ts";
 import { RefereeError } from "../src/engine/errors.ts";
+import { endpointOf } from "../src/engine/key.ts";
 import { Session, type Planned } from "../src/engine/session.ts";
 import { fakeJev, type FakeJev } from "./fake-jev.ts";
 import { FAKE, tempDir } from "./helpers.ts";
 
 const pack = { name: "generic", version: "0.1.0" };
 
-function session(server: FakeJev | null, dataDir: string, extra: { fresh?: boolean; deadlineMs?: number } = {}): Session {
+function session(server: FakeJev | null, dataDir: string, extra: { fresh?: boolean; deadlineMs?: number } = {}, env: Record<string, string> = {}): Session {
   const home = tempDir("referee-home-");
   return new Session({
     command: "test",
-    env: { TYPESAFE_API_KEY: "ts_test_key", ...(server ? { REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: server.url } : {}) },
+    env: { TYPESAFE_API_KEY: "ts_test_key", ...(server ? { REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: server.url } : {}), ...env },
     cwd: home,
     home,
     platform: "linux",
@@ -125,7 +127,43 @@ test("session receipt totals the run without paths or request text", async () =>
   }
 });
 
+test("session receipt records the cost as unknown, not 0, when the answering model has no known price", async () => {
+  const server = await fakeJev();
+  try {
+    const s = session(server, tempDir(), {}, { TYPESAFE_MODEL: "jev-unpriced" });
+    await s.run([noul("a", "some text")]);
+    const receipt = s.record({ verdict: "met" });
+    assert.equal(receipt.requests, 1);
+    assert.equal(receipt.input_tokens, 100);
+    assert.equal(receipt.cost_usd, null);
+  } finally {
+    await server.close();
+  }
+});
+
 const text = (r: { state: unknown }) => (r.state as { text: string }).text;
+
+test("session waits for the requests still in flight when one fails, so the receipt counts every billed request", async () => {
+  const server = await fakeJev(undefined, { behave: (r) => (text(r) === "a" ? { status: 400 } : { delayMs: 200 }) });
+  try {
+    const s = session(server, tempDir());
+    const items = ["a", "b", "c", "d", "e", "f", "g", "h"].map((t) => noul(t, t));
+    const error = await s.run(items).then(
+      () => assert.fail("run should reject"),
+      (e: unknown) => e,
+    );
+    assert.ok(error instanceof RefereeError);
+    assert.equal(error.code, "bad_request");
+    const receipt = s.record({ error });
+    assert.equal(receipt.requests, 5);
+    assert.equal(receipt.input_tokens, 500);
+    assert.equal(receipt.request_ids?.length, 5);
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    assert.equal(server.requests.length, 6);
+  } finally {
+    await server.close();
+  }
+});
 
 test("session batch keeps the other answers when one item fails", async () => {
   const server = await fakeJev(undefined, { behave: (r) => (text(r) === "bad" ? { status: 400 } : undefined) });
@@ -165,4 +203,33 @@ test("session batch still fails when no item got an answer", async () => {
   } finally {
     await server.close();
   }
+});
+
+test("the answer cache is kept per endpoint, and the default endpoint keeps the cache keys it always had", async () => {
+  const yes = await fakeJev(() => ({ q: { type: "noul", noul: 0.97 } }));
+  const no = await fakeJev(() => ({ q: { type: "noul", noul: 0.02 } }));
+  const dataDir = tempDir();
+  try {
+    await session(yes, dataDir).run([noul("x", "same")]);
+    const [other] = await session(no, dataDir).run([noul("x", "same")]);
+    assert.equal(no.requests.length, 1);
+    assert.equal(other?.cached, false);
+    assert.deepEqual(other?.answers?.["q"], { type: "noul", noul: 0.02 });
+    const [again] = await session(yes, dataDir).run([noul("x", "same")]);
+    assert.equal(again?.cached, true);
+    assert.equal(yes.requests.length, 1);
+  } finally {
+    await yes.close();
+    await no.close();
+  }
+  const pinned = "3aa5cb85f58ebcac208a9e0fece05dc6f5ab4afaf6e2c995a1da74ba6d64bcfa";
+  for (const base of [undefined, "", "https://api.typesafe.ai", "https://api.typesafe.ai/"]) {
+    const cacheDir = tempDir();
+    writeCache(cacheDir, pinned, { ts: Date.now(), model: "jev-1.13.0", answers: { q: { type: "noul", noul: 0.5 } }, inputTokens: 1 });
+    const home = tempDir("referee-home-");
+    const offline = new Session({ command: "test", env: base === undefined ? {} : { TYPESAFE_BASE_URL: base }, cwd: home, home, platform: "linux", now: () => Date.now(), pack, dataDir: cacheDir });
+    const [hit] = await offline.run([noul("a", "same")]);
+    assert.equal(hit?.cached, true, String(base));
+  }
+  assert.equal(endpointOf("https://user:pass@proxy.example/v1/?token=x#frag"), "https://proxy.example/v1");
 });

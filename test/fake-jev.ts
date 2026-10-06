@@ -16,6 +16,7 @@ export interface Behaviour {
   readonly retryAfter?: string;
   readonly hang?: boolean;
   readonly body?: unknown;
+  readonly delayMs?: number;
 }
 
 export interface FakeJev {
@@ -51,7 +52,7 @@ export function defaultAnswer(request: FakeRequest): Record<string, unknown> {
 
 export async function fakeJev(
   answer: Answerer = defaultAnswer,
-  options: { hang?: boolean; status?: number; retryAfter?: string; behave?: (request: FakeRequest) => Behaviour | undefined } = {},
+  options: { hang?: boolean; status?: number; retryAfter?: string; delayMs?: number; behave?: (request: FakeRequest) => Behaviour | undefined } = {},
 ): Promise<FakeJev> {
   const requests: FakeRequest[] = [];
   const authorizations: string[] = [];
@@ -66,6 +67,7 @@ export async function fakeJev(
     authorizations.push(String(req.headers.authorization ?? ""));
     const behaviour = options.behave?.(body) ?? options;
     if (behaviour.hang) return;
+    if (behaviour.delayMs) await new Promise((resolve) => setTimeout(resolve, behaviour.delayMs));
     if (behaviour.status) {
       res.writeHead(behaviour.status, { "content-type": "application/json", ...(behaviour.retryAfter ? { "retry-after": behaviour.retryAfter } : {}) });
       res.end(JSON.stringify("body" in behaviour ? behaviour.body : { error: "fake" }));

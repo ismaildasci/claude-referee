@@ -103,7 +103,8 @@ if [[ -n "${IN_BASE_SHA:-}" ]] && git rev-parse --git-dir > /dev/null 2>&1; then
   done < "$work/source.list"
   head -c 60000 "$work/source.txt" > "$work/source.cut"
   if [[ -s "$work/claims.txt" && -s "$work/source.cut" ]]; then
-    line="$("${CLI[@]}" claims --claims "$work/claims.txt" --source "$work/source.cut" --fail-on "${IN_CLAIMS_FAIL_ON:-unsupported}" 2> "$work/claims.err")"
+    node -e 'const fs=require("node:fs");for(const l of fs.readFileSync(process.argv[1],"utf8").split(/\r?\n/))if(l.trim())process.stdout.write(JSON.stringify({text:l})+"\n")' "$work/claims.txt" > "$work/claims.jsonl"
+    line="$("${CLI[@]}" claims --claims "$work/claims.jsonl" --source "$work/source.cut" --fail-on "${IN_CLAIMS_FAIL_ON:-unsupported}" 2> "$work/claims.err")"
     code=$?
     settle claims "$code" "$line"
   else

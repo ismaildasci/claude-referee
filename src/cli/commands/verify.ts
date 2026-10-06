@@ -33,6 +33,7 @@ export function verifyRequest(pack: Pack, thresholds: Thresholds | undefined, cl
   const state = { source };
   const stateTokens = estimateTokens(JSON.stringify(state));
   if (stateTokens > STATE_TOKEN_LIMIT) throw new RefereeError("too_large", "The source is too large for one Jev request.", { next_step: "Pass the relevant section of the source." });
+  if (new Set(claims.map((c) => c.id)).size !== claims.length) throw new RefereeError("bad_input", "Claim ids must be unique.", { next_step: "Give every claim its own id, or leave the ids out." });
   const checks = new Map(claims.map((c) => [c.id, checkClaim(c.text, source)]));
   const asked = claims.filter((c) => {
     const k = checks.get(c.id);
@@ -76,19 +77,19 @@ export function verifyRequest(pack: Pack, thresholds: Thresholds | undefined, cl
     const saysNothing: string[] = [];
     const unsure: string[] = [];
     const unanswered: string[] = [];
-    const reasons: Record<string, string> = {};
-    const listed: Record<string, number> = {};
+    const reasons = new Map<string, string>();
+    const listed = new Map<string, number>();
     for (const claim of claims) {
       const k = checks.get(claim.id);
       if (k && k.quotes_missing.length > 0) {
         const onlyCode = k.quotes_missing.every((q) => claim.text.includes(`\`${q}\``) && !claim.text.includes(`"${q}"`));
         (onlyCode ? unsure : unsupported).push(claim.id);
-        reasons[claim.id] = onlyCode ? "identifier_not_in_source" : "quote_not_in_source";
+        reasons.set(claim.id, onlyCode ? "identifier_not_in_source" : "quote_not_in_source");
         continue;
       }
       if (k && k.numbers_missing.length > 0) {
         unsure.push(claim.id);
-        reasons[claim.id] = "number_not_in_source";
+        reasons.set(claim.id, "number_not_in_source");
         continue;
       }
       const a = probabilities(answers[`claim:${claim.id}:a`]);
@@ -103,22 +104,22 @@ export function verifyRequest(pack: Pack, thresholds: Thresholds | undefined, cl
       if (agree && mean.supports >= supportsAt) {
         if (injected) {
           unsure.push(claim.id);
-          reasons[claim.id] = "source_has_instruction_for_judge";
-          listed[claim.id] = mean.supports;
+          reasons.set(claim.id, "source_has_instruction_for_judge");
+          listed.set(claim.id, mean.supports);
         } else supported += 1;
         continue;
       }
-      listed[claim.id] = mean.supports;
+      listed.set(claim.id, mean.supports);
       if (agree && mean.contradicts >= contradictsAt) {
         contradicted.push(claim.id);
         unsupported.push(claim.id);
-        reasons[claim.id] = "contradicted";
+        reasons.set(claim.id, "contradicted");
       } else if (agree && mean.says_nothing >= silentAt) {
         saysNothing.push(claim.id);
-        reasons[claim.id] = "says_nothing";
+        reasons.set(claim.id, "says_nothing");
       } else {
         unsure.push(claim.id);
-        reasons[claim.id] = agree ? "between_bands" : "orders_disagree";
+        reasons.set(claim.id, agree ? "between_bands" : "orders_disagree");
       }
     }
     const notSupported = unsupported.length > 0;
@@ -134,8 +135,8 @@ export function verifyRequest(pack: Pack, thresholds: Thresholds | undefined, cl
       ...(unsure.length ? { unsure } : {}),
       ...(unanswered.length ? { unanswered } : {}),
       ...(injected ? { source_injection: true } : {}),
-      ...(Object.keys(reasons).length ? { reasons } : {}),
-      ...(Object.keys(listed).length ? { p: listed } : {}),
+      ...(reasons.size ? { reasons: Object.fromEntries(reasons) } : {}),
+      ...(listed.size ? { p: Object.fromEntries(listed) } : {}),
       next_step:
         verdict === "supported"
           ? undefined
@@ -156,7 +157,7 @@ export const claims: Command = {
     inputs: {
       "--source <file|->": "The text the claims must be supported by. '-' reads stdin.",
       "--claim <text>": "A claim; repeat for several.",
-      "--claims <file>": "Claims as a JSON array of strings or {id, text}, JSON lines, or plain lines. Max 100.",
+      "--claims <file>": "Claims as a JSON array of strings or {id, text}, JSON lines, or plain lines. Ids must be unique; a claim without one gets its position. Max 100.",
     },
     outputs: {
       verdict: "supported when every claim is, unsupported when any is contradicted or puts text in double quotes that isn't in the source, unsure otherwise (silent, a backticked name or a number not in the source, no answer)",

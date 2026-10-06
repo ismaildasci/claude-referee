@@ -42,3 +42,15 @@ Micro rules are not ablated: they are reported as flags and never enter the verd
 | Context removed | 11 of 39 | 8/24/7 | 6 |
 
 Reading, within what 39 single-author labels support: dev split 11 of 20, hold-out 5 of 19, so the agreement figure depends on which half is read and is not a stable estimate. Dropping the reversed order changed 8 leaders and 9 verdicts and agreement by one case in either direction; this suite cannot show that the second order improves agreement, only that it moves leaders. Removing the context changed 22 leaders and lowered agreement by 5 cases, and 8 decisions became `clear` of which 2 matched the label: without its facts the model is confidently wrong more often than it was with them. No positive claim about decide accuracy follows from these numbers.
+
+## Rescore (2026-10-06)
+
+The first measurement asked two orders. Rescored after the balanced orders on two-order ties ([record](decide-balanced-near-ties.md); their answers added 14 lines to the recording, the first 78 lines are unchanged) and after an exact tie at the top of one order stopped counting as that order's leader (`order_disagrees` now also counts such an order):
+
+| Run | Agreement | Verdicts clear/weak/tie | Order disagrees | Leaders / verdicts changed against Full |
+|---|---|---|---|---|
+| Full | 16 of 39 | 0/28/11 | 12 | |
+| Reversed order dropped | 17 of 39 | 0/28/11 | 0 | 7 / 8 |
+| Context removed | 11 of 39 | 8/23/8 | 7 | 23 / 22 |
+
+The tie rule alone moves only the context-removed run, from 8/24/7 with 6 order disagreements and 21 changed verdicts: `vb1-migration-window` ties at 0.46 in its reversed order and goes from `weak` to `tie`. The reading above is from the first measurement.

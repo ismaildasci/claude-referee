@@ -154,6 +154,15 @@ test("redact applies pack patterns but keeps the built-in ones", () => {
   assert.equal(value.t, "row [REDACTED:uuid] by [REDACTED:email]");
 });
 
+test("redact ignores the g and y flags of pack patterns, so a credential is never missed", () => {
+  const token = "itk_" + "A".repeat(12) + "b".repeat(12);
+  const stop = (flags: string) => ({ stop: [{ kind: "internal_token", pattern: "\\bitk_[A-Za-z0-9]{24,}", flags }] });
+  for (const flags of ["y", "gy"]) assert.deepEqual(redact({ evidence: `x ${token}` }, { extra: stop(flags) }).stopped, [{ kind: "internal_token", field: "evidence" }], flags);
+  assert.deepEqual(redact({ lines: [`a ${token}`, `b ${token}`] }, { extra: stop("g") }).stopped.map((s) => s.field), ["lines[0]", "lines[1]"]);
+  const replace = { replace: [{ kind: "account_id", pattern: "acct_[0-9]{8}", flags: "y" }] };
+  assert.equal(redact({ t: "id acct_12345678 x" }, { extra: replace }).value.t, "id [REDACTED:account_id] x");
+});
+
 test("redact reports nested field paths and checks object keys", () => {
   const { stopped } = redact({ state: { files: ["ok", FAKE.aws] }, questions: { [FAKE.aws]: 1 } });
   assert.deepEqual(stopped, [

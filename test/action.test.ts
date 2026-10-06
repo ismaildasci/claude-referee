@@ -137,7 +137,7 @@ test("claims: added doc lines are checked against the changed non-markdown files
   const claims = run.calls.find((c) => c.cmd === "claims");
   assert.ok(claims);
   assert.deepEqual(claims.args.filter((a, i) => claims.args[i - 1] === "--fail-on"), ["unsupported"]);
-  assert.equal(readFileSync(join(run.dir, "claims.txt"), "utf8"), "The retry limit is 5 attempts per request.\nPlain added sentence about the cache expiry.\n");
+  assert.equal(readFileSync(join(run.dir, "claims.txt"), "utf8"), '{"text":"The retry limit is 5 attempts per request."}\n{"text":"Plain added sentence about the cache expiry."}\n');
   const source = readFileSync(join(run.dir, "source.txt"), "utf8");
   assert.match(source, /=== src\/a\.ts ===/);
   assert.match(source, /RETRY_LIMIT = 5/);
@@ -167,6 +167,45 @@ test("claims default source keeps files that merely contain 'lock' and drops loc
   const source = readFileSync(join(run.dir, "source.txt"), "utf8");
   for (const v of Object.values(kept)) assert.ok(source.includes(v), v);
   for (const v of Object.values(dropped)) assert.ok(!source.includes(v), v);
+});
+
+test("claims: added doc lines that look like JSON or start with a link reach the real CLI as plain claims", () => {
+  const wrap = join(tempDir("referee-wrap-"), "wrap.cjs");
+  const main = join(root, "src/cli/main.ts");
+  writeFileSync(wrap, `const { spawnSync } = require("node:child_process");
+const env = { ...process.env };
+delete env.TYPESAFE_API_KEY;
+const r = spawnSync(process.execPath, [${JSON.stringify(main)}, ...process.argv.slice(2), "--dry-run"], { env, encoding: "utf8" });
+process.stdout.write(r.stdout ?? "");
+process.stderr.write(r.stderr ?? "");
+process.exit(r.status ?? 1);
+`);
+  const added = {
+    link: "- [Configuration](docs/configuration.md) explains the four settings layers.\n",
+    quotedLink: '- ["Quick start"](docs/start.md) explains how to install the CLI.\n',
+    placeholder: "[{name}] placeholders are replaced by the layer name.\n",
+    jsonSamples: '```json\n{"id": "a", "text": "first sample object in the docs"}\n{"id": "a", "text": "second sample object with the same id"}\n```\n',
+    jsObject: "```js\n{ layers: 4, name: 'the four settings layers' }\n```\n",
+  };
+  for (const [name, lines] of Object.entries(added)) {
+    const repo = tempDir("referee-repo-");
+    git(repo, "init", "-q", "-b", "main");
+    mkdirSync(join(repo, "src"));
+    writeFileSync(join(repo, "README.md"), "# Title\n");
+    writeFileSync(join(repo, "src/a.ts"), "export const a = 1;\n");
+    git(repo, "add", ".");
+    git(repo, "commit", "-q", "-m", "base");
+    const base = git(repo, "rev-parse", "HEAD");
+    writeFileSync(join(repo, "README.md"), `# Title\n\n${lines}`);
+    writeFileSync(join(repo, "src/a.ts"), "export const LAYERS = 4;\n");
+    git(repo, "add", ".");
+    git(repo, "commit", "-q", "-m", "head");
+    const run = runAction({ TYPESAFE_API_KEY: SECRET, IN_BASE_SHA: base, REFEREE_CLI: `node ${wrap}` }, repo);
+    assert.equal(run.status, 0, name + run.stdout + run.stderr);
+    assert.doesNotMatch(run.stdout, /claude-referee claims::CLI error/, name);
+    assert.match(run.outputs, /claims-verdict=would_send/, name);
+    assert.ok(!(run.stdout + run.stderr).includes(SECRET));
+  }
 });
 
 test("an explicit claims-source is used as given", () => {

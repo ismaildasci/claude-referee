@@ -1,4 +1,4 @@
-// Finds .claude/referee.json upward from cwd and merges .claude/referee.local.json over it.
+// Finds .claude/referee.json upward from cwd and merges .claude/referee.local.json over it (hooks and thresholds per key).
 // Project files pick a pack and hooks and can only raise thresholds; key, key command and packs_dir are ignored.
 
 import { existsSync, readFileSync } from "node:fs";
@@ -49,6 +49,14 @@ function checkAreas(raw: unknown): Area[] | undefined {
   });
 }
 
+function mergeThresholds(base: unknown, local: unknown): Thresholds | undefined {
+  const obj = (v: unknown) => (typeof v === "object" && v !== null && !Array.isArray(v) ? (v as Record<string, unknown>) : undefined);
+  if (!obj(base) && !obj(local)) return undefined;
+  const out: Record<string, Record<string, number>> = {};
+  for (const src of [obj(base), obj(local)]) for (const [q, keys] of Object.entries(src ?? {})) out[q] = { ...out[q], ...(obj(keys) as Record<string, number> | undefined) };
+  return out;
+}
+
 export function findProjectFile(cwd: string): string | null {
   let dir = cwd;
   for (;;) {
@@ -78,7 +86,7 @@ export function loadProject(cwd: string): ProjectConfig | null {
       stopGate: gate === "shadow" || gate === "soft" || gate === "active" ? gate : "off",
       preModelSwitch: merged.hooks?.preModelSwitch === true,
     },
-    thresholds: typeof merged.thresholds === "object" && merged.thresholds !== null ? (merged.thresholds as Thresholds) : undefined,
+    thresholds: mergeThresholds(base.thresholds, local.thresholds),
   };
 }
 

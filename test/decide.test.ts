@@ -5,7 +5,10 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { commands } from "../src/cli/commands/index.ts";
+import { planDecide } from "../src/cli/commands/decide.ts";
 import { run } from "../src/cli/run.ts";
+import type { Answer } from "../src/engine/client.ts";
+import { loadPack, packDirs } from "../src/engine/pack.ts";
 import { fakeJev, type Answerer, type FakeRequest } from "./fake-jev.ts";
 import { memoryIo, tempDir } from "./helpers.ts";
 
@@ -214,4 +217,37 @@ test("two agreeing orders and two-option ties stay at two requests", async () =>
   const two = await decideWith(favour({ redis: 0.52, memory: 0.48 }), { decision: "d", options: OPTIONS.slice(0, 2) });
   assert.equal(two.requests.length, 2);
   assert.equal(two.out["verdict"], "tie");
+});
+
+test("an exact top tie inside one order is no leader for that order, whatever the key order of the answer", () => {
+  const best = (probabilities: Record<string, number>): Readonly<Record<string, Answer>> => ({ best: { type: "choice", choice: "", confidence: 0.5, probabilities } as Answer });
+  const byId = (written: Record<string, number>, reversed: Record<string, number>) => new Map([["written", best(written)], ["reversed", best(reversed)]]);
+  const two = planDecide(loadPack("generic", packDirs({})), undefined, { decision: "x" }, [{ name: "a", text: "A" }, { name: "b", text: "B" }]);
+  const ab = two.summarize(byId({ a: 0.5, b: 0.5 }, { b: 0.7, a: 0.3 }));
+  const ba = two.summarize(byId({ b: 0.5, a: 0.5 }, { b: 0.7, a: 0.3 }));
+  assert.deepEqual(ab, ba);
+  assert.equal(ab.disagree, true);
+  assert.equal(ab.verdict, "tie");
+  const three = planDecide(loadPack("generic", packDirs({})), undefined, { decision: "x" }, [{ name: "a", text: "A" }, { name: "b", text: "B" }, { name: "c", text: "C" }]);
+  const reversed = { c: 0.05, b: 0.7, a: 0.25 };
+  assert.equal(three.followUp(byId({ a: 0.45, b: 0.45, c: 0.1 }, reversed)).length, 4);
+  assert.equal(three.followUp(byId({ b: 0.45, a: 0.45, c: 0.1 }, reversed)).length, 4);
+  const agreeing = two.summarize(byId({ b: 0.6, a: 0.4 }, { b: 0.7, a: 0.3 }));
+  assert.equal(agreeing.disagree, false);
+  const unanswered = two.summarize(new Map());
+  assert.equal(unanswered.disagree, false);
+});
+
+test("decide's next step names an exact tie in one order, not a leader disagreement, when both orders favour the same option", async () => {
+  const options = [{ name: "a", text: "A" }, { name: "b", text: "B" }];
+  const answer: Answerer = (r) => ({ best: { type: "choice", choice: labels(r)[0], confidence: 0.5, probabilities: labels(r)[0] === "a" ? { a: 0.45, b: 0.45 } : { b: 0.3, a: 0.6 } } });
+  const { out } = await decideWith(answer, { decision: "d", options });
+  assert.equal(out["verdict"], "tie");
+  assert.equal(out["order_disagrees"], true);
+  assert.match(String(out["next_step"]), /exact tie at the top/);
+  assert.doesNotMatch(String(out["next_step"]), /different leaders/);
+  const best = (probabilities: Record<string, number>): Readonly<Record<string, Answer>> => ({ best: { type: "choice", choice: "", confidence: 0.5, probabilities } as Answer });
+  const plan = planDecide(loadPack("generic", packDirs({})), undefined, { decision: "x" }, options);
+  const split = plan.summarize(new Map([["written", best({ a: 0.6, b: 0.4 })], ["reversed", best({ b: 0.7, a: 0.3 })]]));
+  assert.deepEqual([split.disagree, split.tied], [true, false]);
 });

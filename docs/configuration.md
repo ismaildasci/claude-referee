@@ -19,7 +19,7 @@ Hooks stay off in any project without a project file. `hooks_enabled: false` in 
 |---|---|---|
 | `/plugin configure claude-referee`, or `claude plugin configure claude-referee --values-stdin` (Claude Code 2.1.285+) | You | `api_key` (stored by Claude Code as a sensitive value), `packs_dir`, `hooks_enabled`, `model` (default `jev-1.13.0`) |
 | `.claude/referee.json` (commit it) | The repository | The pack, optional `areas`, which hooks run, stricter thresholds |
-| `.claude/referee.local.json` (gitignore it) | You | Personal overrides, same schema as the project file |
+| `.claude/referee.local.json` (gitignore it) | You | Personal overrides, same schema as the project file; `hooks` and `thresholds` are merged key by key |
 | Environment | You | See [environment variables](#environment-variables) |
 
 ## The project file
@@ -45,7 +45,7 @@ Hooks stay off in any project without a project file. `hooks_enabled: false` in 
 |---|---|---|
 | `pack` | A pack name from the plugin or from `packs_dir` | required |
 | `areas` | Per path prefix: the check commands, evidence files (planned) and an optional pack | none |
-| `thresholds` | Per-question overrides in the same shape as the pack's `thresholds.json`. They can only make a check stricter (for `stop.gate`'s `claims_verified` and `blocked`, which block when the value is *below* the threshold, that means a lower value) | the pack's |
+| `thresholds` | Per-question overrides in the same shape as the pack's `thresholds.json`. They can only make a check stricter (for `stop.gate`'s `claims_verified` and `blocked`, which block when the value is *below* the threshold, that means a lower value). In `.claude/referee.local.json` they merge per question and key over the project file's, so the personal file overrides only the keys it names | the pack's |
 | `hooks.sessionStart` | `true` or `false` | `true` |
 | `hooks.stopGate` | `off`, `shadow` or `soft`; `active` is not built yet | `off` |
 | `hooks.preModelSwitch` | Read but not used: the cache guard was dropped, see [decisions](decisions/dropped.md) | `false` |
@@ -160,6 +160,8 @@ Where the bundled numbers come from: `done.met`'s 0.7 and 0.5 were chosen on 25 
   "replace": [{ "kind": "account_id", "pattern": "\\bacct_[0-9]{8}\\b" }]
 }
 ```
+
+A pattern may carry `flags`, such as `"i"`. The `g` and `y` flags are ignored, so a pattern is checked against every field from the start.
 
 Packs are data only; claude-referee never runs code from a pack.
 

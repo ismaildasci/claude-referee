@@ -21,7 +21,8 @@ interface Item {
 const MAX_ITEMS = 500;
 const LIST_LIMIT = 20;
 
-export function parseItems(text: string): Item[] {
+export function parseItems(raw: string): Item[] {
+  const text = raw.replace(/^\uFEFF/, "");
   const trimmed = text.trim();
   const toItem = (value: unknown, i: number): Item | null => {
     if (typeof value === "string") return value.trim() ? { id: String(i + 1), text: value } : null;
@@ -33,7 +34,9 @@ export function parseItems(text: string): Item[] {
     try {
       return (JSON.parse(trimmed) as unknown[]).map(toItem).filter((x): x is Item => x !== null);
     } catch {
-      throw new RefereeError("bad_input", "Items look like a JSON array but don't parse.");
+      if (trimmed.split("\n", 1)[0]?.trim() === "[" || (/^\[\s*["{[]/.test(trimmed) && trimmed.endsWith("]"))) {
+        throw new RefereeError("bad_input", "Items look like a JSON array but don't parse.", { next_step: "Fix the JSON, or pass JSON lines ({\"text\": ...}) to send lines that start with [ as they are." });
+      }
     }
   }
   const lines = text.split(/\r?\n/);

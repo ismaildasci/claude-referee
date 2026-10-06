@@ -18,7 +18,7 @@ export interface Receipt {
   readonly requests: number;
   readonly cached: number;
   readonly input_tokens: number;
-  readonly cost_usd: number;
+  readonly cost_usd: number | null;
   readonly request_ids?: readonly string[];
   readonly qhash?: string;
   readonly cache_keys?: readonly string[];
@@ -78,7 +78,8 @@ export function readReceipts(dataDir: string, project?: string): Receipt[] {
       for (const line of readFileSync(join(dir, file), "utf8").split("\n")) {
         if (!line.trim()) continue;
         try {
-          out.push(JSON.parse(line) as Receipt);
+          const value = JSON.parse(line) as Partial<Record<keyof Receipt, unknown>> | null;
+          if (typeof value === "object" && value !== null && !Array.isArray(value) && typeof value.id === "string" && typeof value.ts === "string") out.push(value as Receipt);
         } catch {
           continue;
         }
@@ -133,16 +134,22 @@ function overrulePath(dataDir: string): string {
 }
 
 export function readOverruled(dataDir: string): Set<string> {
+  const out = new Set<string>();
+  let text: string;
   try {
-    return new Set(
-      readFileSync(overrulePath(dataDir), "utf8")
-        .split("\n")
-        .filter((l) => l.trim())
-        .map((l) => (JSON.parse(l) as { id: string }).id),
-    );
+    text = readFileSync(overrulePath(dataDir), "utf8");
   } catch {
-    return new Set();
+    return out;
   }
+  for (const line of text.split("\n")) {
+    try {
+      const id = (JSON.parse(line) as { id?: unknown } | null)?.id;
+      if (typeof id === "string") out.add(id);
+    } catch {
+      continue;
+    }
+  }
+  return out;
 }
 
 // Voids a decision: records it outside the chain (receipts are never rewritten) and drops the cache entries it used.

@@ -21,6 +21,10 @@ test("output rounds floats to two digits and keeps _usd precision", () => {
   assert.deepEqual(roundDeep({ a: 0.895, b: 0.29, c: 0.9, d: 0.8999999 }), { a: 0.89, b: 0.29, c: 0.9, d: 0.89 });
 });
 
+test("output keeps an own key named __proto__ from user input", () => {
+  assert.equal(render({ ok: true, reasons: JSON.parse('{"__proto__":"quote_not_in_source"}'), p: JSON.parse('{"__proto__":0.567}') }), '{"ok":true,"reasons":{"__proto__":"quote_not_in_source"},"p":{"__proto__":0.56}}');
+});
+
 test("output is one minified line and drops undefined fields", () => {
   assert.equal(render({ ok: true, verdict: "met", p: 0.914, skip: undefined, receipt: "r1" }), '{"ok":true,"verdict":"met","p":0.91,"receipt":"r1"}');
 });

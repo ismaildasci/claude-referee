@@ -109,6 +109,16 @@ export function isTypeSafeHost(baseUrl: string | undefined): boolean {
   }
 }
 
+export function endpointOf(baseUrl: string | undefined): string | undefined {
+  if (isTypeSafeHost(baseUrl)) return undefined;
+  try {
+    const url = new URL(baseUrl?.trim() ?? "");
+    return `${url.origin}${url.pathname}`.replace(/\/+$/, "");
+  } catch {
+    return "invalid";
+  }
+}
+
 export async function resolveEndpointKey(env: Env, platform: NodeJS.Platform, runner: Runner = runCommand, memo = processMemo): Promise<ResolvedKey> {
   if (isTypeSafeHost(env["TYPESAFE_BASE_URL"])) return resolveKey(env, platform, runner, memo);
   const own = env["REFEREE_BASE_URL_KEY"];

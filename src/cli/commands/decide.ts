@@ -97,15 +97,16 @@ function readContextFiles(context: Context, files: readonly string[]): { content
   return { contents, read };
 }
 
-function argmax(p: Readonly<Record<string, number>>): string {
-  return Object.entries(p).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "";
+function leader(p: Readonly<Record<string, number>>): string | null {
+  const [first, second] = Object.entries(p).sort((a, b) => b[1] - a[1]);
+  return first && second?.[1] === first[1] ? null : (first?.[0] ?? "");
 }
 
 export interface DecidePlan {
   readonly planned: Planned[];
   readonly perOption: boolean;
   readonly followUp: (byId: ReadonlyMap<string, Outcome["answers"]>) => Planned[];
-  readonly summarize: (byId: ReadonlyMap<string, Outcome["answers"]>) => { mean: Record<string, number>; lean: string; verdict: "clear" | "weak" | "tie"; disagree: boolean; orders: number };
+  readonly summarize: (byId: ReadonlyMap<string, Outcome["answers"]>) => { mean: Record<string, number>; lean: string; verdict: "clear" | "weak" | "tie"; disagree: boolean; tied: boolean; orders: number };
 }
 
 const rotate = <T>(list: readonly T[], i: number): T[] => [...list.slice(i), ...list.slice(0, i)];
@@ -140,6 +141,7 @@ export function planDecide(pack: Pack, thresholds: Thresholds | undefined, state
   const summarize: DecidePlan["summarize"] = (byId) => {
     const mean: Record<string, number> = {};
     let disagree = false;
+    let tied = false;
     let orders = 0;
     if (perOption) {
       for (const o of options) {
@@ -150,7 +152,9 @@ export function planDecide(pack: Pack, thresholds: Thresholds | undefined, state
     } else {
       const written = probs(byId, "written") ?? {};
       const reversed = ablation === "reversed" ? written : (probs(byId, "reversed") ?? {});
-      disagree = argmax(written) !== argmax(reversed);
+      const [w, r] = [leader(written), leader(reversed)];
+      tied = w === null || r === null;
+      disagree = tied || w !== r;
       const extra = balanced.map((p) => probs(byId, p.id));
       const all = extra.length > 0 && extra.every((x) => x !== null) ? [written, reversed, ...(extra as Record<string, number>[])] : [written, reversed];
       for (const o of options) mean[o.name] = all.reduce((sum, p) => sum + (p[o.name] ?? 0), 0) / all.length;
@@ -162,7 +166,7 @@ export function planDecide(pack: Pack, thresholds: Thresholds | undefined, state
     const unanimous = orders <= 2;
     const blocked = unanimous && disagree;
     const verdict = !blocked && atLeast(p1, clearAt) && atLeast(p1 - p2, margin) ? "clear" : !blocked && atLeast(p1 - p2, margin) ? "weak" : "tie";
-    return { mean, lean, verdict, disagree, orders };
+    return { mean, lean, verdict, disagree, tied, orders };
   };
   const followUp: DecidePlan["followUp"] = (byId) => (balanced.length > 0 && summarize(byId).verdict === "tie" ? balanced : []);
   return { planned, perOption, followUp, summarize };
@@ -183,7 +187,7 @@ export const decide: Command = {
       verdict: "clear, weak or tie",
       lean: "The option with the highest mean probability",
       p: "Mean probability per option name across the orders asked (per_option mode: normalised fit score)",
-      order_disagrees: "True when the written and reversed orders picked different leaders; with two orders the verdict is then tie",
+      order_disagrees: "True when the written and reversed orders picked different leaders, or either order had an exact tie at the top; with two orders the verdict is then tie",
       orders: "How many option orders were asked: 2, or 2n when the first two tie and there are 3 to 6 options (every option in every slot, plus reversals; the verdict then comes from their mean)",
       mode: "per_option when the options don't fit one request",
       read: "Context files read, with sizes",
@@ -223,7 +227,7 @@ export const decide: Command = {
     const byIdOf = (outcomes: readonly Outcome[]) => new Map(outcomes.map((o) => [o.id, o.answers]));
     return jevCommand(context, "decide", pack, planned, (outcomes: Outcome[]) => {
       const byId = byIdOf(outcomes);
-      const { mean, lean, verdict, disagree, orders } = plan.summarize(byId);
+      const { mean, lean, verdict, disagree, tied, orders } = plan.summarize(byId);
       const flags = input.options.flatMap((o) =>
         micros.flatMap((m) => {
           const answer = byId.get(`micro:${o.name}`)?.[m.id];
@@ -231,7 +235,7 @@ export const decide: Command = {
           return p !== null && (m.bad ? p >= 0.7 : p <= 0.3) ? [{ option: o.name, rule: m.id, p }] : [];
         }),
       );
-      const why = disagree ? "The two option orders picked different leaders. " : "";
+      const why = tied ? "An option order had an exact tie at the top. " : disagree ? "The two option orders picked different leaders. " : "";
       return {
         ok: true,
         verdict,

@@ -31,6 +31,23 @@ test("cliCallsIn counts the CLI only in command position", () => {
   assert.deepEqual(cliCallsIn('node "/work/other-tool/dist/cli.mjs" build'), []);
 });
 
+test("cliCallsIn sees through env with flags, timeout, nohup and xargs", () => {
+  assert.deepEqual(cliCallsIn("env -u TYPESAFE_API_KEY -u TYPESAFE_API_KEY_CMD claude-referee done --dry-run"), ["done"]);
+  assert.deepEqual(cliCallsIn("env -i PATH=/bin claude-referee done"), ["done"]);
+  assert.deepEqual(cliCallsIn("env --unset=K -- claude-referee judge --question q"), ["judge"]);
+  assert.deepEqual(cliCallsIn("timeout 60 claude-referee decide --in d.json"), ["decide"]);
+  assert.deepEqual(cliCallsIn("timeout -k 5 -s KILL 60 npx --yes claude-referee doctor"), ["doctor"]);
+  assert.deepEqual(cliCallsIn("nohup claude-referee eval record --suite x &"), ["eval"]);
+  assert.deepEqual(cliCallsIn("cat claims.txt | xargs -I {} claude-referee claims --claim {} --source s"), ["claims"]);
+  assert.deepEqual(cliCallsIn("xargs -n1 claude-referee claims --source s --claim"), ["claims"]);
+  assert.deepEqual(cliCallsIn(`env -u K node "${CLI}" done`), ["done"]);
+  assert.deepEqual(cliCallsIn("env --unset K --chdir /x claude-referee done"), ["done"]);
+  assert.deepEqual(cliCallsIn("timeout --signal KILL --kill-after 5 30 claude-referee done"), ["done"]);
+  assert.deepEqual(cliCallsIn("timeout --preserve-status 30 claude-referee done"), ["done"]);
+  assert.deepEqual(cliCallsIn("xargs --max-args 1 --max-procs 4 claude-referee judge --question q"), ["judge"]);
+  assert.deepEqual(cliCallsIn("timeout 60 claude -p x; env -u K grep claude-referee x; nohup echo claude-referee; constructor claude-referee done"), []);
+});
+
 function transcriptLine(value: unknown): string {
   return JSON.stringify(value) + "\n";
 }

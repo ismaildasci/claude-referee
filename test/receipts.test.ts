@@ -1,10 +1,11 @@
 // receipts command: project totals, per-day token rows and export without paths or request text.
 
 import assert from "node:assert/strict";
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
-import { readReceipts } from "../src/engine/receipts.ts";
+import { projectId } from "../src/engine/datadir.ts";
+import { appendReceipt, overruleReceipt, readOverruled, readReceipts, type Receipt } from "../src/engine/receipts.ts";
 import { commands } from "../src/cli/commands/index.ts";
 import { run } from "../src/cli/run.ts";
 import { fakeJev } from "./fake-jev.ts";
@@ -100,4 +101,31 @@ test("receipts verify checks the chain and overrule voids cached answers", async
   const report = broken.json();
   assert.equal(report["verdict"], "chain_broken");
   assert.equal(((report["chain"] as { breaks: { kind: string }[] }).breaks[0])?.kind, "mismatch");
+});
+
+test("receipt lines that are not objects with a string id and ts are skipped, and one torn overrule line voids nothing else", async () => {
+  const dataDir = tempDir();
+  const cwd = tempDir();
+  const project = projectId(cwd);
+  const base = (id: string): Receipt => ({ id, ts: "2026-09-30T10:00:00.000Z", command: "done", project, requests: 1, cached: 0, input_tokens: 100, cost_usd: 0.0000042, ms: 5 });
+  appendReceipt(dataDir, base("rGood1"));
+  appendFileSync(join(dataDir, "receipts", project, "2026-09.jsonl"), 'null\n3\n"x"\n[1]\n{}\n{"ts":{}}\n{"id":"rNoTs"}\n{"id":5,"ts":"2026-09-30T10:00:00.000Z"}\n');
+  appendReceipt(dataDir, base("rGood2"));
+  assert.deepEqual(readReceipts(dataDir).map((r) => r.id), ["rGood1", "rGood2"]);
+  const env = { REFEREE_DATA_DIR: dataDir };
+  const summary = memoryIo({ env, cwd });
+  assert.equal(await run(["receipts"], summary, commands), 0);
+  assert.deepEqual([summary.json()["ok"], summary.json()["runs"]], [true, 2]);
+  const tokens = memoryIo({ env, cwd });
+  assert.equal(await run(["receipts", "--tokens"], tokens, commands), 0, JSON.stringify(tokens.json()));
+  const over = memoryIo({ env, cwd });
+  await run(["receipts", "overrule", "rGood2"], over, commands);
+  assert.equal(over.json()["verdict"], "overruled");
+
+  const file = join(dataDir, "overruled.jsonl");
+  writeFileSync(file, '{"id":"r1","ts":"x"}\nnull\n{"id":"r2","ts"\n{"id":"rGood1","ts":"y"}\n');
+  assert.deepEqual([...readOverruled(dataDir)].sort(), ["r1", "rGood1"]);
+  const before = readFileSync(file, "utf8").trim().split("\n").length;
+  overruleReceipt(dataDir, "rGood1", "2026-09-30T11:00:00.000Z");
+  assert.equal(readFileSync(file, "utf8").trim().split("\n").length, before);
 });

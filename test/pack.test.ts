@@ -83,6 +83,22 @@ test("project file is found upward and merged with the local file", () => {
   assert.deepEqual(areaFor(project.areas, project.root, root)?.checks, ["make test"]);
 });
 
+test("the personal file's thresholds override only the question keys it names", () => {
+  const root = tempDir();
+  const pack = loadPack("generic", bundled);
+  writeJson(join(root, ".claude/referee.json"), { pack: "generic", thresholds: { "done.met": { met: 0.9 }, "verify.relation": { supports: 0.85 } } });
+  writeJson(join(root, ".claude/referee.local.json"), { thresholds: { "line.risky": { auto: 0.95 }, "done.met": { missing: 0.6 } } });
+  const project = loadProject(root);
+  assert.deepEqual(project?.thresholds, { "done.met": { met: 0.9, missing: 0.6 }, "verify.relation": { supports: 0.85 }, "line.risky": { auto: 0.95 } });
+  assert.equal(threshold(pack, project?.thresholds, "done.met", "met", 0.7), 0.9);
+  writeJson(join(root, ".claude/referee.local.json"), { thresholds: {} });
+  assert.equal(threshold(pack, loadProject(root)?.thresholds, "done.met", "met", 0.7), 0.9);
+  writeJson(join(root, ".claude/referee.local.json"), { thresholds: { "done.met": { met: 0.95 } } });
+  assert.deepEqual(loadProject(root)?.thresholds?.["done.met"], { met: 0.95 });
+  writeJson(join(root, ".claude/referee.local.json"), {});
+  assert.deepEqual(loadProject(root)?.thresholds, { "done.met": { met: 0.9 }, "verify.relation": { supports: 0.85 } });
+});
+
 test("project absent means null, broken means bad_project", () => {
   assert.equal(loadProject(tempDir()), null);
   const root = tempDir();

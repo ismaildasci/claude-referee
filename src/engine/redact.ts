@@ -84,7 +84,7 @@ export function looksSecret(name: string, value: string): boolean {
 function compile(specs: readonly PatternSpec[] | undefined, global: boolean): Pattern[] {
   return (specs ?? []).map((spec) => {
     try {
-      const flags = [...new Set(((spec.flags ?? "") + (global ? "g" : "")).split(""))].join("");
+      const flags = [...new Set(((spec.flags ?? "").replace(/[gy]/g, "") + (global ? "g" : "")).split(""))].join("");
       return { kind: spec.kind, regex: new RegExp(spec.pattern, flags) };
     } catch {
       throw new RefereeError("bad_pack", `Invalid redaction pattern for ${spec.kind}.`);

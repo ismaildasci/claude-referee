@@ -2,7 +2,7 @@
 // The server runs in-process on a random port with a temp data directory; raw http is used so Host and Origin can be forged.
 
 import assert from "node:assert/strict";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { request as httpRequest } from "node:http";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -522,6 +522,7 @@ test("the flow API joins this project's receipts to Jev's stored answers and its
     appendReceipt(dataDir, receipt("rD", "otherproject1", "2026-09-30T11:30:00.000Z", { verdict: "met" }));
     appendReceipt(dataDir, receipt("rE", project, "2026-09-30T09:00:00.000Z", { verdict: "met", cache_keys: [hexKey("e")] }));
     overruleReceipt(dataDir, "rE", "2026-09-30T09:30:00.000Z");
+    appendFileSync(join(dataDir, "overruled.jsonl"), "null\n{trunc\n");
     appendStop(dataDir, stop("s1", project, { ts: "2026-09-30T11:30:00.000Z", label: "right" }));
     const { decision: _asked, ...skipped } = stop("s2", project, { ts: "2026-09-30T08:00:00.000Z", skipped: "no_edits", edits: 0 });
     appendStop(dataDir, skipped);
@@ -631,6 +632,7 @@ test("a corrupt receipt or cache entry degrades to placeholders instead of faili
     writeFileSync(join(dir, `${hexKey("1")}.json`), JSON.stringify({ ts: 1e20, model: "m", answers: { c1: { type: "noul", noul: 0.9 } } }));
     writeFileSync(join(dir, `${hexKey("2")}.json`), JSON.stringify({ ts: Date.parse("2026-09-30T10:00:00Z"), model: 7, answers: { a: "x", b: null, c: { type: "other" }, d: { type: "choice", choice: "k", confidence: "high", probabilities: { k: "x", j: 0.2 } }, e: { type: "noul", noul: "0.9" } } }));
     appendReceipt(dataDir, receipt("rOk", project, "2026-09-30T11:00:00.000Z", { verdict: "met", cache_keys: [hexKey("1"), hexKey("2")] }));
+    appendFileSync(join(dataDir, "receipts", project, "2026-09.jsonl"), 'null\n42\n"s"\n[1]\n');
     appendReceipt(dataDir, { ...receipt("rBad", project, "2026-09-30T10:00:00.000Z"), command: 5, verdict: 1, error: null, pack: {}, requests: "2", cache_keys: 5 } as unknown as Receipt);
   });
   try {

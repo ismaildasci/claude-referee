@@ -1,12 +1,13 @@
 // judge and verify: item formats, bands, batch stops, claim batching and verdicts.
 
 import assert from "node:assert/strict";
-import { readdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { commands } from "../src/cli/commands/index.ts";
 import { parseItems } from "../src/cli/commands/judge.ts";
 import { run } from "../src/cli/run.ts";
+import type { RefereeError } from "../src/engine/errors.ts";
 import { fakeJev, type Answerer, type Behaviour, type FakeRequest } from "./fake-jev.ts";
 import { FAKE, memoryIo, tempDir } from "./helpers.ts";
 
@@ -208,4 +209,94 @@ test("claims is verify under its new name: same answers, same contract, and veri
   assert.equal(d.out["command"], "claims");
   const dv = await call(["verify", "--describe"], relations({}));
   assert.match(String(dv.out["summary"]), /alias of claims/i);
+});
+
+test("claims rejects duplicate claim ids, so a quote missing from the source can never borrow another claim's answer", async () => {
+  const cwd = tempDir();
+  writeFileSync(join(cwd, "src.md"), "The CLI prints one JSON line.");
+  const fabricated = { id: "2", text: 'The README says "the CLI never writes files"' };
+  const files = {
+    mixed: JSON.stringify([fabricated, "The CLI prints one JSON line."]),
+    jsonl: `${JSON.stringify({ id: 2, text: fabricated.text })}\n${JSON.stringify({ text: "The CLI prints one JSON line." })}\n`,
+    explicit: JSON.stringify([{ id: "x", text: fabricated.text }, { id: "x", text: "The CLI prints one JSON line." }]),
+  };
+  const supportsAll: Answerer = (r) => Object.fromEntries(Object.keys(r.questions).map((k) => [k, k === "injection" ? { type: "noul", noul: 0.01 } : rel(0.95, 0.03, 0.02)]));
+  for (const [name, body] of Object.entries(files)) {
+    writeFileSync(join(cwd, `${name}.json`), body);
+    const { code, out, requests } = await call(["claims", "--source", "src.md", "--claims", `${name}.json`, "--fail-on", "unsupported,unsure"], supportsAll, "", cwd);
+    assert.equal(code, 1, name);
+    assert.equal(out["error"], "bad_input", name);
+    assert.match(String(out["message"]), /unique/, name);
+    assert.equal(requests.length, 0, name);
+  }
+  writeFileSync(join(cwd, "distinct.json"), JSON.stringify([{ id: "a", text: fabricated.text }, { id: "b", text: "The CLI prints one JSON line." }]));
+  const control = await call(["claims", "--source", "src.md", "--claims", "distinct.json"], supportsAll, "", cwd);
+  assert.equal(control.out["verdict"], "unsupported");
+  assert.deepEqual(control.out["reasons"], { a: "quote_not_in_source" });
+  assert.deepEqual(Object.keys(control.requests[0]?.questions ?? {}), ["injection", "claim:b:a", "claim:b:b"]);
+});
+
+test("claims keeps reasons and p for a claim whose id is __proto__", async () => {
+  const cwd = tempDir();
+  writeFileSync(join(cwd, "src.md"), "The CLI prints one JSON line.");
+  writeFileSync(join(cwd, "fab.json"), JSON.stringify([{ id: "__proto__", text: 'The README says "the CLI never writes files"' }, { id: "b", text: "The CLI prints one JSON line." }]));
+  const fab = await call(["claims", "--source", "src.md", "--claims", "fab.json"], relations({ b: rel(0.95, 0.03, 0.02) }), "", cwd);
+  assert.equal(fab.out["verdict"], "unsupported");
+  assert.deepEqual(Object.entries(fab.out["reasons"] as object), [["__proto__", "quote_not_in_source"]]);
+  writeFileSync(join(cwd, "mid.json"), JSON.stringify([{ id: "__proto__", text: "The CLI prints one JSON line." }]));
+  const mid = await call(["claims", "--source", "src.md", "--claims", "mid.json"], relations({ ["__proto__"]: rel(0.6, 0.2, 0.2) }), "", cwd);
+  assert.equal(mid.out["verdict"], "unsure");
+  assert.deepEqual(Object.entries(mid.out["reasons"] as object), [["__proto__", "between_bands"]]);
+  assert.deepEqual(Object.keys(mid.out["p"] as object), ["__proto__"]);
+});
+
+test("items whose first line starts with '[' but are not a JSON array parse as plain lines", () => {
+  assert.deepEqual(parseItems("[Configuration](docs/configuration.md) explains it.\nSecond line here.\n"), [
+    { id: "1", text: "[Configuration](docs/configuration.md) explains it." },
+    { id: "2", text: "Second line here." },
+  ]);
+  assert.equal(parseItems("[ERROR] connection refused\n[WARN] retrying\n").length, 2);
+  assert.equal(parseItems("[ ] Add retries to the client\n").length, 1);
+  for (const plain of ['["Getting started"](docs/start.md) explains installation', "[{name}] is replaced by the name", '["a", "b"] are the accepted values\nnext line', '["a", "b"']) {
+    assert.deepEqual(parseItems(plain).map((i) => i.text), plain.split("\n"), plain);
+  }
+  for (const bad of ['["a", "b",]', '[{"id": "x", "text": "b"},]', '[\n  {"id": "x", "text": "b"},\n', "[\n", "["]) {
+    assert.throws(() => parseItems(bad), (e: RefereeError) => /look like a JSON array/.test(e.message) && /JSON lines/.test(e.details.next_step ?? ""), bad);
+  }
+  assert.throws(() => parseItems('{"id": "x", "text": "a"}\n{"id": "y", "text"\n'), /line 2 is not valid JSON/);
+});
+
+test("items ignore a leading UTF-8 byte order mark", () => {
+  assert.deepEqual(parseItems('\uFEFF{"text":"a"}\n{"text":"b"}\n'), [{ id: "1", text: "a" }, { id: "2", text: "b" }]);
+  assert.deepEqual(parseItems("\uFEFFplain line\r\nsecond\r\n"), [{ id: "1", text: "plain line" }, { id: "2", text: "second" }]);
+  assert.deepEqual(parseItems('\uFEFF["a"]'), [{ id: "1", text: "a" }]);
+});
+
+test("claims accepts a claims file whose first claim is a markdown link", async () => {
+  const cwd = tempDir();
+  writeFileSync(join(cwd, "src.md"), "The configuration page explains the four settings layers.");
+  writeFileSync(join(cwd, "claims.txt"), "[Configuration](docs/configuration.md) explains the four settings layers.\n");
+  const { code, out, requests } = await call(["claims", "--source", "src.md", "--claims", "claims.txt"], relations({ "1": rel(0.95, 0.03, 0.02) }), "", cwd);
+  assert.equal(code, 0);
+  assert.equal(out["verdict"], "supported");
+  assert.equal(requests.length, 1);
+});
+
+test("an empty REFEREE_PACK or --pack is treated as unset, so the project's pack still applies", async () => {
+  const cwd = tempDir();
+  mkdirSync(join(cwd, ".claude"));
+  writeFileSync(join(cwd, ".claude/referee.json"), JSON.stringify({ pack: "i18n" }));
+  const dryRun = async (env: Record<string, string>, extra: string[] = []) => {
+    const io = memoryIo({ cwd, env: { REFEREE_DATA_DIR: tempDir(), ...env }, stdin: '{"id":"a","text":"Save changes"}\n' });
+    const code = await run(["judge", "--question", "string.translatable", "--items", "-", "--dry-run", ...extra], io, commands);
+    return { code, out: io.json() };
+  };
+  for (const [env, extra] of [[{ REFEREE_PACK: "" }, []], [{ REFEREE_PACK: "  " }, []], [{}, ["--pack", ""]], [{}, ["--pack", " "]]] as const) {
+    const { code, out } = await dryRun(env, [...extra]);
+    assert.equal(code, 0, JSON.stringify(out));
+    const sent = out["sent"] as { questions: Record<string, unknown> }[];
+    assert.ok(sent[0]?.questions["string.translatable"]);
+  }
+  const named = await dryRun({ REFEREE_PACK: "generic" });
+  assert.equal(named.out["error"], "bad_pack");
 });

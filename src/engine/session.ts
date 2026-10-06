@@ -9,7 +9,7 @@ import { callJev, type Answer, type JevReply } from "./client.ts";
 import { BATCH_DEADLINE_MS, CACHE_TTL_MS, PROFILES, costUsd, estimateTokens, resolveModel, type Env } from "./config.ts";
 import { resolveDataDir, projectId } from "./datadir.ts";
 import { RefereeError, isRefereeError, type ErrorCode } from "./errors.ts";
-import { resolveEndpointKey, type ResolvedKey } from "./key.ts";
+import { endpointOf, resolveEndpointKey, type ResolvedKey } from "./key.ts";
 import { appendReceipt, newReceiptId, type Receipt } from "./receipts.ts";
 import { redact, stopError, type PackPatterns, type Stop } from "./redact.ts";
 
@@ -80,12 +80,14 @@ export class Session {
   readonly receiptId: string;
   private readonly options: SessionOptions;
   private readonly started: number;
+  private readonly endpoint: string | undefined;
   private readonly inflight = new Map<string, Promise<JevReply>>();
   private keyPromise: Promise<ResolvedKey> | undefined;
   private requests = 0;
   private cachedCount = 0;
   private inputTokens = 0;
   private cost = 0;
+  private unpriced = false;
   private replacedCount = 0;
   private stoppedCount = 0;
   private answeredModel: string | undefined;
@@ -99,6 +101,7 @@ export class Session {
     this.started = options.now();
     this.model = resolveModel(options.env);
     this.dataDir = resolveDataDir(options.env, options.home, options.cwd, options.dataDir);
+    this.endpoint = endpointOf(options.env["TYPESAFE_BASE_URL"]);
     this.receiptId = newReceiptId(this.started);
   }
 
@@ -128,6 +131,7 @@ export class Session {
     const deadline = partial ? AbortSignal.timeout(this.options.deadlineMs ?? BATCH_DEADLINE_MS) : undefined;
     const outcomes: Outcome[] = new Array(prepared.length);
     const failures: RefereeError[] = [];
+    let fatal: { error: unknown } | undefined;
     let next = 0;
     const worker = async () => {
       while (next < prepared.length) {
@@ -135,7 +139,12 @@ export class Session {
         const item = prepared[index];
         if (!item) continue;
         if (!partial) {
-          outcomes[index] = await this.one(item);
+          try {
+            outcomes[index] = await this.one(item);
+          } catch (error) {
+            fatal ??= { error };
+            next = prepared.length;
+          }
           continue;
         }
         try {
@@ -150,6 +159,7 @@ export class Session {
     };
     const width = Math.max(1, Math.min(options.concurrency ?? 6, prepared.length));
     await Promise.all(Array.from({ length: width }, worker));
+    if (fatal) throw fatal.error;
     const [firstFailure] = failures;
     if (firstFailure && !outcomes.some((o) => o.answers !== null)) throw firstFailure;
     return outcomes;
@@ -162,7 +172,7 @@ export class Session {
       return { id, answers: null, stopped: item.stops, cached: false };
     }
     const pack = this.options.pack;
-    const key = cacheKey({ pack: pack.name, packVersion: pack.version, model: this.model, questions: item.body.questions, state: item.body.state });
+    const key = cacheKey({ pack: pack.name, packVersion: pack.version, model: this.model, questions: item.body.questions, state: item.body.state, endpoint: this.endpoint });
     this.cacheKeys.add(key);
     if (!this.options.fresh) {
       const hit = readCache(this.dataDir, key, this.options.now(), CACHE_TTL_MS);
@@ -203,7 +213,9 @@ export class Session {
     if (breakerSession) recordBreaker(this.dataDir, breakerSession, true, this.options.now());
     this.requests += 1;
     this.inputTokens += reply.inputTokens;
-    this.cost += costUsd(reply.model, reply.inputTokens) ?? 0;
+    const usd = costUsd(reply.model, reply.inputTokens);
+    if (usd === null) this.unpriced = true;
+    else this.cost += usd;
     this.answeredModel = reply.model;
     if (reply.requestId) this.requestIds.push(reply.requestId);
     if (!writeCache(this.dataDir, key, { ts: this.options.now(), model: reply.model, answers: reply.answers, inputTokens: reply.inputTokens })) this.unsaved = true;
@@ -232,7 +244,7 @@ export class Session {
       requests: this.requests,
       cached: this.cachedCount,
       input_tokens: this.inputTokens,
-      cost_usd: Number(this.cost.toFixed(8)),
+      cost_usd: this.unpriced ? null : Number(this.cost.toFixed(8)),
       ...(this.requestIds.length > 0 ? { request_ids: this.requestIds } : {}),
       ...(this.questionHashes.size > 0 ? { qhash: [...this.questionHashes].sort().join(",") } : {}),
       ...(this.cacheKeys.size > 0 ? { cache_keys: [...this.cacheKeys].sort() } : {}),

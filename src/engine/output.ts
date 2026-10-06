@@ -24,11 +24,7 @@ export function roundDeep(value: unknown, key = ""): unknown {
   if (typeof value === "number") return roundNumber(key, value);
   if (Array.isArray(value)) return value.map((item) => roundDeep(item, key));
   if (value !== null && typeof value === "object") {
-    const out: Result = {};
-    for (const [k, v] of Object.entries(value)) {
-      if (v !== undefined) out[k] = roundDeep(v, k);
-    }
-    return out;
+    return Object.fromEntries(Object.entries(value).flatMap(([k, v]) => (v === undefined ? [] : [[k, roundDeep(v, k)]])));
   }
   return value;
 }
