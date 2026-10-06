@@ -16,7 +16,7 @@
     "ci:local": "bash scripts/ci-local.sh"
   },
   "devDependencies": {
-    "@types/node": "26.6.3",
+    "@types/node": "26.6.4",
     "@typesafe-ai/sdk": "0.6.0",
     "esbuild": "0.28.2",
     "typescript": "7.0.2"
