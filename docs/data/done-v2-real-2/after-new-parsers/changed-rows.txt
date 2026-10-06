@@ -1,0 +1,26 @@
+sample2 holdout rl-03cd6fd4 mix test exp=met | - missing 0.33 reach=true => mix test:0/0/0/0! missing 0.04 reach=false
+sample2 holdout rl-a864ba87 mix test exp=missing | - missing 0.29 reach=true => mix test:0/0/1/0! missing 0.02 reach=false
+sample2 dev rl-3cee1e31 rubocop exp=met | - missing 0.24 reach=true => rubocop:480/0/0/0 met 0.97 reach=true
+sample2 dev rl-1c15d067 mix test exp=missing | - missing 0.31 reach=true => mix test:288/0/0/41 unsure 0.91 skipped_tests reach=false
+sample2 dev rl-d9cb56b3 mix test exp=missing | - missing 0.27 reach=true => mix test:0/0/0/6! missing 0.03 reach=false
+sample2 dev rl-366fd752 mix test exp=met | - missing 0.29 reach=true => mix test:65/0/0/0 met 0.97 reach=true
+sample2 dev rl-4378dcb8 ctest exp=missing | - missing exit_code_nonzero reach=false => ctest:2555/1/0/3 missing exit_code_nonzero reach=false
+sample2 dev rl-fe7279ef ctest exp=missing | - missing exit_code_nonzero reach=false => ctest:3822/2/0/3 missing exit_code_nonzero reach=false
+sample2 holdout rl-3469b7da ctest exp=met | - missing 0.25 reach=true => ctest:0/0/0/0! missing 0.03 reach=false
+sample2 dev rl-46863d59 rubocop exp=met | - missing 0.24 reach=true => rubocop:464/0/0/0 met 0.96 reach=true
+sample2 holdout rl-4905fd08 ctest exp=met | - missing 0.24 reach=true => ctest:22/0/0/0 met 0.98 reach=true
+sample2 holdout rl-e39c7f5b ctest exp=met | - missing 0.26 reach=true => ctest:0/0/0/0! missing 0.03 reach=false
+sample2 dev rl-ad4a555c ctest exp=missing | - missing exit_code_nonzero reach=false => ctest:138/4/0/0 missing exit_code_nonzero reach=false
+sample2 dev rl-bbbd7b41 ctest exp=missing | - missing exit_code_nonzero reach=false => ctest:139/3/0/0 missing exit_code_nonzero reach=false
+sample2 dev rl-c0d94234 mix test exp=met | - missing 0.28 reach=true => mix test:1534/0/0/0 met 0.97 reach=true
+sample2 holdout rl-3e2ef7a0 mix test exp=met | - missing 0.25 reach=true => mix test:1/0/0/0 met 0.97 reach=true
+sample2 holdout rl-83dac9dc mix test exp=missing | - missing 0.25 reach=true => mix test:1837/0/0/56 unsure 0.88 skipped_tests reach=false
+sample2 holdout rl-4f87a185 mix test exp=met | - missing 0.25 reach=true => mix test:1/0/0/0 met 0.97 reach=true
+sample2 holdout rl-2160ff01 rubocop exp=missing | - missing 0.23 reach=false => rubocop:1769/0/0/0 met 0.96 reach=true
+sample2 holdout rl-535e29af ctest exp=missing | - missing exit_code_nonzero reach=false => ctest:504/1/0/2 missing exit_code_nonzero reach=false
+sample2 rows 272 changed 20
+sample1 s1 rl-5d565b76 rubocop exp=met | - missing 0.22 reach=false => rubocop:3067/0/0/0 unsure 0.95 warning_in_log reach=false
+sample1 s1 rl-0da9b215 rubocop exp=missing | - missing 0.22 reach=false => rubocop:144/0/0/0 unsure 0.95 warning_in_log reach=false
+sample1 s1 rl-a50cea6a rubocop exp=met | - missing 0.25 reach=true => rubocop:12/0/0/0 met 0.96 reach=true
+sample1 s1 rl-3fbd2582 ctest exp=missing | - missing 0.27 reach=false => ctest:0/0/0/0! missing 0.03 reach=false
+sample1 rows 229 changed 4

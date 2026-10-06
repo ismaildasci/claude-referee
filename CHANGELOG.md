@@ -8,6 +8,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - `done` parsers for `mix test` (ExUnit summary, excluded tests count as skipped and cap `met`), `ctest` (summary, `Total Test time`, failed and not-run blocks) and `rubocop` (summary, offenses, corrected offenses, warnings and notices), written from the dev half of the second real-log sample (`docs/decisions/real-logs-2-split.md`, `docs/decisions/real-logs-2-parsers.md`). `cmake --build`, `make`, wrapper builds, `phpstan` and `xcodebuild` were skipped (too few dev examples, or no success marker in the tool's output). Five synthetic cases of `done-v2-h3` and `done-v2-h4` were re-recorded because their logs are now parsed; no suite allowance moved.
 
+### Measured
+
+- Second look at the second real-log sample (`docs/measurements-real-logs-3.md`): on the frozen hold-out half, wrong `met` went from 0 of 52 to 1 of 52, `met` recall among parsed from 23 of 29 to 26 of 35 (0.743), parsed coverage from 41.7% to 49.6%. Its aggregate bars were already seen, so this is not an unseen test; `done` v2 stays not measured on its original bar.
+
 ## [0.2.2] - 2026-10-06
 
 The first unseen real-log test of `done` (code frozen at 0.2.1, 126 public repositories, 231 cases sent to the judge) failed its three registered bars: wrong `met` 2 of 85, `met` recall among recognised logs 69 of 79 (0.873, bar 0.9), `missing` recall 0.529. This release fixes the two parser defects behind the two wrong `met` (a maven run that ran no tests counted as a passed test; Swift Testing logs with several summaries and known issues) and rewrites the README, FAQ and skill text about `done` to match the numbers. After the fixes wrong `met` is 0 of 85 on that sample, but those fixes were made on those same cases, so the 0 is fitted and is not an unseen result; `met` recall (0.873) and `missing` recall (0.529) did not change. `done` v2 stays "not measured" on its original bar. The Stop gate is a reminder, not a judge, and `active` is not recommended. The plugin name `claude-referee` is still flagged by the Claude Code validator; CI tolerates only that error.

@@ -1,0 +1,275 @@
+{
+ "dev": {
+  "cases": 134,
+  "repos": 64,
+  "sent": 116,
+  "unscored_sent": 0,
+  "wrong_met": {
+   "k": 0,
+   "n": 33,
+   "p": 0,
+   "exact95": {
+    "lo": 0,
+    "hi": 0.10576281007457927
+   },
+   "repos": 26,
+   "repo_bootstrap95": {
+    "lo": 0,
+    "hi": 0
+   },
+   "one_sided_upper95": 0.08678118929147499,
+   "repo_clustered": {
+    "repos_hit": 0,
+    "repos": 26,
+    "one_sided_upper95": 0.10883035576078487
+   }
+  },
+  "wrong_met_parsed": {
+   "k": 0,
+   "n": 12,
+   "p": 0,
+   "exact95": {
+    "lo": 0,
+    "hi": 0.26464846939705133
+   },
+   "repos": 10,
+   "repo_bootstrap95": {
+    "lo": 0,
+    "hi": 0
+   },
+   "one_sided_upper95": 0.2209221919455559,
+   "repo_clustered": {
+    "repos_hit": 0,
+    "repos": 10,
+    "one_sided_upper95": 0.2588655508930523
+   }
+  },
+  "met_recall_parsed": {
+   "k": 50,
+   "n": 54,
+   "p": 0.926,
+   "exact95": {
+    "lo": 0.8210665708339282,
+    "hi": 0.9794490327019054
+   },
+   "repos": 35,
+   "repo_bootstrap95": {
+    "lo": 0.8541666666666666,
+    "hi": 0.9824561403508771
+   },
+   "one_sided_upper95": 0.974303297087961,
+   "repo_clustered": {
+    "repos_hit": 35,
+    "repos": 35,
+    "one_sided_upper95": 1
+   }
+  },
+  "parsed_coverage": {
+   "k": 66,
+   "n": 116,
+   "p": 0.569,
+   "exact95": {
+    "lo": 0.47376250489109506,
+    "hi": 0.6605608857441643
+   },
+   "repos": 60,
+   "repo_bootstrap95": {
+    "lo": 0.4594594594594595,
+    "hi": 0.6785714285714286
+   },
+   "one_sided_upper95": 0.6468852989881073,
+   "repo_clustered": {
+    "repos_hit": 38,
+    "repos": 60,
+    "one_sided_upper95": 0.7370775238331495
+   }
+  },
+  "verdicts": {
+   "met": 50,
+   "missing": 32,
+   "unsure": 34
+  }
+ },
+ "holdout": {
+  "cases": 138,
+  "repos": 62,
+  "sent": 115,
+  "unscored_sent": 0,
+  "wrong_met": {
+   "k": 1,
+   "n": 52,
+   "p": 0.019,
+   "exact95": {
+    "lo": 0.00048676241549211506,
+    "hi": 0.10255354465211769
+   },
+   "repos": 38,
+   "repo_bootstrap95": {
+    "lo": 0,
+    "hi": 0.06
+   },
+   "one_sided_upper95": 0.08800893075719357,
+   "repo_clustered": {
+    "repos_hit": 1,
+    "repos": 38,
+    "one_sided_upper95": 0.11885412270056078
+   }
+  },
+  "wrong_met_parsed": {
+   "k": 1,
+   "n": 22,
+   "p": 0.045,
+   "exact95": {
+    "lo": 0.0011501475265735524,
+    "hi": 0.22844439766763341
+   },
+   "repos": 19,
+   "repo_bootstrap95": {
+    "lo": 0,
+    "hi": 0.15
+   },
+   "one_sided_upper95": 0.19812213163688158,
+   "repo_clustered": {
+    "repos_hit": 1,
+    "repos": 19,
+    "one_sided_upper95": 0.22637424927237798
+   }
+  },
+  "met_recall_parsed": {
+   "k": 26,
+   "n": 35,
+   "p": 0.743,
+   "exact95": {
+    "lo": 0.5674411503059615,
+    "hi": 0.8751060280832381
+   },
+   "repos": 25,
+   "repo_bootstrap95": {
+    "lo": 0.6216216216216216,
+    "hi": 0.8620689655172413
+   },
+   "one_sided_upper95": 0.8587833233101383,
+   "repo_clustered": {
+    "repos_hit": 21,
+    "repos": 25,
+    "one_sided_upper95": 0.9434374409799455
+   }
+  },
+  "parsed_coverage": {
+   "k": 57,
+   "n": 115,
+   "p": 0.496,
+   "exact95": {
+    "lo": 0.40110181396392386,
+    "hi": 0.5904318586421506
+   },
+   "repos": 58,
+   "repo_bootstrap95": {
+    "lo": 0.37962962962962965,
+    "hi": 0.608
+   },
+   "one_sided_upper95": 0.5760788805597066,
+   "repo_clustered": {
+    "repos_hit": 35,
+    "repos": 58,
+    "one_sided_upper95": 0.7116652850168439
+   }
+  },
+  "verdicts": {
+   "met": 27,
+   "missing": 43,
+   "unsure": 45
+  }
+ },
+ "all": {
+  "cases": 272,
+  "repos": 126,
+  "sent": 231,
+  "unscored_sent": 0,
+  "wrong_met": {
+   "k": 1,
+   "n": 85,
+   "p": 0.012,
+   "exact95": {
+    "lo": 0.0002978122096584661,
+    "hi": 0.06381287855352841
+   },
+   "repos": 64,
+   "repo_bootstrap95": {
+    "lo": 0,
+    "hi": 0.036585365853658534
+   },
+   "one_sided_upper95": 0.05459601504144379,
+   "repo_clustered": {
+    "repos_hit": 1,
+    "repos": 64,
+    "one_sided_upper95": 0.07198975489470943
+   }
+  },
+  "wrong_met_parsed": {
+   "k": 1,
+   "n": 34,
+   "p": 0.029,
+   "exact95": {
+    "lo": 0.0007443642346902086,
+    "hi": 0.15326766956031773
+   },
+   "repos": 29,
+   "repo_bootstrap95": {
+    "lo": 0,
+    "hi": 0.0967741935483871
+   },
+   "one_sided_upper95": 0.13207382513147808,
+   "repo_clustered": {
+    "repos_hit": 1,
+    "repos": 29,
+    "one_sided_upper95": 0.15339202452618267
+   }
+  },
+  "met_recall_parsed": {
+   "k": 76,
+   "n": 89,
+   "p": 0.854,
+   "exact95": {
+    "lo": 0.7631797563640847,
+    "hi": 0.919868983065802
+   },
+   "repos": 60,
+   "repo_bootstrap95": {
+    "lo": 0.7816091954022989,
+    "hi": 0.9222222222222223
+   },
+   "one_sided_upper95": 0.9113832259262249,
+   "repo_clustered": {
+    "repos_hit": 56,
+    "repos": 60,
+    "one_sided_upper95": 0.976909459208912
+   }
+  },
+  "parsed_coverage": {
+   "k": 123,
+   "n": 231,
+   "p": 0.532,
+   "exact95": {
+    "lo": 0.46590126914656105,
+    "hi": 0.5981899300518023
+   },
+   "repos": 118,
+   "repo_bootstrap95": {
+    "lo": 0.4517543859649123,
+    "hi": 0.6153846153846154
+   },
+   "one_sided_upper95": 0.5880800959318582,
+   "repo_clustered": {
+    "repos_hit": 73,
+    "repos": 118,
+    "one_sided_upper95": 0.693517009494562
+   }
+  },
+  "verdicts": {
+   "met": 77,
+   "missing": 75,
+   "unsure": 79
+  }
+ }
+}
