@@ -8,7 +8,7 @@ What it is not: a model router, a context compactor or a general code reviewer. 
 
 ## Status at 2026-10-06
 
-Four words, used the same way everywhere below. **Done**: in a release (a tag exists) or in main with tests. **Measured**: a dated row in [docs/measurements.md](docs/measurements.md) with a count and a scope. **Open**: planned, with the missing piece named. **Blocked**: waiting on something only the maintainer can do. Latest release: v0.2.3 (tags `v0.2.3` and `claude-referee--v0.2.3`, GitHub release 2026-10-06); before it v0.2.2 (2026-10-06), v0.2.1 and v0.2.0 (2026-10-05) and v0.1.6 (commit 5cc24b1). 0.2.0 to 0.2.2 are on npm; 0.2.3 waits for the maintainer's npm publish. Stop gate studies ran in `shadow` mode, so "blocked" in this file and in the measurements means "would have blocked" (`would_block`); nothing was actually stopped. The name is `claude-referee`: the rename to `evidence-referee` was reverted (2af0ad0, [record](docs/decisions/rename-reverted.md)).
+Four words, used the same way everywhere below. **Done**: in a release (a tag exists) or in main with tests. **Measured**: a dated row in [docs/measurements.md](docs/measurements.md) with a count and a scope. **Open**: planned, with the missing piece named. **Blocked**: waiting on something only the maintainer can do. Latest release: v0.2.3 (tags `v0.2.3` and `claude-referee--v0.2.3`, GitHub release 2026-10-06); before it v0.2.2 (2026-10-06), v0.2.1 and v0.2.0 (2026-10-05) and v0.1.6 (commit 5cc24b1). 0.2.0 to 0.2.3 are on npm. Stop gate studies ran in `shadow` mode, so "blocked" in this file and in the measurements means "would have blocked" (`would_block`); nothing was actually stopped. The name is `claude-referee`: the rename to `evidence-referee` was reverted (2af0ad0, [record](docs/decisions/rename-reverted.md)).
 
 | Item | State | Evidence |
 |---|---|---|
@@ -38,9 +38,9 @@ Four words, used the same way everywhere below. **Done**: in a release (a tag ex
 | A/B bench (cost per task) | harness and pre-registration done, not run | 6847182, 9a8e9a9; [bench/RESULTS.md](bench/RESULTS.md) says "Not run"; needs the maintainer's go and the Jev key |
 | Release 0.2.0 | done, 2026-10-05, GitHub and npm | `package.json`, `npm/package.json` and `plugin.json` said 0.2.0; tags `v0.2.0` and `claude-referee--v0.2.0`; on npm 2026-10-05 |
 | Release 0.2.1 | done, 2026-10-05, GitHub and npm | tags `v0.2.1` and `claude-referee--v0.2.1`, tarball asset; on npm 2026-10-05 |
-| Release 0.2.3 | done on GitHub and the Marketplace listing, 2026-10-06; npm publish waits for the maintainer | tags `v0.2.3` and `claude-referee--v0.2.3`, tarball asset; balanced `decide` orders on ties, the `extract` fixes and `<script>` templates, three `done` parsers, dashboard marks; chosen with Jev (`decide` p 0.98, both orders) |
+| Release 0.2.3 | done, 2026-10-06, GitHub, npm and the Marketplace listing | tags `v0.2.3` and `claude-referee--v0.2.3`, tarball asset; balanced `decide` orders on ties, the `extract` fixes and `<script>` templates, three `done` parsers, dashboard marks; chosen with Jev (`decide` p 0.98, both orders) |
 | Release 0.2.2 | done, 2026-10-06, GitHub and npm | tags `v0.2.2` and `claude-referee--v0.2.2`, tarball asset; on npm 2026-10-06; the parser fixes and the honest `done` wording |
-| npm publish | done, 0.2.0 to 0.2.2 | `npm view claude-referee versions` lists 0.2.0, 0.2.1 and 0.2.2, `latest` is 0.2.2; `npx claude-referee@0.2.2 doctor` runs from a clean HOME; published by the maintainer with a security-key login, no workflow publishes; trusted publishing (a manually triggered workflow behind a protected environment) is still open |
+| npm publish | done, 0.2.0 to 0.2.3 | `npm view claude-referee versions` lists 0.2.0 to 0.2.3, `latest` is 0.2.3; `npx claude-referee@0.2.3 doctor` runs from a clean HOME (2026-10-06); published by the maintainer with a security-key login, no workflow publishes; trusted publishing (a manually triggered workflow behind a protected environment) is still open |
 | `claims` precision for release notes, community marketplace, 1.0 | open | each waits on a measurement named in its section below |
 
 ## v0.1: the commands and the session note (released)
@@ -70,7 +70,7 @@ Released in 0.1.5 and 0.1.6: labels appended instead of rewriting `stops.jsonl`,
 
 Still open:
 
-- Trusted publishing with a manually triggered workflow behind a protected environment. Publishing itself is done (0.2.0 to 0.2.2, by the maintainer with a security-key login). No workflow publishes on a tag by itself.
+- Trusted publishing with a manually triggered workflow behind a protected environment. Publishing itself is done (0.2.0 to 0.2.3, by the maintainer with a security-key login). No workflow publishes on a tag by itself.
 - Whether `decide` should send both orders in one request. A pilot on the 39 close-call decisions on 2026-10-01 passed its registered rules (leaders within re-ask noise, 33% fewer input tokens) but showed no latency gain, and the saving is about $0.000015 per decision, so no code change is planned until a fresh hold-out says otherwise. Raw data and scripts: [jev-evals/experiments](jev-evals/experiments/README.md).
 
 ## v0.2: evidence in code, and thresholds in the open
