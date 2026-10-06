@@ -14,6 +14,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Fixed
 
+- `eval record` honours `--split dev|holdout`. Before, it ignored the flag and recorded every case of the suite, although its own `--max-requests` error suggested `--split`, so a registration that records dev first and the hold-out once could not be followed on a suite that holds both splits.
 - `ui`: bidi control characters (U+061C, U+200E, U+200F, U+202A to U+202E, U+2066 to U+2069) in stored excerpts are shown in the labelling queue as code points such as `[U+202E]`, so a reversed or reordered excerpt can no longer show the labeller other text than what was stored; `stops.jsonl` and the export keep the original text.
 - `ui`: opening the printed URL again in the same tab (after a reload dropped the token from the address bar) now loads the dashboard; before, only the hash changed and the page stayed on "No session token".
 - `ui`: the queue card says "1 edit" and "1 check" in the singular.

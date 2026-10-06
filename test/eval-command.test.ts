@@ -196,3 +196,18 @@ test("eval applies the exit-code rule like done: a non-zero exit code is missing
   assert.deepEqual(out["verdicts"], { met: 1, unsure: 0, missing: 1 });
   assert.equal(out["wrong_positive"], 0);
 });
+
+test("eval record --split records only that split, so dev can be recorded before the hold-out", async () => {
+  const root = suite([{ ...CASES[0]!, split: "dev" }, CASES[1]!]);
+  const dev = await record(root, ["--split", "dev"]);
+  assert.equal(dev.code, 0);
+  assert.equal(dev.requests, 1);
+  const recorded = () => readFileSync(join(root, "s1", "recorded.jsonl"), "utf8").trim().split("\n").map((l) => (JSON.parse(l) as { case: string }).case);
+  assert.deepEqual(recorded(), ["pass"]);
+  const holdout = await record(root, ["--split", "holdout"]);
+  assert.equal(holdout.requests, 1);
+  assert.equal(holdout.out["skipped"], 0);
+  assert.deepEqual(recorded(), ["pass", "fail"]);
+  const bad = await record(root, ["--split", "test"]);
+  assert.equal(bad.out["error"], "bad_input");
+});

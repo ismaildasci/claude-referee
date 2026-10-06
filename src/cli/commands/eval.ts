@@ -185,6 +185,7 @@ async function record(context: Context, pack: Pack, list: readonly Suite[]): Pro
   const ablation = ablationFlag(context);
   const maxRequests = cap(context, "max-requests");
   const maxUsd = cap(context, "max-usd");
+  const split = splitFlag(context);
   const { io, flags } = context;
   const session = new Session({
     command: "eval",
@@ -200,7 +201,7 @@ async function record(context: Context, pack: Pack, list: readonly Suite[]): Pro
   const todo: CaseRequest[] = [];
   let skipped = 0;
   for (const suite of list) {
-    for (const item of suite.cases) {
+    for (const item of suite.cases.filter((c) => !split || c.split === split)) {
       const req = request(context, pack, suite, item, ablation);
       const found = lookup(suite, item, req, session.model, ablation).status === "ok";
       if (ablation === "reversed" && req.planned.length > 0 && !found) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: --ablation reversed is rescored from the full recording and records nothing.`, { next_step: `Run eval record --suite ${suite.name} without --ablation first.` });
@@ -314,10 +315,15 @@ function scoreSuite(context: Context, pack: Pack, suite: Suite, model: string, s
   };
 }
 
-function score(context: Context, pack: Pack, list: readonly Suite[], all: boolean): Result {
-  const model = resolveModel(context.io.env);
+function splitFlag(context: Context): string | undefined {
   const split = str(context, "split");
   if (split !== undefined && split !== "dev" && split !== "holdout") throw new RefereeError("bad_input", '--split takes "dev" or "holdout".');
+  return split;
+}
+
+function score(context: Context, pack: Pack, list: readonly Suite[], all: boolean): Result {
+  const model = resolveModel(context.io.env);
+  const split = splitFlag(context);
   const scored = (all ? list.filter((s) => s.recordings.length > 0) : list).map((s) => scoreSuite(context, pack, s, model, split, str(context, "sweep")));
   const verdict = scored.some((s) => s["verdict"] === "violated") ? "violated" : "pass";
   if (!all && scored[0]) {
@@ -340,7 +346,7 @@ export const evalCommand: Command = {
       "record | score": "Positional action.",
       "--suite <name|all>": "A directory under the evals dir with suite.json, cases.jsonl and, once recorded, recorded.jsonl. 'all' takes every suite; score then skips suites without recordings.",
       "--evals-dir <dir>": "Where the suites live; default jev-evals in the current directory. A suite.json names its command: done, verify, judge, stop or decide (a decide case has decision, context, options and an expected option name; a judge suite also names its question, and its cases have text and an expected yes, no or review).",
-      "--split <dev|holdout>": "score: only cases from this split.",
+      "--split <dev|holdout>": "record and score: only cases from this split, so dev can be recorded before the hold-out.",
       "--sweep <from:to:step>": "score: precision, recall and wrong positives per threshold; suggests one only with at least 10 cases per class.",
       "--ablation <context|reversed>": "decide suites only. record: record answers with the context text left out of the request (reversed needs no new recording). score: rescore with that element removed and report the change against the full run; context needs those answers recorded first.",
       "--fresh": "record: record every case again, even ones already recorded for this question text, input and model.",
