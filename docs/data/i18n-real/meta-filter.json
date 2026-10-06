@@ -1,0 +1,82 @@
+{
+ "react": {
+  "repositories": 261,
+  "by_reason": {
+   "stars": 54,
+   "license": 194,
+   "ok": 13
+  },
+  "passing": [
+   "hamster1963/nezha-dash-v2",
+   "Hccake/skill-deck",
+   "TO-Bus/to-bus-ca",
+   "caudal-labs/caudalflow",
+   "PepperKUN/plasticity-radial-menu-editor",
+   "EmmaStoneX/NetPulse",
+   "jjsvs/Hashcat-Reactor",
+   "wzdavid/openclaw-desktop",
+   "univeous/Pixel-Extractor",
+   "open-metadata/OpenMetadata",
+   "IFRCGo/go-web-app",
+   "tubban1/eduNest",
+   "mercurjs/mercur"
+  ]
+ },
+ "vue": {
+  "repositories": 293,
+  "by_reason": {
+   "license": 192,
+   "pushed": 8,
+   "ok": 35,
+   "stars": 58
+  },
+  "passing": [
+   "Hanziness/FocusTide",
+   "JDArmy/RTASS",
+   "alfg/opendrinks",
+   "openbmc/webui-vue",
+   "WTWB-none/void",
+   "nineaiyu/xadmin-client",
+   "huchenlei/sd-webui-openpose-editor",
+   "FlowCI/flow-web-x",
+   "xingrz/GerberViewer",
+   "taovc/pr-cockpit",
+   "pa001024/riven-mirror",
+   "telosnetwork/teloscan",
+   "ConorSheehan1/spelling-bee",
+   "liaoqifeng/fex-wallet-app",
+   "Luzifer/password",
+   "apache/echarts-handbook",
+   "ldang264/vue-cron-generator",
+   "AndySkaura/crosssubtitle-ai",
+   "NeverBehave/Motivation",
+   "omvjro/DOL-pancake",
+   "NestMTX/app",
+   "just-another-account/electron-telegram-channel-downloader",
+   "evcc-io/evcc",
+   "LycheeOrg/Lychee",
+   "swingmx/webclient",
+   "aneasystone/weekly-practice",
+   "metadist/synaplan",
+   "CircuitVerse/cv-frontend-vue",
+   "antfu/pulls.review",
+   "xziying44/arkham-homebrew",
+   "yzxingtu2026/novusai-saas",
+   "cubezhao/ai-tools-mng",
+   "ThingsPanel/thingspanel-frontend-community",
+   "JaguarJack/catch-admin-vue",
+   "tzuyi0817/PDF-signature"
+  ]
+ },
+ "html": {
+  "repositories": 221,
+  "by_reason": {
+   "license": 172,
+   "stars": 48,
+   "ok": 1
+  },
+  "passing": [
+   "babutree/TTS-API"
+  ]
+ }
+}
