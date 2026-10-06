@@ -1,0 +1,51 @@
+{
+ "all": {
+  "n": 168,
+  "agree": 155,
+  "kappa": 0.7988209285187916,
+  "yes_1": 128,
+  "yes_2": 121,
+  "low_confidence_1": 41,
+  "low_confidence_2": 40
+ },
+ "Y": {
+  "n": 95,
+  "agree": 93,
+  "kappa": 0,
+  "yes_1": 95,
+  "yes_2": 93,
+  "low_confidence_1": 4,
+  "low_confidence_2": 8
+ },
+ "O": {
+  "n": 73,
+  "agree": 62,
+  "kappa": 0.691746641074856,
+  "yes_1": 33,
+  "yes_2": 28,
+  "low_confidence_1": 37,
+  "low_confidence_2": 32
+ },
+ "O_flagged": {
+  "n": 11,
+  "agree": 11,
+  "kappa": 1,
+  "yes_1": 6,
+  "yes_2": 6,
+  "low_confidence_1": 5,
+  "low_confidence_2": 2
+ },
+ "O_unflagged": {
+  "n": 62,
+  "agree": 51,
+  "kappa": 0.6313513513513515,
+  "yes_1": 27,
+  "yes_2": 22,
+  "low_confidence_1": 32,
+  "low_confidence_2": 30
+ },
+ "y_with_one_no": [
+  "openbmc__webui-vue:src/router/routes.js:169",
+  "openbmc__webui-vue:src/views/SecurityAndAccess/Policies/Policies.vue:124"
+ ]
+}

@@ -126,6 +126,10 @@ A new suite `jev-evals/judge-i18n-real` (all items in `holdout`; fields id, expe
 - **Leakage check** (`leakage.json`, before labelling): the blind files hold only key, text and context; no context shows a translation call. Y and O differ in shape, as real code does: text with a placeholder or template expression in 2% of Y and 30% of O, any brace in 11% and 47%; kinds are listed. Labellers see neither origin nor the flag.
 - Reported only: among registered matches, the candidate text equals the value (after normalisation) except in 25 of 556 JSX text and 126 of 483 Vue text matches, where the value sits inside a longer run.
 
+#### Labels, 2026-10-06, before the hold-out is recorded
+
+Two fresh `general-purpose` subagents, each given only its own blind file in an empty directory, labelled all 168 items (identical prompt: the pack's question and both criteria verbatim, plus one sentence not in the pack, that text inside `{...}`, `{{ ... }}` or `${...}` is filled in at run time and the words around it are judged). By script (`agreement.json`): agreement 155 of 168, Cohen's kappa 0.80; on origin O 62 of 73, kappa 0.69; on the 11 flagged O items 11 of 11. Labeller 1 said `yes` to all 95 Y items, labeller 2 to 93; no Y item got two `no`, so none is dropped; the two with one `no` are listed in `agreement.json`. Low confidence was marked on 41 and 40 items. The 11 O disagreements are dropped (`dropped.json`). Scored: **157 items, 120 `yes` and 37 `no`**. Both labellers are sessions of one model family; no person labelled.
+
 ## Status
 
 Recorded on 2026-10-06, `jev-1.13.0`, one request per case. (The build session could not run `eval record`: its sandbox refused every command containing the word eval.) Dev first (receipt `rmuwd71k1p62l`), then the amendment above was committed (8fe449d), then the hold-out once with `eval record --suite judge-i18n --split holdout` (95 requests, receipt `rmuwdlnekxqiv`, no `--fresh`). Order, checkable in the repository: dev `recorded_at` 2026-10-06T07:36:03Z, amendment commit 8fe449d at 07:47:08Z, first hold-out `recorded_at` 07:47:28Z. Nothing was reworded or relabelled.

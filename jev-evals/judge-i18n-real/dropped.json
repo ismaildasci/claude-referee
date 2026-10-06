@@ -1,0 +1,16 @@
+{
+ "y_both_no": [],
+ "o_disagree": [
+  "hamster1963__nezha-dash-v2:src/components/ServerDetailChart.tsx:523",
+  "hamster1963__nezha-dash-v2:src/components/ServerDetailChart.tsx:2042",
+  "hamster1963__nezha-dash-v2:src/components/ServerDetailSummary.tsx:39",
+  "hamster1963__nezha-dash-v2:src/components/ServerDetailSummary.tsx:70",
+  "hamster1963__nezha-dash-v2:src/components/ServerDetailChart.tsx:2035",
+  "hamster1963__nezha-dash-v2:src/components/ServerDetailChart.tsx:610",
+  "hamster1963__nezha-dash-v2:src/components/ServerDetailChart.tsx:540",
+  "Hanziness__FocusTide:platforms/mobile.ts:73",
+  "Hanziness__FocusTide:platforms/mobile.ts:74",
+  "openbmc__webui-vue:src/views/ResourceManagement/Power.vue:10",
+  "openbmc__webui-vue:src/views/Operations/VirtualMedia/ModalConfigureConnection.vue:62"
+ ]
+}
