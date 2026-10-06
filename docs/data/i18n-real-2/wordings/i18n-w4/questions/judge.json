@@ -1,0 +1,13 @@
+{
+  "string.translatable": {
+    "type": "noul",
+    "instructions": {
+      "question": "Would a translator localising this interface need to translate this string?",
+      "note": "`item` is one string found in source code. Text inside {...}, {{ ... }} or ${...} is a value filled in at run time and is not translated; judge the words around it. `context` gives the file, the line and where the string sits: an element, an attribute, a call or an object key."
+    },
+    "criteria": {
+      "true": "Yes when the string holds words a person reads in the interface: a label, button, heading, paragraph, message, placeholder, tooltip, alt text or accessible name.",
+      "false": "No when nothing in it is wording for people: an identifier, key, class name, path, URL, query, command, pattern, format, event name, code, a number, unit or version, a brand or product name, only values filled in at run time, a string already passed to a translation function, or a log, debug or test message."
+    }
+  }
+}

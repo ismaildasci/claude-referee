@@ -1,0 +1,7 @@
+{
+  "name": "i18n-w4",
+  "version": "0.2.0-w4",
+  "model": "jev-1.13.0",
+  "extends": "generic",
+  "description": "Candidate wording for the i18n string.translatable question (docs/decisions/i18n-real-2.md); not shipped."
+}
