@@ -11,3 +11,13 @@ paths = [
   '''^jev-evals/decide-close/subsets\.json$''',
   '''^jev-evals/experiments/p-floor-near-bands/live\.mjs$''',
 ]
+
+[[allowlists]]
+description = "Translation keys (dotted identifiers) in the i18n real-code study data; only the key field, only those files"
+condition = "AND"
+regexTarget = "match"
+regexes = ['''key":"[A-Za-z][A-Za-z0-9_.:-]*"''']
+paths = [
+  '''^docs/data/i18n-real[^/]*/.+\.jsonl$''',
+  '''^jev-evals/judge-i18n-real[^/]*/.+\.jsonl$''',
+]

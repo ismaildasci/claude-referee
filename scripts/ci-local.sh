@@ -34,6 +34,26 @@ step "install canary (offline, only when a claude binary exists)"
 if command -v claude >/dev/null; then rc=0; node scripts/canary-install.mjs || rc=$?; test "$rc" -eq 0 -o "$rc" -eq 2; else echo "claude not installed here; the canary workflow covers it"; fi
 
 step "private terms";bash scripts/check-no-private.sh
-step "secrets in git history (gitleaks, when installed)"
-if command -v gitleaks >/dev/null; then gitleaks git --redact --no-banner . 2>&1 | tail -1; test "${PIPESTATUS[0]}" -eq 0; else echo "gitleaks not installed here; CI runs it"; fi
+step "secrets in git history (gitleaks 8.30.1, as CI; downloaded with its checksum when not installed)"
+gl="$(command -v gitleaks || true)"
+if [ -z "$gl" ]; then
+  case "$(uname -s)_$(uname -m)" in
+    Darwin_arm64) asset=darwin_arm64; sum=b40ab0ae55c505963e365f271a8d3846efbc170aa17f2607f13df610a9aeb6a5 ;;
+    Darwin_x86_64) asset=darwin_x64; sum=dfe101a4db2255fc85120ac7f3d25e4342c3c20cf749f2c20a18081af1952709 ;;
+    Linux_x86_64) asset=linux_x64; sum=551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb ;;
+    Linux_aarch64) asset=linux_arm64; sum=e4a487ee7ccd7d3a7f7ec08657610aa3606637dab924210b3aee62570fb4b080 ;;
+    *) asset="" ;;
+  esac
+  cache="${XDG_CACHE_HOME:-$HOME/.cache}/claude-referee/gitleaks-8.30.1-${asset:-none}"
+  if [ -n "$asset" ] && [ ! -x "$cache/gitleaks" ]; then
+    mkdir -p "$cache"
+    curl -sSfL -o "$cache/gitleaks.tar.gz" "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_${asset}.tar.gz" \
+      && echo "$sum  $cache/gitleaks.tar.gz" | shasum -a 256 -c - >/dev/null \
+      && tar xzf "$cache/gitleaks.tar.gz" -C "$cache" gitleaks || rm -f "$cache/gitleaks"
+    rm -f "$cache/gitleaks.tar.gz"
+  fi
+  [ -x "$cache/gitleaks" ] && gl="$cache/gitleaks"
+fi
+if [ -z "$gl" ]; then echo "gitleaks unavailable (not installed, download failed): CI would scan, so stop here"; exit 1; fi
+"$gl" git --redact --no-banner . 2>&1 | tail -1; test "${PIPESTATUS[0]}" -eq 0
 printf '\nci-local: all steps passed\n'
