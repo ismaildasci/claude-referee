@@ -1,0 +1,51 @@
+{"file":"src/App.vue","line":80,"position":"vue-text","key":"notifications.error","value":"Error","read":true}
+{"file":"src/App.vue","line":85,"position":"vue-text","key":"notifications.warning","value":"Warning","read":true}
+{"file":"src/components/ui/settings/SettingsPopup.vue","line":35,"position":"vue-text","key":"common.download","value":"Download","read":true}
+{"file":"src/components/ui/side-panel/side-panel-items/Canvas.vue","line":4,"position":"vue-text","key":"common.canvas","value":"Canvas","read":true}
+{"file":"src/components/ui/side-panel/side-panel-items/Code.vue","line":8,"position":"vue-text","key":"common.terminal","value":"Terminal","read":true}
+{"file":"src/components/ui/side-panel/side-panel-items/ExplorerMenu.vue","line":17,"position":"vue-text","key":"contextMenu.createFile","value":"Create File","read":true}
+{"file":"src/components/ui/side-panel/side-panel-items/ExplorerMenu.vue","line":18,"position":"vue-text","key":"contextMenu.createFolder","value":"Create Folder","read":true}
+{"file":"src/components/ui/side-panel/side-panel-items/ExplorerMenu.vue","line":19,"position":"vue-text","key":"contextMenu.delete","value":"Delete File/Folder","read":true}
+{"file":"src/components/ui/side-panel/side-panel-items/ExplorerMenu.vue","line":21,"position":"vue-text","key":"contextMenu.rename","value":"Rename","read":true}
+{"file":"src/components/ui/side-panel/side-panel-items/ExplorerMenu.vue","line":23,"position":"vue-text","key":"contextMenu.cut","value":"Cut","read":true}
+{"file":"src/components/ui/side-panel/side-panel-items/ExplorerMenu.vue","line":24,"position":"vue-text","key":"contextMenu.copy","value":"Copy","read":true}
+{"file":"src/components/ui/side-panel/side-panel-items/ExplorerMenu.vue","line":26,"position":"vue-text","key":"contextMenu.epaste","value":"Paste","read":true}
+{"file":"src/components/ui/side-panel/side-panel-items/Graph.vue","line":8,"position":"vue-text","key":"common.graph","value":"Graph","read":true}
+{"file":"src/components/ui/side-panel/side-panel-items/Home.vue","line":7,"position":"vue-text","key":"common.home","value":"Home","read":true}
+{"file":"src/components/ui/side-panel/SidePanel.vue","line":182,"position":"vue-text","key":"common.explorer","value":"Explorer","read":true}
+{"file":"src/components/ui/side-panel/SidePanel.vue","line":296,"position":"vue-text","key":"common.tools","value":"Tools","read":true}
+{"file":"src/components/ui/side-panel/SidePanel.vue","line":313,"position":"vue-text","key":"common.settings","value":"Settings","read":true}
+{"file":"src/views/Global.vue","line":17,"position":"vue-text","key":"common.general","value":"General","read":true}
+{"file":"src/views/Global.vue","line":18,"position":"vue-attr","key":"settingsHeaders.changeWorkdir","value":"Change working directory","read":true}
+{"file":"src/views/Global.vue","line":21,"position":"vue-attr","key":"settingsButtons.change","value":"Change","read":true}
+{"file":"src/views/Global.vue","line":24,"position":"vue-text","key":"settings.font","value":"Change application font","read":true}
+{"file":"src/views/Global.vue","line":28,"position":"vue-text","key":"settings.addFont","value":"Add your own font","read":true}
+{"file":"src/views/Global.vue","line":29,"position":"vue-attr","key":"settingsButtons.addFont","value":"Add font","read":true}
+{"file":"src/views/Global.vue","line":32,"position":"vue-attr","key":"settingsHeaders.editorSettings","value":"Editor settings","read":true}
+{"file":"src/views/Global.vue","line":34,"position":"vue-text","key":"settings.lineNumbers","value":"Enable editor line numbers","read":true}
+{"file":"src/views/Global.vue","line":39,"position":"vue-text","key":"settingsHeaders.changeLocale","value":"Select language","read":true}
+{"file":"src/views/Global.vue","line":40,"position":"vue-attr","key":"settingsSelector.language","value":"Language","read":true}
+{"file":"src/views/Global.vue","line":44,"position":"vue-text","key":"settings.editorMode","value":"Open new notes by default in mode","read":true}
+{"file":"src/views/Global.vue","line":45,"position":"vue-attr","key":"settingsSelector.editorMode","value":"Mode","read":true}
+{"file":"src/views/Global.vue","line":49,"position":"vue-attr","key":"settingsHeaders.officialPlugins","value":"Official plugins","read":true}
+{"file":"src/views/Home.vue","line":71,"position":"vue-text","key":"home.welcome","value":"Welcome","read":true}
+{"file":"src/views/JournalContent.vue","line":23,"position":"vue-text","key":"journalContent.loadingMsg","value":"Loading","read":true}
+{"file":"src/views/Loader.vue","line":116,"position":"vue-text","key":"loader.loader","value":"Veni. Vidi. Notavi.","read":true}
+{"file":"src/views/Plugins.vue","line":67,"position":"vue-text","key":"plugins.pluginHeader","value":"Extensions and Customizations","read":true}
+{"file":"src/views/Plugins.vue","line":68,"position":"vue-text","key":"plugins.collect","value":"Build yours","read":true}
+{"file":"src/views/Plugins.vue","line":70,"position":"vue-attr","key":"settingsHeaders.installPlugins","value":"Install plugins","read":true}
+{"file":"src/views/Plugins.vue","line":72,"position":"vue-text","key":"plugins.moreFreedom","value":"Do you want more freedom?","read":true}
+{"file":"src/views/Plugins.vue","line":73,"position":"vue-attr","key":"settingsButtons.installPlugins","value":"Install plugins","read":true}
+{"file":"src/views/Plugins.vue","line":75,"position":"vue-attr","key":"settingsHeaders.selectTheme","value":"Select theme","read":true}
+{"file":"src/views/Plugins.vue","line":80,"position":"vue-attr","key":"settingsHeaders.installedThemes","value":"Installed themes","read":true}
+{"file":"src/views/SettingsSelector.vue","line":34,"position":"vue-attr","key":"settingsSelector.settingsLabel","value":"Settings","read":true}
+{"file":"src/views/SettingsSelector.vue","line":38,"position":"vue-text","key":"settingsSelector.settingsLabel","value":"Settings","read":true}
+{"file":"src/views/SettingsSelector.vue","line":40,"position":"vue-text","key":"settingsSelector.general","value":"General","read":true}
+{"file":"src/views/SettingsSelector.vue","line":43,"position":"vue-text","key":"common.extAndCustomization","value":"Extensions and Customizations","read":true}
+{"file":"src/views/SettingsSelector.vue","line":46,"position":"vue-text","key":"settingsSelector.sideRepos","value":"Custom Repositories","read":true}
+{"file":"src/views/SideRepos.vue","line":18,"position":"vue-text","key":"settingsSelector.sideRepos","value":"Custom Repositories","read":true}
+{"file":"src/views/SideRepos.vue","line":22,"position":"vue-attr","key":"settingsButtons.add","value":"Add","read":true}
+{"file":"src/views/SideRepos.vue","line":24,"position":"vue-attr","key":"settingsHeaders.installedRepos","value":"Installed Repos","read":true}
+{"file":"src/views/UnsupportedContent.vue","line":20,"position":"vue-text","key":"unsupportedContent.filetypeNotSupportedMsg","value":"This file type is not supported!","read":true}
+{"file":"src/views/VideoContent.vue","line":23,"position":"vue-text","key":"videoContent.vidErrMsg","value":"Error Loading Video","read":true}
+{"file":"src/views/WelcomeSetup.vue","line":51,"position":"vue-text","key":"welcomeSetup.namePrompt","value":"What should I call you?","read":true}

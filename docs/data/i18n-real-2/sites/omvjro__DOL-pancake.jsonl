@@ -1,0 +1,113 @@
+{"file":"src/App.vue","line":21,"position":"expr","key":"placeholder.1","value":"Welcome to DoL pancake maker!<br><br>The tool helps you to forge fake screenshots for Degrees of Lewdity, just type here, and click buttons ","read":true}
+{"file":"src/App.vue","line":22,"position":"expr","key":"placeholder.buttonPosNarrow","value":"👇","read":true}
+{"file":"src/App.vue","line":22,"position":"expr","key":"placeholder.buttonPosWide","value":"👉","read":true}
+{"file":"src/App.vue","line":23,"position":"expr","key":"placeholder.2","value":"to insert special objects.<br><br>Please clarify the screenshot is fake if others are confused. If any problems or advice, feel free to tell me on <a contenteditable=\"false\" href=\"https://github.com/omvjro/DOL-pancake\" target=\"_blank\">GitHub</a>.<br><br>&ZeroWidthSpace;<a class=\"normalLink\">&ZeroWidthSpace;Next</a>","read":true}
+{"file":"src/App.vue","line":40,"position":"expr","key":"relationBox.kylar","value":"Kylar","read":true}
+{"file":"src/App.vue","line":41,"position":"expr","key":"relationBox.loner","value":"loner","read":true}
+{"file":"src/App.vue","line":42,"position":"expr","key":"relationBox.isHysterical","value":"is hysterical.","read":true}
+{"file":"src/App.vue","line":46,"position":"expr","key":"relationBox.love","value":"Love","read":true}
+{"file":"src/App.vue","line":53,"position":"expr","key":"relationBox.lust","value":"Lust","read":true}
+{"file":"src/App.vue","line":60,"position":"expr","key":"relationBox.jealousy","value":"Jealousy","read":true}
+{"file":"src/App.vue","line":78,"position":"expr","key":"title","value":"DoL pancake","read":true}
+{"file":"src/App.vue","line":123,"position":"expr","key":"title","value":"DoL pancake","read":true}
+{"file":"src/App.vue","line":141,"position":"vue-text","key":"restoreTip","value":"Last edited content restored. Click here to restore initial content.","read":true}
+{"file":"src/App.vue","line":149,"position":"vue-text","key":"watermark","value":"MADE BY DOL PANCAKE","read":true}
+{"file":"src/App.vue","line":150,"position":"vue-text","key":"watermark","value":"MADE BY DOL PANCAKE","read":true}
+{"file":"src/App.vue","line":161,"position":"vue-binding","key":"intro","value":"Welcome to DoL pancake maker! The tool helps you to forge fake screenshots for Degrees of Lewdity. Please clarify the screenshot is fake if others are confused. If any problems or advice, feel free to tell me on <a contenteditable=\"false\" href=\"https://github.com/omvjro/DOL-pancake\" target=\"_blank\">GitHub</a>.","read":true}
+{"file":"src/App.vue","line":164,"position":"vue-text","key":"theme","value":"Theme","read":true}
+{"file":"src/App.vue","line":166,"position":"vue-text","key":"default","value":"Default","read":true}
+{"file":"src/App.vue","line":178,"position":"vue-text","key":"scene","value":"Scene","read":true}
+{"file":"src/App.vue","line":180,"position":"vue-text","key":"default","value":"Default","read":true}
+{"file":"src/App.vue","line":185,"position":"vue-text","key":"language","value":"Language","read":true}
+{"file":"src/App.vue","line":196,"position":"vue-text","key":"experimental","value":"Experimental","read":true}
+{"file":"src/App.vue","line":197,"position":"vue-text","key":"indexed","value":"Numbered links","read":true}
+{"file":"src/App.vue","line":198,"position":"vue-text","key":"exportHTML","value":"Export HTML","read":true}
+{"file":"src/App.vue","line":199,"position":"vue-text","key":"pasteDirectly","value":"Paste formatted","read":true}
+{"file":"src/App.vue","line":206,"position":"vue-binding","key":"insertPics","value":"Insert pics","read":true}
+{"file":"src/App.vue","line":209,"position":"vue-text","key":"insertNPCwidgets","value":"Insert NPC widgets","read":true}
+{"file":"src/App.vue","line":211,"position":"vue-text","key":"invisibleTip","value":"Invisible widgets, only visible when editing","read":true}
+{"file":"src/App.vue","line":214,"position":"vue-text","key":"achievementPopup","value":"Achievement popup","read":true}
+{"file":"src/App.vue","line":216,"position":"vue-text","key":"noPopup","value":"None","read":true}
+{"file":"src/App.vue","line":226,"position":"vue-attr","key":"achvName","value":"name","read":true}
+{"file":"src/App.vue","line":227,"position":"vue-attr","key":"achvDesc","value":"desc","read":true}
+{"file":"src/App.vue","line":228,"position":"vue-text","key":"captureFeat","value":"Capture feat only","read":true}
+{"file":"src/App.vue","line":243,"position":"vue-text","key":"relationBox.desc","value":"description","read":true}
+{"file":"src/App.vue","line":248,"position":"vue-text","key":"relationBox.horizontal","value":"horizontal","read":true}
+{"file":"src/App.vue","line":249,"position":"vue-text","key":"relationBox.vertical","value":"vertical","read":true}
+{"file":"src/App.vue","line":251,"position":"vue-binding","key":"relationBox.icon","value":"icon","read":true}
+{"file":"src/App.vue","line":259,"position":"vue-text","key":"clear","value":"Clear","read":true}
+{"file":"src/components/panel/CodeButton.vue","line":12,"position":"expr","key":"copy.caption","value":"<a id=\"copyCode\">Click me</a> to copy. There may be neglected widgets because of ambiguity. Also, please check &lt;&lt;personselect&gt;&gt; widgets.","read":true}
+{"file":"src/components/panel/CodeButton.vue","line":18,"position":"expr","key":"copy.fail","value":"Copy failed, please do it manually!","read":true}
+{"file":"src/components/panel/CodeButton.vue","line":25,"position":"vue-text","key":"code","value":"Code","read":true}
+{"file":"src/components/panel/ColouredText.vue","line":19,"position":"expr","key":"inputPrompt","value":"Text here","read":true}
+{"file":"src/components/panel/ColouredText.vue","line":52,"position":"expr","key":"next","value":"Next","read":true}
+{"file":"src/components/panel/ColouredText.vue","line":66,"position":"vue-text","key":"insertColoredText","value":"Insert coloured text","read":true}
+{"file":"src/components/panel/ColouredText.vue","line":67,"position":"vue-attr","key":"normal","value":"Normal","read":true}
+{"file":"src/components/panel/ColouredText.vue","line":70,"position":"vue-attr","key":"attitude","value":"Attitude","read":true}
+{"file":"src/components/panel/ColouredText.vue","line":73,"position":"vue-attr","key":"effected","value":"Effected","read":true}
+{"file":"src/components/panel/ColouredText.vue","line":76,"position":"vue-attr","key":"biu","value":"B/I/U","read":true}
+{"file":"src/components/panel/ColouredText.vue","line":77,"position":"vue-text","key":"bold","value":"Bold","read":true}
+{"file":"src/components/panel/ColouredText.vue","line":78,"position":"vue-text","key":"italic","value":"Italic","read":true}
+{"file":"src/components/panel/ColouredText.vue","line":79,"position":"vue-text","key":"underlined","value":"Underlined","read":true}
+{"file":"src/components/panel/ColouredText.vue","line":84,"position":"vue-text","key":"insert","value":"Insert","read":true}
+{"file":"src/components/panel/ColouredText.vue","line":86,"position":"vue-text","key":"link","value":"link","read":true}
+{"file":"src/components/panel/ColouredText.vue","line":87,"position":"vue-text","key":"wraithLink","value":"wraith link","read":true}
+{"file":"src/components/panel/ColouredText.vue","line":88,"position":"vue-text","key":"insertLink.1","value":" which takes ","read":true}
+{"file":"src/components/panel/ColouredText.vue","line":90,"position":"vue-text","key":"insertLink.3","value":"routes to ","read":true}
+{"file":"src/components/panel/ColouredText.vue","line":90,"position":"vue-text","key":"insertLink.2","value":" min(s), ","read":true}
+{"file":"src/components/panel/ColouredText.vue","line":95,"position":"vue-text","key":"insertLink.4","value":" ","read":true}
+{"file":"src/components/panel/ColouredText.vue","line":97,"position":"vue-text","key":"insertLink.5","value":"without","read":true}
+{"file":"src/components/panel/ColouredText.vue","line":98,"position":"vue-text","key":"insertLink.6","value":"with","read":true}
+{"file":"src/components/panel/ColouredText.vue","line":100,"position":"vue-text","key":"insertLink.7","value":" endevent","read":true}
+{"file":"src/components/panel/ColouredText.vue","line":101,"position":"vue-text","key":"confirm","value":"Confirm","read":true}
+{"file":"src/components/panel/CustomWidget.vue","line":82,"position":"expr","key":"widget.duplicated","value":"Duplicate name","read":true}
+{"file":"src/components/panel/CustomWidget.vue","line":91,"position":"expr","key":"widget.success","value":"saved","read":true}
+{"file":"src/components/panel/CustomWidget.vue","line":111,"position":"vue-text","key":"insertCustomWidgets","value":"Custom widgets","read":true}
+{"file":"src/components/panel/CustomWidget.vue","line":114,"position":"vue-text","key":"new","value":"New","read":true}
+{"file":"src/components/panel/CustomWidget.vue","line":116,"position":"vue-text","key":"confirm","value":"Confirm","read":true}
+{"file":"src/components/panel/CustomWidget.vue","line":117,"position":"vue-text","key":"delete","value":"Delete","read":true}
+{"file":"src/components/panel/CustomWidget.vue","line":118,"position":"vue-text","key":"exportAll","value":"Export all","read":true}
+{"file":"src/components/panel/CustomWidget.vue","line":123,"position":"vue-text","key":"widget.name","value":"Widget name","read":true}
+{"file":"src/components/panel/CustomWidget.vue","line":127,"position":"vue-text","key":"widget.display","value":"Widget Display","read":true}
+{"file":"src/components/panel/CustomWidget.vue","line":136,"position":"vue-text","key":"save","value":"Save","read":true}
+{"file":"src/components/panel/CustomWidget.vue","line":137,"position":"vue-text","key":"insert","value":"Insert","read":true}
+{"file":"src/components/panel/CustomWidget.vue","line":138,"position":"vue-text","key":"cancel","value":"Cancel","read":true}
+{"file":"src/components/panel/CustomWidget.vue","line":139,"position":"vue-text","key":"useHTML","value":"Use HTML","read":true}
+{"file":"src/components/panel/InsertTags.vue","line":72,"position":"vue-text","key":"insertLewd","value":"Insert lewd tags","read":true}
+{"file":"src/components/panel/InsertTags.vue","line":74,"position":"vue-text","key":"lewd.exhibitionist","value":"Exhibitionism","read":true}
+{"file":"src/components/panel/InsertTags.vue","line":75,"position":"vue-text","key":"lewd.promiscuous","value":"Promiscuity","read":true}
+{"file":"src/components/panel/InsertTags.vue","line":76,"position":"vue-text","key":"lewd.deviant","value":"Deviancy","read":true}
+{"file":"src/components/panel/InsertTags.vue","line":83,"position":"vue-text","key":"confirm","value":"Confirm","read":true}
+{"file":"src/components/panel/InsertTags.vue","line":86,"position":"vue-text","key":"insertOther","value":"Insert other tags","read":true}
+{"file":"src/components/panel/InsertTags.vue","line":87,"position":"vue-attr","key":"tags.trans","value":"Trans","read":true}
+{"file":"src/components/panel/InsertTags.vue","line":97,"position":"vue-attr","key":"tags.others","value":"Others","read":true}
+{"file":"src/components/panel/InsertTags.vue","line":102,"position":"vue-attr","key":"symbols","value":"Symbols","read":true}
+{"file":"src/components/panel/PicButton.vue","line":15,"position":"expr","key":"pic.loading","value":"Loading...","read":true}
+{"file":"src/components/panel/PicButton.vue","line":29,"position":"expr","key":"pic.error","value":"Something went wrong: ","read":true}
+{"file":"src/components/panel/PicButton.vue","line":40,"position":"expr","key":"pic.loading","value":"Loading...","read":true}
+{"file":"src/components/panel/PicButton.vue","line":51,"position":"expr","key":"pic.error","value":"Something went wrong: ","read":true}
+{"file":"src/components/panel/PicButton.vue","line":59,"position":"vue-text","key":"preview","value":"Preview","read":true}
+{"file":"src/components/panel/PicButton.vue","line":60,"position":"vue-text","key":"download","value":"Download","read":true}
+{"file":"src/components/panel/SaveManage.vue","line":117,"position":"vue-text","key":"savePassage.1","value":"Save as ","read":true}
+{"file":"src/components/panel/SaveManage.vue","line":119,"position":"vue-text","key":"savePassage.2","value":" named ","read":true}
+{"file":"src/components/panel/SaveManage.vue","line":121,"position":"vue-text","key":"confirm","value":"Confirm","read":true}
+{"file":"src/components/panel/SaveManage.vue","line":122,"position":"vue-text","key":"duplicated","value":"Duplicated","read":true}
+{"file":"src/components/panel/SaveManage.vue","line":126,"position":"vue-text","key":"load","value":"Load","read":true}
+{"file":"src/components/panel/SaveManage.vue","line":127,"position":"vue-text","key":"delete","value":"Delete","read":true}
+{"file":"src/components/panel/SaveManage.vue","line":128,"position":"vue-text","key":"exportAll","value":"Export all","read":true}
+{"file":"src/components/panel/SaveManage.vue","line":130,"position":"vue-text","key":"saved","value":"saved","read":true}
+{"file":"src/components/panel/SaveManage.vue","line":138,"position":"vue-text","key":"confirm","value":"Confirm","read":true}
+{"file":"src/components/panel/SaveManage.vue","line":142,"position":"vue-text","key":"export","value":"Export","read":true}
+{"file":"src/components/panel/SaveManage.vue","line":143,"position":"vue-text","key":"import","value":"Import","read":true}
+{"file":"src/components/panel/SaveManage.vue","line":144,"position":"vue-text","key":"reset","value":"Reset","read":true}
+{"file":"src/components/panel/SaveManage.vue","line":146,"position":"vue-text","key":"settings","value":"settings","read":true}
+{"file":"src/components/panel/SaveManage.vue","line":147,"position":"vue-text","key":"confirm","value":"Confirm","read":true}
+{"file":"src/components/panel/SaveManage.vue","line":148,"position":"vue-text","key":"settingsTip","value":"Including saved passages; import will override current settings","read":true}
+{"file":"src/components/panel/SkillCheck.vue","line":48,"position":"vue-text","key":"insertSkillChecks","value":"Insert skill checks","read":true}
+{"file":"src/components/panel/SkillCheck.vue","line":79,"position":"vue-attr","key":"skillCheck.name","value":"Skill","read":true}
+{"file":"src/components/panel/SkillCheck.vue","line":80,"position":"vue-attr","key":"skillCheck.var","value":"Var","read":true}
+{"file":"src/components/panel/SkillCheck.vue","line":82,"position":"vue-text","key":"confirm","value":"Confirm","read":true}
+{"file":"src/components/panel/StatChange.vue","line":65,"position":"vue-text","key":"insert","value":"Insert","read":true}
+{"file":"src/components/panel/StatChange.vue","line":71,"position":"vue-text","key":"statChange","value":"stat change","read":true}
+{"file":"src/components/panel/StatChange.vue","line":85,"position":"vue-text","key":"npc.s","value":"'s","read":true}
+{"file":"src/components/panel/StatChange.vue","line":95,"position":"vue-text","key":"confirm","value":"Confirm","read":true}

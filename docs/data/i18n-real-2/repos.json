@@ -1,0 +1,74 @@
+[
+ {
+  "framework": "react",
+  "repo": "TO-Bus/to-bus-ca",
+  "sha": "58e0b9163681f06badd8bb8276fa368e3902558c",
+  "license": "MIT",
+  "stars": 33,
+  "url": "https://github.com/TO-Bus/to-bus-ca"
+ },
+ {
+  "framework": "react",
+  "repo": "caudal-labs/caudalflow",
+  "sha": "c9b030b3a5da77bce689d9193013c76ed7ba20f2",
+  "license": "MIT",
+  "stars": 26,
+  "url": "https://github.com/caudal-labs/caudalflow"
+ },
+ {
+  "framework": "react",
+  "repo": "EmmaStoneX/NetPulse",
+  "sha": "39612e4245e4679b4863e90b519572262d9493a4",
+  "license": "MIT",
+  "stars": 64,
+  "url": "https://github.com/EmmaStoneX/NetPulse"
+ },
+ {
+  "framework": "react",
+  "repo": "wzdavid/openclaw-desktop",
+  "sha": "cbb43f8d4ab5c934d83b075a03129af17261a7fd",
+  "license": "MIT",
+  "stars": 43,
+  "url": "https://github.com/wzdavid/openclaw-desktop"
+ },
+ {
+  "framework": "vue",
+  "repo": "WTWB-none/void",
+  "sha": "203865a74e7624428b49bf8643b52a1730282409",
+  "license": "Apache-2.0",
+  "stars": 155,
+  "url": "https://github.com/WTWB-none/void"
+ },
+ {
+  "framework": "vue",
+  "repo": "taovc/pr-cockpit",
+  "sha": "f4da887231459fbbb0930ed25903d9b5d775700d",
+  "license": "MIT",
+  "stars": 494,
+  "url": "https://github.com/taovc/pr-cockpit"
+ },
+ {
+  "framework": "vue",
+  "repo": "pa001024/riven-mirror",
+  "sha": "71cdb9198f37224116832570eb4f5193f2688628",
+  "license": "MIT",
+  "stars": 118,
+  "url": "https://github.com/pa001024/riven-mirror"
+ },
+ {
+  "framework": "vue",
+  "repo": "omvjro/DOL-pancake",
+  "sha": "7f6c2d25a2fcbd9014b88ce71eec401671dec2a7",
+  "license": "MIT",
+  "stars": 35,
+  "url": "https://github.com/omvjro/DOL-pancake"
+ },
+ {
+  "framework": "html",
+  "repo": "joeartsea/node-red-contrib-ftp",
+  "sha": "5b730adf7229ea82914330525c85c05b0e08b5de",
+  "license": "Apache-2.0",
+  "stars": 6,
+  "url": "https://github.com/joeartsea/node-red-contrib-ftp"
+ }
+]

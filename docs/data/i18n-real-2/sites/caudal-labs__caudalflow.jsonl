@@ -1,0 +1,115 @@
+{"file":"docs/app.js","line":372,"position":"expr","key":"node.collapse","value":"Collapse","read":true}
+{"file":"docs/app.js","line":378,"position":"expr","key":"node.close","value":"Close","read":true}
+{"file":"docs/app.js","line":684,"position":"expr","key":"merge.placeholder","value":"What should I do with these?","read":true}
+{"file":"docs/app.js","line":1139,"position":"expr","key":"merge.placeholder","value":"What should I do with these?","read":true}
+{"file":"src/App.tsx","line":37,"position":"expr","key":"copilot.chat.chatToggleOpenLabel","value":"Open chat","read":true}
+{"file":"src/App.tsx","line":37,"position":"expr","key":"copilot.chat.chatToggleCloseLabel","value":"Close chat","read":true}
+{"file":"src/components/canvas/Canvas.tsx","line":113,"position":"expr","key":"canvas.newChat","value":"New Chat","read":true}
+{"file":"src/components/canvas/Canvas.tsx","line":165,"position":"expr","key":"canvas.newChat","value":"New Chat","read":true}
+{"file":"src/components/canvas/CanvasControls.tsx","line":46,"position":"expr","key":"canvas.newChat","value":"New Chat","read":true}
+{"file":"src/components/canvas/CanvasControls.tsx","line":102,"position":"jsx-attr","key":"canvas.newChat","value":"New Chat","read":true}
+{"file":"src/components/canvas/CanvasControls.tsx","line":108,"position":"jsx-attr","key":"canvas.zoomIn","value":"Zoom In","read":true}
+{"file":"src/components/canvas/CanvasControls.tsx","line":113,"position":"jsx-attr","key":"canvas.zoomOut","value":"Zoom Out","read":true}
+{"file":"src/components/canvas/CanvasControls.tsx","line":118,"position":"jsx-attr","key":"canvas.fitView","value":"Fit View","read":true}
+{"file":"src/components/canvas/CanvasControls.tsx","line":123,"position":"jsx-attr","key":"canvas.autoArrange","value":"Auto-arrange nodes","read":true}
+{"file":"src/components/canvas/CanvasControls.tsx","line":134,"position":"jsx-attr","key":"canvas.settings","value":"Settings","read":true}
+{"file":"src/components/canvas/CanvasControls.tsx","line":139,"position":"jsx-attr","key":"canvas.help","value":"Help & shortcuts","read":true}
+{"file":"src/components/canvas/MergeSelectionPopup.tsx","line":53,"position":"jsx-text","key":"merge.mergeNodes","value":"Merge {{count}} nodes","read":true}
+{"file":"src/components/canvas/MergeSelectionPopup.tsx","line":76,"position":"jsx-attr","key":"merge.placeholder","value":"What should I do with these?","read":true}
+{"file":"src/components/canvas/MergeSelectionPopup.tsx","line":81,"position":"jsx-attr","key":"merge.send","value":"Send","read":true}
+{"file":"src/components/canvas/MergeSelectionPopup.tsx","line":102,"position":"jsx-text","key":"merge.compare","value":"Compare","read":true}
+{"file":"src/components/canvas/MergeSelectionPopup.tsx","line":112,"position":"jsx-text","key":"merge.summarize","value":"Summarize","read":true}
+{"file":"src/components/canvas/MergeSelectionPopup.tsx","line":122,"position":"jsx-text","key":"merge.connections","value":"Connections","read":true}
+{"file":"src/components/copilot/BranchProposalCard.tsx","line":23,"position":"jsx-text","key":"branch.branchProposal","value":"Branch proposal","read":true}
+{"file":"src/components/copilot/ChartRenderer.tsx","line":34,"position":"jsx-text","key":"chart.noData","value":"No chart data provided.","read":true}
+{"file":"src/components/copilot/CustomCopilotChat.tsx","line":58,"position":"jsx-text","key":"copilot.chat.title","value":"CaudalFlow Assistant","read":true}
+{"file":"src/components/copilot/CustomCopilotChat.tsx","line":75,"position":"jsx-text","key":"copilot.chat.welcomeMessageText","value":"How can I help you today?","read":true}
+{"file":"src/components/copilot/CustomCopilotChat.tsx","line":130,"position":"jsx-attr","key":"copilot.chat.chatInputPlaceholder","value":"Type a message...","read":true}
+{"file":"src/components/copilot/CustomCopilotChat.tsx","line":148,"position":"jsx-text","key":"copilot.chat.chatDisclaimerText","value":"AI can make mistakes. Please verify important information.","read":true}
+{"file":"src/components/nodes/ChatInput.tsx","line":126,"position":"jsx-attr","key":"chat.askSomething","value":"Ask something...","read":true}
+{"file":"src/components/nodes/ChatInput.tsx","line":153,"position":"expr","key":"chat.attachImage","value":"Attach image","read":true}
+{"file":"src/components/nodes/ChatInput.tsx","line":154,"position":"expr","key":"chat.imagesNotSupported","value":"Images not supported by provider","read":true}
+{"file":"src/components/nodes/ChatMessageList.tsx","line":64,"position":"jsx-text","key":"chat.askQuestionToStart","value":"Ask a question to start exploring","read":true}
+{"file":"src/components/nodes/ChatMessageList.tsx","line":91,"position":"jsx-attr","key":"selection.branchFromSelection","value":"Branch from selection","read":true}
+{"file":"src/components/nodes/ChatMessageList.tsx","line":94,"position":"jsx-text","key":"selection.branch","value":"Branch","read":true}
+{"file":"src/components/nodes/ChatNode.tsx","line":408,"position":"jsx-attr","key":"node.restore","value":"Restore","read":true}
+{"file":"src/components/nodes/ChatNode.tsx","line":415,"position":"jsx-attr","key":"node.close","value":"Close","read":true}
+{"file":"src/components/nodes/ChatNode.tsx","line":486,"position":"jsx-attr","key":"node.expand","value":"Expand","read":true}
+{"file":"src/components/nodes/ChatNode.tsx","line":493,"position":"jsx-attr","key":"node.close","value":"Close","read":true}
+{"file":"src/components/nodes/ChatNode.tsx","line":589,"position":"jsx-attr","key":"node.addLabel","value":"Add label...","read":true}
+{"file":"src/components/nodes/ChatNode.tsx","line":601,"position":"jsx-text","key":"node.clear","value":"Clear","read":true}
+{"file":"src/components/nodes/ChatNodeDeleteConfirmation.tsx","line":73,"position":"jsx-text","key":"delete.deleteChat","value":"Delete this chat?","read":true}
+{"file":"src/components/nodes/ChatNodeDeleteConfirmation.tsx","line":76,"position":"jsx-text","key":"delete.deleteDescription","value":"This removes \"{{topic}}\" and its conversation history.","read":true}
+{"file":"src/components/nodes/ChatNodeDeleteConfirmation.tsx","line":85,"position":"jsx-attr","key":"delete.cancel","value":"Cancel","read":true}
+{"file":"src/components/nodes/ChatNodeDeleteConfirmation.tsx","line":86,"position":"jsx-attr","key":"delete.cancel","value":"Cancel","read":true}
+{"file":"src/components/nodes/ChatNodeDeleteConfirmation.tsx","line":101,"position":"jsx-text","key":"delete.cancel","value":"Cancel","read":true}
+{"file":"src/components/nodes/ChatNodeDeleteConfirmation.tsx","line":111,"position":"jsx-text","key":"delete.delete","value":"Delete","read":true}
+{"file":"src/components/nodes/ChatNodeHeader.tsx","line":40,"position":"expr","key":"node.collapse","value":"Collapse","read":true}
+{"file":"src/components/nodes/ChatNodeHeader.tsx","line":40,"position":"expr","key":"node.expand","value":"Expand","read":true}
+{"file":"src/components/nodes/ChatNodeHeader.tsx","line":66,"position":"jsx-attr","key":"node.minimize","value":"Minimize","read":true}
+{"file":"src/components/nodes/ChatNodeHeader.tsx","line":77,"position":"expr","key":"node.maximize","value":"Maximize","read":true}
+{"file":"src/components/nodes/ChatNodeHeader.tsx","line":77,"position":"expr","key":"node.restoreSize","value":"Restore size","read":true}
+{"file":"src/components/nodes/ChatNodeHeader.tsx","line":84,"position":"jsx-attr","key":"node.addLabelAndColor","value":"Add label and color","read":true}
+{"file":"src/components/nodes/ChatNodeHeader.tsx","line":91,"position":"jsx-attr","key":"node.close","value":"Close","read":true}
+{"file":"src/components/nodes/SelectionPopup.tsx","line":60,"position":"jsx-text","key":"selection.selectionLabel","value":"Selection:","read":true}
+{"file":"src/components/nodes/SelectionPopup.tsx","line":68,"position":"jsx-attr","key":"selection.closeEsc","value":"Close (Esc)","read":true}
+{"file":"src/components/nodes/SelectionPopup.tsx","line":80,"position":"jsx-attr","key":"selection.askAbout","value":"Ask about \"{{text}}\"","read":true}
+{"file":"src/components/nodes/SelectionPopup.tsx","line":85,"position":"jsx-attr","key":"selection.send","value":"Send","read":true}
+{"file":"src/components/nodes/SelectionPopup.tsx","line":104,"position":"jsx-text","key":"selection.explore","value":"Explore","read":true}
+{"file":"src/components/ui/HelpGuide.tsx","line":8,"position":"expr","key":"help.shortcuts.newNodeDescription","value":"Double-click on canvas or press + button","read":true}
+{"file":"src/components/ui/HelpGuide.tsx","line":8,"position":"expr","key":"help.shortcuts.newNode","value":"New node","read":true}
+{"file":"src/components/ui/HelpGuide.tsx","line":9,"position":"expr","key":"help.shortcuts.panCanvasDescription","value":"Click & drag on empty canvas","read":true}
+{"file":"src/components/ui/HelpGuide.tsx","line":9,"position":"expr","key":"help.shortcuts.panCanvas","value":"Pan canvas","read":true}
+{"file":"src/components/ui/HelpGuide.tsx","line":10,"position":"expr","key":"help.shortcuts.selectTextDescription","value":"Highlight text in a conversation, then copy or click Branch to explore","read":true}
+{"file":"src/components/ui/HelpGuide.tsx","line":10,"position":"expr","key":"help.shortcuts.selectText","value":"Select text","read":true}
+{"file":"src/components/ui/HelpGuide.tsx","line":11,"position":"expr","key":"help.shortcuts.branchFromTextDescription","value":"Select text → click Branch button → type a prompt or click Explore","read":true}
+{"file":"src/components/ui/HelpGuide.tsx","line":11,"position":"expr","key":"help.shortcuts.branchFromText","value":"Branch from text","read":true}
+{"file":"src/components/ui/HelpGuide.tsx","line":12,"position":"expr","key":"help.shortcuts.multiSelectNodesDescription","value":"Hold Shift + drag to draw a selection rectangle around 2+ nodes","read":true}
+{"file":"src/components/ui/HelpGuide.tsx","line":12,"position":"expr","key":"help.shortcuts.multiSelectNodes","value":"Multi-select nodes","read":true}
+{"file":"src/components/ui/HelpGuide.tsx","line":13,"position":"expr","key":"help.shortcuts.mergeNodesDescription","value":"Multi-select 2+ nodes → type an action like \"Compare these\" in the popup","read":true}
+{"file":"src/components/ui/HelpGuide.tsx","line":13,"position":"expr","key":"help.shortcuts.mergeNodes","value":"Merge nodes","read":true}
+{"file":"src/components/ui/HelpGuide.tsx","line":14,"position":"expr","key":"help.shortcuts.maximizeNodeDescription","value":"Click the maximize button on a node header to fill the viewport","read":true}
+{"file":"src/components/ui/HelpGuide.tsx","line":14,"position":"expr","key":"help.shortcuts.maximizeNode","value":"Maximize node","read":true}
+{"file":"src/components/ui/HelpGuide.tsx","line":18,"position":"expr","key":"help.tips.escClosesPopup","value":"Esc closes any open popup","read":true}
+{"file":"src/components/ui/HelpGuide.tsx","line":19,"position":"expr","key":"help.tips.mergedNodesContext","value":"Merged nodes receive context from all selected parents","read":true}
+{"file":"src/components/ui/HelpGuide.tsx","line":20,"position":"expr","key":"help.tips.branchRetainsContext","value":"Follow-up messages in branch/merge nodes retain parent context","read":true}
+{"file":"src/components/ui/HelpGuide.tsx","line":26,"position":"jsx-text","key":"help.title","value":"Quick Guide","read":true}
+{"file":"src/components/ui/HelpGuide.tsx","line":44,"position":"jsx-text","key":"help.tips.title","value":"Tips","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":57,"position":"expr","key":"settings.themeLight","value":"Light","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":58,"position":"expr","key":"settings.themeDark","value":"Dark","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":59,"position":"expr","key":"settings.themeSystem","value":"System","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":65,"position":"jsx-text","key":"settings.title","value":"Settings","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":77,"position":"jsx-text","key":"settings.theme","value":"Theme","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":98,"position":"jsx-text","key":"settings.llmProvider","value":"LLM Provider","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":115,"position":"jsx-text","key":"settings.providerName","value":"Provider Name","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":129,"position":"jsx-text","key":"settings.apiKey","value":"API Key","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":136,"position":"jsx-attr","key":"settings.apiKeyPlaceholder","value":"Enter your API key","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":147,"position":"jsx-text","key":"settings.apiKeyDescription","value":"Your API key is stored locally and sent directly to the provider.","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":155,"position":"jsx-text","key":"settings.endpoint","value":"API Endpoint URL","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":164,"position":"jsx-text","key":"settings.endpointDescription","value":"Base URL (e.g. https://api.deepseek.com) or full path (e.g. https://api.deepseek.com/v1/chat/completions)","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":181,"position":"jsx-text","key":"settings.testConnection","value":"Test","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":189,"position":"jsx-text","key":"settings.fetchModels","value":"Fetch Models","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":205,"position":"jsx-text","key":"settings.model","value":"Model","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":212,"position":"jsx-text","key":"settings.selectModel","value":"Select a model","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":230,"position":"jsx-text","key":"settings.temperature","value":"Temperature","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":247,"position":"jsx-text","key":"settings.maxTokens","value":"Max Tokens","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":263,"position":"jsx-text","key":"settings.tokenDelay","value":"Token Delay (ms)","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":275,"position":"jsx-text","key":"settings.tokenDelayDescription","value":"Simulated delay between tokens for development mode.","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":282,"position":"jsx-text","key":"settings.display","value":"Display","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":284,"position":"jsx-text","key":"settings.showSystemPrompts","value":"Show system prompts","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":299,"position":"jsx-text","key":"settings.showSystemPromptsDescription","value":"Show system prompt messages in conversations.","read":true}
+{"file":"src/components/ui/SettingsPanel.tsx","line":319,"position":"jsx-text","key":"settings.savedToLocalStorage","value":"Settings are saved to localStorage","read":true}
+{"file":"src/components/ui/WelcomePopup.tsx","line":47,"position":"jsx-text","key":"welcome.title","value":"Welcome to CaudalFlow","read":true}
+{"file":"src/components/ui/WelcomePopup.tsx","line":58,"position":"jsx-text","key":"welcome.realAiDescription","value":"To use real AI, open Settings and connect an Anthropic or OpenAI provider.","read":true}
+{"file":"src/components/ui/WelcomePopup.tsx","line":67,"position":"jsx-text","key":"welcome.openSettings","value":"Open Settings","read":true}
+{"file":"src/components/ui/WelcomePopup.tsx","line":73,"position":"jsx-text","key":"welcome.exploreMockMode","value":"Explore Mock Mode","read":true}
+{"file":"src/components/ui/WorkspaceSelector.tsx","line":163,"position":"expr","key":"workspace.defaultName","value":"Workspace","read":true}
+{"file":"src/components/ui/WorkspaceSelector.tsx","line":169,"position":"jsx-attr","key":"workspace.renameWorkspace","value":"Rename workspace","read":true}
+{"file":"src/components/ui/WorkspaceSelector.tsx","line":192,"position":"jsx-attr","key":"workspace.renameWorkspace","value":"Rename workspace","read":true}
+{"file":"src/components/ui/WorkspaceSelector.tsx","line":199,"position":"jsx-attr","key":"workspace.deleteWorkspace","value":"Delete workspace","read":true}
+{"file":"src/components/ui/WorkspaceSelector.tsx","line":212,"position":"jsx-text","key":"workspace.newWorkspace","value":"New Workspace","read":true}
+{"file":"src/components/ui/WorkspaceSelector.tsx","line":227,"position":"jsx-attr","key":"workspace.exportMarkdown","value":"Export as Markdown","read":true}
+{"file":"src/components/ui/WorkspaceSelector.tsx","line":234,"position":"jsx-attr","key":"workspace.exportWorkspace","value":"Export Workspace (JSON)","read":true}
+{"file":"src/components/ui/WorkspaceSelector.tsx","line":241,"position":"jsx-attr","key":"workspace.importWorkspace","value":"Import Workspace","read":true}
+{"file":"src/components/ui/WorkspaceSelector.tsx","line":250,"position":"jsx-attr","key":"workspace.github","value":"View on GitHub","read":true}
+{"file":"src/hooks/usePersistence.ts","line":88,"position":"expr","key":"canvas.newChat","value":"New Chat","read":true}

@@ -1,0 +1,79 @@
+{"file":"src/App.tsx","line":40,"position":"expr","key":"home.title.tooltip","value":"Return home","read":true}
+{"file":"src/App.tsx","line":44,"position":"jsx-text","key":"home.title.name","value":"TO bus","read":true}
+{"file":"src/components/accordions/StopAccordions.tsx","line":121,"position":"expr","key":"buttons.busIcon","value":"View stop ETA","read":true}
+{"file":"src/components/accordions/StopAccordions.tsx","line":141,"position":"expr","key":"buttons.mapPin","value":"View location in Google Maps","read":true}
+{"file":"src/components/alerts/AlertsPage.tsx","line":40,"position":"jsx-text","key":"alerts.now","value":"Now","read":true}
+{"file":"src/components/alerts/AlertsPage.tsx","line":41,"position":"jsx-text","key":"alerts.later","value":"Later","read":true}
+{"file":"src/components/alerts/AlertsPage.tsx","line":42,"position":"jsx-text","key":"alerts.today","value":"Today","read":true}
+{"file":"src/components/alerts/AlertsPage.tsx","line":43,"position":"jsx-text","key":"alerts.thisWeekend","value":"This weekend","read":true}
+{"file":"src/components/alerts/AlertsPage.tsx","line":44,"position":"jsx-text","key":"alerts.allAlerts","value":"All alerts","read":true}
+{"file":"src/components/bookmarks/Bookmark.tsx","line":39,"position":"jsx-text","key":"home.headline","value":"You'll see saved stops here.","read":true}
+{"file":"src/components/bookmarks/Bookmark.tsx","line":40,"position":"jsx-text","key":"home.bookmarkReminder","value":"Try clicking the bookmark icons on a stop you frequently visit.","read":true}
+{"file":"src/components/bookmarks/Bookmark.tsx","line":46,"position":"jsx-text","key":"buttons.clear","value":"Clear All","read":true}
+{"file":"src/components/bookmarks/BookmarkButton.tsx","line":41,"position":"expr","key":"buttons.bookmarkDelete","value":"Remove bookmark","read":true}
+{"file":"src/components/bookmarks/BookmarkButton.tsx","line":42,"position":"expr","key":"buttons.bookmarkAdd","value":"Add to bookmark","read":true}
+{"file":"src/components/countdown/CountdownSec.tsx","line":55,"position":"jsx-text","key":"eta.minuteShort","value":"m","read":true}
+{"file":"src/components/countdown/CountdownSec.tsx","line":63,"position":"jsx-text","key":"eta.minuteShort","value":"m","read":true}
+{"file":"src/components/countdown/CountdownSec.tsx","line":64,"position":"jsx-text","key":"eta.secondShort","value":"s","read":true}
+{"file":"src/components/countdown/CountdownSec.tsx","line":70,"position":"jsx-text","key":"eta.secondShort","value":"s","read":true}
+{"file":"src/components/countdown/CountdownSec.tsx","line":84,"position":"jsx-text","key":"badge.arriving","value":"Arriving","read":true}
+{"file":"src/components/eta/FavouriteEta.tsx","line":97,"position":"expr","key":"home.homeNoEta","value":"All your bookmarked stops have no ETA.","read":true}
+{"file":"src/components/eta/FavouriteEta.tsx","line":104,"position":"jsx-text","key":"buttons.bookmarkEdit","value":"Edit bookmarks","read":true}
+{"file":"src/components/etaCard/EtaCard.tsx","line":218,"position":"expr","key":"buttons.delete","value":"Delete","read":true}
+{"file":"src/components/fetch/FetchRoute.tsx","line":194,"position":"jsx-text","key":"lines.noLineInDb","value":"Error: This line is not in the route database. Subway lines are unsupported for now.","read":true}
+{"file":"src/components/fetch/FetchRoute.tsx","line":215,"position":"jsx-text","key":"reminder.loading","value":"Loading...","read":true}
+{"file":"src/components/fetch/FetchSubwayRoute.tsx","line":200,"position":"expr","key":"reminder.loading","value":"Loading...","read":true}
+{"file":"src/components/fetch/FetchTtcLineStop.tsx","line":100,"position":"jsx-text","key":"reminder.noEta","value":"No ETAs detected.","read":true}
+{"file":"src/components/fetch/FetchTtcLineStop.tsx","line":116,"position":"jsx-text","key":"reminder.noEta","value":"No ETAs detected.","read":true}
+{"file":"src/components/fetch/FetchTtcLineStop.tsx","line":121,"position":"jsx-text","key":"reminder.noEta","value":"No ETAs detected.","read":true}
+{"file":"src/components/fetch/FetchTtcLineStop.tsx","line":198,"position":"jsx-text","key":"buttons.refresh","value":"Refresh","read":true}
+{"file":"src/components/fetch/StopPredictionInfo.tsx","line":35,"position":"jsx-text","key":"buttons.refresh","value":"Refresh","read":true}
+{"file":"src/components/fetch/StopPredictionInfo.tsx","line":186,"position":"jsx-text","key":"reminder.noEta","value":"No ETAs detected.","read":true}
+{"file":"src/components/fetch/StopPredictionInfo.tsx","line":198,"position":"jsx-text","key":"reminder.failToLocate","value":"Cannot locate this route.","read":true}
+{"file":"src/components/fetch/StopPredictionInfo.tsx","line":211,"position":"jsx-text","key":"reminder.loading","value":"Loading...","read":true}
+{"file":"src/components/nearby/Nearby.tsx","line":115,"position":"expr","key":"nearby.totalStopsSummary","value":"There are {{stopsTotal}} stops in the local database.","read":true}
+{"file":"src/components/nearby/Nearby.tsx","line":116,"position":"expr","key":"nearby.checkingDb","value":"Downloading database ...","read":true}
+{"file":"src/components/nearby/Nearby.tsx","line":119,"position":"expr","key":"nearby.checkDb","value":"Download database","read":true}
+{"file":"src/components/nearby/Nearby.tsx","line":119,"position":"expr","key":"nearby.checkingDb","value":"Downloading database ...","read":true}
+{"file":"src/components/nearby/Nearby.tsx","line":123,"position":"expr","key":"nearby.checkingLocation","value":"Checking your location...","read":true}
+{"file":"src/components/nearby/Nearby.tsx","line":125,"position":"expr","key":"nearby.recheckLocation","value":"Refresh my location","read":true}
+{"file":"src/components/nearby/Nearby.tsx","line":126,"position":"expr","key":"nearby.checkLocation","value":"Set my location","read":true}
+{"file":"src/components/nearby/Nearby.tsx","line":136,"position":"jsx-attr","key":"nearby.alwaysProvideLocation","value":"Provide my locations on load","read":true}
+{"file":"src/components/nearby/NearbyList.tsx","line":68,"position":"jsx-text","key":"nearby.closestStopsLead","value":"The closest bus stops are:","read":true}
+{"file":"src/components/nearby/NearbyList.tsx","line":76,"position":"jsx-text","key":"nearby.locationNeeded","value":"Nearby feature requires your location.","read":true}
+{"file":"src/components/nearby/NearbyStopCard.tsx","line":79,"position":"jsx-text","key":"nearby.mAway","value":"{{distanceInMetres}}m away","read":true}
+{"file":"src/components/rawDisplay/RawDisplay.tsx","line":61,"position":"jsx-text","key":"debug.showResponse","value":"View raw response","read":true}
+{"file":"src/components/search/StopSearch.tsx","line":57,"position":"jsx-text","key":"home.nextVehicle","value":"Next vehicle","read":true}
+{"file":"src/components/search/StopSearch.tsx","line":66,"position":"expr","key":"stops.ariaLabel","value":"Stop#","read":true}
+{"file":"src/components/search/StopSearch.tsx","line":76,"position":"jsx-attr","key":"buttons.search","value":"Search","read":true}
+{"file":"src/components/settings/LayoutToolbar.tsx","line":44,"position":"jsx-attr","key":"settings.singleList","value":"single list","read":true}
+{"file":"src/components/settings/LayoutToolbar.tsx","line":50,"position":"jsx-attr","key":"settings.separateLines","value":"separate for each line","read":true}
+{"file":"src/components/settings/Settings.tsx","line":135,"position":"jsx-text","key":"nav.label.settings","value":"Settings","read":true}
+{"file":"src/components/settings/Settings.tsx","line":136,"position":"jsx-text","key":"buttons.languageChange","value":"language selection","read":true}
+{"file":"src/components/settings/Settings.tsx","line":139,"position":"expr","key":"buttons.languageChange","value":"language selection","read":true}
+{"file":"src/components/settings/Settings.tsx","line":142,"position":"jsx-attr","key":"lang.en","value":"English","read":true}
+{"file":"src/components/settings/Settings.tsx","line":143,"position":"jsx-attr","key":"lang.fr","value":"français","read":true}
+{"file":"src/components/settings/Settings.tsx","line":144,"position":"jsx-attr","key":"lang.zh","value":"中文","read":true}
+{"file":"src/components/settings/Settings.tsx","line":149,"position":"jsx-attr","key":"settings.devMode","value":"Dev mode","read":true}
+{"file":"src/components/settings/Settings.tsx","line":151,"position":"expr","key":"nav.label.about","value":"About","read":true}
+{"file":"src/components/settings/Settings.tsx","line":153,"position":"jsx-text","key":"nav.label.about","value":"About","read":true}
+{"file":"src/components/settings/Settings.tsx","line":156,"position":"jsx-text","key":"settings.etaLists","value":"ETA lists","read":true}
+{"file":"src/components/settings/Settings.tsx","line":162,"position":"jsx-attr","key":"settings.separateLines","value":"separate for each line","read":true}
+{"file":"src/components/settings/Settings.tsx","line":163,"position":"jsx-attr","key":"settings.singleList","value":"single list","read":true}
+{"file":"src/components/yrt/YRTheader.tsx","line":17,"position":"expr","key":"home.title.tooltip","value":"Return home","read":true}
+{"file":"src/routes/Error.tsx","line":12,"position":"jsx-text","key":"error.notFound","value":"404: this page does not exist :(","read":true}
+{"file":"src/routes/Home.tsx","line":60,"position":"jsx-text","key":"nav.label.nearby","value":"Nearby","read":true}
+{"file":"src/routes/Home.tsx","line":61,"position":"jsx-text","key":"nav.label.bookmarks","value":"Bookmarks","read":true}
+{"file":"src/routes/Home.tsx","line":63,"position":"jsx-text","key":"nav.label.serviceAlerts","value":"Service Alerts","read":true}
+{"file":"src/routes/Home.tsx","line":100,"position":"jsx-text","key":"home.headline","value":"You'll see saved stops here.","read":true}
+{"file":"src/routes/Home.tsx","line":101,"position":"jsx-text","key":"home.bookmarkReminder","value":"Try clicking the bookmark icons on a stop you frequently visit.","read":true}
+{"file":"src/routes/Home.tsx","line":103,"position":"jsx-text","key":"home.orSee","value":"Or, see","read":true}
+{"file":"src/routes/Home.tsx","line":110,"position":"jsx-text","key":"home.allRoutes","value":"All routes","read":true}
+{"file":"src/routes/Line.tsx","line":18,"position":"expr","key":"lines.browserTitle","value":"Line {{lineNum}} | TO bus","read":true}
+{"file":"src/routes/Line.tsx","line":26,"position":"jsx-text","key":"lines.number","value":"Line {{lineNum}}","read":true}
+{"file":"src/routes/LineSearch.tsx","line":11,"position":"jsx-text","key":"nav.label.lines","value":"Lines","read":true}
+{"file":"src/routes/LineStopPrediction.tsx","line":21,"position":"jsx-text","key":"lines.lineAndStopInfo","value":"Line {{lineNum}} Stop {{stopNum}} =","read":true}
+{"file":"src/routes/RelativeVehiclePosition.tsx","line":75,"position":"jsx-text","key":"buttons.refresh","value":"Refresh","read":true}
+{"file":"src/routes/Search.tsx","line":32,"position":"expr","key":"lines.ariaLabel","value":"enter a line number","read":true}
+{"file":"src/routes/Search.tsx","line":33,"position":"jsx-attr","key":"lines.placeholder","value":"enter a line number","read":true}
+{"file":"src/routes/Search.tsx","line":41,"position":"jsx-text","key":"buttons.search","value":"Search","read":true}

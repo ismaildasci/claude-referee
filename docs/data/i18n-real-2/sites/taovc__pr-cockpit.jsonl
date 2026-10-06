@@ -1,0 +1,688 @@
+{"file":"app/app.vue","line":8,"position":"expr","key":"layout.metaDescription","value":"Local batch PR review management","read":true}
+{"file":"app/app.vue","line":24,"position":"expr","key":"inbox.prompts","value":"Waiting for your answer","read":true}
+{"file":"app/app.vue","line":24,"position":"expr","key":"layout.inbox","value":"Inbox","read":true}
+{"file":"app/app.vue","line":71,"position":"expr","key":"layout.createError","value":"Creation failed","read":true}
+{"file":"app/app.vue","line":103,"position":"vue-text","key":"layout.projectsTitle","value":"Projects","read":true}
+{"file":"app/app.vue","line":110,"position":"vue-binding","key":"layout.notifyHint","value":"Turn on desktop notifications: shown when an agent is waiting on you","read":true}
+{"file":"app/app.vue","line":110,"position":"vue-binding","key":"layout.notifyOn","value":"Desktop notifications on: shown when an agent is waiting on you (click to turn off)","read":true}
+{"file":"app/app.vue","line":111,"position":"vue-binding","key":"layout.notifyHint","value":"Turn on desktop notifications: shown when an agent is waiting on you","read":true}
+{"file":"app/app.vue","line":111,"position":"vue-binding","key":"layout.notifyOn","value":"Desktop notifications on: shown when an agent is waiting on you (click to turn off)","read":true}
+{"file":"app/app.vue","line":119,"position":"vue-attr","key":"layout.createProject","value":"Create project","read":true}
+{"file":"app/app.vue","line":132,"position":"vue-text","key":"layout.inbox","value":"Inbox","read":true}
+{"file":"app/app.vue","line":137,"position":"vue-text","key":"layout.dashboard","value":"Dashboard","read":true}
+{"file":"app/app.vue","line":142,"position":"vue-text","key":"layout.agentConfig","value":"Agent config","read":true}
+{"file":"app/app.vue","line":156,"position":"vue-text","key":"layout.emptyProjectsHint","value":"Click + above to create","read":true}
+{"file":"app/app.vue","line":156,"position":"vue-text","key":"layout.emptyProjects","value":"No projects yet","read":true}
+{"file":"app/app.vue","line":175,"position":"vue-attr","key":"layout.createProject","value":"Create project","read":true}
+{"file":"app/app.vue","line":178,"position":"vue-text","key":"layout.form.name","value":"Name","read":true}
+{"file":"app/app.vue","line":182,"position":"vue-text","key":"layout.form.repo","value":"Repository (owner/repo)","read":true}
+{"file":"app/app.vue","line":185,"position":"vue-text","key":"layout.picker.browse","value":"Browse","read":true}
+{"file":"app/app.vue","line":187,"position":"vue-text","key":"layout.picker.depotHint","value":"Browse to a local git clone — its repository (owner/repo) is filled in automatically.","read":true}
+{"file":"app/app.vue","line":190,"position":"vue-text","key":"layout.form.localPath","value":"Local clone path (worktrees branch from here)","read":true}
+{"file":"app/app.vue","line":193,"position":"vue-text","key":"layout.picker.browse","value":"Browse","read":true}
+{"file":"app/app.vue","line":195,"position":"vue-text","key":"layout.picker.cloneHint","value":"Worktree source. Defaults to the repository above; pick another local clone to change it.","read":true}
+{"file":"app/app.vue","line":198,"position":"vue-text","key":"layout.form.defaultBranch","value":"Default branch","read":true}
+{"file":"app/app.vue","line":204,"position":"vue-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"app/app.vue","line":205,"position":"vue-binding","key":"layout.create","value":"Create","read":true}
+{"file":"app/app.vue","line":205,"position":"vue-binding","key":"layout.creating","value":"Creating…","read":true}
+{"file":"app/components/AppConfirm.vue","line":10,"position":"expr","key":"confirm.title","value":"Confirm","read":true}
+{"file":"app/components/AppConfirm.vue","line":11,"position":"expr","key":"confirm.ok","value":"Confirm","read":true}
+{"file":"app/components/AppConfirm.vue","line":12,"position":"expr","key":"common.cancel","value":"Cancel","read":true}
+{"file":"app/components/AutomationDialog.vue","line":13,"position":"expr","key":"automation.modeOnce","value":"Once after PR","read":true}
+{"file":"app/components/AutomationDialog.vue","line":13,"position":"expr","key":"automation.modeEveryPush","value":"Every push","read":true}
+{"file":"app/components/AutomationDialog.vue","line":90,"position":"vue-attr","key":"automation.title","value":"Automation config","read":true}
+{"file":"app/components/AutomationDialog.vue","line":91,"position":"vue-text","key":"common.loading","value":"Loading…","read":true}
+{"file":"app/components/AutomationDialog.vue","line":95,"position":"vue-text","key":"automation.reviewSystem","value":"Auto-review","read":true}
+{"file":"app/components/AutomationDialog.vue","line":100,"position":"vue-text","key":"automation.modeLabel","value":"Review mode","read":true}
+{"file":"app/components/AutomationDialog.vue","line":113,"position":"vue-text","key":"project.col.author","value":"Author","read":true}
+{"file":"app/components/AutomationDialog.vue","line":117,"position":"vue-text","key":"automation.noAuthors","value":"No authors yet","read":true}
+{"file":"app/components/AutomationDialog.vue","line":127,"position":"vue-text","key":"project.col.prStatus","value":"PR","read":true}
+{"file":"app/components/AutomationDialog.vue","line":145,"position":"vue-text","key":"automation.fixSystem","value":"Auto-fix feedback","read":true}
+{"file":"app/components/AutomationDialog.vue","line":151,"position":"vue-text","key":"project.col.author","value":"Author","read":true}
+{"file":"app/components/AutomationDialog.vue","line":155,"position":"vue-text","key":"automation.noAuthors","value":"No authors yet","read":true}
+{"file":"app/components/AutomationDialog.vue","line":164,"position":"vue-text","key":"project.col.prStatus","value":"PR","read":true}
+{"file":"app/components/AutomationDialog.vue","line":175,"position":"vue-text","key":"automation.fixHint","value":"Each PR runs at most {n} fix↔re-review rounds, then pauses for you.","read":true}
+{"file":"app/components/AutomationDialog.vue","line":176,"position":"vue-text","key":"automation.fixAuthorHint","value":"Empty author = only your own PRs are auto-fixed. Add authors to auto-fix others' PRs (runs an agent + pushes).","read":true}
+{"file":"app/components/AutomationDialog.vue","line":182,"position":"vue-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"app/components/AutomationDialog.vue","line":184,"position":"vue-binding","key":"automation.start","value":"Start","read":true}
+{"file":"app/components/AutomationDialog.vue","line":184,"position":"vue-binding","key":"config.saving","value":"Saving…","read":true}
+{"file":"app/components/CatalogList.vue","line":26,"position":"vue-attr","key":"agentConfig.filter","value":"Filter by name","read":true}
+{"file":"app/components/CatalogList.vue","line":37,"position":"vue-binding","key":"agentConfig.noDescription","value":"(no description)","read":true}
+{"file":"app/components/CatalogList.vue","line":41,"position":"vue-text","key":"agentConfig.none","value":"none","read":true}
+{"file":"app/components/CatalogList.vue","line":44,"position":"vue-text","key":"agentConfig.none","value":"none","read":true}
+{"file":"app/components/chat/ChatLogPanel.vue","line":10,"position":"vue-binding","key":"review.expandLog","value":"Expand log ({count})","read":true}
+{"file":"app/components/chat/ChatLogPanel.vue","line":10,"position":"vue-binding","key":"review.collapseLog","value":"Collapse log","read":true}
+{"file":"app/components/ColorModeToggle.vue","line":16,"position":"vue-binding","key":"common.toggleDark","value":"Switch to dark","read":true}
+{"file":"app/components/ColorModeToggle.vue","line":16,"position":"vue-binding","key":"common.toggleLight","value":"Switch to light","read":true}
+{"file":"app/components/ColorModeToggle.vue","line":17,"position":"vue-binding","key":"common.toggleDark","value":"Switch to dark","read":true}
+{"file":"app/components/ColorModeToggle.vue","line":17,"position":"vue-binding","key":"common.toggleLight","value":"Switch to light","read":true}
+{"file":"app/components/DiffView.vue","line":108,"position":"vue-text","key":"prDrawer.diffTruncated","value":"Diff too large, truncated — see the full content on GitHub.","read":true}
+{"file":"app/components/DiffView.vue","line":109,"position":"vue-text","key":"fix.noDiff","value":"(no changes)","read":true}
+{"file":"app/components/DirectoryPicker.vue","line":74,"position":"vue-attr","key":"layout.picker.title","value":"Choose a folder","read":true}
+{"file":"app/components/DirectoryPicker.vue","line":81,"position":"vue-attr","key":"layout.picker.parent","value":"Parent folder","read":true}
+{"file":"app/components/DirectoryPicker.vue","line":89,"position":"vue-attr","key":"layout.picker.home","value":"Home folder","read":true}
+{"file":"app/components/DirectoryPicker.vue","line":97,"position":"vue-attr","key":"layout.picker.pathPlaceholder","value":"Type a path, Enter to open","read":true}
+{"file":"app/components/DirectoryPicker.vue","line":104,"position":"vue-text","key":"common.loading","value":"Loading…","read":true}
+{"file":"app/components/DirectoryPicker.vue","line":106,"position":"vue-text","key":"layout.picker.empty","value":"No subfolders","read":true}
+{"file":"app/components/DirectoryPicker.vue","line":123,"position":"vue-text","key":"layout.picker.repoDetected","value":"repository","read":true}
+{"file":"app/components/DirectoryPicker.vue","line":124,"position":"vue-text","key":"layout.picker.repoUnknown","value":"no origin remote","read":true}
+{"file":"app/components/DirectoryPicker.vue","line":129,"position":"vue-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"app/components/DirectoryPicker.vue","line":135,"position":"vue-text","key":"layout.picker.select","value":"Select this folder","read":true}
+{"file":"app/components/GlobalChat.vue","line":53,"position":"expr","key":"common.failed","value":"Failed","read":true}
+{"file":"app/components/GlobalChat.vue","line":68,"position":"expr","key":"common.failed","value":"Failed","read":true}
+{"file":"app/components/GlobalChat.vue","line":81,"position":"expr","key":"session.forked","value":"Forked into a new session","read":true}
+{"file":"app/components/GlobalChat.vue","line":83,"position":"expr","key":"common.failed","value":"Failed","read":true}
+{"file":"app/components/GlobalChat.vue","line":122,"position":"expr","key":"common.failed","value":"Failed","read":true}
+{"file":"app/components/GlobalChat.vue","line":130,"position":"expr","key":"common.failed","value":"Failed","read":true}
+{"file":"app/components/GlobalChat.vue","line":138,"position":"vue-attr","key":"global.fabTitle","value":"AI assistant — do anything","read":true}
+{"file":"app/components/GlobalChat.vue","line":146,"position":"vue-attr","key":"global.title","value":"Assistant","read":true}
+{"file":"app/components/GlobalChat.vue","line":151,"position":"vue-text","key":"global.newSession","value":"New chat","read":true}
+{"file":"app/components/GlobalChat.vue","line":152,"position":"vue-text","key":"global.history","value":"History","read":true}
+{"file":"app/components/GlobalChat.vue","line":159,"position":"vue-attr","key":"global.untitled","value":"Untitled chat","read":true}
+{"file":"app/components/GlobalChat.vue","line":161,"position":"vue-binding","key":"global.untitled","value":"Untitled chat","read":true}
+{"file":"app/components/GlobalChat.vue","line":161,"position":"vue-attr","key":"global.rename","value":"Rename","read":true}
+{"file":"app/components/GlobalChat.vue","line":163,"position":"vue-text","key":"session.fork","value":"Fork","read":true}
+{"file":"app/components/GlobalChat.vue","line":163,"position":"vue-attr","key":"session.forkHint","value":"Start a new session that continues from this one","read":true}
+{"file":"app/components/GlobalChat.vue","line":165,"position":"vue-binding","key":"global.confirmDelete","value":"Delete this chat? This cannot be undone.","read":true}
+{"file":"app/components/GlobalChat.vue","line":165,"position":"vue-binding","key":"feature.discardConfirm","value":"Delete this task? (incl. worktree, irreversible)","read":true}
+{"file":"app/components/GlobalChat.vue","line":166,"position":"vue-text","key":"common.delete","value":"Delete","read":true}
+{"file":"app/components/GlobalChat.vue","line":167,"position":"vue-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"app/components/GlobalChat.vue","line":169,"position":"vue-text","key":"common.delete","value":"Delete","read":true}
+{"file":"app/components/GlobalChat.vue","line":174,"position":"vue-text","key":"global.historyEmpty","value":"No past chats yet","read":true}
+{"file":"app/components/GlobalChat.vue","line":179,"position":"vue-attr","key":"global.untitled","value":"Untitled chat","read":true}
+{"file":"app/components/GlobalChat.vue","line":182,"position":"vue-binding","key":"global.untitled","value":"Untitled chat","read":true}
+{"file":"app/components/GlobalChat.vue","line":186,"position":"vue-attr","key":"feature.status.working","value":"Working","read":true}
+{"file":"app/components/GlobalChat.vue","line":197,"position":"vue-binding","key":"global.confirmDelete","value":"Delete this chat? This cannot be undone.","read":true}
+{"file":"app/components/GlobalChat.vue","line":197,"position":"vue-binding","key":"feature.discardConfirm","value":"Delete this task? (incl. worktree, irreversible)","read":true}
+{"file":"app/components/GlobalChat.vue","line":198,"position":"vue-text","key":"common.delete","value":"Delete","read":true}
+{"file":"app/components/GlobalChat.vue","line":199,"position":"vue-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"app/components/GlobalChat.vue","line":202,"position":"vue-attr","key":"global.rename","value":"Rename","read":true}
+{"file":"app/components/GlobalChat.vue","line":203,"position":"vue-attr","key":"global.deleteSession","value":"Delete chat","read":true}
+{"file":"app/components/GlobalChat.vue","line":208,"position":"vue-text","key":"project.pagination.prev","value":"← Previous","read":true}
+{"file":"app/components/GlobalChat.vue","line":210,"position":"vue-text","key":"project.pagination.next","value":"Next →","read":true}
+{"file":"app/components/LanguageSwitcher.vue","line":31,"position":"vue-attr","key":"switcher.label","value":"Language","read":true}
+{"file":"app/components/LanguageSwitcher.vue","line":32,"position":"vue-attr","key":"switcher.label","value":"Language","read":true}
+{"file":"app/components/PagerBar.vue","line":11,"position":"vue-text","key":"project.pagination.summaryPages","value":"{total} total · page {page} / {pages}","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":144,"position":"expr","key":"prDrawer.loadFailed","value":"Load failed","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":192,"position":"expr","key":"prDrawer.approve.failed","value":"Approval failed","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":192,"position":"expr","key":"prDrawer.approve.failed","value":"Approval failed","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":217,"position":"expr","key":"prDrawer.dismiss.failed","value":"Could not withdraw","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":217,"position":"expr","key":"prDrawer.dismiss.failed","value":"Could not withdraw","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":235,"position":"expr","key":"prDrawer.diffLoadFailed","value":"Diff load failed","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":246,"position":"expr","key":"prDrawer.time.justNow","value":"just now","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":247,"position":"expr","key":"prDrawer.time.minutesAgo","value":"{n} min ago","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":248,"position":"expr","key":"prDrawer.time.hoursAgo","value":"{n}h ago","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":249,"position":"expr","key":"prDrawer.time.daysAgo","value":"{n}d ago","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":308,"position":"vue-text","key":"prDrawer.filesCount","value":"{count} files","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":316,"position":"vue-text","key":"prDrawer.approve.confirm","value":"Approve?","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":317,"position":"vue-binding","key":"prDrawer.approve.yes","value":"Approve","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":317,"position":"vue-binding","key":"prDrawer.approve.running","value":"Approving…","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":318,"position":"vue-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":322,"position":"vue-attr","key":"prDrawer.dismiss.reasonPlaceholder","value":"Reason (optional)","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":323,"position":"vue-binding","key":"prDrawer.dismiss.yes","value":"Withdraw","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":323,"position":"vue-binding","key":"prDrawer.dismiss.running","value":"Withdrawing…","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":324,"position":"vue-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":326,"position":"vue-text","key":"prDrawer.dismiss.button","value":"Withdraw approval","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":326,"position":"vue-attr","key":"prDrawer.dismiss.title","value":"Dismiss your approval on GitHub (the reason is shown publicly)","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":327,"position":"vue-text","key":"prDrawer.approve.button","value":"Approve PR","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":327,"position":"vue-attr","key":"prDrawer.approve.title","value":"Approve this PR on GitHub as you","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":328,"position":"vue-text","key":"prDrawer.openInGithub","value":"Open in GitHub ↗","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":333,"position":"vue-binding","key":"prDrawer.title","value":"PR details","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":333,"position":"vue-binding","key":"common.loading","value":"Loading…","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":342,"position":"vue-text","key":"automation.prAutoReview","value":"Auto-review","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":346,"position":"vue-text","key":"automation.prAutoFix","value":"Auto-fix","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":348,"position":"vue-text","key":"automation.coolingHint","value":"Cooling down · {n} min left (you can still turn it off)","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":356,"position":"vue-text","key":"prDrawer.tabReview","value":"AI review","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":357,"position":"vue-text","key":"prDrawer.tabFix","value":"Fix PR","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":358,"position":"vue-text","key":"prDrawer.tabTimeline","value":"Timeline","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":359,"position":"vue-text","key":"prDrawer.tabChanges","value":"Changes","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":360,"position":"vue-text","key":"automation.tab","value":"Workflow","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":386,"position":"vue-text","key":"prDrawer.openedPr","value":"opened the PR","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":390,"position":"vue-text","key":"prDrawer.noDescription","value":"(no description)","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":402,"position":"vue-text","key":"prDrawer.commentLabel","value":"commented","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":434,"position":"vue-text","key":"prDrawer.changedFiles","value":"Changed files ({count})","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":444,"position":"vue-text","key":"prDrawer.loadingDiff","value":"Loading diff…","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":452,"position":"vue-binding","key":"automation.noEvents","value":"No automation activity yet","read":true}
+{"file":"app/components/PrDetailDrawer.vue","line":452,"position":"vue-binding","key":"common.loading","value":"Loading…","read":true}
+{"file":"app/components/ProjectConfig.vue","line":41,"position":"expr","key":"config.useEnvDefault","value":"Use the default model from .env","read":true}
+{"file":"app/components/ProjectConfig.vue","line":41,"position":"expr","key":"config.globalDefault","value":"Global default","read":true}
+{"file":"app/components/ProjectConfig.vue","line":52,"position":"expr","key":"config.claudeStatusReady","value":"Local claude is available · {n} models","read":true}
+{"file":"app/components/ProjectConfig.vue","line":55,"position":"expr","key":"config.providerClaude","value":"Claude","read":true}
+{"file":"app/components/ProjectConfig.vue","line":55,"position":"expr","key":"config.providerCodex","value":"Codex","read":true}
+{"file":"app/components/ProjectConfig.vue","line":58,"position":"expr","key":"config.codexModelPlaceholder","value":"Use CODEX_MODEL or Codex default","read":true}
+{"file":"app/components/ProjectConfig.vue","line":58,"position":"expr","key":"config.globalDefault","value":"Global default","read":true}
+{"file":"app/components/ProjectConfig.vue","line":92,"position":"expr","key":"config.codexModelsRefreshed","value":"Refreshed Codex model catalog ({n} models)","read":true}
+{"file":"app/components/ProjectConfig.vue","line":94,"position":"expr","key":"config.codexModelsRefreshFailed","value":"Failed to refresh the Codex model catalog","read":true}
+{"file":"app/components/ProjectConfig.vue","line":114,"position":"expr","key":"config.saved","value":"Saved","read":true}
+{"file":"app/components/ProjectConfig.vue","line":115,"position":"expr","key":"config.saveFailed","value":"Save failed","read":true}
+{"file":"app/components/ProjectConfig.vue","line":120,"position":"expr","key":"common.delete","value":"Delete","read":true}
+{"file":"app/components/ProjectConfig.vue","line":120,"position":"expr","key":"config.confirm.deleteProjectMsg","value":"Delete project “{name}”? Review tasks and skills will be deleted too (no impact on GitHub).","read":true}
+{"file":"app/components/ProjectConfig.vue","line":120,"position":"expr","key":"config.deleteProject","value":"Delete project","read":true}
+{"file":"app/components/ProjectConfig.vue","line":136,"position":"expr","key":"config.skillActivated","value":"Skill activated","read":true}
+{"file":"app/components/ProjectConfig.vue","line":158,"position":"expr","key":"common.delete","value":"Delete","read":true}
+{"file":"app/components/ProjectConfig.vue","line":158,"position":"expr","key":"config.confirm.deleteSkillMsg","value":"Delete this skill?","read":true}
+{"file":"app/components/ProjectConfig.vue","line":158,"position":"expr","key":"config.confirm.deleteSkillTitle","value":"Delete skill","read":true}
+{"file":"app/components/ProjectConfig.vue","line":198,"position":"expr","key":"config.connecting","value":"Connecting…","read":true}
+{"file":"app/components/ProjectConfig.vue","line":205,"position":"expr","key":"config.genInterrupted","value":"Generation request interrupted — if a new candidate appears above it was generated, otherwise retry.","read":true}
+{"file":"app/components/ProjectConfig.vue","line":208,"position":"expr","key":"config.candidateGenerated","value":"New candidate generated — preview/compare, then click “Enable”.","read":true}
+{"file":"app/components/ProjectConfig.vue","line":215,"position":"expr","key":"config.connecting","value":"Connecting…","read":true}
+{"file":"app/components/ProjectConfig.vue","line":227,"position":"expr","key":"config.candidateGenerated","value":"New candidate generated — preview/compare, then click “Enable”.","read":true}
+{"file":"app/components/ProjectConfig.vue","line":231,"position":"expr","key":"config.genInterrupted","value":"Generation request interrupted — if a new candidate appears above it was generated, otherwise retry.","read":true}
+{"file":"app/components/ProjectConfig.vue","line":239,"position":"expr","key":"config.handwrittenSkill","value":"Handwritten skill","read":true}
+{"file":"app/components/ProjectConfig.vue","line":292,"position":"expr","key":"config.stageUnsupported","value":"Not wired","read":true}
+{"file":"app/components/ProjectConfig.vue","line":292,"position":"expr","key":"config.stageSupported","value":"Supported","read":true}
+{"file":"app/components/ProjectConfig.vue","line":301,"position":"expr","key":"config.codexInstall.unknown","value":"Unknown","read":true}
+{"file":"app/components/ProjectConfig.vue","line":302,"position":"expr","key":"config.codexInstall.missing","value":"Missing","read":true}
+{"file":"app/components/ProjectConfig.vue","line":302,"position":"expr","key":"config.codexInstall.installed","value":"Installed","read":true}
+{"file":"app/components/ProjectConfig.vue","line":322,"position":"vue-text","key":"config.projectInfo","value":"Project info","read":true}
+{"file":"app/components/ProjectConfig.vue","line":324,"position":"vue-text","key":"layout.form.name","value":"Name","read":true}
+{"file":"app/components/ProjectConfig.vue","line":326,"position":"vue-text","key":"layout.form.repo","value":"Repository (owner/repo)","read":true}
+{"file":"app/components/ProjectConfig.vue","line":328,"position":"vue-text","key":"config.localPathShort","value":"Local clone path","read":true}
+{"file":"app/components/ProjectConfig.vue","line":330,"position":"vue-text","key":"layout.form.defaultBranch","value":"Default branch","read":true}
+{"file":"app/components/ProjectConfig.vue","line":341,"position":"vue-text","key":"config.providerSection","value":"Review provider","read":true}
+{"file":"app/components/ProjectConfig.vue","line":342,"position":"vue-text","key":"config.selectedProvider","value":"Selected: {provider}","read":true}
+{"file":"app/components/ProjectConfig.vue","line":348,"position":"vue-text","key":"config.providerClaude","value":"Claude","read":true}
+{"file":"app/components/ProjectConfig.vue","line":353,"position":"vue-text","key":"config.providerCodex","value":"Codex","read":true}
+{"file":"app/components/ProjectConfig.vue","line":358,"position":"vue-text","key":"config.autoMaxRounds","value":"Auto-fix round limit","read":true}
+{"file":"app/components/ProjectConfig.vue","line":359,"position":"vue-text","key":"config.autoMaxRoundsHint","value":"Max fix↔re-review rounds, then pause","read":true}
+{"file":"app/components/ProjectConfig.vue","line":367,"position":"vue-text","key":"config.verifyBeforePost","value":"Verify before post","read":true}
+{"file":"app/components/ProjectConfig.vue","line":368,"position":"vue-text","key":"config.verifyBeforePostHint","value":"After a fresh review, a second read-only pass tries to refute each finding; refuted ones stay visible but unchecked.","read":true}
+{"file":"app/components/ProjectConfig.vue","line":373,"position":"vue-text","key":"config.autoCooldown","value":"Automation cooldown (min)","read":true}
+{"file":"app/components/ProjectConfig.vue","line":374,"position":"vue-text","key":"config.autoCooldownHint","value":"Delay after a new commit, 0 = off","read":true}
+{"file":"app/components/ProjectConfig.vue","line":386,"position":"vue-text","key":"config.stageColumn","value":"Stage","read":true}
+{"file":"app/components/ProjectConfig.vue","line":387,"position":"vue-text","key":"config.providerClaude","value":"Claude","read":true}
+{"file":"app/components/ProjectConfig.vue","line":388,"position":"vue-text","key":"config.providerCodex","value":"Codex","read":true}
+{"file":"app/components/ProjectConfig.vue","line":390,"position":"vue-text","key":"config.loadingCapabilities","value":"Loading provider capabilities…","read":true}
+{"file":"app/components/ProjectConfig.vue","line":400,"position":"vue-text","key":"config.notProviderControlled","value":"not controlled by the selected provider","read":true}
+{"file":"app/components/ProjectConfig.vue","line":422,"position":"vue-text","key":"config.codexSdkStatus","value":"Codex SDK status","read":true}
+{"file":"app/components/ProjectConfig.vue","line":427,"position":"vue-text","key":"config.codexSdkInstalled","value":"SDK installed","read":true}
+{"file":"app/components/ProjectConfig.vue","line":431,"position":"vue-text","key":"config.codexAuthenticated","value":"Auth","read":true}
+{"file":"app/components/ProjectConfig.vue","line":438,"position":"vue-text","key":"config.codexFastLabel","value":"Fast mode","read":true}
+{"file":"app/components/ProjectConfig.vue","line":439,"position":"vue-text","key":"config.codexFastHint","value":"Codex projects only. When on, this project’s review family (review / re-review / verify / skill generation), sessions and comment translation request Codex’s Fast tier: about 1.5× speed at higher usage. No effect for a model without a Fast tier.","read":true}
+{"file":"app/components/ProjectConfig.vue","line":440,"position":"vue-text","key":"config.codexFastUnsupported","value":"{model} has no Fast tier; this switch does nothing for it.","read":true}
+{"file":"app/components/ProjectConfig.vue","line":446,"position":"vue-text","key":"config.codexStatusLine","value":"login {auth} · binary {source}","read":true}
+{"file":"app/components/ProjectConfig.vue","line":447,"position":"vue-text","key":"config.codexStatusUnknown","value":"Codex SDK status has not loaded yet.","read":true}
+{"file":"app/components/ProjectConfig.vue","line":451,"position":"vue-text","key":"config.claudeStatus","value":"Claude status","read":true}
+{"file":"app/components/ProjectConfig.vue","line":454,"position":"vue-text","key":"config.claudeCli","value":"Local Claude","read":true}
+{"file":"app/components/ProjectConfig.vue","line":456,"position":"vue-binding","key":"config.claudeUnavailable","value":"Unavailable","read":true}
+{"file":"app/components/ProjectConfig.vue","line":456,"position":"vue-binding","key":"config.claudeReady","value":"Ready","read":true}
+{"file":"app/components/ProjectConfig.vue","line":460,"position":"vue-text","key":"config.claudeModels","value":"Models","read":true}
+{"file":"app/components/ProjectConfig.vue","line":464,"position":"vue-binding","key":"config.claudeStatusUnknown","value":"Claude status unknown.","read":true}
+{"file":"app/components/ProjectConfig.vue","line":473,"position":"vue-binding","key":"config.claudeModelSection","value":"Claude model","read":true}
+{"file":"app/components/ProjectConfig.vue","line":473,"position":"vue-binding","key":"config.codexModelSection","value":"Codex model","read":true}
+{"file":"app/components/ProjectConfig.vue","line":480,"position":"vue-binding","key":"config.refreshCodexModels","value":"Refresh model catalog","read":true}
+{"file":"app/components/ProjectConfig.vue","line":480,"position":"vue-binding","key":"config.refreshingCodexModels","value":"Refreshing…","read":true}
+{"file":"app/components/ProjectConfig.vue","line":482,"position":"vue-binding","key":"config.claudeModelHint","value":"When the selected provider is Claude, this model is used for every stage (initial review / recheck / guided review / skill generation / Fix-PR chat / comment translation). Codex does not read this field.","read":true}
+{"file":"app/components/ProjectConfig.vue","line":482,"position":"vue-binding","key":"config.codexModelHint","value":"When the selected provider is Codex, this model is used for every stage (initial review / recheck / guided review / skill generation / Fix-PR chat / comment translation). Comment translation is produced by Codex too — never mixed with Claude.","read":true}
+{"file":"app/components/ProjectConfig.vue","line":495,"position":"vue-binding","key":"config.inheritEnvDefault","value":"Inherits .env default","read":true}
+{"file":"app/components/ProjectConfig.vue","line":501,"position":"vue-text","key":"config.effortLabel","value":"Review effort","read":true}
+{"file":"app/components/ProjectConfig.vue","line":503,"position":"vue-text","key":"config.effortNone","value":"(unset, model default)","read":true}
+{"file":"app/components/ProjectConfig.vue","line":507,"position":"vue-text","key":"config.noEffortSupport","value":"This model does not support effort settings","read":true}
+{"file":"app/components/ProjectConfig.vue","line":511,"position":"vue-binding","key":"config.saveConfig","value":"Save configuration","read":true}
+{"file":"app/components/ProjectConfig.vue","line":511,"position":"vue-binding","key":"config.saving","value":"Saving…","read":true}
+{"file":"app/components/ProjectConfig.vue","line":518,"position":"vue-text","key":"config.skillsSection","value":"Review skills (enable one)","read":true}
+{"file":"app/components/ProjectConfig.vue","line":520,"position":"vue-text","key":"config.addBlank","value":"+ Blank","read":true}
+{"file":"app/components/ProjectConfig.vue","line":521,"position":"vue-text","key":"config.aiGenerate","value":"AI generate","read":true}
+{"file":"app/components/ProjectConfig.vue","line":522,"position":"vue-text","key":"config.aiOptimize","value":"AI optimize current","read":true}
+{"file":"app/components/ProjectConfig.vue","line":526,"position":"vue-binding","key":"config.readingCode","value":"Reading project code…","read":true}
+{"file":"app/components/ProjectConfig.vue","line":526,"position":"vue-text","key":"config.aiGenerating","value":"AI generating","read":true}
+{"file":"app/components/ProjectConfig.vue","line":528,"position":"vue-text","key":"config.localPathRequired","value":"Set the local clone path to use AI generation.","read":true}
+{"file":"app/components/ProjectConfig.vue","line":532,"position":"vue-attr","key":"config.activeTitle","value":"Active","read":true}
+{"file":"app/components/ProjectConfig.vue","line":541,"position":"vue-text","key":"config.warnCount","value":"⚠ {count} warning(s)","read":true}
+{"file":"app/components/ProjectConfig.vue","line":543,"position":"vue-text","key":"config.preview","value":"Preview","read":true}
+{"file":"app/components/ProjectConfig.vue","line":544,"position":"vue-text","key":"config.enable","value":"Enable","read":true}
+{"file":"app/components/ProjectConfig.vue","line":545,"position":"vue-text","key":"common.delete","value":"Delete","read":true}
+{"file":"app/components/ProjectConfig.vue","line":547,"position":"vue-text","key":"config.noSkills","value":"No skills yet. Click “AI generate” to have the AI read your project and produce one, or “+ Blank” to write it by hand. With no skill enabled, the built-in default methodology is used.","read":true}
+{"file":"app/components/ProjectConfig.vue","line":552,"position":"vue-text","key":"config.vsActive","value":"· compared to active","read":true}
+{"file":"app/components/ProjectConfig.vue","line":553,"position":"vue-text","key":"config.enableThis","value":"Enable this one","read":true}
+{"file":"app/components/ProjectConfig.vue","line":566,"position":"vue-text","key":"config.deleteProject","value":"Delete project","read":true}
+{"file":"app/components/ProjectConfig.vue","line":570,"position":"vue-attr","key":"config.warnModal.title","value":"Skill health check","read":true}
+{"file":"app/components/ProjectConfig.vue","line":572,"position":"vue-binding","key":"config.warnModal.body","value":"“{name}” contains terms that <b>look like an “operations flow”</b>. A review skill should only describe “what to audit, how to judge”, not git operations / code changes / worktree skipping (handled by the engine). Matched:","read":true}
+{"file":"app/components/ProjectConfig.vue","line":576,"position":"vue-binding","key":"config.warnModal.note","value":"Most are “descriptive mentions” (false positives — e.g. writing “no git push” in the methodology also gets flagged), with no impact.<br />Even when enabled, the engine hard-blocks git writes / file changes at the tool level; a skill cannot run them — so this is just a warning, not an error.","read":true}
+{"file":"app/components/ProjectConfig.vue","line":579,"position":"vue-text","key":"config.warnModal.gotIt","value":"Got it","read":true}
+{"file":"app/components/ProjectConfig.vue","line":584,"position":"vue-attr","key":"config.lintModal.title","value":"This skill may contain operations-flow content","read":true}
+{"file":"app/components/ProjectConfig.vue","line":586,"position":"vue-binding","key":"config.lintModal.body","value":"“{name}” matched the following suspected “operations flow” content (review only audits, never modifies; operations are handled by the engine):","read":true}
+{"file":"app/components/ProjectConfig.vue","line":590,"position":"vue-text","key":"config.lintModal.note","value":"Note: these may be descriptive mentions (false positives). Even when enabled, the engine hard-blocks git writes / file changes at the tool level, which won't actually run.","read":true}
+{"file":"app/components/ProjectConfig.vue","line":593,"position":"vue-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"app/components/ProjectConfig.vue","line":594,"position":"vue-text","key":"config.lintModal.enableAnyway","value":"Enable anyway","read":true}
+{"file":"app/components/ProjectConfig.vue","line":599,"position":"vue-binding","key":"config.genModal.titleGenerate","value":"AI generate review skill","read":true}
+{"file":"app/components/ProjectConfig.vue","line":599,"position":"vue-binding","key":"config.genModal.titleOptimize","value":"AI optimize current skill","read":true}
+{"file":"app/components/ProjectConfig.vue","line":601,"position":"vue-binding","key":"config.genModal.intro","value":"The AI uses the project's configured model/effort, <b>reads the full local repo + thinks deeply</b>, then produces output. {mode}The result is saved as a <b>new candidate</b> — it does not overwrite or auto-enable.","read":true}
+{"file":"app/components/ProjectConfig.vue","line":603,"position":"vue-text","key":"config.genModal.instructionLabel","value":"Instruction for the AI (optional, leave empty for the default approach)","read":true}
+{"file":"app/components/ProjectConfig.vue","line":606,"position":"vue-attr","key":"config.genModal.instructionPlaceholder","value":"E.g.: emphasize permissions and concurrency; follow the staki-review format; watch tRPC input validation; use a stricter tone…","read":true}
+{"file":"app/components/ProjectConfig.vue","line":612,"position":"vue-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"app/components/ProjectConfig.vue","line":613,"position":"vue-text","key":"config.genModal.start","value":"Start generating","read":true}
+{"file":"app/components/ProjectConfig.vue","line":618,"position":"vue-attr","key":"config.newModal.title","value":"New review skill","read":true}
+{"file":"app/components/ProjectConfig.vue","line":621,"position":"vue-text","key":"layout.form.name","value":"Name","read":true}
+{"file":"app/components/ProjectConfig.vue","line":625,"position":"vue-text","key":"config.newModal.contentLabel","value":"Content (methodology, can stay empty for later / paste an existing one)","read":true}
+{"file":"app/components/ProjectConfig.vue","line":630,"position":"vue-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"app/components/ProjectConfig.vue","line":631,"position":"vue-text","key":"layout.create","value":"Create","read":true}
+{"file":"app/components/RemoteAccessButton.vue","line":67,"position":"vue-attr","key":"remote.title","value":"Remote access","read":true}
+{"file":"app/components/RemoteAccessButton.vue","line":68,"position":"vue-attr","key":"remote.title","value":"Remote access","read":true}
+{"file":"app/components/RemoteAccessButton.vue","line":74,"position":"vue-attr","key":"remote.title","value":"Remote access","read":true}
+{"file":"app/components/RemoteAccessButton.vue","line":79,"position":"vue-text","key":"remote.toggleLabel","value":"Enable LAN remote access","read":true}
+{"file":"app/components/RemoteAccessButton.vue","line":80,"position":"vue-text","key":"remote.toggleHint","value":"Let an iPad/phone on the same network open the same view. The app still runs on this machine.","read":true}
+{"file":"app/components/RemoteAccessButton.vue","line":91,"position":"vue-text","key":"remote.warning","value":"⚠️ Once on, any device on this network that obtains the share link/QR can drive this app (run agents, touch your repos). Use only on trusted networks.","read":true}
+{"file":"app/components/RemoteAccessButton.vue","line":95,"position":"vue-text","key":"remote.portNote","value":"Note: the app’s port is reachable on your LAN while running; turning remote access off rejects requests but does not close the port.","read":true}
+{"file":"app/components/RemoteAccessButton.vue","line":100,"position":"vue-attr","key":"remote.scanHint","value":"Scan with your iPad/phone camera to open","read":true}
+{"file":"app/components/RemoteAccessButton.vue","line":101,"position":"vue-text","key":"remote.scanHint","value":"Scan with your iPad/phone camera to open","read":true}
+{"file":"app/components/RemoteAccessButton.vue","line":103,"position":"vue-text","key":"remote.noNetwork","value":"No LAN address found (not connected to a network?)","read":true}
+{"file":"app/components/RemoteAccessButton.vue","line":106,"position":"vue-text","key":"remote.urlsLabel","value":"Addresses","read":true}
+{"file":"app/components/RemoteAccessButton.vue","line":119,"position":"vue-binding","key":"remote.copy","value":"Copy link","read":true}
+{"file":"app/components/RemoteAccessButton.vue","line":119,"position":"vue-binding","key":"remote.copied","value":"Copied","read":true}
+{"file":"app/components/RemoteAccessButton.vue","line":124,"position":"vue-text","key":"remote.rotate","value":"Reset link","read":true}
+{"file":"app/components/RemoteAccessButton.vue","line":126,"position":"vue-text","key":"remote.rotateHint","value":"Resetting invalidates the old QR/link immediately; connected devices must re-scan.","read":true}
+{"file":"app/components/RemoteAccessButton.vue","line":128,"position":"vue-text","key":"remote.offHint","value":"Remote access is off. Turn it on to generate a QR code to connect.","read":true}
+{"file":"app/components/ReviewPanel.vue","line":132,"position":"expr","key":"review.triggerFailed","value":"Trigger failed","read":true}
+{"file":"app/components/ReviewPanel.vue","line":139,"position":"expr","key":"review.triggerFailed","value":"Trigger failed","read":true}
+{"file":"app/components/ReviewPanel.vue","line":157,"position":"expr","key":"review.costUnknown","value":"cost unknown","read":true}
+{"file":"app/components/ReviewPanel.vue","line":158,"position":"expr","key":"review.costTotal","value":"total ${cost}","read":true}
+{"file":"app/components/ReviewPanel.vue","line":192,"position":"expr","key":"review.previewFailed","value":"Preview failed","read":true}
+{"file":"app/components/ReviewPanel.vue","line":200,"position":"expr","key":"review.published","value":"Published: {url}","read":true}
+{"file":"app/components/ReviewPanel.vue","line":201,"position":"expr","key":"review.publishFailed","value":"Publish failed","read":true}
+{"file":"app/components/ReviewPanel.vue","line":214,"position":"expr","key":"common.failed","value":"Failed","read":true}
+{"file":"app/components/ReviewPanel.vue","line":258,"position":"vue-text","key":"review.noTask","value":"This PR has no review task yet","read":true}
+{"file":"app/components/ReviewPanel.vue","line":260,"position":"vue-text","key":"review.startInstructionLabel","value":"Guidance for this pass (optional)","read":true}
+{"file":"app/components/ReviewPanel.vue","line":263,"position":"vue-attr","key":"review.startInstructionPlaceholder","value":"What should it focus on? e.g. judge whether each file changed inside this scope earns its place — do not widen the review","read":true}
+{"file":"app/components/ReviewPanel.vue","line":266,"position":"vue-text","key":"review.startInstructionHint","value":"Applies to the first pass only. Each later round is bound by the instruction you give it then; earlier ones are kept as history.","read":true}
+{"file":"app/components/ReviewPanel.vue","line":270,"position":"vue-binding","key":"review.startReview","value":"Start review","read":true}
+{"file":"app/components/ReviewPanel.vue","line":270,"position":"vue-binding","key":"review.creatingTask","value":"Creating…","read":true}
+{"file":"app/components/ReviewPanel.vue","line":279,"position":"vue-text","key":"review.statusLabel","value":"Review status","read":true}
+{"file":"app/components/ReviewPanel.vue","line":281,"position":"vue-text","key":"project.authorUpdated","value":"Author updated","read":true}
+{"file":"app/components/ReviewPanel.vue","line":281,"position":"vue-attr","key":"review.authorUpdatedTitle","value":"The author pushed new commits after your last comment","read":true}
+{"file":"app/components/ReviewPanel.vue","line":284,"position":"vue-text","key":"review.stop","value":"Stop","read":true}
+{"file":"app/components/ReviewPanel.vue","line":286,"position":"vue-text","key":"review.rerunConfirm","value":"Recheck per your notes + instructions?","read":true}
+{"file":"app/components/ReviewPanel.vue","line":287,"position":"vue-text","key":"review.startRerun","value":"Start recheck","read":true}
+{"file":"app/components/ReviewPanel.vue","line":288,"position":"vue-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"app/components/ReviewPanel.vue","line":291,"position":"vue-text","key":"review.recheckConfirm","value":"Check the new commits after the author's comments?","read":true}
+{"file":"app/components/ReviewPanel.vue","line":292,"position":"vue-text","key":"review.startRecheck","value":"Start checking","read":true}
+{"file":"app/components/ReviewPanel.vue","line":293,"position":"vue-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"app/components/ReviewPanel.vue","line":296,"position":"vue-text","key":"review.freshConfirm","value":"Re-run from scratch? Current findings and notes will be erased.","read":true}
+{"file":"app/components/ReviewPanel.vue","line":297,"position":"vue-text","key":"review.startFresh","value":"Re-run from scratch","read":true}
+{"file":"app/components/ReviewPanel.vue","line":298,"position":"vue-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"app/components/ReviewPanel.vue","line":301,"position":"vue-text","key":"review.deleteConfirm","value":"Delete this review task? Local only — comments already posted to GitHub stay.","read":true}
+{"file":"app/components/ReviewPanel.vue","line":302,"position":"vue-text","key":"common.delete","value":"Delete","read":true}
+{"file":"app/components/ReviewPanel.vue","line":303,"position":"vue-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"app/components/ReviewPanel.vue","line":307,"position":"vue-text","key":"review.retryBtn","value":"Re-run review","read":true}
+{"file":"app/components/ReviewPanel.vue","line":307,"position":"vue-attr","key":"review.retryTitle","value":"Run a full review from scratch — clears current findings and notes","read":true}
+{"file":"app/components/ReviewPanel.vue","line":308,"position":"vue-text","key":"review.rerunBtn","value":"Recheck per my feedback","read":true}
+{"file":"app/components/ReviewPanel.vue","line":308,"position":"vue-attr","key":"review.rerunTitle","value":"Keeps your checks/notes; targeted recheck using each note + the instruction below, the AI replies point by point","read":true}
+{"file":"app/components/ReviewPanel.vue","line":309,"position":"vue-text","key":"review.recheckBtn","value":"Check author's changes","read":true}
+{"file":"app/components/ReviewPanel.vue","line":309,"position":"vue-attr","key":"review.recheckTitle","value":"Reads the author's new commits since your last comment and judges whether each item was addressed","read":true}
+{"file":"app/components/ReviewPanel.vue","line":310,"position":"vue-text","key":"review.deleteBtn","value":"Delete task","read":true}
+{"file":"app/components/ReviewPanel.vue","line":310,"position":"vue-attr","key":"review.deleteTitle","value":"Delete this review task (local only; GitHub comments stay)","read":true}
+{"file":"app/components/ReviewPanel.vue","line":317,"position":"vue-binding","key":"review.runLog","value":"Run log ({count} lines)","read":true}
+{"file":"app/components/ReviewPanel.vue","line":317,"position":"vue-binding","key":"review.processing","value":"Processing…","read":true}
+{"file":"app/components/ReviewPanel.vue","line":320,"position":"vue-binding","key":"review.expandLog","value":"Expand log ({count})","read":true}
+{"file":"app/components/ReviewPanel.vue","line":320,"position":"vue-binding","key":"review.collapseLog","value":"Collapse log","read":true}
+{"file":"app/components/ReviewPanel.vue","line":328,"position":"vue-attr","key":"review.runLineTitle","value":"Latest agent run: cost · provider · model · effort · tokens · duration · skill version","read":true}
+{"file":"app/components/ReviewPanel.vue","line":332,"position":"vue-text","key":"review.aiSummary","value":"AI overall review","read":true}
+{"file":"app/components/ReviewPanel.vue","line":338,"position":"vue-text","key":"review.instructionLabel","value":"Review instruction for the AI","read":true}
+{"file":"app/components/ReviewPanel.vue","line":341,"position":"vue-attr","key":"review.instructionPlaceholder","value":"What the AI should focus on / where you disagree / have it recheck something. “Recheck per my feedback” reviews this + each note.","read":true}
+{"file":"app/components/ReviewPanel.vue","line":350,"position":"vue-text","key":"review.requirement","value":"Requirement","read":true}
+{"file":"app/components/ReviewPanel.vue","line":354,"position":"vue-text","key":"review.testPath","value":"Manual test path","read":true}
+{"file":"app/components/ReviewPanel.vue","line":360,"position":"vue-text","key":"review.findings","value":"Findings ({count})","read":true}
+{"file":"app/components/ReviewPanel.vue","line":368,"position":"vue-text","key":"review.verifyUnsure","value":"unverified","read":true}
+{"file":"app/components/ReviewPanel.vue","line":368,"position":"vue-text","key":"review.verifyConfirmed","value":"verified","read":true}
+{"file":"app/components/ReviewPanel.vue","line":368,"position":"vue-text","key":"review.verifyRefuted","value":"refuted by verify","read":true}
+{"file":"app/components/ReviewPanel.vue","line":368,"position":"vue-text","key":"review.preExisting","value":"· pre-existing","read":true}
+{"file":"app/components/ReviewPanel.vue","line":371,"position":"vue-text","key":"review.detailFix","value":"Details / Fix","read":true}
+{"file":"app/components/ReviewPanel.vue","line":376,"position":"vue-text","key":"review.recheckRound","value":"Recheck R{round}","read":true}
+{"file":"app/components/ReviewPanel.vue","line":381,"position":"vue-attr","key":"review.notePlaceholder","value":"Reply / feedback (to the AI: invalid? add context? have it recheck? With “Recheck per my feedback”, the AI responds. When checked, translated to English in the posted comment)","read":true}
+{"file":"app/components/ReviewPanel.vue","line":388,"position":"vue-text","key":"review.noFindings","value":"No findings yet.","read":true}
+{"file":"app/components/ReviewPanel.vue","line":392,"position":"vue-text","key":"review.globalNotesLabel","value":"Global note (comment preamble)","read":true}
+{"file":"app/components/ReviewPanel.vue","line":394,"position":"vue-attr","key":"review.globalNotesPlaceholder","value":"Placed at the top of the comment, translated to English when posting","read":true}
+{"file":"app/components/ReviewPanel.vue","line":400,"position":"vue-text","key":"review.generatingPreview","value":"Generating preview… (translating to English)","read":true}
+{"file":"app/components/ReviewPanel.vue","line":401,"position":"vue-text","key":"review.previewComment","value":"Preview comment ({count})","read":true}
+{"file":"app/components/ReviewPanel.vue","line":404,"position":"vue-text","key":"review.latest","value":"latest","read":true}
+{"file":"app/components/ReviewPanel.vue","line":404,"position":"vue-text","key":"review.postedTimes","value":"Posted {count} times ·","read":true}
+{"file":"app/components/ReviewPanel.vue","line":411,"position":"vue-text","key":"review.previewSkipped","value":"{count} skipped","read":true}
+{"file":"app/components/ReviewPanel.vue","line":411,"position":"vue-text","key":"review.previewMeta","value":"Preview · {count} inline · mode {mode}","read":true}
+{"file":"app/components/ReviewPanel.vue","line":413,"position":"vue-attr","key":"review.regenTitle","value":"Ignore the cache, regenerate from the current findings/notes","read":true}
+{"file":"app/components/ReviewPanel.vue","line":414,"position":"vue-binding","key":"review.regenerate","value":"Regenerate","read":true}
+{"file":"app/components/ReviewPanel.vue","line":414,"position":"vue-binding","key":"review.regenerating","value":"Regenerating…","read":true}
+{"file":"app/components/ReviewPanel.vue","line":416,"position":"vue-text","key":"review.close","value":"Close","read":true}
+{"file":"app/components/ReviewPanel.vue","line":418,"position":"vue-binding","key":"review.confirmPublish","value":"Confirm publish to GitHub","read":true}
+{"file":"app/components/ReviewPanel.vue","line":418,"position":"vue-binding","key":"review.publishing","value":"Publishing…","read":true}
+{"file":"app/components/ReviewPanel.vue","line":423,"position":"vue-text","key":"review.skippedTitle","value":"Not posted per re-review status ({count})","read":true}
+{"file":"app/components/ReviewPanel.vue","line":435,"position":"vue-text","key":"common.loading","value":"Loading…","read":true}
+{"file":"app/components/RunHostStrip.vue","line":10,"position":"vue-text","key":"global.modeLabel","value":"Permissions","read":true}
+{"file":"app/components/RunHostStrip.vue","line":19,"position":"vue-text","key":"global.contextMeter","value":"context","read":true}
+{"file":"app/components/RunHostStrip.vue","line":23,"position":"vue-text","key":"global.turnCost","value":"this turn","read":true}
+{"file":"app/components/RunHostStrip.vue","line":23,"position":"vue-text","key":"global.sessionCost","value":"session","read":true}
+{"file":"app/components/RunPromptCards.vue","line":10,"position":"vue-text","key":"global.questionTitle","value":"Claude has a question","read":true}
+{"file":"app/components/RunPromptCards.vue","line":20,"position":"vue-attr","key":"global.otherAnswer","value":"Other…","read":true}
+{"file":"app/components/RunPromptCards.vue","line":24,"position":"vue-text","key":"global.submitAnswer","value":"Submit","read":true}
+{"file":"app/components/RunPromptCards.vue","line":25,"position":"vue-text","key":"global.deny","value":"Deny","read":true}
+{"file":"app/components/RunPromptCards.vue","line":29,"position":"vue-text","key":"global.planTitle","value":"Plan ready for approval","read":true}
+{"file":"app/components/RunPromptCards.vue","line":32,"position":"vue-text","key":"global.approvePlan","value":"Approve plan","read":true}
+{"file":"app/components/RunPromptCards.vue","line":33,"position":"vue-text","key":"global.revisePlan","value":"Revise…","read":true}
+{"file":"app/components/RunPromptCards.vue","line":36,"position":"vue-attr","key":"global.denyNotePlaceholder","value":"Tell Claude what to do instead (optional)","read":true}
+{"file":"app/components/RunPromptCards.vue","line":37,"position":"vue-text","key":"global.deny","value":"Deny","read":true}
+{"file":"app/components/RunPromptCards.vue","line":41,"position":"vue-text","key":"global.permissionTitle","value":"The agent asks permission","read":true}
+{"file":"app/components/RunPromptCards.vue","line":46,"position":"vue-text","key":"global.allow","value":"Allow","read":true}
+{"file":"app/components/RunPromptCards.vue","line":47,"position":"vue-text","key":"global.allowAlways","value":"Always allow","read":true}
+{"file":"app/components/RunPromptCards.vue","line":48,"position":"vue-text","key":"global.deny","value":"Deny","read":true}
+{"file":"app/components/RunPromptCards.vue","line":49,"position":"vue-text","key":"global.denyWithNote","value":"Deny with note…","read":true}
+{"file":"app/components/RunPromptCards.vue","line":52,"position":"vue-attr","key":"global.denyNotePlaceholder","value":"Tell Claude what to do instead (optional)","read":true}
+{"file":"app/components/RunPromptCards.vue","line":53,"position":"vue-text","key":"global.deny","value":"Deny","read":true}
+{"file":"app/components/session/CommandPalette.vue","line":30,"position":"expr","key":"session.palette.local","value":"PR Cockpit","read":true}
+{"file":"app/components/session/CommandPalette.vue","line":32,"position":"expr","key":"session.palette.skills","value":"Your skills","read":true}
+{"file":"app/components/session/CommandPalette.vue","line":34,"position":"expr","key":"session.palette.codexSkills","value":"Codex skills","read":true}
+{"file":"app/components/session/CommandPalette.vue","line":37,"position":"expr","key":"session.palette.plugin","value":"Plugin","read":true}
+{"file":"app/components/session/CommandPalette.vue","line":39,"position":"expr","key":"session.palette.builtin","value":"Built-in","read":true}
+{"file":"app/components/session/CommandPalette.vue","line":57,"position":"vue-binding","key":"session.palette.skill","value":"skill","read":true}
+{"file":"app/components/session/CommandPalette.vue","line":60,"position":"vue-text","key":"session.palette.showAll","value":"{n} more built-in commands hidden — show all","read":true}
+{"file":"app/components/session/CommandPalette.vue","line":67,"position":"vue-text","key":"session.palette.title","value":"Commands","read":true}
+{"file":"app/components/session/CommandPalette.vue","line":68,"position":"vue-text","key":"session.palette.showAllToggle","value":"show all","read":true}
+{"file":"app/components/session/RunEventCard.vue","line":18,"position":"expr","key":"global.thinking","value":"thinking","read":true}
+{"file":"app/components/session/RunEventCard.vue","line":20,"position":"expr","key":"global.compacted","value":"context compacted: {pre} → {post} tokens","read":true}
+{"file":"app/components/session/SessionView.vue","line":225,"position":"expr","key":"global.cmd.clear","value":"Start a new chat (clear context)","read":true}
+{"file":"app/components/session/SessionView.vue","line":226,"position":"expr","key":"session.cmdNew","value":"Start a new session","read":true}
+{"file":"app/components/session/SessionView.vue","line":227,"position":"expr","key":"global.cmd.resume","value":"Browse past chats","read":true}
+{"file":"app/components/session/SessionView.vue","line":228,"position":"expr","key":"session.forkHint","value":"Start a new session that continues from this one","read":true}
+{"file":"app/components/session/SessionView.vue","line":229,"position":"expr","key":"global.cmd.cd","value":"/cd <path> — change working directory","read":true}
+{"file":"app/components/session/SessionView.vue","line":230,"position":"expr","key":"global.cmd.copy","value":"Copy the last reply","read":true}
+{"file":"app/components/session/SessionView.vue","line":231,"position":"expr","key":"session.cmdModel","value":"Switch model (persists on this session)","read":true}
+{"file":"app/components/session/SessionView.vue","line":232,"position":"expr","key":"session.cmdEffort","value":"Set reasoning effort","read":true}
+{"file":"app/components/session/SessionView.vue","line":233,"position":"expr","key":"session.cmdStop","value":"Stop the running turn","read":true}
+{"file":"app/components/session/SessionView.vue","line":234,"position":"expr","key":"session.cmdPush","value":"Commit & upload (PR sessions)","read":true}
+{"file":"app/components/session/SessionView.vue","line":235,"position":"expr","key":"session.cmdPr","value":"Ask the agent to open / update the PR","read":true}
+{"file":"app/components/session/SessionView.vue","line":281,"position":"expr","key":"common.failed","value":"Failed","read":true}
+{"file":"app/components/session/SessionView.vue","line":286,"position":"expr","key":"session.effortSet","value":"Effort set to {effort}","read":true}
+{"file":"app/components/session/SessionView.vue","line":286,"position":"expr","key":"session.modelSet","value":"Model set to {model}","read":true}
+{"file":"app/components/session/SessionView.vue","line":288,"position":"expr","key":"common.failed","value":"Failed","read":true}
+{"file":"app/components/session/SessionView.vue","line":296,"position":"expr","key":"global.copied","value":"Copied","read":true}
+{"file":"app/components/session/SessionView.vue","line":303,"position":"expr","key":"global.cdSet","value":"Will switch to {path} on the next message","read":true}
+{"file":"app/components/session/SessionView.vue","line":338,"position":"expr","key":"common.failed","value":"Failed","read":true}
+{"file":"app/components/session/SessionView.vue","line":357,"position":"expr","key":"common.failed","value":"Failed","read":true}
+{"file":"app/components/session/SessionView.vue","line":366,"position":"expr","key":"session.rewound","value":"Files restored ({n} changed)","read":true}
+{"file":"app/components/session/SessionView.vue","line":369,"position":"expr","key":"common.failed","value":"Failed","read":true}
+{"file":"app/components/session/SessionView.vue","line":376,"position":"expr","key":"session.automationPaused","value":"Turn stopped — automation for this PR is paused (you took over)","read":true}
+{"file":"app/components/session/SessionView.vue","line":378,"position":"expr","key":"common.failed","value":"Failed","read":true}
+{"file":"app/components/session/SessionView.vue","line":381,"position":"expr","key":"feature.openPrMsg","value":"Please open a PR for this: commit with an English conventional-commit message, push the branch, and run gh pr create with an English title + body. Then reply with the PR URL.","read":true}
+{"file":"app/components/session/SessionView.vue","line":394,"position":"expr","key":"common.failed","value":"Failed","read":true}
+{"file":"app/components/session/SessionView.vue","line":401,"position":"expr","key":"fix.pushedOnly","value":"Pushed {sha}","read":true}
+{"file":"app/components/session/SessionView.vue","line":406,"position":"expr","key":"fix.pushFailed","value":"Push failed","read":true}
+{"file":"app/components/session/SessionView.vue","line":424,"position":"expr","key":"common.failed","value":"Failed","read":true}
+{"file":"app/components/session/SessionView.vue","line":432,"position":"expr","key":"fix.worktreeDeleted","value":"Local worktree deleted","read":true}
+{"file":"app/components/session/SessionView.vue","line":435,"position":"expr","key":"common.failed","value":"Failed","read":true}
+{"file":"app/components/session/SessionView.vue","line":441,"position":"expr","key":"fix.pathCopied","value":"Path copied","read":true}
+{"file":"app/components/session/SessionView.vue","line":446,"position":"expr","key":"common.failed","value":"Failed","read":true}
+{"file":"app/components/session/SessionView.vue","line":457,"position":"vue-text","key":"fix.backToChat","value":"Back to chat","read":true}
+{"file":"app/components/session/SessionView.vue","line":459,"position":"vue-text","key":"prDrawer.filesCount","value":"{count} files","read":true}
+{"file":"app/components/session/SessionView.vue","line":464,"position":"vue-text","key":"fix.commitMsgLabel","value":"Commit message","read":true}
+{"file":"app/components/session/SessionView.vue","line":465,"position":"vue-attr","key":"fix.commitMsgPlaceholder","value":"Commit message (editable)","read":true}
+{"file":"app/components/session/SessionView.vue","line":467,"position":"vue-text","key":"fix.rePushHint","value":"Changes are already committed — re-pushing to the remote.","read":true}
+{"file":"app/components/session/SessionView.vue","line":470,"position":"vue-binding","key":"fix.commitAndUpload","value":"Commit & upload","read":true}
+{"file":"app/components/session/SessionView.vue","line":470,"position":"vue-binding","key":"fix.pushing","value":"Pushing…","read":true}
+{"file":"app/components/session/SessionView.vue","line":472,"position":"vue-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"app/components/session/SessionView.vue","line":485,"position":"vue-text","key":"prDrawer.filesCount","value":"{count} files","read":true}
+{"file":"app/components/session/SessionView.vue","line":488,"position":"vue-text","key":"fix.viewChanges","value":"View changes","read":true}
+{"file":"app/components/session/SessionView.vue","line":493,"position":"vue-text","key":"prDrawer.openInGithub","value":"Open in GitHub ↗","read":true}
+{"file":"app/components/session/SessionView.vue","line":500,"position":"vue-binding","key":"global.confirmDelete","value":"Delete this chat? This cannot be undone.","read":true}
+{"file":"app/components/session/SessionView.vue","line":500,"position":"vue-binding","key":"feature.discardConfirm","value":"Delete this task? (incl. worktree, irreversible)","read":true}
+{"file":"app/components/session/SessionView.vue","line":500,"position":"vue-binding","key":"fix.discardConfirm","value":"Discard this fix task? (clears the local worktree, GitHub untouched)","read":true}
+{"file":"app/components/session/SessionView.vue","line":501,"position":"vue-text","key":"common.delete","value":"Delete","read":true}
+{"file":"app/components/session/SessionView.vue","line":502,"position":"vue-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"app/components/session/SessionView.vue","line":504,"position":"vue-binding","key":"common.delete","value":"Delete","read":true}
+{"file":"app/components/session/SessionView.vue","line":504,"position":"vue-binding","key":"feature.discard","value":"Delete task","read":true}
+{"file":"app/components/session/SessionView.vue","line":504,"position":"vue-binding","key":"fix.discard","value":"Discard","read":true}
+{"file":"app/components/session/SessionView.vue","line":513,"position":"vue-binding","key":"global.empty","value":"Start a conversation","read":true}
+{"file":"app/components/session/SessionView.vue","line":513,"position":"vue-binding","key":"fix.chatHint","value":"Chat here to work on the PR — ask the AI to read the code and make changes. No need to run a batch fix first.","read":true}
+{"file":"app/components/session/SessionView.vue","line":518,"position":"vue-text","key":"session.cancelQueued","value":"withdraw","read":true}
+{"file":"app/components/session/SessionView.vue","line":518,"position":"vue-text","key":"session.queued","value":"queued — runs when the current turn ends","read":true}
+{"file":"app/components/session/SessionView.vue","line":520,"position":"vue-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"app/components/session/SessionView.vue","line":520,"position":"vue-text","key":"session.rewind","value":"rewind files","read":true}
+{"file":"app/components/session/SessionView.vue","line":520,"position":"vue-text","key":"session.rewindConfirm","value":"Restore files to before this message?","read":true}
+{"file":"app/components/session/SessionView.vue","line":521,"position":"vue-text","key":"session.rewind","value":"rewind files","read":true}
+{"file":"app/components/session/SessionView.vue","line":521,"position":"vue-attr","key":"session.rewindHint","value":"Restore the workspace files to their state before this message (the conversation is kept)","read":true}
+{"file":"app/components/session/SessionView.vue","line":528,"position":"vue-text","key":"fix.stoppedTag","value":"stopped","read":true}
+{"file":"app/components/session/SessionView.vue","line":529,"position":"vue-text","key":"common.failed","value":"Failed","read":true}
+{"file":"app/components/session/SessionView.vue","line":540,"position":"vue-text","key":"feature.decisionTitle","value":"Decision — your call","read":true}
+{"file":"app/components/session/SessionView.vue","line":546,"position":"vue-attr","key":"feature.decisionOther","value":"Something else…","read":true}
+{"file":"app/components/session/SessionView.vue","line":547,"position":"vue-text","key":"global.send","value":"Send","read":true}
+{"file":"app/components/session/SessionView.vue","line":552,"position":"vue-binding","key":"global.thinking","value":"thinking","read":true}
+{"file":"app/components/session/SessionView.vue","line":552,"position":"vue-binding","key":"global.live.waiting_prompt","value":"waiting for you","read":true}
+{"file":"app/components/session/SessionView.vue","line":562,"position":"vue-binding","key":"global.dangerOff","value":"Dangerous commands blocked (rm -rf / git push need allow)","read":true}
+{"file":"app/components/session/SessionView.vue","line":562,"position":"vue-binding","key":"global.dangerOn","value":"⚠️ Dangerous commands ALLOWED (rm -rf / git push not blocked)","read":true}
+{"file":"app/components/session/SessionView.vue","line":566,"position":"vue-text","key":"global.cdPending","value":"Pending working dir: {path}","read":true}
+{"file":"app/components/session/SessionView.vue","line":570,"position":"vue-binding","key":"global.placeholder","value":"Ask me anything… type / for commands","read":true}
+{"file":"app/components/session/SessionView.vue","line":570,"position":"vue-binding","key":"feature.composerPlaceholder","value":"Describe the feature / paste an issue…","read":true}
+{"file":"app/components/session/SessionView.vue","line":570,"position":"vue-binding","key":"feature.chatPlaceholder","value":"Keep chatting to build / ask for changes… (click Open PR when you’re happy)","read":true}
+{"file":"app/components/session/SessionView.vue","line":570,"position":"vue-binding","key":"fix.chatPlaceholder","value":"Keep chatting / ask the AI to change more (e.g. rewrite F3; missing null check here…)","read":true}
+{"file":"app/components/session/SessionView.vue","line":575,"position":"vue-attr","key":"session.palette.button","value":"Commands","read":true}
+{"file":"app/components/session/SessionView.vue","line":580,"position":"vue-attr","key":"global.ultracodeHint","value":"Toggle ultracode mode (stays on) — Codex uses native ultra when the model supports it, otherwise xhigh plus the enhanced workflow (stronger, but slower and pricier). Just type normally; it's applied in the background.","read":true}
+{"file":"app/components/session/SessionView.vue","line":584,"position":"vue-text","key":"global.ultracode","value":"ultracode mode","read":true}
+{"file":"app/components/session/SessionView.vue","line":588,"position":"vue-binding","key":"fix.commitAndUpload","value":"Commit & upload","read":true}
+{"file":"app/components/session/SessionView.vue","line":588,"position":"vue-binding","key":"common.loading","value":"Loading…","read":true}
+{"file":"app/components/session/SessionView.vue","line":590,"position":"vue-binding","key":"feature.openPr","value":"Open PR","read":true}
+{"file":"app/components/session/SessionView.vue","line":590,"position":"vue-binding","key":"feature.updatePr","value":"Update PR","read":true}
+{"file":"app/components/session/SessionView.vue","line":592,"position":"vue-text","key":"fix.stop","value":"Stop","read":true}
+{"file":"app/components/session/SessionView.vue","line":593,"position":"vue-binding","key":"global.send","value":"Send","read":true}
+{"file":"app/components/session/SessionView.vue","line":593,"position":"vue-binding","key":"session.queue","value":"Queue","read":true}
+{"file":"app/components/session/SessionView.vue","line":593,"position":"vue-binding","key":"feature.creating","value":"Creating…","read":true}
+{"file":"app/components/session/SessionView.vue","line":599,"position":"vue-binding","key":"fix.deleteWorktreeConfirm","value":"Delete the local folder to free disk? The fix record stays and pushed changes are unaffected.","read":true}
+{"file":"app/components/session/SessionView.vue","line":599,"position":"vue-binding","key":"fix.deleteWorktreeConfirmUnpushed","value":"There are unpushed local changes that will be lost. Still delete the worktree?","read":true}
+{"file":"app/components/session/SessionView.vue","line":600,"position":"vue-binding","key":"common.delete","value":"Delete","read":true}
+{"file":"app/components/session/SessionView.vue","line":600,"position":"vue-binding","key":"fix.deleting","value":"Deleting…","read":true}
+{"file":"app/components/session/SessionView.vue","line":601,"position":"vue-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"app/components/session/SessionView.vue","line":604,"position":"vue-binding","key":"fix.worktreeHint","value":"Changes in worktree:","read":true}
+{"file":"app/components/session/SessionView.vue","line":604,"position":"vue-binding","key":"session.cwdHint","value":"Working directory","read":true}
+{"file":"app/components/session/SessionView.vue","line":606,"position":"vue-text","key":"fix.copyPath","value":"Copy path","read":true}
+{"file":"app/components/session/SessionView.vue","line":610,"position":"vue-text","key":"session.terminal","value":"Terminal","read":true}
+{"file":"app/components/session/SessionView.vue","line":612,"position":"vue-text","key":"fix.deleteWorktree","value":"Delete worktree","read":true}
+{"file":"app/components/UpdateCheckButton.vue","line":39,"position":"vue-attr","key":"update.check","value":"Check for updates","read":true}
+{"file":"app/components/UpdateCheckButton.vue","line":40,"position":"vue-attr","key":"update.check","value":"Check for updates","read":true}
+{"file":"app/composables/useRunHost.ts","line":52,"position":"expr","key":"global.thinking","value":"thinking","read":true}
+{"file":"app/composables/useRunHost.ts","line":63,"position":"expr","key":"global.compacted","value":"context compacted: {pre} → {post} tokens","read":true}
+{"file":"app/composables/useRunHost.ts","line":96,"position":"expr","key":"common.failed","value":"Failed","read":true}
+{"file":"app/pages/agent-config.vue","line":14,"position":"expr","key":"agentConfig.serverCwd","value":"Server directory","read":true}
+{"file":"app/pages/agent-config.vue","line":79,"position":"expr","key":"agentConfig.skillSource.plugin","value":"plugin","read":true}
+{"file":"app/pages/agent-config.vue","line":86,"position":"expr","key":"agentConfig.readOnly","value":"read-only","read":true}
+{"file":"app/pages/agent-config.vue","line":86,"position":"expr","key":"agentConfig.destructive","value":"writes","read":true}
+{"file":"app/pages/agent-config.vue","line":91,"position":"expr","key":"agentConfig.toolCount","value":"{n} tools","read":true}
+{"file":"app/pages/agent-config.vue","line":96,"position":"expr","key":"agentConfig.toolCount","value":"{n} tools","read":true}
+{"file":"app/pages/agent-config.vue","line":99,"position":"expr","key":"agentConfig.groups.mcp","value":"MCP servers","read":true}
+{"file":"app/pages/agent-config.vue","line":109,"position":"expr","key":"agentConfig.aliases","value":"Aliases","read":true}
+{"file":"app/pages/agent-config.vue","line":109,"position":"expr","key":"agentConfig.args","value":"Arguments","read":true}
+{"file":"app/pages/agent-config.vue","line":118,"position":"expr","key":"agentConfig.disabled","value":"disabled","read":true}
+{"file":"app/pages/agent-config.vue","line":123,"position":"expr","key":"agentConfig.skillGroupLocal","value":"Standalone skills","read":true}
+{"file":"app/pages/agent-config.vue","line":142,"position":"vue-text","key":"agentConfig.title","value":"Agent configuration","read":true}
+{"file":"app/pages/agent-config.vue","line":143,"position":"vue-text","key":"agentConfig.subtitle","value":"What Claude Code and Codex each read in this directory, what they report once started, and the two switches PR Cockpit owns. Switch provider to see its report.","read":true}
+{"file":"app/pages/agent-config.vue","line":146,"position":"vue-text","key":"agentConfig.cwd","value":"Directory","read":true}
+{"file":"app/pages/agent-config.vue","line":148,"position":"vue-binding","key":"agentConfig.refreshProbe","value":"Probe again","read":true}
+{"file":"app/pages/agent-config.vue","line":148,"position":"vue-binding","key":"agentConfig.probing","value":"Probing…","read":true}
+{"file":"app/pages/agent-config.vue","line":154,"position":"vue-text","key":"agentConfig.memoryDir","value":"memory / transcript directory","read":true}
+{"file":"app/pages/agent-config.vue","line":161,"position":"vue-text","key":"agentConfig.saved","value":"saved","read":true}
+{"file":"app/pages/agent-config.vue","line":161,"position":"vue-text","key":"agentConfig.groups.switches","value":"Switches PR Cockpit owns","read":true}
+{"file":"app/pages/agent-config.vue","line":162,"position":"vue-text","key":"agentConfig.groups.switchesHint","value":"Only these two live in the PR Cockpit database and are edited here; everything below is the CLI’s own report, read-only.","read":true}
+{"file":"app/pages/agent-config.vue","line":171,"position":"vue-text","key":"agentConfig.chromeHint","value":"Start Claude Code with --chrome so the Claude in Chrome MCP server comes up. Applies to every Claude session (from the next turn) and needs the Chrome extension; reviews only get it when MCP is allowed below.","read":true}
+{"file":"app/pages/agent-config.vue","line":171,"position":"vue-text","key":"agentConfig.chrome","value":"Claude in Chrome (--chrome)","read":true}
+{"file":"app/pages/agent-config.vue","line":177,"position":"vue-text","key":"agentConfig.reviewMcpHint","value":"Off by default: the review family (review / re-review / recheck / automation) connects no MCP server and only reads the repository. On, reviews connect every MCP server configured in your CLI, like sessions do — including tools that write to external systems, and automatic reviews run unattended. Shared by both providers. Servers declared inside the PR branch itself (.mcp.json / .codex/config.toml) are never enabled for a review.","read":true}
+{"file":"app/pages/agent-config.vue","line":177,"position":"vue-text","key":"agentConfig.reviewMcp","value":"Let reviews use MCP","read":true}
+{"file":"app/pages/agent-config.vue","line":185,"position":"vue-text","key":"agentConfig.probeError","value":"Probe failed: {msg}","read":true}
+{"file":"app/pages/agent-config.vue","line":186,"position":"vue-text","key":"agentConfig.noProbe","value":"Not probed yet","read":true}
+{"file":"app/pages/agent-config.vue","line":186,"position":"vue-text","key":"agentConfig.probeTime","value":"probed {at} in {ms} ms","read":true}
+{"file":"app/pages/agent-config.vue","line":190,"position":"vue-text","key":"agentConfig.groups.files","value":"Files read into the startup context","read":true}
+{"file":"app/pages/agent-config.vue","line":194,"position":"vue-text","key":"agentConfig.tokens","value":"tokens","read":true}
+{"file":"app/pages/agent-config.vue","line":194,"position":"vue-text","key":"agentConfig.loaded","value":"Loaded","read":true}
+{"file":"app/pages/agent-config.vue","line":194,"position":"vue-text","key":"agentConfig.count","value":"Entries","read":true}
+{"file":"app/pages/agent-config.vue","line":194,"position":"vue-text","key":"agentConfig.size","value":"Size","read":true}
+{"file":"app/pages/agent-config.vue","line":194,"position":"vue-text","key":"agentConfig.path","value":"Path","read":true}
+{"file":"app/pages/agent-config.vue","line":194,"position":"vue-text","key":"agentConfig.kind","value":"Kind","read":true}
+{"file":"app/pages/agent-config.vue","line":199,"position":"vue-binding","key":"agentConfig.missing","value":"missing","read":true}
+{"file":"app/pages/agent-config.vue","line":200,"position":"vue-binding","key":"agentConfig.loadedNaHint","value":"The CLI only reports memory files; directories, settings and MCP config are not reported.","read":true}
+{"file":"app/pages/agent-config.vue","line":202,"position":"vue-text","key":"agentConfig.loadedYes","value":"loaded","read":true}
+{"file":"app/pages/agent-config.vue","line":203,"position":"vue-text","key":"agentConfig.loadedNo","value":"not loaded","read":true}
+{"file":"app/pages/agent-config.vue","line":204,"position":"vue-text","key":"agentConfig.loadedNa","value":"not reported","read":true}
+{"file":"app/pages/agent-config.vue","line":213,"position":"vue-text","key":"agentConfig.pluginsHint","value":"Plugins the CLI actually loaded (name · version · source).","read":true}
+{"file":"app/pages/agent-config.vue","line":213,"position":"vue-text","key":"agentConfig.plugins","value":"Plugins","read":true}
+{"file":"app/pages/agent-config.vue","line":216,"position":"vue-text","key":"agentConfig.none","value":"none","read":true}
+{"file":"app/pages/agent-config.vue","line":219,"position":"vue-text","key":"agentConfig.disabled","value":"disabled","read":true}
+{"file":"app/pages/agent-config.vue","line":220,"position":"vue-text","key":"agentConfig.none","value":"none","read":true}
+{"file":"app/pages/agent-config.vue","line":225,"position":"vue-text","key":"agentConfig.settingsLayersHint","value":"Which settings layers the CLI applied (layer names only, contents are never read).","read":true}
+{"file":"app/pages/agent-config.vue","line":225,"position":"vue-text","key":"agentConfig.settingsLayers","value":"Settings layers","read":true}
+{"file":"app/pages/agent-config.vue","line":227,"position":"vue-text","key":"agentConfig.none","value":"none","read":true}
+{"file":"app/pages/agent-config.vue","line":230,"position":"vue-text","key":"agentConfig.configLayersHint","value":"The order in which the app-server merges config (later overrides earlier); layers whose file does not exist show empty.","read":true}
+{"file":"app/pages/agent-config.vue","line":230,"position":"vue-text","key":"agentConfig.configLayers","value":"Config layers","read":true}
+{"file":"app/pages/agent-config.vue","line":232,"position":"vue-text","key":"agentConfig.none","value":"none","read":true}
+{"file":"app/pages/agent-config.vue","line":233,"position":"vue-text","key":"agentConfig.hooks","value":"Hooks","read":true}
+{"file":"app/pages/agent-config.vue","line":235,"position":"vue-text","key":"agentConfig.none","value":"none","read":true}
+{"file":"app/pages/agent-config.vue","line":245,"position":"vue-text","key":"agentConfig.contextTotal","value":"{total} / {max} tokens ({pct}%)","read":true}
+{"file":"app/pages/agent-config.vue","line":245,"position":"vue-text","key":"agentConfig.groups.context","value":"Startup context","read":true}
+{"file":"app/pages/agent-config.vue","line":250,"position":"vue-text","key":"agentConfig.none","value":"none","read":true}
+{"file":"app/pages/agent-config.vue","line":253,"position":"vue-text","key":"agentConfig.categories","value":"By category","read":true}
+{"file":"app/pages/agent-config.vue","line":254,"position":"vue-text","key":"agentConfig.deferred","value":"deferred","read":true}
+{"file":"app/pages/agent-config.vue","line":255,"position":"vue-text","key":"agentConfig.slashCommands","value":"Slash commands {included}/{total}","read":true}
+{"file":"app/pages/agent-config.vue","line":258,"position":"vue-text","key":"agentConfig.ctxMemory","value":"Memory files","read":true}
+{"file":"app/pages/agent-config.vue","line":260,"position":"vue-text","key":"agentConfig.ctxSkills","value":"Skills (visible to the model)","read":true}
+{"file":"app/pages/agent-config.vue","line":269,"position":"vue-text","key":"agentConfig.codexNoTokens","value":"Codex does not report startup-context tokens. Instruction files a thread in this directory actually injects:","read":true}
+{"file":"app/pages/agent-config.vue","line":271,"position":"vue-text","key":"agentConfig.none","value":"none","read":true}
+{"file":"app/pages/agent-config.vue","line":278,"position":"vue-text","key":"agentConfig.groups.mcp","value":"MCP servers","read":true}
+{"file":"app/pages/dashboard.vue","line":21,"position":"expr","key":"dashboard.allProjects","value":"All projects","read":true}
+{"file":"app/pages/dashboard.vue","line":22,"position":"expr","key":"dashboard.all","value":"All time","read":true}
+{"file":"app/pages/dashboard.vue","line":22,"position":"expr","key":"dashboard.last30","value":"Last 30 days","read":true}
+{"file":"app/pages/dashboard.vue","line":22,"position":"expr","key":"dashboard.last7","value":"Last 7 days","read":true}
+{"file":"app/pages/dashboard.vue","line":73,"position":"vue-text","key":"dashboard.title","value":"Dashboard","read":true}
+{"file":"app/pages/dashboard.vue","line":74,"position":"vue-text","key":"dashboard.subtitle","value":"Cost, tokens and quality signals from every agent run. Estimated Codex prices come from data/codex-rates.json.","read":true}
+{"file":"app/pages/dashboard.vue","line":79,"position":"vue-attr","key":"dashboard.refresh","value":"Refresh","read":true}
+{"file":"app/pages/dashboard.vue","line":79,"position":"vue-attr","key":"dashboard.refresh","value":"Refresh","read":true}
+{"file":"app/pages/dashboard.vue","line":83,"position":"vue-text","key":"dashboard.noData","value":"No runs recorded yet — run a review to see numbers here.","read":true}
+{"file":"app/pages/dashboard.vue","line":89,"position":"vue-text","key":"dashboard.errors","value":"errors","read":true}
+{"file":"app/pages/dashboard.vue","line":89,"position":"vue-text","key":"dashboard.runs","value":"Runs","read":true}
+{"file":"app/pages/dashboard.vue","line":90,"position":"vue-text","key":"dashboard.unpriced","value":"{n} unpriced","read":true}
+{"file":"app/pages/dashboard.vue","line":90,"position":"vue-text","key":"dashboard.cost","value":"Cost","read":true}
+{"file":"app/pages/dashboard.vue","line":91,"position":"vue-text","key":"dashboard.tokens","value":"Tokens (in / out)","read":true}
+{"file":"app/pages/dashboard.vue","line":94,"position":"vue-text","key":"dashboard.tilesHint","value":"Every run in the selected project and period.","read":true}
+{"file":"app/pages/dashboard.vue","line":95,"position":"vue-binding","key":"dashboard.pricingMissing","value":"Codex runs are not priced: add data/codex-rates.json to estimate their cost.","read":true}
+{"file":"app/pages/dashboard.vue","line":95,"position":"vue-binding","key":"dashboard.pricingNote","value":"Codex cost is estimated from {n} priced models (rates as of {asOf}).","read":true}
+{"file":"app/pages/dashboard.vue","line":101,"position":"vue-text","key":"dashboard.hint.spend","value":"One row per run, aggregated here by kind, model and day. Cost is what the SDK reported (Claude) or tokens × rate (Codex, marked ~); runs without a rate count as \"unpriced\" and are left out of the total.","read":true}
+{"file":"app/pages/dashboard.vue","line":101,"position":"vue-text","key":"dashboard.group.spend","value":"Where the money goes","read":true}
+{"file":"app/pages/dashboard.vue","line":104,"position":"vue-text","key":"dashboard.hint.bySubkind","value":"Run kind × provider. review / guided / recheck / skillgen are the review family; session is the persistent chat; helper is a one-shot helper call (commit message, title, translation).","read":true}
+{"file":"app/pages/dashboard.vue","line":104,"position":"vue-text","key":"dashboard.bySubkind","value":"Runs by kind","read":true}
+{"file":"app/pages/dashboard.vue","line":106,"position":"vue-text","key":"dashboard.tokens","value":"Tokens (in / out)","read":true}
+{"file":"app/pages/dashboard.vue","line":106,"position":"vue-text","key":"dashboard.cost","value":"Cost","read":true}
+{"file":"app/pages/dashboard.vue","line":106,"position":"vue-text","key":"dashboard.col.runs","value":"Runs","read":true}
+{"file":"app/pages/dashboard.vue","line":106,"position":"vue-text","key":"dashboard.col.provider","value":"Provider","read":true}
+{"file":"app/pages/dashboard.vue","line":106,"position":"vue-text","key":"dashboard.col.kind","value":"Kind","read":true}
+{"file":"app/pages/dashboard.vue","line":116,"position":"vue-text","key":"dashboard.hint.byModel","value":"Review family only (review / guided / recheck). Average cost counts priced runs only; p50 / p95 = half / 95% of the runs finished within this duration.","read":true}
+{"file":"app/pages/dashboard.vue","line":116,"position":"vue-text","key":"dashboard.byModel","value":"Review runs by model × effort","read":true}
+{"file":"app/pages/dashboard.vue","line":118,"position":"vue-text","key":"dashboard.col.p95Dur","value":"p95 duration","read":true}
+{"file":"app/pages/dashboard.vue","line":118,"position":"vue-text","key":"dashboard.col.p50Dur","value":"p50 duration","read":true}
+{"file":"app/pages/dashboard.vue","line":118,"position":"vue-text","key":"dashboard.col.avgCost","value":"Avg cost","read":true}
+{"file":"app/pages/dashboard.vue","line":118,"position":"vue-text","key":"dashboard.col.runs","value":"Runs","read":true}
+{"file":"app/pages/dashboard.vue","line":118,"position":"vue-text","key":"dashboard.col.effort","value":"Effort","read":true}
+{"file":"app/pages/dashboard.vue","line":118,"position":"vue-text","key":"dashboard.col.model","value":"Model","read":true}
+{"file":"app/pages/dashboard.vue","line":127,"position":"vue-text","key":"dashboard.hint.byDay","value":"Grouped by the run's creation day; at most the 30 most recent days that had runs (within the period above).","read":true}
+{"file":"app/pages/dashboard.vue","line":127,"position":"vue-text","key":"dashboard.byDay","value":"Cost by day","read":true}
+{"file":"app/pages/dashboard.vue","line":129,"position":"vue-text","key":"dashboard.tokens","value":"Tokens (in / out)","read":true}
+{"file":"app/pages/dashboard.vue","line":129,"position":"vue-text","key":"dashboard.cost","value":"Cost","read":true}
+{"file":"app/pages/dashboard.vue","line":129,"position":"vue-text","key":"dashboard.col.runs","value":"Runs","read":true}
+{"file":"app/pages/dashboard.vue","line":129,"position":"vue-text","key":"dashboard.col.day","value":"Day","read":true}
+{"file":"app/pages/dashboard.vue","line":140,"position":"vue-text","key":"dashboard.hint.quality","value":"Precision only counts reviews a human handled (ticked or posted) — a draft nobody looked at says nothing about the skill and is left out; rechecks and automation are counted from their own records.","read":true}
+{"file":"app/pages/dashboard.vue","line":140,"position":"vue-text","key":"dashboard.group.quality","value":"Review quality","read":true}
+{"file":"app/pages/dashboard.vue","line":143,"position":"vue-text","key":"dashboard.hint.precision","value":"Precision = human-accepted (ticked or posted) ÷ all findings; machine ticks (auto / engine) do not count as accepted. Cost per accepted = every run of those reviews ÷ accepted findings — what one useful finding costs.","read":true}
+{"file":"app/pages/dashboard.vue","line":143,"position":"vue-text","key":"dashboard.precision","value":"Precision by skill version","read":true}
+{"file":"app/pages/dashboard.vue","line":145,"position":"vue-text","key":"dashboard.col.costPerAccepted","value":"Cost / accepted","read":true}
+{"file":"app/pages/dashboard.vue","line":145,"position":"vue-text","key":"dashboard.cost","value":"Cost","read":true}
+{"file":"app/pages/dashboard.vue","line":145,"position":"vue-text","key":"dashboard.col.precision","value":"Precision","read":true}
+{"file":"app/pages/dashboard.vue","line":145,"position":"vue-text","key":"dashboard.col.posted","value":"Posted","read":true}
+{"file":"app/pages/dashboard.vue","line":145,"position":"vue-text","key":"dashboard.col.machine","value":"Machine-checked","read":true}
+{"file":"app/pages/dashboard.vue","line":145,"position":"vue-text","key":"dashboard.col.accepted","value":"Human-accepted","read":true}
+{"file":"app/pages/dashboard.vue","line":145,"position":"vue-text","key":"dashboard.col.findings","value":"Findings","read":true}
+{"file":"app/pages/dashboard.vue","line":145,"position":"vue-text","key":"dashboard.col.reviews","value":"Reviews","read":true}
+{"file":"app/pages/dashboard.vue","line":145,"position":"vue-text","key":"dashboard.col.skill","value":"Skill","read":true}
+{"file":"app/pages/dashboard.vue","line":147,"position":"vue-binding","key":"dashboard.defaultSkill","value":"built-in default","read":true}
+{"file":"app/pages/dashboard.vue","line":152,"position":"vue-text","key":"dashboard.noTriaged","value":"No triaged review yet — tick or post findings once and this fills in.","read":true}
+{"file":"app/pages/dashboard.vue","line":155,"position":"vue-text","key":"dashboard.hint.recheck","value":"Retraction rate: findings withdrawn after your feedback and a re-review (lower is better). Fixed rate: findings judged fixed after the author pushed. Below, the count of each finding's latest recheck status.","read":true}
+{"file":"app/pages/dashboard.vue","line":155,"position":"vue-text","key":"dashboard.recheck","value":"Recheck outcomes","read":true}
+{"file":"app/pages/dashboard.vue","line":157,"position":"vue-text","key":"dashboard.fixedRate","value":"Fixed rate","read":true}
+{"file":"app/pages/dashboard.vue","line":157,"position":"vue-text","key":"dashboard.retractionRate","value":"Retraction rate","read":true}
+{"file":"app/pages/dashboard.vue","line":159,"position":"vue-text","key":"dashboard.stance","value":"stance","read":true}
+{"file":"app/pages/dashboard.vue","line":163,"position":"vue-text","key":"dashboard.hint.automation","value":"Event counts from the automation engine: review_created / recheck / posted / fix_started / pushed, plus cooldown, capped, converged and the error kinds.","read":true}
+{"file":"app/pages/dashboard.vue","line":163,"position":"vue-text","key":"dashboard.automation","value":"Automation","read":true}
+{"file":"app/pages/dashboard.vue","line":171,"position":"vue-text","key":"dashboard.hint.recent","value":"One row per run, newest first. After the cost, ~ means estimated and +? means some turns were unpriced (the total is a lower bound); hover a row for its title or error text.","read":true}
+{"file":"app/pages/dashboard.vue","line":171,"position":"vue-text","key":"dashboard.recent","value":"Recent runs","read":true}
+{"file":"app/pages/dashboard.vue","line":174,"position":"vue-text","key":"dashboard.col.skill","value":"Skill","read":true}
+{"file":"app/pages/dashboard.vue","line":174,"position":"vue-text","key":"dashboard.col.duration","value":"Duration","read":true}
+{"file":"app/pages/dashboard.vue","line":174,"position":"vue-text","key":"dashboard.tokens","value":"Tokens (in / out)","read":true}
+{"file":"app/pages/dashboard.vue","line":174,"position":"vue-text","key":"dashboard.cost","value":"Cost","read":true}
+{"file":"app/pages/dashboard.vue","line":174,"position":"vue-text","key":"dashboard.col.status","value":"Status","read":true}
+{"file":"app/pages/dashboard.vue","line":174,"position":"vue-text","key":"dashboard.col.model","value":"Model","read":true}
+{"file":"app/pages/dashboard.vue","line":174,"position":"vue-text","key":"dashboard.col.pr","value":"PR","read":true}
+{"file":"app/pages/dashboard.vue","line":174,"position":"vue-text","key":"dashboard.col.kind","value":"Kind","read":true}
+{"file":"app/pages/dashboard.vue","line":174,"position":"vue-text","key":"dashboard.col.project","value":"Project","read":true}
+{"file":"app/pages/dashboard.vue","line":174,"position":"vue-text","key":"dashboard.col.when","value":"When","read":true}
+{"file":"app/pages/inbox.vue","line":41,"position":"expr","key":"inbox.where.review","value":"review · no local workspace","read":true}
+{"file":"app/pages/inbox.vue","line":42,"position":"expr","key":"inbox.where.run","value":"{kind} run","read":true}
+{"file":"app/pages/inbox.vue","line":43,"position":"expr","key":"inbox.where.pr","value":"PR #{n} worktree","read":true}
+{"file":"app/pages/inbox.vue","line":44,"position":"expr","key":"inbox.where.branch","value":"branch worktree","read":true}
+{"file":"app/pages/inbox.vue","line":45,"position":"expr","key":"inbox.where.cwd","value":"directory session","read":true}
+{"file":"app/pages/inbox.vue","line":52,"position":"vue-text","key":"inbox.title","value":"Inbox","read":true}
+{"file":"app/pages/inbox.vue","line":53,"position":"vue-text","key":"inbox.subtitle","value":"Everything waiting for you: agents blocked on a decision, drafts to triage, PRs the author updated, runs that failed in the last 24 h.","read":true}
+{"file":"app/pages/inbox.vue","line":55,"position":"vue-text","key":"inbox.empty","value":"Nothing is waiting for you.","read":true}
+{"file":"app/pages/inbox.vue","line":59,"position":"vue-text","key":"inbox.hint.prompts","value":"Sessions blocked on a permission, a question or a plan approval. \"Open\" follows the workspace: PR worktree → the fix tab of the PR drawer; branch worktree → the project's session list; directory session → the global drawer (bottom right).","read":true}
+{"file":"app/pages/inbox.vue","line":59,"position":"vue-text","key":"inbox.prompts","value":"Waiting for your answer","read":true}
+{"file":"app/pages/inbox.vue","line":66,"position":"vue-text","key":"inbox.since","value":"since {t}","read":true}
+{"file":"app/pages/inbox.vue","line":66,"position":"vue-binding","key":"inbox.session","value":"session","read":true}
+{"file":"app/pages/inbox.vue","line":68,"position":"vue-text","key":"inbox.open","value":"Open","read":true}
+{"file":"app/pages/inbox.vue","line":76,"position":"vue-text","key":"inbox.hint.drafts","value":"Reviews that produced findings and were not posted yet (still in draft, ticked or not). A review runs in a throw-away worktree that is deleted right after, so the PR list's \"worktree\" filter never matches them — \"Open\" goes to the review tab of the PR drawer.","read":true}
+{"file":"app/pages/inbox.vue","line":76,"position":"vue-text","key":"inbox.drafts","value":"Drafts to triage","read":true}
+{"file":"app/pages/inbox.vue","line":81,"position":"vue-text","key":"inbox.findings","value":"{n} findings · {u} unchecked","read":true}
+{"file":"app/pages/inbox.vue","line":81,"position":"vue-text","key":"inbox.where.review","value":"review · no local workspace","read":true}
+{"file":"app/pages/inbox.vue","line":83,"position":"vue-text","key":"inbox.open","value":"Open","read":true}
+{"file":"app/pages/inbox.vue","line":91,"position":"vue-text","key":"inbox.hint.errors","value":"Runs that ended in error during the last 24 hours (reviews, rechecks, skill generation and sessions alike); the second line is the error text.","read":true}
+{"file":"app/pages/inbox.vue","line":91,"position":"vue-text","key":"inbox.errors","value":"Failed in the last 24 h","read":true}
+{"file":"app/pages/inbox.vue","line":99,"position":"vue-text","key":"inbox.open","value":"Open","read":true}
+{"file":"app/pages/inbox.vue","line":100,"position":"vue-text","key":"inbox.open","value":"Open","read":true}
+{"file":"app/pages/inbox.vue","line":108,"position":"vue-text","key":"inbox.hint.automation","value":"The automation engine's events of the last 24 hours: review / recheck / post / fix dispatched / pushed, plus cooldown, round limit (capped), converged and the error kinds. Read-only log.","read":true}
+{"file":"app/pages/inbox.vue","line":108,"position":"vue-text","key":"inbox.automation","value":"Automation notes (24 h)","read":true}
+{"file":"app/pages/index.vue","line":15,"position":"vue-text","key":"home.tagline","value":"Local batch PR review. Terminal agent at the core, web for gatekeeping and state management.","read":true}
+{"file":"app/pages/index.vue","line":22,"position":"vue-binding","key":"home.ghStatusNotReady","value":"Not ready — run gh auth login first","read":true}
+{"file":"app/pages/index.vue","line":22,"position":"vue-binding","key":"home.ghStatusOk","value":"Signed in","read":true}
+{"file":"app/pages/index.vue","line":26,"position":"vue-text","key":"home.defaultModel","value":"Default model","read":true}
+{"file":"app/pages/index.vue","line":30,"position":"vue-text","key":"layout.projectsTitle","value":"Projects","read":true}
+{"file":"app/pages/index.vue","line":31,"position":"vue-text","key":"home.projectsCount","value":"{count}","read":true}
+{"file":"app/pages/index.vue","line":41,"position":"vue-text","key":"home.enterProject","value":"Open “{name}” →","read":true}
+{"file":"app/pages/index.vue","line":43,"position":"vue-text","key":"home.emptyHint","value":"Create your first project with + on the left.","read":true}
+{"file":"app/pages/projects/[id].vue","line":103,"position":"expr","key":"project.msg.fetchFailed","value":"Fetch failed","read":true}
+{"file":"app/pages/projects/[id].vue","line":227,"position":"expr","key":"status.pr.approved","value":"Approved","read":true}
+{"file":"app/pages/projects/[id].vue","line":228,"position":"expr","key":"status.pr.changes","value":"Changes requested","read":true}
+{"file":"app/pages/projects/[id].vue","line":229,"position":"expr","key":"project.tag.reviewed","value":"reviewed","read":true}
+{"file":"app/pages/projects/[id].vue","line":238,"position":"expr","key":"project.reviewNone","value":"not reviewed","read":true}
+{"file":"app/pages/projects/[id].vue","line":239,"position":"expr","key":"project.tag.reviewed","value":"reviewed","read":true}
+{"file":"app/pages/projects/[id].vue","line":240,"position":"expr","key":"status.pr.approved","value":"Approved","read":true}
+{"file":"app/pages/projects/[id].vue","line":241,"position":"expr","key":"status.pr.changes","value":"Changes requested","read":true}
+{"file":"app/pages/projects/[id].vue","line":246,"position":"expr","key":"project.fixNone","value":"no fix","read":true}
+{"file":"app/pages/projects/[id].vue","line":249,"position":"expr","key":"project.worktree.has","value":"Present","read":true}
+{"file":"app/pages/projects/[id].vue","line":250,"position":"expr","key":"project.worktree.stale","value":"Stale","read":true}
+{"file":"app/pages/projects/[id].vue","line":251,"position":"expr","key":"project.worktree.none","value":"None","read":true}
+{"file":"app/pages/projects/[id].vue","line":255,"position":"expr","key":"project.col.author","value":"Author","read":true}
+{"file":"app/pages/projects/[id].vue","line":256,"position":"expr","key":"project.col.prStatus","value":"PR","read":true}
+{"file":"app/pages/projects/[id].vue","line":257,"position":"expr","key":"project.col.reviewStatus","value":"Review","read":true}
+{"file":"app/pages/projects/[id].vue","line":258,"position":"expr","key":"project.col.fixStatus","value":"Fix","read":true}
+{"file":"app/pages/projects/[id].vue","line":259,"position":"expr","key":"project.col.worktree","value":"Worktree","read":true}
+{"file":"app/pages/projects/[id].vue","line":281,"position":"vue-text","key":"project.tabs.pulls","value":"All PRs","read":true}
+{"file":"app/pages/projects/[id].vue","line":286,"position":"vue-text","key":"project.tabs.config","value":"Configuration","read":true}
+{"file":"app/pages/projects/[id].vue","line":303,"position":"vue-binding","key":"project.selectAll","value":"Select all","read":true}
+{"file":"app/pages/projects/[id].vue","line":303,"position":"vue-binding","key":"project.deselectAll","value":"Deselect all","read":true}
+{"file":"app/pages/projects/[id].vue","line":318,"position":"vue-text","key":"project.clearFilter","value":"Clear filter","read":true}
+{"file":"app/pages/projects/[id].vue","line":319,"position":"vue-text","key":"automation.configBtn","value":"Automation","read":true}
+{"file":"app/pages/projects/[id].vue","line":320,"position":"vue-text","key":"project.refreshList","value":"Refresh","read":true}
+{"file":"app/pages/projects/[id].vue","line":329,"position":"vue-text","key":"project.col.title","value":"Title","read":true}
+{"file":"app/pages/projects/[id].vue","line":330,"position":"vue-text","key":"project.col.author","value":"Author","read":true}
+{"file":"app/pages/projects/[id].vue","line":331,"position":"vue-text","key":"project.col.prStatus","value":"PR","read":true}
+{"file":"app/pages/projects/[id].vue","line":332,"position":"vue-text","key":"project.col.reviewStatus","value":"Review","read":true}
+{"file":"app/pages/projects/[id].vue","line":333,"position":"vue-text","key":"project.col.fixStatus","value":"Fix","read":true}
+{"file":"app/pages/projects/[id].vue","line":360,"position":"vue-text","key":"project.authorUpdated","value":"Author updated","read":true}
+{"file":"app/pages/projects/[id].vue","line":360,"position":"vue-attr","key":"project.authorUpdatedTitle","value":"The author pushed new commits after your last comment — you can recheck","read":true}
+{"file":"app/pages/projects/[id].vue","line":367,"position":"vue-attr","key":"project.chattingTitle","value":"Chat in progress — the AI is working on this fix","read":true}
+{"file":"app/pages/projects/[id].vue","line":370,"position":"vue-text","key":"project.chatting","value":"Chatting","read":true}
+{"file":"app/pages/projects/[id].vue","line":375,"position":"vue-text","key":"project.reviewerUpdated","value":"Re-reviewed","read":true}
+{"file":"app/pages/projects/[id].vue","line":375,"position":"vue-attr","key":"project.reviewerUpdatedTitle","value":"A new review was submitted after you pushed the fix","read":true}
+{"file":"app/pages/projects/[id].vue","line":381,"position":"vue-binding","key":"project.noPulls","value":"No matching PRs","read":true}
+{"file":"app/pages/projects/[id].vue","line":381,"position":"vue-binding","key":"common.loading","value":"Loading…","read":true}
+{"file":"app/pages/projects/[id].vue","line":386,"position":"vue-text","key":"project.pagination.summaryPages","value":"{total} total · page {page} / {pages}","read":true}
+{"file":"app/pages/projects/[id].vue","line":388,"position":"vue-text","key":"project.pagination.prev","value":"← Previous","read":true}
+{"file":"app/pages/projects/[id].vue","line":389,"position":"vue-text","key":"project.pagination.next","value":"Next →","read":true}

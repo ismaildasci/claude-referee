@@ -1,0 +1,115 @@
+{"file":"App.tsx","line":201,"position":"jsx-text","key":"footer.poweredBy","value":"Powered by Google Gemini","read":true}
+{"file":"App.tsx","line":204,"position":"jsx-text","key":"footer.copyright","value":"© {{year}} Cyberceratops. All rights reserved.","read":true}
+{"file":"App.tsx","line":211,"position":"jsx-text","key":"footer.about","value":"About Us","read":true}
+{"file":"App.tsx","line":218,"position":"jsx-text","key":"footer.privacyPolicy","value":"Privacy Policy","read":true}
+{"file":"App.tsx","line":225,"position":"jsx-text","key":"footer.termsOfService","value":"Terms of Service","read":true}
+{"file":"App.tsx","line":254,"position":"jsx-text","key":"sharedView.errorTitle","value":"Invalid Share Link","read":true}
+{"file":"App.tsx","line":257,"position":"jsx-text","key":"sharedView.errorDescription","value":"This share link is invalid or has expired. The data may be corrupted.","read":true}
+{"file":"App.tsx","line":264,"position":"jsx-text","key":"sharedView.backToHome","value":"Back to Home","read":true}
+{"file":"App.tsx","line":288,"position":"jsx-text","key":"sharedView.loading","value":"Loading shared analysis...","read":true}
+{"file":"App.tsx","line":313,"position":"jsx-text","key":"result.backToSearch","value":"Research Another Event","read":true}
+{"file":"App.tsx","line":368,"position":"expr","key":"loading.deepAnalyzing","value":"Deep Analyzing...","read":true}
+{"file":"App.tsx","line":368,"position":"expr","key":"loading.fastScanning","value":"Quick Scanning...","read":true}
+{"file":"App.tsx","line":370,"position":"jsx-text","key":"loading.queryingSource","value":"Querying real-time sources and historical databases.","read":true}
+{"file":"App.tsx","line":379,"position":"jsx-text","key":"error.title","value":"Analysis Failed","read":true}
+{"file":"App.tsx","line":385,"position":"jsx-text","key":"error.retry","value":"Retry","read":true}
+{"file":"components/Header.tsx","line":62,"position":"jsx-text","key":"header.subtitle","value":"Event Horizon","read":true}
+{"file":"components/Header.tsx","line":79,"position":"jsx-text","key":"header.realTimeAnalysis","value":"Real-time Analysis","read":true}
+{"file":"components/Header.tsx","line":80,"position":"jsx-text","key":"header.searchEnabled","value":"Search Enhancement Enabled","read":true}
+{"file":"components/Header.tsx","line":112,"position":"jsx-attr","key":"settings.title","value":"API Settings","read":true}
+{"file":"components/Header.tsx","line":163,"position":"jsx-text","key":"header.realTimeAnalysis","value":"Real-time Analysis","read":true}
+{"file":"components/Header.tsx","line":167,"position":"jsx-text","key":"header.searchEnabled","value":"Search Enhancement Enabled","read":true}
+{"file":"components/Header.tsx","line":176,"position":"expr","key":"languageSwitcher.zh","value":"中文","read":true}
+{"file":"components/Header.tsx","line":191,"position":"expr","key":"languageSwitcher.zh","value":"中文","read":true}
+{"file":"components/Header.tsx","line":191,"position":"expr","key":"languageSwitcher.zh","value":"中文","read":true}
+{"file":"components/Header.tsx","line":205,"position":"jsx-text","key":"settings.title","value":"API Settings","read":true}
+{"file":"components/LanguageSwitcher.tsx","line":32,"position":"expr","key":"languageSwitcher.en","value":"English","read":true}
+{"file":"components/LanguageSwitcher.tsx","line":32,"position":"expr","key":"languageSwitcher.zh","value":"中文","read":true}
+{"file":"components/LoginPrompt.tsx","line":45,"position":"jsx-attr","key":"share.close","value":"Close","read":true}
+{"file":"components/LoginPrompt.tsx","line":59,"position":"jsx-text","key":"auth.limitReachedTitle","value":"Daily Limit Reached","read":true}
+{"file":"components/LoginPrompt.tsx","line":64,"position":"jsx-text","key":"auth.limitReachedDesc","value":"You've used all 5 free analyses for today. Login with GitHub to unlock unlimited access.","read":true}
+{"file":"components/LoginPrompt.tsx","line":77,"position":"jsx-text","key":"auth.loginWithGitHub","value":"Login with GitHub","read":true}
+{"file":"components/LoginPrompt.tsx","line":82,"position":"jsx-text","key":"auth.loginBenefit","value":"Logged in users enjoy unlimited analyses","read":true}
+{"file":"components/ResultView.tsx","line":57,"position":"jsx-text","key":"result.analysisComplete","value":"Analysis Complete","read":true}
+{"file":"components/ResultView.tsx","line":63,"position":"expr","key":"result.eventAnalysis","value":"Event Analysis","read":true}
+{"file":"components/ResultView.tsx","line":78,"position":"jsx-text","key":"result.coreImpact","value":"Key Impacts","read":true}
+{"file":"components/ResultView.tsx","line":115,"position":"jsx-text","key":"result.historicalEchoes","value":"Historical Echoes","read":true}
+{"file":"components/ResultView.tsx","line":128,"position":"jsx-text","key":"result.historyRhymes","value":"History doesn't repeat itself, but it often rhymes","read":true}
+{"file":"components/ResultView.tsx","line":137,"position":"jsx-text","key":"result.references","value":"References","read":true}
+{"file":"components/SearchBar.tsx","line":112,"position":"jsx-text","key":"searchBar.heroTitle1","value":"Decoding the Pulse of the","read":true}
+{"file":"components/SearchBar.tsx","line":113,"position":"jsx-text","key":"searchBar.heroTitle2","value":"Digital Age","read":true}
+{"file":"components/SearchBar.tsx","line":119,"position":"jsx-text","key":"searchBar.heroDescription","value":"Instantly summarize major tech events, analyze their impact, and discover historical echoes.","read":true}
+{"file":"components/SearchBar.tsx","line":138,"position":"jsx-text","key":"searchBar.fastMode","value":"Quick Mode (Flash)","read":true}
+{"file":"components/SearchBar.tsx","line":153,"position":"jsx-text","key":"searchBar.deepMode","value":"Deep Mode (Pro)","read":true}
+{"file":"components/SearchBar.tsx","line":170,"position":"expr","key":"searchBar.placeholderDeep","value":"Deep analysis (approx. 60 sec)...","read":true}
+{"file":"components/SearchBar.tsx","line":170,"position":"expr","key":"searchBar.placeholderFast","value":"Quick analysis (approx. 15 sec)...","read":true}
+{"file":"components/SearchBar.tsx","line":189,"position":"jsx-text","key":"searchBar.analyzeButton","value":"Analyze","read":true}
+{"file":"components/SettingsPanel.tsx","line":94,"position":"expr","key":"settings.testNoKey","value":"Please enter an API key first","read":true}
+{"file":"components/SettingsPanel.tsx","line":102,"position":"expr","key":"settings.testFailed","value":"Connection failed","read":true}
+{"file":"components/SettingsPanel.tsx","line":102,"position":"expr","key":"settings.testSuccess","value":"Connection successful!","read":true}
+{"file":"components/SettingsPanel.tsx","line":105,"position":"expr","key":"settings.testFailed","value":"Connection failed","read":true}
+{"file":"components/SettingsPanel.tsx","line":111,"position":"expr","key":"settings.testNoKey","value":"Please enter an API key first","read":true}
+{"file":"components/SettingsPanel.tsx","line":115,"position":"expr","key":"settings.customEndpointRequired","value":"Endpoint is required for custom provider","read":true}
+{"file":"components/SettingsPanel.tsx","line":125,"position":"expr","key":"settings.testFailed","value":"Connection failed","read":true}
+{"file":"components/SettingsPanel.tsx","line":125,"position":"expr","key":"settings.testSuccess","value":"Connection successful!","read":true}
+{"file":"components/SettingsPanel.tsx","line":128,"position":"expr","key":"settings.testFailed","value":"Connection failed","read":true}
+{"file":"components/SettingsPanel.tsx","line":193,"position":"jsx-text","key":"settings.warningTitle","value":"Advanced Feature","read":true}
+{"file":"components/SettingsPanel.tsx","line":195,"position":"jsx-text","key":"settings.warningMessage","value":"Enabling custom API keys requires understanding of API keys, endpoints, and related concepts. If you're unsure what these are, we recommend keeping this toggle off and using the default service.","read":true}
+{"file":"components/SettingsPanel.tsx","line":201,"position":"jsx-text","key":"settings.warningCancel","value":"Keep it off","read":true}
+{"file":"components/SettingsPanel.tsx","line":207,"position":"jsx-text","key":"settings.warningConfirm","value":"I understand, continue","read":true}
+{"file":"components/SettingsPanel.tsx","line":221,"position":"jsx-text","key":"settings.title","value":"API Settings","read":true}
+{"file":"components/SettingsPanel.tsx","line":223,"position":"jsx-attr","key":"settings.close","value":"Close","read":true}
+{"file":"components/SettingsPanel.tsx","line":233,"position":"jsx-text","key":"settings.enableCustom","value":"Enable Custom API Keys","read":true}
+{"file":"components/SettingsPanel.tsx","line":234,"position":"jsx-text","key":"settings.enableCustomDesc","value":"Use your own API keys instead of the default service","read":true}
+{"file":"components/SettingsPanel.tsx","line":256,"position":"jsx-text","key":"settings.searchProvider","value":"Search Service","read":true}
+{"file":"components/SettingsPanel.tsx","line":273,"position":"jsx-attr","key":"settings.apiKeyPlaceholder","value":"Enter your API key...","read":true}
+{"file":"components/SettingsPanel.tsx","line":291,"position":"jsx-text","key":"settings.test","value":"Test","read":true}
+{"file":"components/SettingsPanel.tsx","line":302,"position":"jsx-text","key":"settings.llmProvider","value":"LLM Service","read":true}
+{"file":"components/SettingsPanel.tsx","line":308,"position":"expr","key":"settings.customProvider","value":"Custom","read":true}
+{"file":"components/SettingsPanel.tsx","line":319,"position":"jsx-attr","key":"settings.apiKeyPlaceholder","value":"Enter your API key...","read":true}
+{"file":"components/SettingsPanel.tsx","line":337,"position":"jsx-text","key":"settings.test","value":"Test","read":true}
+{"file":"components/SettingsPanel.tsx","line":349,"position":"jsx-text","key":"settings.customEndpoint","value":"Custom Endpoint","read":true}
+{"file":"components/SettingsPanel.tsx","line":354,"position":"expr","key":"settings.customEndpointPlaceholder","value":"https://api.example.com/v1","read":true}
+{"file":"components/SettingsPanel.tsx","line":361,"position":"jsx-text","key":"settings.endpointMissingV1","value":"⚠️ Endpoint URL may be missing the /v1 path. Most OpenAI-compatible proxies require it, e.g. https://api.example.com/v1","read":true}
+{"file":"components/SettingsPanel.tsx","line":363,"position":"jsx-text","key":"settings.customEndpointHint","value":"Leave empty to use official endpoint. Supports OpenAI-compatible proxies. URL must include the full path (e.g. /v1).","read":true}
+{"file":"components/SettingsPanel.tsx","line":372,"position":"jsx-text","key":"settings.customEndpoint","value":"Custom Endpoint","read":true}
+{"file":"components/SettingsPanel.tsx","line":379,"position":"jsx-text","key":"settings.modelFast","value":"Fast Mode Model","read":true}
+{"file":"components/SettingsPanel.tsx","line":384,"position":"expr","key":"settings.modelPlaceholder","value":"Enter model name...","read":true}
+{"file":"components/SettingsPanel.tsx","line":389,"position":"jsx-text","key":"settings.modelDeep","value":"Deep Mode Model","read":true}
+{"file":"components/SettingsPanel.tsx","line":394,"position":"expr","key":"settings.modelPlaceholder","value":"Enter model name...","read":true}
+{"file":"components/SettingsPanel.tsx","line":400,"position":"jsx-text","key":"settings.customEndpointHint","value":"Leave empty to use official endpoint. Supports OpenAI-compatible proxies. URL must include the full path (e.g. /v1).","read":true}
+{"file":"components/SettingsPanel.tsx","line":409,"position":"jsx-text","key":"settings.clear","value":"Clear","read":true}
+{"file":"components/SettingsPanel.tsx","line":413,"position":"jsx-text","key":"settings.save","value":"Save","read":true}
+{"file":"components/ShareButton.tsx","line":36,"position":"jsx-attr","key":"share.button","value":"Share","read":true}
+{"file":"components/ShareButton.tsx","line":49,"position":"jsx-text","key":"share.button","value":"Share","read":true}
+{"file":"components/SharedView.tsx","line":23,"position":"expr","key":"share.sharedAnalysis","value":"Shared Analysis","read":true}
+{"file":"components/SharedView.tsx","line":45,"position":"jsx-text","key":"sharedView.badge","value":"Shared Analysis","read":true}
+{"file":"components/SharedView.tsx","line":55,"position":"jsx-text","key":"sharedView.startNew","value":"Start New Analysis","read":true}
+{"file":"components/SharedView.tsx","line":65,"position":"jsx-text","key":"sharedView.queryLabel","value":"Analysis Topic","read":true}
+{"file":"components/SharedView.tsx","line":82,"position":"jsx-text","key":"sharedView.ctaTitle","value":"Want to analyze your own topic?","read":true}
+{"file":"components/SharedView.tsx","line":85,"position":"jsx-text","key":"sharedView.ctaDescription","value":"NetPulse helps you instantly summarize tech events, analyze their impact, and discover historical echoes.","read":true}
+{"file":"components/SharedView.tsx","line":92,"position":"jsx-text","key":"sharedView.startNewButton","value":"Start New Analysis","read":true}
+{"file":"components/SharedView.tsx","line":105,"position":"jsx-text","key":"footer.copyright","value":"© {{year}} Cyberceratops. All rights reserved.","read":true}
+{"file":"components/ShareModal.tsx","line":47,"position":"expr","key":"share.rateLimitError","value":"Too many share links generated. Please try again later.","read":true}
+{"file":"components/ShareModal.tsx","line":59,"position":"expr","key":"share.generateError","value":"Unable to generate share link.","read":true}
+{"file":"components/ShareModal.tsx","line":83,"position":"expr","key":"share.copyError","value":"Unable to copy to clipboard. Please copy manually.","read":true}
+{"file":"components/ShareModal.tsx","line":113,"position":"expr","key":"share.sharedAnalysis","value":"Shared Analysis","read":true}
+{"file":"components/ShareModal.tsx","line":132,"position":"jsx-text","key":"share.modalTitle","value":"Share Analysis","read":true}
+{"file":"components/ShareModal.tsx","line":138,"position":"jsx-attr","key":"share.close","value":"Close","read":true}
+{"file":"components/ShareModal.tsx","line":149,"position":"jsx-text","key":"share.includeQuery","value":"Include search query","read":true}
+{"file":"components/ShareModal.tsx","line":173,"position":"jsx-text","key":"share.includeSources","value":"Include references","read":true}
+{"file":"components/ShareModal.tsx","line":197,"position":"jsx-text","key":"share.customTitle","value":"Custom title (optional)","read":true}
+{"file":"components/ShareModal.tsx","line":204,"position":"jsx-attr","key":"share.customTitlePlaceholder","value":"Enter a custom title...","read":true}
+{"file":"components/ShareModal.tsx","line":214,"position":"jsx-text","key":"share.preview","value":"Preview","read":true}
+{"file":"components/ShareModal.tsx","line":217,"position":"jsx-text","key":"share.previewLabel","value":"Recipients will see:","read":true}
+{"file":"components/ShareModal.tsx","line":224,"position":"jsx-text","key":"share.sourcesCount","value":"{{count}} references included","read":true}
+{"file":"components/ShareModal.tsx","line":257,"position":"jsx-text","key":"share.copied","value":"Copied to clipboard!","read":true}
+{"file":"components/ShareModal.tsx","line":262,"position":"jsx-text","key":"share.copyFailed","value":"Copy failed","read":true}
+{"file":"components/ShareModal.tsx","line":267,"position":"jsx-text","key":"share.copyLink","value":"Copy Link","read":true}
+{"file":"components/TrendingSection.tsx","line":72,"position":"jsx-attr","key":"trending.refresh","value":"Refresh","read":true}
+{"file":"components/TrendingSection.tsx","line":123,"position":"jsx-text","key":"trending.loadError","value":"Failed to load trending, showing cached data","read":true}
+{"file":"components/UsageIndicator.tsx","line":39,"position":"jsx-attr","key":"auth.usageTooltip","value":"{{remaining}} of {{total}} free analyses remaining today","read":true}
+{"file":"components/UserMenu.tsx","line":53,"position":"jsx-attr","key":"auth.loginWithGitHub","value":"Login with GitHub","read":true}
+{"file":"components/UserMenu.tsx","line":56,"position":"jsx-text","key":"auth.loginWithGitHub","value":"Login with GitHub","read":true}
+{"file":"components/UserMenu.tsx","line":104,"position":"jsx-text","key":"auth.loggedIn","value":"Logged in","read":true}
+{"file":"components/UserMenu.tsx","line":120,"position":"jsx-text","key":"auth.logout","value":"Logout","read":true}

@@ -1,0 +1,1148 @@
+{"file":"electron/main.ts","line":1429,"position":"expr","key":"contextMenu.openLink","value":"🔗 Open Link","read":true}
+{"file":"electron/main.ts","line":1430,"position":"expr","key":"contextMenu.copyLink","value":"📋 Copy Link","read":true}
+{"file":"electron/main.ts","line":1434,"position":"expr","key":"contextMenu.cut","value":"Cut","read":true}
+{"file":"electron/main.ts","line":1437,"position":"expr","key":"contextMenu.copy","value":"Copy","read":true}
+{"file":"electron/main.ts","line":1440,"position":"expr","key":"contextMenu.paste","value":"Paste","read":true}
+{"file":"electron/main.ts","line":1444,"position":"expr","key":"contextMenu.selectAll","value":"Select All","read":true}
+{"file":"electron/main.ts","line":1900,"position":"expr","key":"dialog.saveImage","value":"Save Image","read":true}
+{"file":"electron/main.ts","line":1918,"position":"expr","key":"dialog.imageSaved","value":"Image Saved","read":true}
+{"file":"electron/main.ts","line":3163,"position":"expr","key":"tray.open","value":"OpenClaw Desktop","read":true}
+{"file":"electron/main.ts","line":3166,"position":"expr","key":"tray.close","value":"❌ Close","read":true}
+{"file":"electron/tray.ts","line":20,"position":"expr","key":"tray.open","value":"OpenClaw Desktop","read":true}
+{"file":"electron/tray.ts","line":28,"position":"expr","key":"tray.close","value":"❌ Close","read":true}
+{"file":"src/App.tsx","line":122,"position":"expr","key":"dashboard.mainSession","value":"Main Session","read":true}
+{"file":"src/App.tsx","line":293,"position":"expr","key":"notifications.newMessage","value":"New Message","read":true}
+{"file":"src/App.tsx","line":342,"position":"expr","key":"notifications.replyComplete","value":"Reply Complete","read":true}
+{"file":"src/components/Chat/AudioPlayer.tsx","line":227,"position":"jsx-text","key":"media.audioLoadError","value":"Failed to load audio","read":true}
+{"file":"src/components/Chat/AudioPlayer.tsx","line":287,"position":"jsx-attr","key":"media.playbackSpeed","value":"Playback speed","read":true}
+{"file":"src/components/Chat/AudioPlayer.tsx","line":296,"position":"expr","key":"media.mute","value":"Mute","read":true}
+{"file":"src/components/Chat/AudioPlayer.tsx","line":296,"position":"expr","key":"media.unmute","value":"Unmute","read":true}
+{"file":"src/components/Chat/ChatImage.tsx","line":238,"position":"jsx-text","key":"media.imageControls","value":"Scroll to zoom · Drag to pan · R to rotate · 0 to reset · Esc to close","read":true}
+{"file":"src/components/Chat/ChatImage.tsx","line":312,"position":"jsx-attr","key":"media.saveImage","value":"Save image","read":true}
+{"file":"src/components/Chat/ChatImage.tsx","line":320,"position":"jsx-attr","key":"media.zoom","value":"Zoom","read":true}
+{"file":"src/components/Chat/ChatImage.tsx","line":328,"position":"expr","key":"media.attachment","value":"Attachment","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":234,"position":"expr","key":"chat.statusOffline","value":"Offline","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":234,"position":"expr","key":"chat.statusActive","value":"Active","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":242,"position":"jsx-text","key":"chat.compactions","value":"Compactions","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":246,"position":"jsx-text","key":"chat.sessionAge","value":"Session Age","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":254,"position":"jsx-text","key":"chat.contextUsage","value":"Context Usage","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":275,"position":"jsx-text","key":"chat.compactsAt","value":"Compaction at","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":282,"position":"jsx-text","key":"chat.heartbeat","value":"Heartbeat","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":283,"position":"jsx-text","key":"chat.heartbeatInterval","value":"15m interval","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":287,"position":"jsx-text","key":"chat.thinking","value":"Thinking","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":328,"position":"expr","key":"agents.mainAgent","value":"Main Agent","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":331,"position":"expr","key":"agents.mainAgent","value":"Main Agent","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":366,"position":"jsx-text","key":"chat.newConversationWith","value":"New conversation with","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":421,"position":"jsx-text","key":"chat.openMainSession","value":"Open main session","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":433,"position":"jsx-text","key":"chat.newDesktopSession","value":"New desktop conversation","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":444,"position":"jsx-text","key":"chat.availableSessions","value":"Available Sessions","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":449,"position":"jsx-text","key":"common.loading","value":"Loading...","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":603,"position":"expr","key":"agents.mainAgent","value":"Main Agent","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":647,"position":"expr","key":"connection.connected","value":"Connected","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":649,"position":"expr","key":"connection.connecting","value":"Connecting...","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":650,"position":"expr","key":"connection.disconnected","value":"Disconnected","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":690,"position":"expr","key":"chat.deleteSessionConfirm","value":"Delete this session and its history? This cannot be undone.","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":702,"position":"expr","key":"chat.resetSessionConfirm","value":"Clear conversation history for this session? The session will be kept.","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":745,"position":"jsx-attr","key":"chat.sessions","value":"Chat sessions","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":873,"position":"jsx-attr","key":"chat.closeTab","value":"Close tab","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":917,"position":"jsx-text","key":"chat.closeTab","value":"Close tab","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":926,"position":"jsx-text","key":"chat.resetSession","value":"Reset session","read":true}
+{"file":"src/components/Chat/ChatTabs.tsx","line":937,"position":"jsx-text","key":"chat.deleteSession","value":"Delete session","read":true}
+{"file":"src/components/Chat/ChatVideo.tsx","line":134,"position":"jsx-text","key":"media.videoLoadError","value":"Failed to load video","read":true}
+{"file":"src/components/Chat/ChatVideo.tsx","line":208,"position":"expr","key":"media.muteAudio","value":"Mute audio","read":true}
+{"file":"src/components/Chat/ChatVideo.tsx","line":208,"position":"expr","key":"media.unmute","value":"Unmute","read":true}
+{"file":"src/components/Chat/ChatVideo.tsx","line":220,"position":"jsx-attr","key":"media.saveVideo","value":"Save video","read":true}
+{"file":"src/components/Chat/ChatVideo.tsx","line":228,"position":"jsx-attr","key":"media.fullscreen","value":"Fullscreen","read":true}
+{"file":"src/components/Chat/ChatView.tsx","line":588,"position":"jsx-attr","key":"chat.contextCompactedLabel","value":"Context Compacted","read":true}
+{"file":"src/components/Chat/ChatView.tsx","line":688,"position":"jsx-text","key":"connection.connectingBanner","value":"Connecting to Gateway...","read":true}
+{"file":"src/components/Chat/ChatView.tsx","line":692,"position":"jsx-text","key":"connection.disconnectedBanner","value":"Disconnected from Gateway","read":true}
+{"file":"src/components/Chat/ChatView.tsx","line":699,"position":"jsx-text","key":"connection.reconnect","value":"Reconnect","read":true}
+{"file":"src/components/Chat/ChatView.tsx","line":711,"position":"jsx-text","key":"dashboard.setupProviderBanner","value":"No AI provider configured. Set up a provider to start chatting.","read":true}
+{"file":"src/components/Chat/ChatView.tsx","line":717,"position":"jsx-text","key":"dashboard.setupProviderAction","value":"Go to Config →","read":true}
+{"file":"src/components/Chat/ChatView.tsx","line":762,"position":"jsx-attr","key":"chat.searchMessages","value":"Search messages...","read":true}
+{"file":"src/components/Chat/ChatView.tsx","line":771,"position":"jsx-text","key":"chat.noSearchResults","value":"No results","read":true}
+{"file":"src/components/Chat/ChatView.tsx","line":808,"position":"jsx-text","key":"chat.newMessages","value":"New messages","read":true}
+{"file":"src/components/Chat/CodeBlock.tsx","line":144,"position":"jsx-attr","key":"code.copyCode","value":"Copy code","read":true}
+{"file":"src/components/Chat/CodeBlock.tsx","line":149,"position":"jsx-text","key":"code.copied","value":"Copied","read":true}
+{"file":"src/components/Chat/CodeBlock.tsx","line":154,"position":"jsx-text","key":"code.copy","value":"Copy","read":true}
+{"file":"src/components/Chat/EmojiPicker.tsx","line":60,"position":"jsx-attr","key":"input.emoji","value":"Emoji","read":true}
+{"file":"src/components/Chat/MessageBubble.tsx","line":90,"position":"jsx-text","key":"resultCards.preview","value":"Preview","read":true}
+{"file":"src/components/Chat/MessageBubble.tsx","line":97,"position":"jsx-text","key":"resultCards.chars","value":"chars","read":true}
+{"file":"src/components/Chat/MessageBubble.tsx","line":97,"position":"jsx-text","key":"resultCards.viewSource","value":"View source","read":true}
+{"file":"src/components/Chat/MessageBubble.tsx","line":215,"position":"expr","key":"resultCards.open","value":"Open","read":true}
+{"file":"src/components/Chat/MessageBubble.tsx","line":328,"position":"expr","key":"agents.mainAgent","value":"Main Agent","read":true}
+{"file":"src/components/Chat/MessageBubble.tsx","line":439,"position":"expr","key":"media.attachment","value":"Attachment","read":true}
+{"file":"src/components/Chat/MessageBubble.tsx","line":462,"position":"jsx-text","key":"chat.sendEdit","value":"Send","read":true}
+{"file":"src/components/Chat/MessageBubble.tsx","line":468,"position":"jsx-text","key":"chat.cancel","value":"Cancel","read":true}
+{"file":"src/components/Chat/MessageBubble.tsx","line":544,"position":"jsx-attr","key":"chat.copy","value":"Copy","read":true}
+{"file":"src/components/Chat/MessageBubble.tsx","line":556,"position":"jsx-attr","key":"chat.resend","value":"Resend","read":true}
+{"file":"src/components/Chat/MessageBubble.tsx","line":566,"position":"jsx-attr","key":"chat.regenerate","value":"Regenerate","read":true}
+{"file":"src/components/Chat/MessageInput.tsx","line":224,"position":"expr","key":"voice.voiceMessage","value":"🎤 Voice message ({{seconds}}s)","read":true}
+{"file":"src/components/Chat/MessageInput.tsx","line":358,"position":"expr","key":"input.attachFile","value":"Attach File","read":true}
+{"file":"src/components/Chat/MessageInput.tsx","line":359,"position":"expr","key":"input.screenshot","value":"Screenshot","read":true}
+{"file":"src/components/Chat/MessageInput.tsx","line":363,"position":"expr","key":"input.voiceRecord","value":"Voice Record","read":true}
+{"file":"src/components/Chat/MessageInput.tsx","line":399,"position":"expr","key":"input.placeholderHistoryLoading","value":"Loading recent conversation…","read":true}
+{"file":"src/components/Chat/MessageInput.tsx","line":401,"position":"expr","key":"input.placeholder","value":"Type your message...","read":true}
+{"file":"src/components/Chat/MessageInput.tsx","line":402,"position":"expr","key":"input.placeholderDisconnected","value":"Disconnected","read":true}
+{"file":"src/components/Chat/MessageInput.tsx","line":425,"position":"jsx-attr","key":"input.stop","value":"Stop","read":true}
+{"file":"src/components/Chat/MessageInput.tsx","line":438,"position":"expr","key":"input.send","value":"Send (Enter)","read":true}
+{"file":"src/components/Chat/MessageInput.tsx","line":438,"position":"expr","key":"input.historyLoading","value":"Recent conversation is loading…","read":true}
+{"file":"src/components/Chat/ResultCards.tsx","line":103,"position":"jsx-text","key":"resultCards.preview","value":"Preview","read":true}
+{"file":"src/components/Chat/ResultCards.tsx","line":109,"position":"jsx-text","key":"resultCards.chars","value":"chars","read":true}
+{"file":"src/components/Chat/ResultCards.tsx","line":109,"position":"jsx-text","key":"resultCards.viewSource","value":"View source","read":true}
+{"file":"src/components/Chat/ResultCards.tsx","line":141,"position":"expr","key":"errors.occurred","value":"An error occurred","read":true}
+{"file":"src/components/Chat/ResultCards.tsx","line":141,"position":"expr","key":"resultCards.open","value":"Open","read":true}
+{"file":"src/components/Chat/ResultCards.tsx","line":145,"position":"expr","key":"fileManager.reveal","value":"Show in Folder","read":true}
+{"file":"src/components/Chat/ResultCards.tsx","line":145,"position":"expr","key":"resultCards.open","value":"Open","read":true}
+{"file":"src/components/Chat/ResultCards.tsx","line":177,"position":"expr","key":"fileManager.copyPathDone","value":"Path copied","read":true}
+{"file":"src/components/Chat/ResultCards.tsx","line":182,"position":"expr","key":"errors.occurred","value":"An error occurred","read":true}
+{"file":"src/components/Chat/ResultCards.tsx","line":182,"position":"expr","key":"resultCards.path","value":"Path","read":true}
+{"file":"src/components/Chat/ResultCards.tsx","line":195,"position":"jsx-text","key":"resultCards.open","value":"Open","read":true}
+{"file":"src/components/Chat/ResultCards.tsx","line":198,"position":"jsx-text","key":"resultCards.reveal","value":"Reveal","read":true}
+{"file":"src/components/Chat/ResultCards.tsx","line":201,"position":"expr","key":"resultCards.path","value":"Path","read":true}
+{"file":"src/components/Chat/ResultCards.tsx","line":201,"position":"expr","key":"common.copied","value":"Copied","read":true}
+{"file":"src/components/Chat/ResultCards.tsx","line":216,"position":"jsx-text","key":"resultCards.files","value":"Files","read":true}
+{"file":"src/components/Chat/ResultCards.tsx","line":235,"position":"jsx-text","key":"resultCards.nextStep","value":"Next step","read":true}
+{"file":"src/components/Chat/ResultCards.tsx","line":287,"position":"jsx-text","key":"resultCards.workshop","value":"Workshop","read":true}
+{"file":"src/components/Chat/ScreenshotPicker.tsx","line":129,"position":"jsx-text","key":"screenshot.title","value":"Screenshot","read":true}
+{"file":"src/components/Chat/ScreenshotPicker.tsx","line":138,"position":"jsx-text","key":"screenshot.loading","value":"Loading windows...","read":true}
+{"file":"src/components/Chat/ScreenshotPicker.tsx","line":160,"position":"jsx-text","key":"screenshot.fullScreen","value":"Full Screen","read":true}
+{"file":"src/components/Chat/ScreenshotPicker.tsx","line":161,"position":"jsx-text","key":"screenshot.fullScreenDesc","value":"Minimize app and capture screen","read":true}
+{"file":"src/components/Chat/ScreenshotPicker.tsx","line":168,"position":"jsx-text","key":"screenshot.openWindows","value":"Open Windows ({{count}})","read":true}
+{"file":"src/components/Chat/ScreenshotPicker.tsx","line":219,"position":"jsx-text","key":"screenshot.noWindows","value":"No open windows","read":true}
+{"file":"src/components/Chat/SessionContextBar.tsx","line":68,"position":"jsx-attr","key":"config.addFirstProvider","value":"Add your first AI provider to get started","read":true}
+{"file":"src/components/Chat/SessionContextBar.tsx","line":70,"position":"jsx-text","key":"config.setupProviderShort","value":"Setup →","read":true}
+{"file":"src/components/Chat/SessionContextBar.tsx","line":82,"position":"expr","key":"config.notSet","value":"Not set","read":true}
+{"file":"src/components/Chat/SessionContextBar.tsx","line":131,"position":"jsx-attr","key":"titlebar.thinking.ariaLabel","value":"Thinking level: {{level}}","read":true}
+{"file":"src/components/Chat/SessionContextBar.tsx","line":132,"position":"jsx-attr","key":"titlebar.thinking.ariaLabel","value":"Thinking level: {{level}}","read":true}
+{"file":"src/components/Chat/SessionContextBar.tsx","line":142,"position":"jsx-text","key":"titlebar.thinking.label","value":"Thinking","read":true}
+{"file":"src/components/Chat/SessionContextBar.tsx","line":145,"position":"expr","key":"titlebar.thinking.updating","value":"Updating…","read":true}
+{"file":"src/components/Chat/SessionContextBar.tsx","line":196,"position":"jsx-text","key":"chat.currentSession","value":"Current Session","read":true}
+{"file":"src/components/Chat/SessionContextBar.tsx","line":207,"position":"expr","key":"config.notSet","value":"Not set","read":true}
+{"file":"src/components/Chat/SessionContextBar.tsx","line":238,"position":"expr","key":"chat.refresh","value":"Refresh","read":true}
+{"file":"src/components/Chat/SessionContextBar.tsx","line":238,"position":"expr","key":"chat.refreshDone","value":"Refreshed","read":true}
+{"file":"src/components/Chat/SessionContextBar.tsx","line":247,"position":"jsx-attr","key":"chat.newTab","value":"New Tab","read":true}
+{"file":"src/components/Chat/ThinkingBubble.tsx","line":56,"position":"jsx-text","key":"thinking.thoughtProcess","value":"Thought Process","read":true}
+{"file":"src/components/Chat/ThinkingBubble.tsx","line":98,"position":"expr","key":"thinking.thoughtProcess","value":"Thought Process","read":true}
+{"file":"src/components/Chat/ThinkingBubble.tsx","line":98,"position":"expr","key":"thinking.thinking","value":"Thinking…","read":true}
+{"file":"src/components/Chat/TypingIndicator.tsx","line":25,"position":"expr","key":"agents.mainAgent","value":"Main Agent","read":true}
+{"file":"src/components/Chat/VoiceRecorder.tsx","line":112,"position":"expr","key":"voice.micError","value":"⚠️ Cannot access microphone. Check permissions.","read":true}
+{"file":"src/components/Chat/VoiceRecorder.tsx","line":197,"position":"jsx-attr","key":"voice.cancel","value":"Cancel","read":true}
+{"file":"src/components/Chat/VoiceRecorder.tsx","line":241,"position":"jsx-attr","key":"voice.sendRecording","value":"Send Recording","read":true}
+{"file":"src/components/CommandPalette.tsx","line":59,"position":"expr","key":"nav.dashboard","value":"Dashboard","read":true}
+{"file":"src/components/CommandPalette.tsx","line":60,"position":"expr","key":"nav.chat","value":"Chat","read":true}
+{"file":"src/components/CommandPalette.tsx","line":61,"position":"expr","key":"nav.workshop","value":"Workshop","read":true}
+{"file":"src/components/CommandPalette.tsx","line":62,"position":"expr","key":"nav.costs","value":"Usage","read":true}
+{"file":"src/components/CommandPalette.tsx","line":63,"position":"expr","key":"nav.cron","value":"Cron Jobs","read":true}
+{"file":"src/components/CommandPalette.tsx","line":64,"position":"expr","key":"nav.agents","value":"Agents","read":true}
+{"file":"src/components/CommandPalette.tsx","line":65,"position":"expr","key":"nav.memory","value":"Memory","read":true}
+{"file":"src/components/CommandPalette.tsx","line":66,"position":"expr","key":"nav.settings","value":"Settings","read":true}
+{"file":"src/components/CommandPalette.tsx","line":69,"position":"expr","key":"palette.heartbeat","value":"Quick Check (Heartbeat)","read":true}
+{"file":"src/components/CommandPalette.tsx","line":72,"position":"expr","key":"palette.checkEmails","value":"Check Emails","read":true}
+{"file":"src/components/CommandPalette.tsx","line":75,"position":"expr","key":"palette.checkCalendar","value":"Check Calendar","read":true}
+{"file":"src/components/CommandPalette.tsx","line":78,"position":"expr","key":"palette.compactContext","value":"Compact Context","read":true}
+{"file":"src/components/CommandPalette.tsx","line":83,"position":"expr","key":"palette.connectGateway","value":"Connect to Gateway","read":true}
+{"file":"src/components/CommandPalette.tsx","line":83,"position":"expr","key":"palette.reconnect","value":"Reconnect","read":true}
+{"file":"src/components/CommandPalette.tsx","line":88,"position":"expr","key":"palette.toggleLanguage","value":"Switch to Arabic","read":true}
+{"file":"src/components/CommandPalette.tsx","line":93,"position":"expr","key":"palette.toggleNotifications","value":"Toggle Notifications","read":true}
+{"file":"src/components/CommandPalette.tsx","line":164,"position":"jsx-attr","key":"palette.searchPlaceholder","value":"Search commands...","read":true}
+{"file":"src/components/CommandPalette.tsx","line":174,"position":"jsx-text","key":"commandPaletteFooter.noResults","value":"No results","read":true}
+{"file":"src/components/CommandPalette.tsx","line":203,"position":"jsx-text","key":"commandPaletteFooter.navigate","value":"navigate","read":true}
+{"file":"src/components/CommandPalette.tsx","line":204,"position":"jsx-text","key":"commandPaletteFooter.execute","value":"execute","read":true}
+{"file":"src/components/CommandPalette.tsx","line":205,"position":"jsx-text","key":"commandPaletteFooter.close","value":"close","read":true}
+{"file":"src/components/Layout/NavSidebar.tsx","line":83,"position":"expr","key":"nav.collapseSidebar","value":"Collapse sidebar","read":true}
+{"file":"src/components/Layout/NavSidebar.tsx","line":83,"position":"expr","key":"nav.expandSidebar","value":"Expand sidebar","read":true}
+{"file":"src/components/Layout/NavSidebar.tsx","line":84,"position":"expr","key":"nav.collapseSidebar","value":"Collapse sidebar","read":true}
+{"file":"src/components/Layout/NavSidebar.tsx","line":84,"position":"expr","key":"nav.expandSidebar","value":"Expand sidebar","read":true}
+{"file":"src/components/Layout/NavSidebar.tsx","line":89,"position":"jsx-text","key":"nav.collapseSidebar","value":"Collapse sidebar","read":true}
+{"file":"src/components/Layout/NavSidebar.tsx","line":194,"position":"jsx-text","key":"nav.settings","value":"Settings","read":true}
+{"file":"src/components/Layout/NavSidebar.tsx","line":203,"position":"jsx-text","key":"nav.settings","value":"Settings","read":true}
+{"file":"src/components/OfflineOverlay.tsx","line":27,"position":"expr","key":"offline.title","value":"Not Connected","read":true}
+{"file":"src/components/OfflineOverlay.tsx","line":27,"position":"expr","key":"offline.connectingTitle","value":"Connecting","read":true}
+{"file":"src/components/OfflineOverlay.tsx","line":30,"position":"expr","key":"offline.description","value":"Unable to connect to OpenClaw Gateway. The app will reconnect automatically when the gateway becomes available.","read":true}
+{"file":"src/components/OfflineOverlay.tsx","line":30,"position":"expr","key":"offline.connectingDescription","value":"OpenClaw Gateway is starting and the app is establishing a connection automatically.","read":true}
+{"file":"src/components/OfflineOverlay.tsx","line":36,"position":"jsx-text","key":"offline.connectingHint","value":"The first cold start can take longer. Please wait a moment.","read":true}
+{"file":"src/components/OfflineOverlay.tsx","line":49,"position":"jsx-text","key":"offline.retrying","value":"Attempting to reconnect...","read":true}
+{"file":"src/components/PairingScreen.tsx","line":226,"position":"expr","key":"pairing.pairedSuccess","value":"Paired Successfully!","read":true}
+{"file":"src/components/PairingScreen.tsx","line":228,"position":"expr","key":"pairing.pairingError","value":"Pairing Error","read":true}
+{"file":"src/components/PairingScreen.tsx","line":230,"position":"expr","key":"pairing.needsApproval","value":"Device Needs Approval","read":true}
+{"file":"src/components/PairingScreen.tsx","line":231,"position":"expr","key":"pairing.pairWithGateway","value":"Pair with Gateway","read":true}
+{"file":"src/components/PairingScreen.tsx","line":249,"position":"jsx-text","key":"pairing.enterCode","value":"Enter this code in Gateway:","read":true}
+{"file":"src/components/PairingScreen.tsx","line":268,"position":"jsx-text","key":"pairing.openTerminal","value":"Open Terminal and run: openclaw gateway approve","read":true}
+{"file":"src/components/PairingScreen.tsx","line":273,"position":"jsx-text","key":"pairing.orApproveFromUI","value":"Or approve from the OpenClaw Control UI","read":true}
+{"file":"src/components/PairingScreen.tsx","line":282,"position":"jsx-text","key":"pairing.waitingApproval","value":"Waiting for approval...","read":true}
+{"file":"src/components/PairingScreen.tsx","line":292,"position":"jsx-text","key":"pairing.requestingPairing","value":"Requesting pairing...","read":true}
+{"file":"src/components/PairingScreen.tsx","line":300,"position":"jsx-text","key":"pairing.needsApprovalDesc","value":"Your device needs approval from OpenClaw Gateway. Open Terminal on the Gateway machine and run:","read":true}
+{"file":"src/components/PairingScreen.tsx","line":312,"position":"jsx-text","key":"pairing.orApproveFromUIFull","value":"Or approve from the OpenClaw Control UI (Dashboard)","read":true}
+{"file":"src/components/PairingScreen.tsx","line":316,"position":"jsx-text","key":"pairing.oneTimeOnly","value":"Approval is needed once only — after that it connects automatically","read":true}
+{"file":"src/components/PairingScreen.tsx","line":323,"position":"jsx-text","key":"pairing.waitingApprovalRetry","value":"Waiting for approval... (retrying every 5s)","read":true}
+{"file":"src/components/PairingScreen.tsx","line":332,"position":"jsx-text","key":"pairing.reconnecting","value":"Reconnecting...","read":true}
+{"file":"src/components/PairingScreen.tsx","line":346,"position":"jsx-text","key":"pairing.retry","value":"Retry","read":true}
+{"file":"src/components/PairingScreen.tsx","line":356,"position":"jsx-text","key":"pairing.cancel","value":"Cancel","read":true}
+{"file":"src/components/PairingScreen.tsx","line":371,"position":"jsx-text","key":"pairing.enterTokenManually","value":"Enter token manually","read":true}
+{"file":"src/components/PairingScreen.tsx","line":376,"position":"jsx-text","key":"pairing.enterTokenDesc","value":"Enter the Gateway Token from OpenClaw settings:","read":true}
+{"file":"src/components/PairingScreen.tsx","line":382,"position":"jsx-attr","key":"pairing.pasteToken","value":"Paste token here...","read":true}
+{"file":"src/components/PairingScreen.tsx","line":398,"position":"jsx-text","key":"pairing.connect","value":"Connect","read":true}
+{"file":"src/components/PairingScreen.tsx","line":409,"position":"jsx-text","key":"pairing.tokenExplanation","value":"OpenClaw Desktop needs a valid token to connect to the OpenClaw Gateway. This pairing is done once only.","read":true}
+{"file":"src/components/shared/ErrorBoundary.tsx","line":31,"position":"jsx-text","key":"errors.unexpected","value":"An unexpected error occurred","read":true}
+{"file":"src/components/shared/ErrorBoundary.tsx","line":33,"position":"expr","key":"errors.tryAgain","value":"Try again","read":true}
+{"file":"src/components/shared/ErrorBoundary.tsx","line":37,"position":"jsx-text","key":"errors.retry","value":"Retry","read":true}
+{"file":"src/components/shared/ModelDropdown.tsx","line":116,"position":"expr","key":"config.notSet","value":"Not set","read":true}
+{"file":"src/components/TitleBar.tsx","line":203,"position":"jsx-text","key":"gateway.confirmRestart","value":"Restart Gateway?","read":true}
+{"file":"src/components/TitleBar.tsx","line":210,"position":"jsx-text","key":"gateway.confirmYes","value":"Restart","read":true}
+{"file":"src/components/TitleBar.tsx","line":218,"position":"jsx-text","key":"gateway.confirmNo","value":"Cancel","read":true}
+{"file":"src/components/TitleBar.tsx","line":229,"position":"expr","key":"gateway.restarting","value":"Restarting…","read":true}
+{"file":"src/components/TitleBar.tsx","line":230,"position":"expr","key":"gateway.restartTooltip","value":"Click to restart OpenClaw Gateway","read":true}
+{"file":"src/components/TitleBar.tsx","line":231,"position":"expr","key":"gateway.startTooltip","value":"Start OpenClaw Gateway","read":true}
+{"file":"src/components/TitleBar.tsx","line":264,"position":"expr","key":"gateway.restarting","value":"Restarting…","read":true}
+{"file":"src/components/TitleBar.tsx","line":266,"position":"expr","key":"gateway.connectedLabel","value":"Gateway Connected","read":true}
+{"file":"src/components/TitleBar.tsx","line":268,"position":"expr","key":"gateway.connectingLabel","value":"Connecting Gateway…","read":true}
+{"file":"src/components/TitleBar.tsx","line":269,"position":"expr","key":"gateway.disconnectedLabel","value":"Gateway Disconnected","read":true}
+{"file":"src/pages/AgentHub/AgentSettingsPanel.tsx","line":251,"position":"expr","key":"agentSettings.failedToLoadConfig","value":"Failed to load config","read":true}
+{"file":"src/pages/AgentHub/AgentSettingsPanel.tsx","line":324,"position":"jsx-text","key":"agentSettings.saveFailed","value":"Failed to save","read":true}
+{"file":"src/pages/AgentHub/AgentSettingsPanel.tsx","line":503,"position":"jsx-text","key":"agentSettings.loadingConfig","value":"Loading agent config…","read":true}
+{"file":"src/pages/AgentHub/AgentSettingsPanel.tsx","line":523,"position":"jsx-text","key":"agentSettings.failedToLoadConfig","value":"Failed to load config","read":true}
+{"file":"src/pages/AgentHub/AgentSettingsPanel.tsx","line":533,"position":"jsx-text","key":"common.retry","value":"Retry","read":true}
+{"file":"src/pages/AgentHub/AgentSettingsPanel.tsx","line":547,"position":"jsx-text","key":"agentSettings.model","value":"Model","read":true}
+{"file":"src/pages/AgentHub/AgentSettingsPanel.tsx","line":582,"position":"jsx-text","key":"agentSettings.selectModel","value":"Select a model...","read":true}
+{"file":"src/pages/AgentHub/AgentSettingsPanel.tsx","line":622,"position":"jsx-attr","key":"agentSettings.filterModels","value":"Filter models…","read":true}
+{"file":"src/pages/AgentHub/AgentSettingsPanel.tsx","line":642,"position":"expr","key":"agentSettings.noModels","value":"No models available","read":true}
+{"file":"src/pages/AgentHub/AgentSettingsPanel.tsx","line":720,"position":"jsx-text","key":"agentSettings.stats","value":"Session Stats","read":true}
+{"file":"src/pages/AgentHub/AgentSettingsPanel.tsx","line":736,"position":"jsx-text","key":"agentSettings.activeSessions","value":"Active","read":true}
+{"file":"src/pages/AgentHub/AgentSettingsPanel.tsx","line":758,"position":"jsx-text","key":"agentSettings.totalTokens","value":"Tokens","read":true}
+{"file":"src/pages/AgentHub/AgentSettingsPanel.tsx","line":848,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/pages/AgentHub/AgentSettingsPanel.tsx","line":890,"position":"expr","key":"agentSettings.saving","value":"Saving...","read":true}
+{"file":"src/pages/AgentHub/AgentSettingsPanel.tsx","line":892,"position":"expr","key":"agentSettings.saved","value":"Saved!","read":true}
+{"file":"src/pages/AgentHub/AgentSettingsPanel.tsx","line":893,"position":"expr","key":"settings.save","value":"Save","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":155,"position":"expr","key":"agents.mainAgent","value":"Main Agent","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":209,"position":"jsx-text","key":"agentHub.depth0","value":"Depth 0 — Orchestrator","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":241,"position":"expr","key":"agentHub.statusActive","value":"Active","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":242,"position":"expr","key":"agentHub.statusOnline","value":"Online","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":295,"position":"jsx-text","key":"agentHub.depth1","value":"Depth 1 — Specialists","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":340,"position":"jsx-text","key":"agentHub.running","value":"Running","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":344,"position":"jsx-text","key":"agentHub.idle","value":"Idle","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":393,"position":"jsx-text","key":"agentHub.depth2","value":"Depth 2 — Workers","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":416,"position":"expr","key":"agentHub.done","value":"Done","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":416,"position":"expr","key":"agentHub.running","value":"Running","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":429,"position":"jsx-text","key":"agentHub.main","value":"Main","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":434,"position":"jsx-text","key":"agentHub.subAgent","value":"Sub-agent","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":435,"position":"jsx-text","key":"agentHub.cron","value":"Cron","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":442,"position":"jsx-text","key":"agentHub.dataFlow","value":"data flow","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":467,"position":"expr","key":"agentHub.activity.spawned","value":"spawned {{label}}","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":468,"position":"expr","key":"agentHub.activity.cronRunning","value":"cron running: {{label}}","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":469,"position":"expr","key":"agentHub.activity.activeSession","value":"active session","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":470,"position":"expr","key":"agentHub.activity.completed","value":"completed {{label}} ({{tokens}} tokens)","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":471,"position":"expr","key":"agentHub.activity.cronFinished","value":"cron finished: {{label}}","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":472,"position":"expr","key":"agentHub.activity.sessionActive","value":"session active ({{tokens}} tokens)","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":515,"position":"jsx-text","key":"agentHub.live","value":"LIVE","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":672,"position":"jsx-text","key":"common.loading","value":"Loading...","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":675,"position":"jsx-text","key":"agents.noActivity","value":"No activity recorded yet","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":680,"position":"jsx-text","key":"agents.task","value":"Task","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":688,"position":"expr","key":"agents.result","value":"Result","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":688,"position":"expr","key":"agents.doing","value":"Currently doing","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":697,"position":"jsx-text","key":"agentHub.running","value":"Running","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":698,"position":"jsx-text","key":"agentHub.completed","value":"Completed","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":718,"position":"jsx-text","key":"agents.title","value":"Agent Hub","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":720,"position":"jsx-text","key":"agents.subtitle","value":"Agents and active workers","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":721,"position":"jsx-text","key":"agentHubExtra.workersCount","value":"workers","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":721,"position":"jsx-text","key":"agentHubExtra.agentsCount","value":"agents","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":728,"position":"expr","key":"agentHubExtra.treeView","value":"🌳 Tree","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":729,"position":"expr","key":"agentHubExtra.gridView","value":"▤ Grid","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":764,"position":"jsx-text","key":"agentHub.liveActivityFeed","value":"Live Activity Feed","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":777,"position":"jsx-text","key":"agents.mainAgent","value":"Main Agent","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":788,"position":"expr","key":"agents.mainAgent","value":"Main Agent","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":791,"position":"jsx-text","key":"agents.lastActive","value":"Last active","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":814,"position":"expr","key":"agents.mainAgent","value":"Main Agent","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":816,"position":"jsx-text","key":"agents.notConnected","value":"Not connected","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":819,"position":"jsx-text","key":"agentHub.offline","value":"OFFLINE","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":831,"position":"jsx-text","key":"agents.registeredAgents","value":"Registered Agents","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":835,"position":"jsx-text","key":"common.add","value":"Add","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":846,"position":"jsx-text","key":"agentHub.addNewAgent","value":"Add New Agent","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":849,"position":"jsx-attr","key":"agentHub.addForm.agentIdPlaceholder","value":"Agent ID *","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":850,"position":"jsx-attr","key":"agentHub.addForm.namePlaceholder","value":"Name","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":851,"position":"jsx-attr","key":"agentHub.addForm.modelPlaceholder","value":"Model","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":852,"position":"jsx-attr","key":"agentHub.addForm.workspacePlaceholder","value":"Workspace","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":856,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":859,"position":"jsx-text","key":"common.create","value":"Create","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":899,"position":"jsx-text","key":"agentHub.idle","value":"Idle","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":926,"position":"jsx-text","key":"common.confirm","value":"Confirm","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":942,"position":"jsx-text","key":"agents.workers","value":"Active Workers","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":943,"position":"jsx-text","key":"agentHubExtra.totalCount","value":"total","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":943,"position":"jsx-text","key":"agentHubExtra.runningCount","value":"running","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":949,"position":"jsx-text","key":"agents.noWorkers","value":"No active workers","read":true}
+{"file":"src/pages/AgentHub/index.tsx","line":950,"position":"jsx-text","key":"agents.noWorkersHint","value":"Cron jobs and sub-agents will appear here when running","read":true}
+{"file":"src/pages/Calendar/DayView.tsx","line":108,"position":"jsx-text","key":"calendar.allDay","value":"All day","read":true}
+{"file":"src/pages/Calendar/DayView.tsx","line":136,"position":"jsx-text","key":"calendar.daySummary","value":"Day Summary","read":true}
+{"file":"src/pages/Calendar/DayView.tsx","line":141,"position":"jsx-text","key":"calendar.eventCount","value":"{{count}} events","read":true}
+{"file":"src/pages/Calendar/DayView.tsx","line":146,"position":"jsx-text","key":"calendar.noEvents","value":"No events","read":true}
+{"file":"src/pages/Calendar/DayView.tsx","line":164,"position":"expr","key":"calendar.untitled","value":"Untitled","read":true}
+{"file":"src/pages/Calendar/EventCard.tsx","line":34,"position":"expr","key":"calendar.allDay","value":"All day","read":true}
+{"file":"src/pages/Calendar/EventCard.tsx","line":36,"position":"expr","key":"calendar.untitled","value":"Untitled","read":true}
+{"file":"src/pages/Calendar/EventCard.tsx","line":53,"position":"expr","key":"calendar.allDay","value":"All day","read":true}
+{"file":"src/pages/Calendar/EventCard.tsx","line":59,"position":"expr","key":"calendar.untitled","value":"Untitled","read":true}
+{"file":"src/pages/Calendar/EventCard.tsx","line":82,"position":"expr","key":"calendar.allDay","value":"All day","read":true}
+{"file":"src/pages/Calendar/EventCard.tsx","line":85,"position":"expr","key":"calendar.untitled","value":"Untitled","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":123,"position":"jsx-text","key":"calendar.deleteConfirm","value":"Are you sure you want to delete this event?","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":126,"position":"jsx-text","key":"calendar.deleteConfirmHint","value":"The linked reminder will also be removed.","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":131,"position":"jsx-text","key":"calendar.actions.back","value":"Back","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":135,"position":"expr","key":"calendar.actions.delete","value":"Delete","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":148,"position":"expr","key":"calendar.newEvent","value":"New Event","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":148,"position":"expr","key":"calendar.editEvent","value":"Edit Event","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":152,"position":"jsx-attr","key":"calendar.actions.delete","value":"Delete","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":166,"position":"jsx-attr","key":"calendar.field.title","value":"Title","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":168,"position":"jsx-attr","key":"calendar.field.titlePlaceholder","value":"Event name...","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":173,"position":"jsx-attr","key":"calendar.field.date","value":"Date","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":176,"position":"jsx-attr","key":"calendar.field.category","value":"Category","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":189,"position":"jsx-text","key":"calendar.allDay","value":"All day","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":195,"position":"jsx-attr","key":"calendar.field.startTime","value":"Start Time","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":198,"position":"jsx-attr","key":"calendar.field.endTime","value":"End Time","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":204,"position":"jsx-attr","key":"calendar.field.location","value":"Location","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":206,"position":"jsx-attr","key":"calendar.field.locationPlaceholder","value":"Optional...","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":209,"position":"jsx-attr","key":"calendar.field.notes","value":"Notes","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":211,"position":"jsx-attr","key":"calendar.field.notesPlaceholder","value":"Add notes...","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":216,"position":"jsx-attr","key":"calendar.field.reminder","value":"Reminder","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":223,"position":"jsx-attr","key":"calendar.delivery.label","value":"Deliver to","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":233,"position":"jsx-attr","key":"calendar.field.recurrence","value":"Recurrence","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":244,"position":"jsx-text","key":"calendar.actions.cancel","value":"Cancel","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":247,"position":"expr","key":"calendar.actions.save","value":"Save","read":true}
+{"file":"src/pages/Calendar/EventModal.tsx","line":247,"position":"expr","key":"calendar.actions.saving","value":"Saving...","read":true}
+{"file":"src/pages/Calendar/index.tsx","line":120,"position":"jsx-text","key":"calendar.today","value":"Today","read":true}
+{"file":"src/pages/Calendar/index.tsx","line":127,"position":"jsx-text","key":"calendar.eventCount","value":"{{count}} events","read":true}
+{"file":"src/pages/Calendar/index.tsx","line":156,"position":"jsx-text","key":"calendar.loading","value":"Loading...","read":true}
+{"file":"src/pages/Calendar/index.tsx","line":172,"position":"jsx-text","key":"calendar.addEvent","value":"Add Event","read":true}
+{"file":"src/pages/Calendar/index.tsx","line":178,"position":"jsx-text","key":"calendar.upcoming","value":"Upcoming","read":true}
+{"file":"src/pages/Calendar/MonthView.tsx","line":129,"position":"jsx-text","key":"calendar.moreEvents","value":"+{{n}} more","read":true}
+{"file":"src/pages/Calendar/UpcomingEvents.tsx","line":34,"position":"jsx-text","key":"calendar.noUpcoming","value":"No upcoming events","read":true}
+{"file":"src/pages/Calendar/UpcomingEvents.tsx","line":55,"position":"expr","key":"calendar.allDay","value":"All day","read":true}
+{"file":"src/pages/Calendar/UpcomingEvents.tsx","line":63,"position":"expr","key":"calendar.untitled","value":"Untitled","read":true}
+{"file":"src/pages/CodeInterpreter.tsx","line":105,"position":"jsx-attr","key":"codeInterpreter.copyOutput","value":"Copy output","read":true}
+{"file":"src/pages/CodeInterpreter.tsx","line":114,"position":"expr","key":"common.copy","value":"Copy","read":true}
+{"file":"src/pages/CodeInterpreter.tsx","line":114,"position":"expr","key":"common.copied","value":"Copied","read":true}
+{"file":"src/pages/ConfigManager/AdvancedTab.tsx","line":176,"position":"jsx-text","key":"config.rawJson","value":"Raw JSON","read":true}
+{"file":"src/pages/ConfigManager/AdvancedTab.tsx","line":179,"position":"jsx-text","key":"config.rawJsonHint","value":"Edit the full configuration as JSON. Be careful — invalid JSON will not be applied.","read":true}
+{"file":"src/pages/ConfigManager/AdvancedTab.tsx","line":188,"position":"jsx-text","key":"config.lineCount","value":"{{count}} lines","read":true}
+{"file":"src/pages/ConfigManager/AdvancedTab.tsx","line":220,"position":"jsx-text","key":"config.jsonApplied","value":"JSON applied successfully","read":true}
+{"file":"src/pages/ConfigManager/AdvancedTab.tsx","line":236,"position":"jsx-text","key":"config.format","value":"Format","read":true}
+{"file":"src/pages/ConfigManager/AdvancedTab.tsx","line":247,"position":"jsx-text","key":"config.apply","value":"Apply","read":true}
+{"file":"src/pages/ConfigManager/AdvancedTab.tsx","line":255,"position":"jsx-text","key":"config.envVars","value":"Environment Variables","read":true}
+{"file":"src/pages/ConfigManager/AdvancedTab.tsx","line":306,"position":"jsx-attr","key":"config.variableKey","value":"Key","read":true}
+{"file":"src/pages/ConfigManager/AdvancedTab.tsx","line":313,"position":"jsx-attr","key":"config.variableValue","value":"Value","read":true}
+{"file":"src/pages/ConfigManager/AdvancedTab.tsx","line":327,"position":"jsx-text","key":"config.addVariable","value":"Add Variable","read":true}
+{"file":"src/pages/ConfigManager/AdvancedTab.tsx","line":341,"position":"jsx-text","key":"config.commands","value":"Commands","read":true}
+{"file":"src/pages/ConfigManager/AdvancedTab.tsx","line":347,"position":"jsx-text","key":"config.nativeCommands","value":"Native Commands","read":true}
+{"file":"src/pages/ConfigManager/AdvancedTab.tsx","line":356,"position":"jsx-text","key":"config.nativeSkills","value":"Native Skills","read":true}
+{"file":"src/pages/ConfigManager/AdvancedTab.tsx","line":365,"position":"jsx-text","key":"config.restartCommand","value":"Restart Command","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":90,"position":"jsx-attr","key":"config.remove","value":"Remove","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":103,"position":"jsx-attr","key":"config.addFallbackModel","value":"Add fallback model...","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":246,"position":"jsx-text","key":"agents.mainAgent","value":"Main Agent","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":251,"position":"jsx-text","key":"config.isDefault","value":"Default Agent","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":293,"position":"jsx-attr","key":"config.agentName","value":"Agent Name","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":300,"position":"jsx-attr","key":"config.inheritedFromDefaults","value":"Inherited from defaults","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":300,"position":"jsx-attr","key":"config.primaryModel","value":"Primary Model","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":306,"position":"jsx-attr","key":"config.inheritedFromDefaults","value":"Inherited from defaults","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":311,"position":"jsx-attr","key":"config.inheritedFromDefaults","value":"Inherited from defaults","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":311,"position":"jsx-attr","key":"config.workspace","value":"Workspace","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":315,"position":"jsx-attr","key":"config.inheritedFromDefaults","value":"Inherited from defaults","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":323,"position":"jsx-text","key":"config.heartbeat","value":"Heartbeat","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":337,"position":"jsx-attr","key":"config.heartbeatEveryHint","value":"e.g. 30m, 1h, 45m","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":337,"position":"jsx-attr","key":"config.heartbeatEvery","value":"Interval","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":343,"position":"jsx-attr","key":"config.heartbeatEveryPlaceholder","value":"30m","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":350,"position":"jsx-attr","key":"config.subagents","value":"Sub-agents","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":350,"position":"jsx-attr","key":"config.allowAgents","value":"Allowed Agents","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":356,"position":"jsx-attr","key":"config.agentIdPlaceholder","value":"agent-id...","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":362,"position":"jsx-text","key":"config.isDefault","value":"Default Agent","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":381,"position":"jsx-text","key":"config.removeAgent","value":"Remove Agent","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":390,"position":"jsx-attr","key":"config.removeAgent","value":"Remove Agent","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":391,"position":"jsx-attr","key":"config.removeAgentConfirm","value":"Are you sure you want to remove agent \"{{name}}\"?","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":392,"position":"jsx-attr","key":"config.removeAgent","value":"Remove Agent","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":393,"position":"jsx-attr","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":451,"position":"jsx-text","key":"config.addAgent","value":"Add Agent","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":464,"position":"jsx-attr","key":"config.agentId","value":"Agent ID","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":468,"position":"jsx-attr","key":"config.agentIdExample","value":"my-agent","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":472,"position":"jsx-attr","key":"config.agentName","value":"Agent Name","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":476,"position":"jsx-attr","key":"config.agentNameExample","value":"My Agent","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":479,"position":"jsx-attr","key":"config.inheritedFromDefaults","value":"Inherited from defaults","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":479,"position":"jsx-attr","key":"config.primaryModel","value":"Primary Model","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":483,"position":"jsx-attr","key":"config.inheritedFromDefaults","value":"Inherited from defaults","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":499,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":506,"position":"expr","key":"config.mainAgentReserved","value":"Main agent is already in the list","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":518,"position":"jsx-text","key":"config.addAgent","value":"Add Agent","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":536,"position":"expr","key":"agents.mainAgent","value":"Main Agent","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":632,"position":"jsx-attr","key":"config.agentDefaults","value":"Agent Defaults","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":633,"position":"expr","key":"config.inheritedFromDefaults","value":"Inherited from defaults","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":638,"position":"jsx-attr","key":"config.workspace","value":"Workspace","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":648,"position":"jsx-attr","key":"config.primaryModel","value":"Primary Model","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":658,"position":"jsx-attr","key":"config.fallbackModels","value":"Fallback Models","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":670,"position":"jsx-attr","key":"config.thinkingDefault","value":"Thinking Level","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":675,"position":"jsx-attr","key":"config.inherit","value":"Inherit","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":679,"position":"jsx-attr","key":"config.maxConcurrent","value":"Max Concurrent Sessions","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":693,"position":"jsx-attr","key":"config.heartbeat","value":"Heartbeat","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":699,"position":"jsx-attr","key":"config.heartbeatEvery","value":"Interval","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":707,"position":"jsx-attr","key":"config.heartbeatPrompt","value":"Prompt","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":711,"position":"jsx-attr","key":"config.heartbeatReadmePlaceholder","value":"Read HEARTBEAT.md if it exists...","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":719,"position":"jsx-attr","key":"config.compaction","value":"Compaction","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":725,"position":"jsx-attr","key":"config.compactionMode","value":"Mode","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":730,"position":"jsx-attr","key":"config.inherit","value":"Inherit","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":733,"position":"jsx-attr","key":"config.reserveTokensFloor","value":"Reserve Tokens Floor","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":746,"position":"jsx-text","key":"config.memoryFlush","value":"Memory Flush","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":756,"position":"jsx-attr","key":"config.softThresholdTokens","value":"Soft Threshold Tokens","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":763,"position":"jsx-attr","key":"config.heartbeatPrompt","value":"Prompt","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":767,"position":"jsx-attr","key":"config.memoryFlushPromptPlaceholder","value":"Memory flush prompt...","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":775,"position":"jsx-attr","key":"config.memoryFlushSystemPromptPlaceholder","value":"System prompt for memory flush...","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":786,"position":"jsx-attr","key":"config.contextPruning","value":"Context Pruning","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":792,"position":"jsx-attr","key":"config.pruningMode","value":"Mode","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":797,"position":"jsx-attr","key":"config.inherit","value":"Inherit","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":800,"position":"jsx-attr","key":"config.ttl","value":"TTL","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":807,"position":"jsx-attr","key":"config.keepLastAssistants","value":"Keep Last Assistants","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":815,"position":"jsx-attr","key":"config.softTrimRatio","value":"Soft Trim Ratio","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":824,"position":"jsx-attr","key":"config.minPrunableToolChars","value":"Min Prunable Tool Chars","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":839,"position":"jsx-text","key":"config.agentList","value":"Agents","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":849,"position":"jsx-text","key":"config.addAgent","value":"Add Agent","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":857,"position":"jsx-text","key":"config.noAgents","value":"No agents configured","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":858,"position":"jsx-text","key":"config.addFirstAgent","value":"Add your first agent to get started","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":867,"position":"jsx-text","key":"config.addAgent","value":"Add Agent","read":true}
+{"file":"src/pages/ConfigManager/AgentsTab.tsx","line":895,"position":"jsx-text","key":"config.addAgent","value":"Add Agent","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":225,"position":"expr","key":"config.disabled","value":"Disabled","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":225,"position":"expr","key":"config.enabled","value":"Enabled","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":229,"position":"jsx-text","key":"config.unknownChannel","value":"Unknown Channel","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":257,"position":"jsx-text","key":"config.unknownChannel","value":"Unknown Channel","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":270,"position":"jsx-text","key":"config.enabled","value":"Enabled","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":299,"position":"jsx-attr","key":"config.appToken","value":"App Token","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":311,"position":"jsx-attr","key":"config.appId","value":"App ID","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":318,"position":"jsx-attr","key":"config.appSecret","value":"App Secret","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":322,"position":"jsx-attr","key":"config.appSecret","value":"App Secret","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":331,"position":"jsx-attr","key":"config.dmPolicy","value":"DM Policy","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":342,"position":"jsx-attr","key":"config.groupPolicy","value":"Group Policy","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":353,"position":"jsx-attr","key":"config.streaming","value":"Streaming","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":362,"position":"jsx-attr","key":"config.streaming","value":"Streaming","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":373,"position":"jsx-attr","key":"config.mediaMaxMb","value":"Media Max Size (MB)","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":385,"position":"jsx-attr","key":"config.allowFrom","value":"Allow From","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":389,"position":"jsx-attr","key":"config.addIdentifier","value":"Add identifier...","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":430,"position":"jsx-text","key":"config.removeChannel","value":"Remove Channel","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":439,"position":"jsx-attr","key":"config.removeChannel","value":"Remove Channel","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":440,"position":"jsx-attr","key":"config.removeChannelConfirm","value":"Are you sure you want to remove the {{channel}} channel?","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":441,"position":"jsx-attr","key":"config.removeChannel","value":"Remove Channel","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":442,"position":"jsx-attr","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":483,"position":"jsx-attr","key":"config.selectChannelType","value":"Select Channel Type","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":534,"position":"jsx-text","key":"config.alreadyAdded","value":"Already added","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":543,"position":"jsx-text","key":"config.noChannelsFound","value":"No channels found","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":626,"position":"jsx-attr","key":"config.botToken","value":"Bot Token","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":638,"position":"jsx-attr","key":"config.appToken","value":"App Token","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":650,"position":"jsx-attr","key":"config.appId","value":"App ID","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":657,"position":"jsx-attr","key":"config.appSecret","value":"App Secret","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":661,"position":"jsx-attr","key":"config.appSecret","value":"App Secret","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":670,"position":"jsx-attr","key":"config.dmPolicy","value":"DM Policy","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":681,"position":"jsx-attr","key":"config.streaming","value":"Streaming","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":690,"position":"jsx-attr","key":"config.streaming","value":"Streaming","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":711,"position":"jsx-text","key":"config.back","value":"← Back","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":721,"position":"jsx-text","key":"config.addChannel","value":"Add Channel","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":766,"position":"expr","key":"config.addChannel","value":"Add Channel","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":832,"position":"jsx-text","key":"config.channels","value":"Channels","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":845,"position":"jsx-text","key":"config.addChannel","value":"Add Channel","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":872,"position":"jsx-text","key":"config.modelByChannel","value":"Model by Channel","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":896,"position":"jsx-text","key":"config.channelList","value":"Channels","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":904,"position":"jsx-text","key":"config.noChannels","value":"No channels configured","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":905,"position":"jsx-text","key":"config.addFirstChannel","value":"Add your first channel to get started","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":914,"position":"jsx-text","key":"config.addChannel","value":"Add Channel","read":true}
+{"file":"src/pages/ConfigManager/ChannelsTab.tsx","line":940,"position":"jsx-text","key":"config.addChannel","value":"Add Channel","read":true}
+{"file":"src/pages/ConfigManager/components.tsx","line":56,"position":"jsx-text","key":"common.hide","value":"Hide","read":true}
+{"file":"src/pages/ConfigManager/components.tsx","line":58,"position":"jsx-text","key":"common.show","value":"Show","read":true}
+{"file":"src/pages/ConfigManager/components.tsx","line":96,"position":"jsx-text","key":"config.noModelsConfigured","value":"No models configured","read":true}
+{"file":"src/pages/ConfigManager/components.tsx","line":135,"position":"expr","key":"config.primaryModel","value":"Primary Model","read":true}
+{"file":"src/pages/ConfigManager/components.tsx","line":136,"position":"expr","key":"config.setPrimary","value":"Set as Primary","read":true}
+{"file":"src/pages/ConfigManager/components.tsx","line":157,"position":"expr","key":"config.imageModel","value":"Image Model","read":true}
+{"file":"src/pages/ConfigManager/components.tsx","line":158,"position":"expr","key":"config.setImageModel","value":"Set as Image Model","read":true}
+{"file":"src/pages/ConfigManager/components.tsx","line":183,"position":"jsx-attr","key":"common.remove","value":"Remove","read":true}
+{"file":"src/pages/ConfigManager/components.tsx","line":300,"position":"jsx-text","key":"config.discard","value":"Discard Changes","read":true}
+{"file":"src/pages/ConfigManager/components.tsx","line":316,"position":"jsx-text","key":"config.reviewAndSave","value":"Review & Save","read":true}
+{"file":"src/pages/ConfigManager/components.tsx","line":316,"position":"expr","key":"config.saving","value":"Saving...","read":true}
+{"file":"src/pages/ConfigManager/components.tsx","line":872,"position":"jsx-text","key":"config.reviewChanges","value":"Review Changes","read":true}
+{"file":"src/pages/ConfigManager/components.tsx","line":893,"position":"jsx-text","key":"config.noChanges","value":"No changes detected","read":true}
+{"file":"src/pages/ConfigManager/components.tsx","line":913,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/pages/ConfigManager/components.tsx","line":926,"position":"expr","key":"config.saveAndRestart","value":"Save & Restart Gateway","read":true}
+{"file":"src/pages/ConfigManager/components.tsx","line":926,"position":"expr","key":"config.saving","value":"Saving...","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":363,"position":"expr","key":"config.saveFailed","value":"Save failed","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":409,"position":"expr","key":"config.importError","value":"Invalid JSON file","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1031,"position":"jsx-text","key":"config.title","value":"Config Manager","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1032,"position":"jsx-attr","key":"config.unsavedChanges","value":"unsaved changes","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1053,"position":"expr","key":"config.reloading","value":"Reloading...","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1055,"position":"expr","key":"config.reloadDone","value":"Reloaded ✓","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1056,"position":"expr","key":"config.reload","value":"Reload","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1067,"position":"jsx-text","key":"config.exportConfig","value":"Export Config","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1078,"position":"jsx-text","key":"config.importConfig","value":"Import Config","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1093,"position":"jsx-attr","key":"config.restoreBackup","value":"Restore","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1096,"position":"jsx-text","key":"config.restoreBackup","value":"Restore","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1141,"position":"jsx-text","key":"config.configPath","value":"Config Path","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1143,"position":"jsx-text","key":"config.detecting","value":"Detecting configuration...","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1151,"position":"jsx-attr","key":"config.pathPlaceholder","value":"D:\\MyClawdbot\\clawdbot.json","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1162,"position":"jsx-text","key":"common.apply","value":"Apply","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1168,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1179,"position":"jsx-attr","key":"config.editPath","value":"Edit path","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1191,"position":"jsx-text","key":"config.noFile","value":"No configuration file found. Set the path in Settings.","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1200,"position":"expr","key":"config.providers","value":"Providers","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1201,"position":"expr","key":"config.agents","value":"Agents","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1202,"position":"expr","key":"config.channels","value":"Channels","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1218,"position":"jsx-text","key":"config.detecting","value":"Detecting configuration...","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1223,"position":"jsx-text","key":"config.noFile","value":"No configuration file found. Set the path in Settings.","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1310,"position":"jsx-text","key":"config.configSaved","value":"Configuration saved successfully","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1328,"position":"jsx-text","key":"config.recentBackups","value":"Recent Backups","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1339,"position":"jsx-text","key":"config.noBackupsYet","value":"No backups yet","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1361,"position":"expr","key":"config.savesAgo","value":"{{count}} saves ago","read":true}
+{"file":"src/pages/ConfigManager/index.tsx","line":1361,"position":"expr","key":"config.latestBackup","value":"Latest","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1252,"position":"jsx-text","key":"config.profileName","value":"Profile Name","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1267,"position":"jsx-text","key":"config.authMode","value":"Auth Mode","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1293,"position":"jsx-text","key":"config.apiKey","value":"API Key","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1304,"position":"expr","key":"config.apiKeyConfigured","value":"Configured (stored in env)","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1305,"position":"expr","key":"config.notSet","value":"Not set","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1315,"position":"jsx-text","key":"config.modelsAndAliases","value":"Models & Aliases","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1340,"position":"jsx-text","key":"config.remove","value":"Remove","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1466,"position":"jsx-text","key":"config.customProvider","value":"Custom Provider","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1501,"position":"jsx-text","key":"config.baseUrl","value":"API Endpoint","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1520,"position":"jsx-text","key":"config.api","value":"API","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1537,"position":"jsx-text","key":"config.models","value":"Models","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1562,"position":"jsx-text","key":"config.envKey","value":"Env Key","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1576,"position":"jsx-text","key":"config.envKeyNotSet","value":"not set in env.vars","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1596,"position":"jsx-text","key":"common.remove","value":"Remove","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1642,"position":"jsx-text","key":"config.envKeyOnly","value":"ENV Key Only","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1648,"position":"jsx-text","key":"config.addAuthProfileHint","value":"Add an auth profile for full configuration","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1670,"position":"jsx-text","key":"config.configure","value":"Configure","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1732,"position":"jsx-attr","key":"config.searchProviders","value":"Search providers...","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1773,"position":"jsx-text","key":"config.codingPlanAdvisory","value":"Coding Plan uses a dedicated API Key and endpoint — do not mix with your general API Key. Get the key from the provider's \"Coding Plan\" console.","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1779,"position":"jsx-text","key":"config.localProviderAdvisory","value":"Local and custom endpoints run on your own machine or private server — no cloud API Key needed. vLLM / Custom requires a Base URL; Ollama defaults to localhost:11434.","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1790,"position":"jsx-text","key":"config.noProvidersFound","value":"No matching providers found","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1855,"position":"expr","key":"config.authModeOption.oauth","value":"OAuth","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":1855,"position":"expr","key":"config.codingPlan","value":"Coding Plan","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2230,"position":"expr","key":"config.connected","value":"Connected","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2345,"position":"expr","key":"config.authModeOption.oauth","value":"OAuth","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2345,"position":"expr","key":"config.codingPlan","value":"Coding Plan","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2373,"position":"jsx-text","key":"config.profileName","value":"Profile Name","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2390,"position":"jsx-text","key":"config.providerId","value":"Provider ID","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2398,"position":"jsx-attr","key":"config.providerIdPlaceholder","value":"e.g. minimax-anthropic, my-vllm, custom","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2406,"position":"jsx-text","key":"config.providerIdHint","value":"Written to models.providers[id] in OpenClaw config. Defaults to \"custom\".","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2415,"position":"jsx-text","key":"config.baseUrl","value":"API Endpoint","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2420,"position":"expr","key":"config.baseUrlPlaceholder","value":"e.g. https://api.example.com/v1","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2430,"position":"jsx-text","key":"config.baseUrlDriftWarning","value":"⚠️ Drifted from recommended endpoint ({{url}}) — verify before continuing.","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2444,"position":"jsx-text","key":"config.modelId","value":"Model ID","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2449,"position":"jsx-attr","key":"config.modelIdPlaceholder","value":"e.g. gpt-4 or custom/model-name","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2452,"position":"jsx-text","key":"config.modelIdHint","value":"Enter model names, confirm with Enter or comma. OpenClaw will prefix with {{providerId}}/","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2478,"position":"jsx-text","key":"config.authMode","value":"Auth Mode","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2499,"position":"jsx-text","key":"config.apiKey","value":"API Key","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2504,"position":"expr","key":"config.apiKeyPlaceholder","value":"Enter API key...","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2514,"position":"jsx-text","key":"config.envKeyAltHint","value":"(alt: {{keys}})","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2536,"position":"jsx-text","key":"config.testConnection","value":"Test Connection","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2552,"position":"jsx-text","key":"config.suggestedModels","value":"Suggested Models","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2596,"position":"jsx-text","key":"config.modelId","value":"Model ID","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2601,"position":"jsx-attr","key":"config.modelIdPlaceholder","value":"e.g. gpt-4 or custom/model-name","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2604,"position":"jsx-text","key":"config.modelIdHint","value":"Enter model names, confirm with Enter or comma. OpenClaw will prefix with {{providerId}}/","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2613,"position":"jsx-text","key":"config.primaryModel","value":"Primary Model","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2631,"position":"jsx-text","key":"config.imageModel","value":"Image Model","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2642,"position":"jsx-text","key":"config.notSet","value":"Not set","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2661,"position":"jsx-text","key":"config.configPreviewTitle","value":"Config Write Preview","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2676,"position":"expr","key":"common.show","value":"Show","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2676,"position":"expr","key":"common.hide","value":"Hide","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2687,"position":"jsx-text","key":"config.apiKeyEmpty","value":"(not filled)","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2706,"position":"jsx-text","key":"config.back","value":"← Back","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2718,"position":"expr","key":"config.saveAndRestart","value":"Save & Restart Gateway","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2718,"position":"expr","key":"config.saving","value":"Saving...","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2782,"position":"expr","key":"config.addProvider","value":"Add Provider","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2786,"position":"expr","key":"config.providers","value":"Providers","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2927,"position":"jsx-text","key":"config.providers","value":"Providers","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2929,"position":"jsx-text","key":"config.manageProvidersDesc","value":"Manage providers, models, and API keys","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2940,"position":"jsx-text","key":"config.addProvider","value":"Add Provider","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2946,"position":"jsx-attr","key":"config.providers","value":"Providers","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2948,"position":"jsx-attr","key":"config.models","value":"Models","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2950,"position":"jsx-attr","key":"config.aliases","value":"Aliases","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2965,"position":"jsx-text","key":"config.primaryModel","value":"Primary Model","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2970,"position":"jsx-text","key":"config.notSet","value":"Not set","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2987,"position":"jsx-text","key":"config.imageModel","value":"Image Model","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":2992,"position":"jsx-text","key":"config.notSet","value":"Not set","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":3011,"position":"jsx-text","key":"config.imageGenerationModel","value":"Image Generation Model","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":3016,"position":"jsx-text","key":"config.notSet","value":"Not set","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":3033,"position":"jsx-text","key":"config.videoGenerationModel","value":"Video Generation Model","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":3038,"position":"jsx-text","key":"config.notSet","value":"Not set","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":3051,"position":"jsx-text","key":"config.providers","value":"Providers","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":3060,"position":"jsx-text","key":"config.noProviders","value":"No providers configured yet","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":3062,"position":"jsx-text","key":"config.addFirstProvider","value":"Add your first AI provider to get started","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":3071,"position":"jsx-text","key":"config.addProvider","value":"Add Provider","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":3124,"position":"jsx-text","key":"config.addProvider","value":"Add Provider","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":3136,"position":"jsx-text","key":"config.modelsAndAliases","value":"Models & Aliases","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":3143,"position":"jsx-text","key":"config.imageGenerationModel","value":"Image Generation Model","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":3165,"position":"jsx-text","key":"config.notSet","value":"Not set","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":3173,"position":"jsx-text","key":"config.videoGenerationModel","value":"Video Generation Model","read":true}
+{"file":"src/pages/ConfigManager/ProvidersTab.tsx","line":3195,"position":"jsx-text","key":"config.notSet","value":"Not set","read":true}
+{"file":"src/pages/ConfigManager/SecretsTab.tsx","line":91,"position":"expr","key":"secrets.audit.failed","value":"Audit failed","read":true}
+{"file":"src/pages/ConfigManager/SecretsTab.tsx","line":107,"position":"expr","key":"secrets.reload.success","value":"Secrets reloaded successfully","read":true}
+{"file":"src/pages/ConfigManager/SecretsTab.tsx","line":109,"position":"expr","key":"secrets.reload.failed","value":"Reload failed","read":true}
+{"file":"src/pages/ConfigManager/SecretsTab.tsx","line":125,"position":"jsx-text","key":"secrets.audit.clean","value":"🟢 Clean — no issues found","read":true}
+{"file":"src/pages/ConfigManager/SecretsTab.tsx","line":127,"position":"jsx-text","key":"secrets.audit.findings","value":"🟡 Findings — plaintext secrets detected","read":true}
+{"file":"src/pages/ConfigManager/SecretsTab.tsx","line":129,"position":"jsx-text","key":"secrets.audit.unresolved","value":"🔴 Unresolved — secret refs could not be resolved","read":true}
+{"file":"src/pages/ConfigManager/SecretsTab.tsx","line":130,"position":"jsx-text","key":"secrets.audit.unknown","value":"⚪ Unknown","read":true}
+{"file":"src/pages/ConfigManager/SecretsTab.tsx","line":139,"position":"jsx-attr","key":"secrets.audit.title","value":"Secrets Audit","read":true}
+{"file":"src/pages/ConfigManager/SecretsTab.tsx","line":140,"position":"jsx-attr","key":"secrets.audit.subtitle","value":"Scan config for plaintext secrets and unresolved refs","read":true}
+{"file":"src/pages/ConfigManager/SecretsTab.tsx","line":156,"position":"expr","key":"secrets.audit.run","value":"Run Audit","read":true}
+{"file":"src/pages/ConfigManager/SecretsTab.tsx","line":156,"position":"expr","key":"secrets.audit.running","value":"Running audit...","read":true}
+{"file":"src/pages/ConfigManager/SecretsTab.tsx","line":178,"position":"jsx-attr","key":"secrets.providers.title","value":"Secret Providers","read":true}
+{"file":"src/pages/ConfigManager/SecretsTab.tsx","line":179,"position":"jsx-attr","key":"secrets.providers.subtitle","value":"Configured sources for secret resolution (read-only — edit via Advanced → Raw JSON)","read":true}
+{"file":"src/pages/ConfigManager/SecretsTab.tsx","line":193,"position":"jsx-text","key":"secrets.providers.emptyTitle","value":"No secret providers configured","read":true}
+{"file":"src/pages/ConfigManager/SecretsTab.tsx","line":195,"position":"jsx-text","key":"secrets.providers.emptyHintPrefix","value":"Add providers under","read":true}
+{"file":"src/pages/ConfigManager/SecretsTab.tsx","line":197,"position":"jsx-text","key":"secrets.providers.emptyHintSuffix","value":"in the Advanced tab","read":true}
+{"file":"src/pages/ConfigManager/SecretsTab.tsx","line":230,"position":"jsx-attr","key":"secrets.reload.title","value":"Reload Secrets","read":true}
+{"file":"src/pages/ConfigManager/SecretsTab.tsx","line":231,"position":"jsx-attr","key":"secrets.reload.subtitle","value":"Re-resolves all secret refs and swaps the runtime snapshot","read":true}
+{"file":"src/pages/ConfigManager/SecretsTab.tsx","line":236,"position":"jsx-text","key":"secrets.reload.hint","value":"Use this after updating secret values in your providers (environment variables, files, etc.) to apply them without restarting the gateway.","read":true}
+{"file":"src/pages/ConfigManager/SecretsTab.tsx","line":250,"position":"expr","key":"secrets.reload.button","value":"Reload Secrets","read":true}
+{"file":"src/pages/ConfigManager/SecretsTab.tsx","line":250,"position":"expr","key":"secrets.reload.reloading","value":"Reloading...","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":213,"position":"expr","key":"config.apiKeyPlaceholderReuseModel","value":"Leave empty to reuse provider credential","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":214,"position":"expr","key":"config.apiKeyPlaceholderNeedConfig","value":"Enter provider API key","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":306,"position":"jsx-text","key":"config.webTools","value":"Web Tools","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":311,"position":"jsx-text","key":"config.searchEnabled","value":"Web Search","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":329,"position":"jsx-text","key":"config.addWebSearchTool","value":"Add Web Search Tool","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":334,"position":"jsx-text","key":"config.noWebSearchToolsConfigured","value":"No web search providers configured yet","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":349,"position":"expr","key":"config.setAsActiveProvider","value":"Set Active","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":349,"position":"expr","key":"config.activeProvider","value":"Active","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":360,"position":"jsx-text","key":"common.remove","value":"Remove","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":367,"position":"jsx-attr","key":"config.searchMaxResults","value":"Max Results","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":377,"position":"jsx-attr","key":"config.searchTimeoutSeconds","value":"Search Timeout (s)","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":387,"position":"jsx-attr","key":"config.searchCacheTtlMinutes","value":"Search Cache TTL (min)","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":400,"position":"jsx-text","key":"config.codexNativeSearch","value":"Codex Native Search","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":409,"position":"jsx-attr","key":"config.codexNativeMode","value":"Codex Mode","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":416,"position":"jsx-attr","key":"config.contextSize","value":"Context Size","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":424,"position":"jsx-attr","key":"config.allowedDomains","value":"Allowed Domains","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":428,"position":"jsx-attr","key":"config.allowedDomainsPlaceholder","value":"example.com","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":432,"position":"jsx-attr","key":"config.userLocationCountry","value":"User Country","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":441,"position":"jsx-attr","key":"config.userLocationCity","value":"User City","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":450,"position":"jsx-attr","key":"config.userLocationTimezone","value":"User Timezone","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":467,"position":"jsx-text","key":"config.fetchEnabled","value":"Web Fetch","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":485,"position":"jsx-text","key":"config.addWebFetchTool","value":"Add Web Fetch Tool","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":490,"position":"jsx-text","key":"config.noWebFetchToolsConfigured","value":"No web fetch providers configured yet","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":505,"position":"expr","key":"config.setAsActiveProvider","value":"Set Active","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":505,"position":"expr","key":"config.activeProvider","value":"Active","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":516,"position":"jsx-text","key":"common.remove","value":"Remove","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":522,"position":"jsx-attr","key":"config.fetchMaxChars","value":"Max Characters","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":537,"position":"jsx-text","key":"config.toolBlockedHint","value":"Current allow/deny policies may block web search or fetch tools.","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":546,"position":"jsx-text","key":"config.toolsAccessControl","value":"Tools Access Control","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":550,"position":"jsx-attr","key":"config.toolProfile","value":"Tool Profile","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":568,"position":"expr","key":"config.showAdvancedPolicy","value":"Show Advanced Policy","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":568,"position":"expr","key":"config.hideAdvancedPolicy","value":"Hide Advanced Policy","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":573,"position":"jsx-attr","key":"config.execAskMode","value":"Exec Ask Mode","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":584,"position":"jsx-attr","key":"config.denyTools","value":"Deny Tools","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":591,"position":"jsx-attr","key":"config.allowTools","value":"Allow Tools","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":609,"position":"expr","key":"config.addWebFetchTool","value":"Add Web Fetch Tool","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":609,"position":"expr","key":"config.addWebSearchTool","value":"Add Web Search Tool","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":613,"position":"jsx-attr","key":"config.webSearchProvider","value":"Provider","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":618,"position":"expr","key":"config.selectProvider","value":"Select provider","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":638,"position":"jsx-attr","key":"config.sharedCredentialSource","value":"Credential Source","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":643,"position":"expr","key":"config.useSharedCredential","value":"Reuse provider credential from model settings","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":644,"position":"expr","key":"config.useIndependentCredential","value":"Use independent credential","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":650,"position":"jsx-attr","key":"config.providerCredentialOverride","value":"Credential Override","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":671,"position":"expr","key":"config.apiKeyHintSharedConfigured","value":"Shared credential is configured and can be reused.","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":672,"position":"expr","key":"config.apiKeyHintSharedMissing","value":"No shared credential found. Please enter one here.","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":673,"position":"expr","key":"config.apiKeyHintNotShared","value":"This provider does not support shared model credential reuse.","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":712,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/pages/ConfigManager/ToolsTab.tsx","line":723,"position":"jsx-text","key":"common.apply","value":"Apply","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":106,"position":"expr","key":"cronTemplates.morningName","value":"Morning Briefing","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":107,"position":"expr","key":"cronTemplates.morningDesc","value":"Weather, news, and memory review every morning","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":112,"position":"expr","key":"cronTemplates.weeklyName","value":"Weekly Digest","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":113,"position":"expr","key":"cronTemplates.weeklyDesc","value":"End-of-week summary and memory cleanup","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":118,"position":"expr","key":"cronTemplates.checkInName","value":"Check-In","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":119,"position":"expr","key":"cronTemplates.checkInDesc","value":"Periodic nudge if anything needs attention","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":124,"position":"expr","key":"cronTemplates.healthName","value":"System Health","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":125,"position":"expr","key":"cronTemplates.healthDesc","value":"Disk, RAM, uptime, and process monitoring","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":585,"position":"jsx-text","key":"cron.title","value":"Cron Monitor","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":597,"position":"jsx-attr","key":"cron.searchPlaceholder","value":"Search jobs...","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":606,"position":"jsx-text","key":"common.refresh","value":"Refresh","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":612,"position":"jsx-text","key":"cron.newJob","value":"New Job","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":625,"position":"jsx-text","key":"cron.scheduledJobs","value":"Scheduled Jobs","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":640,"position":"jsx-text","key":"cron.noJobs","value":"No scheduled tasks","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":641,"position":"jsx-text","key":"cron.noJobsHint","value":"Add cron jobs to automate your workflow — or start with a template below","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":693,"position":"expr","key":"cronDetail.paused","value":"Paused","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":696,"position":"jsx-text","key":"cron.exactTiming","value":"Exact","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":704,"position":"jsx-text","key":"cron.timeLeft","value":"Time Left","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":754,"position":"jsx-text","key":"cron.schedule24h","value":"24h Schedule","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":801,"position":"jsx-text","key":"cron.stagger","value":"Stagger","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":808,"position":"jsx-text","key":"cron.exactTiming","value":"Exact","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":819,"position":"jsx-attr","key":"cron.autoSpreadTitle","value":"This job may run up to 5 minutes after the scheduled time due to automatic spreading","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":821,"position":"jsx-text","key":"cron.autoSpread","value":"Auto-spread: ±5min","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":837,"position":"expr","key":"cronDetail.paused","value":"Paused","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":837,"position":"expr","key":"cronDetail.error","value":"Error","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":837,"position":"expr","key":"cronDetail.active","value":"Active","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":838,"position":"jsx-text","key":"cronDetail.isolated","value":"Isolated","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":851,"position":"expr","key":"cron.deliveryUnknown","value":"Delivery Unknown","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":851,"position":"expr","key":"cron.deliveryFailed","value":"Delivery Failed","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":851,"position":"expr","key":"cron.delivered","value":"Delivered","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":858,"position":"expr","key":"cron.totalRuns","value":"Total Runs","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":859,"position":"expr","key":"cron.timeLeft","value":"Time Left","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":860,"position":"expr","key":"cron.lastDur","value":"Last Dur.","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":861,"position":"expr","key":"cron.successRate","value":"Success Rate","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":874,"position":"expr","key":"cron.lastNRuns","value":"Last {{n}} Runs","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":902,"position":"expr","key":"cronDetail.runNow","value":"▶ Run Now","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":902,"position":"expr","key":"cronDetail.done","value":"✓ Done","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":909,"position":"expr","key":"cronDetail.enable","value":"▶ Enable","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":909,"position":"expr","key":"cronDetail.pause","value":"⏸ Pause","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":916,"position":"jsx-text","key":"cron.selectJob","value":"Select a job","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":927,"position":"jsx-text","key":"cronDetail.activityLog","value":"Activity Log","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":928,"position":"expr","key":"cronDetail.activityLog","value":"Activity Log","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":947,"position":"jsx-text","key":"cron.noRunsYet","value":"No runs yet","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":964,"position":"expr","key":"cron.job","value":"Job","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":968,"position":"expr","key":"cron.failed","value":"Failed","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":968,"position":"expr","key":"cron.completed","value":"Completed","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":987,"position":"expr","key":"cronDetail.showMore","value":"▼ Show More ({{n}})","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":987,"position":"expr","key":"cronDetail.showLess","value":"▲ Show Less","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":1008,"position":"jsx-text","key":"cron.templatesTitle","value":"Quick Templates","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":1009,"position":"jsx-text","key":"cron.templatesSubtitle","value":"Add a pre-configured job with one click","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":1033,"position":"expr","key":"cronDetail.add","value":"+ Add","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":1033,"position":"expr","key":"cronDetail.addError","value":"✗ Error","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":1033,"position":"expr","key":"cronDetail.added","value":"✓ Added","read":true}
+{"file":"src/pages/CronMonitor.tsx","line":1041,"position":"jsx-text","key":"common.close","value":"Close","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":74,"position":"jsx-text","key":"dashboard.input","value":"Input","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":78,"position":"jsx-text","key":"dashboard.output","value":"Output","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":81,"position":"jsx-text","key":"dashboard.total","value":"Total","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":130,"position":"expr","key":"dashboard.quickMsg.heartbeat","value":"Run a quick heartbeat check — emails, calendar, anything urgent?","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":131,"position":"expr","key":"dashboard.quickMsg.emails","value":"Check my unread emails and summarize anything important.","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":132,"position":"expr","key":"dashboard.quickMsg.calendar","value":"What's on my calendar today and tomorrow?","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":133,"position":"expr","key":"dashboard.quickMsg.compact","value":"Compact the main session context","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":134,"position":"expr","key":"dashboard.quickMsg.status","value":"Give me a full system status report","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":135,"position":"expr","key":"dashboard.quickMsg.summary","value":"Summarize what we discussed in this session","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":252,"position":"expr","key":"dashboard.mainSession","value":"Main Session","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":257,"position":"expr","key":"dashboard.feedTokens","value":"{{label}} — {{n}} tokens","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":263,"position":"expr","key":"dashboardExtra.contextCompacted","value":"Context compacted ×{{n}}","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":288,"position":"jsx-text","key":"dashboard.title","value":"Mission Control","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":290,"position":"jsx-text","key":"dashboard.commandCenter","value":"OpenClaw Desktop","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":298,"position":"jsx-text","key":"dashboard.uptime","value":"Uptime","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":302,"position":"expr","key":"dashboard.model","value":"Model","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":320,"position":"expr","key":"dashboard.idle","value":"Idle","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":320,"position":"expr","key":"dashboard.working","value":"Working","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":321,"position":"expr","key":"dashboard.offline","value":"Offline","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":358,"position":"jsx-text","key":"dashboard.setupProviderBanner","value":"No AI provider configured. Set up a provider to start chatting.","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":364,"position":"jsx-text","key":"dashboard.setupProviderAction","value":"Go to Config →","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":376,"position":"jsx-text","key":"dashboard.todayCost","value":"Today's Cost","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":389,"position":"jsx-text","key":"dashboard.vsYesterday","value":"vs yesterday","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":400,"position":"jsx-text","key":"dashboard.thisMonth","value":"This Month","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":406,"position":"jsx-text","key":"dashboard.monthBudget","value":"this month","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":417,"position":"jsx-text","key":"dashboard.tokensToday","value":"Tokens Today","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":425,"position":"jsx-text","key":"dashboard.tokensIn","value":"in","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":429,"position":"jsx-text","key":"dashboard.tokensOut","value":"out","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":438,"position":"jsx-text","key":"dashboard.contextCard","value":"Context","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":443,"position":"jsx-text","key":"dashboard.used","value":"{{n}} used","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":444,"position":"jsx-text","key":"dashboard.max","value":"/ {{n}} max","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":458,"position":"jsx-text","key":"dashboard.dailyCostChart","value":"Daily Cost (14 days)","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":461,"position":"jsx-text","key":"dashboard.inputCostLabel","value":"Input","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":462,"position":"jsx-text","key":"dashboard.outputCostLabel","value":"Output","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":491,"position":"expr","key":"dashboard.notConnected","value":"Not connected to Gateway","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":491,"position":"expr","key":"common.loading","value":"Loading...","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":501,"position":"jsx-text","key":"dashboard.activeAgents","value":"Active Agents","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":507,"position":"jsx-text","key":"dashboard.viewAll","value":"View All","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":534,"position":"expr","key":"dashboard.notConnected","value":"Not connected to Gateway","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":534,"position":"expr","key":"dashboard.noAgentData","value":"No agent data yet","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":548,"position":"jsx-text","key":"dashboard.quickActions","value":"Quick Actions","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":551,"position":"jsx-attr","key":"dashboard.runHeartbeat","value":"Run Heartbeat","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":554,"position":"jsx-attr","key":"dashboard.checkEmails","value":"Check Emails","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":557,"position":"jsx-attr","key":"dashboard.checkCalendar","value":"Check Calendar","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":560,"position":"jsx-attr","key":"dashboard.compact","value":"Compact","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":563,"position":"jsx-attr","key":"dashboard.systemStatus","value":"System Status","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":566,"position":"jsx-attr","key":"dashboard.sessionSummary","value":"Session Summary","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":577,"position":"jsx-text","key":"dashboard.sessions","value":"Sessions","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":583,"position":"jsx-text","key":"dashboard.viewAll","value":"View All","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":592,"position":"jsx-attr","key":"dashboard.mainSession","value":"Main Session","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":594,"position":"jsx-attr","key":"dashboard.compactCount","value":"{{n}} compact","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":605,"position":"expr","key":"dashboard.mainSession","value":"Main Session","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":624,"position":"expr","key":"dashboard.notConnected","value":"Not connected to Gateway","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":624,"position":"expr","key":"dashboard.noActiveSessions","value":"No active sessions","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":635,"position":"jsx-text","key":"dashboard.activity","value":"Activity","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":638,"position":"jsx-text","key":"dashboard.live","value":"LIVE","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":655,"position":"expr","key":"dashboard.notConnected","value":"Not connected to Gateway","read":true}
+{"file":"src/pages/Dashboard/index.tsx","line":655,"position":"expr","key":"dashboard.noActiveSessions","value":"No active sessions","read":true}
+{"file":"src/pages/FileManager.tsx","line":165,"position":"expr","key":"fileManager.kindUploads","value":"Uploads","read":true}
+{"file":"src/pages/FileManager.tsx","line":166,"position":"expr","key":"fileManager.kindOutputs","value":"Output Refs","read":true}
+{"file":"src/pages/FileManager.tsx","line":167,"position":"expr","key":"fileManager.kindVoice","value":"Voice","read":true}
+{"file":"src/pages/FileManager.tsx","line":172,"position":"expr","key":"fileManager.visibility.unknown","value":"Unknown","read":true}
+{"file":"src/pages/FileManager.tsx","line":195,"position":"jsx-text","key":"fileManager.sessionLabel","value":"Session","read":true}
+{"file":"src/pages/FileManager.tsx","line":196,"position":"jsx-text","key":"fileManager.agentLabel","value":"Agent","read":true}
+{"file":"src/pages/FileManager.tsx","line":197,"position":"jsx-text","key":"fileManager.visibilityLabel","value":"Visibility","read":true}
+{"file":"src/pages/FileManager.tsx","line":206,"position":"jsx-text","key":"fileManager.outputRefShort","value":"Ref","read":true}
+{"file":"src/pages/FileManager.tsx","line":211,"position":"jsx-text","key":"fileManager.visibility.internal","value":"Internal","read":true}
+{"file":"src/pages/FileManager.tsx","line":216,"position":"jsx-text","key":"fileManager.missing","value":"Missing","read":true}
+{"file":"src/pages/FileManager.tsx","line":243,"position":"jsx-text","key":"fileManager.missing","value":"Missing","read":true}
+{"file":"src/pages/FileManager.tsx","line":259,"position":"expr","key":"fileManager.noFiles","value":"No files found","read":true}
+{"file":"src/pages/FileManager.tsx","line":262,"position":"expr","key":"fileManager.noFilesDesc","value":"No readable files in this folder, or the path is inaccessible.","read":true}
+{"file":"src/pages/FileManager.tsx","line":278,"position":"jsx-text","key":"fileManager.noBridge","value":"IPC Bridge Unavailable","read":true}
+{"file":"src/pages/FileManager.tsx","line":281,"position":"jsx-text","key":"fileManager.noBridgeDesc","value":"File management requires the Electron IPC bridge (window.aegis). This feature is only available inside OpenClaw Desktop.","read":true}
+{"file":"src/pages/FileManager.tsx","line":296,"position":"jsx-text","key":"fileManager.selectFile","value":"Select a file to preview","read":true}
+{"file":"src/pages/FileManager.tsx","line":386,"position":"expr","key":"fileManager.errRead","value":"Failed to load files","read":true}
+{"file":"src/pages/FileManager.tsx","line":433,"position":"expr","key":"fileManager.errUnknown","value":"Unexpected error","read":true}
+{"file":"src/pages/FileManager.tsx","line":545,"position":"jsx-text","key":"fileManager.title","value":"File Manager","read":true}
+{"file":"src/pages/FileManager.tsx","line":560,"position":"jsx-text","key":"fileManager.title","value":"File Manager","read":true}
+{"file":"src/pages/FileManager.tsx","line":573,"position":"jsx-text","key":"fileManager.outputsView","value":"Generated Output Files","read":true}
+{"file":"src/pages/FileManager.tsx","line":585,"position":"jsx-text","key":"fileManager.uploadsView","value":"Uploaded Files","read":true}
+{"file":"src/pages/FileManager.tsx","line":590,"position":"expr","key":"fileManager.outputsDesc","value":"Manage output files and references.","read":true}
+{"file":"src/pages/FileManager.tsx","line":591,"position":"expr","key":"fileManager.uploadsDesc","value":"Manage files you uploaded into managed storage.","read":true}
+{"file":"src/pages/FileManager.tsx","line":597,"position":"jsx-attr","key":"fileManager.refreshHint","value":"Reload the current file list","read":true}
+{"file":"src/pages/FileManager.tsx","line":600,"position":"jsx-text","key":"fileManager.refresh","value":"Refresh List","read":true}
+{"file":"src/pages/FileManager.tsx","line":625,"position":"jsx-attr","key":"fileManager.searchFiles","value":"Search files...","read":true}
+{"file":"src/pages/FileManager.tsx","line":637,"position":"jsx-text","key":"fileManager.sessionOnly","value":"Current Session Only","read":true}
+{"file":"src/pages/FileManager.tsx","line":643,"position":"jsx-text","key":"fileManager.filterAgent","value":"Agent","read":true}
+{"file":"src/pages/FileManager.tsx","line":650,"position":"jsx-text","key":"fileManager.filterAllAgents","value":"All agents","read":true}
+{"file":"src/pages/FileManager.tsx","line":658,"position":"jsx-text","key":"fileManager.filterVisibility","value":"Visibility","read":true}
+{"file":"src/pages/FileManager.tsx","line":665,"position":"jsx-text","key":"fileManager.filterAllVisibility","value":"All visibility","read":true}
+{"file":"src/pages/FileManager.tsx","line":681,"position":"jsx-text","key":"fileManager.filesCount","value":"files","read":true}
+{"file":"src/pages/FileManager.tsx","line":682,"position":"jsx-text","key":"fileManager.filesCount","value":"files","read":true}
+{"file":"src/pages/FileManager.tsx","line":698,"position":"expr","key":"fileManager.noOutputFiles","value":"No generated files yet","read":true}
+{"file":"src/pages/FileManager.tsx","line":699,"position":"expr","key":"fileManager.noUploadFiles","value":"No uploaded files yet","read":true}
+{"file":"src/pages/FileManager.tsx","line":701,"position":"expr","key":"fileManager.noOutputFilesDesc","value":"Output file references will appear here when this lane is enabled.","read":true}
+{"file":"src/pages/FileManager.tsx","line":702,"position":"expr","key":"fileManager.noUploadFilesDesc","value":"Files you upload in chat will appear here for preview and export.","read":true}
+{"file":"src/pages/FileManager.tsx","line":736,"position":"jsx-text","key":"fileManager.reveal","value":"Show in Folder","read":true}
+{"file":"src/pages/FileManager.tsx","line":741,"position":"expr","key":"fileManager.copyPathDone","value":"Path copied","read":true}
+{"file":"src/pages/FileManager.tsx","line":745,"position":"jsx-text","key":"fileManager.copyPath","value":"Copy Path","read":true}
+{"file":"src/pages/FileManager.tsx","line":752,"position":"expr","key":"fileManager.saveAsFailed","value":"Save as failed","read":true}
+{"file":"src/pages/FileManager.tsx","line":755,"position":"expr","key":"fileManager.saveAsDone","value":"Saved to a new location","read":true}
+{"file":"src/pages/FileManager.tsx","line":760,"position":"jsx-text","key":"fileManager.saveAs","value":"Save As","read":true}
+{"file":"src/pages/FileManager.tsx","line":765,"position":"expr","key":"fileManager.deleteOutputFileConfirm","value":"Delete this file from disk? This cannot be undone.","read":true}
+{"file":"src/pages/FileManager.tsx","line":769,"position":"expr","key":"fileManager.deleteFailed","value":"Delete failed","read":true}
+{"file":"src/pages/FileManager.tsx","line":773,"position":"expr","key":"fileManager.deleteOutputFileDone","value":"File deleted","read":true}
+{"file":"src/pages/FileManager.tsx","line":779,"position":"jsx-text","key":"fileManager.deleteOutputFile","value":"Delete File","read":true}
+{"file":"src/pages/FileManager.tsx","line":786,"position":"expr","key":"fileManager.deleteFailed","value":"Delete failed","read":true}
+{"file":"src/pages/FileManager.tsx","line":790,"position":"expr","key":"fileManager.deleteDone","value":"File deleted","read":true}
+{"file":"src/pages/FileManager.tsx","line":795,"position":"jsx-text","key":"fileManager.deleteFile","value":"Delete","read":true}
+{"file":"src/pages/FileManager.tsx","line":803,"position":"jsx-text","key":"fileManager.outputRef","value":"Reference","read":true}
+{"file":"src/pages/FileManager.tsx","line":812,"position":"jsx-text","key":"fileManager.lines","value":"lines","read":true}
+{"file":"src/pages/FileManager.tsx","line":819,"position":"expr","key":"fileManager.missing","value":"Missing","read":true}
+{"file":"src/pages/FileManager.tsx","line":819,"position":"expr","key":"fileManager.exists","value":"Available","read":true}
+{"file":"src/pages/FileManager.tsx","line":854,"position":"jsx-text","key":"fileManager.openInBrowser","value":"Open in Browser","read":true}
+{"file":"src/pages/FileManager.tsx","line":873,"position":"jsx-text","key":"fileManager.missingFileDesc","value":"This file reference no longer points to an existing file.","read":true}
+{"file":"src/pages/FileManager.tsx","line":880,"position":"jsx-text","key":"fileManager.binaryFile","value":"Binary file - cannot preview","read":true}
+{"file":"src/pages/FileManager.tsx","line":887,"position":"jsx-text","key":"fileManager.openExternal","value":"Open in system viewer","read":true}
+{"file":"src/pages/FullAnalytics/components/AgentBreakdownSection.tsx","line":26,"position":"jsx-text","key":"analytics.perAgentBreakdown","value":"Per-Agent Breakdown","read":true}
+{"file":"src/pages/FullAnalytics/components/AgentBreakdownSection.tsx","line":56,"position":"expr","key":"agents.mainAgent","value":"Main Agent","read":true}
+{"file":"src/pages/FullAnalytics/components/AgentBreakdownSection.tsx","line":59,"position":"jsx-text","key":"analytics.percentOfTotal","value":"{{percent}}% of total","read":true}
+{"file":"src/pages/FullAnalytics/components/AgentBreakdownSection.tsx","line":67,"position":"jsx-text","key":"analytics.tokens","value":"Tokens","read":true}
+{"file":"src/pages/FullAnalytics/components/AgentBreakdownSection.tsx","line":73,"position":"jsx-text","key":"analytics.input","value":"Input","read":true}
+{"file":"src/pages/FullAnalytics/components/AgentBreakdownSection.tsx","line":77,"position":"jsx-text","key":"analytics.output","value":"Output","read":true}
+{"file":"src/pages/FullAnalytics/components/AgentBreakdownSection.tsx","line":82,"position":"jsx-text","key":"analytics.cacheReadShort","value":"Cache ↓","read":true}
+{"file":"src/pages/FullAnalytics/components/AgentBreakdownSection.tsx","line":89,"position":"jsx-text","key":"analytics.cost","value":"Cost","read":true}
+{"file":"src/pages/FullAnalytics/components/ByModelSection.tsx","line":28,"position":"jsx-text","key":"analytics.byModel","value":"By Model","read":true}
+{"file":"src/pages/FullAnalytics/components/ByModelSection.tsx","line":37,"position":"jsx-text","key":"analytics.model","value":"Model","read":true}
+{"file":"src/pages/FullAnalytics/components/ByModelSection.tsx","line":40,"position":"jsx-text","key":"analytics.calls","value":"Calls","read":true}
+{"file":"src/pages/FullAnalytics/components/ByModelSection.tsx","line":42,"position":"jsx-text","key":"analytics.input","value":"Input","read":true}
+{"file":"src/pages/FullAnalytics/components/ByModelSection.tsx","line":43,"position":"jsx-text","key":"analytics.output","value":"Output","read":true}
+{"file":"src/pages/FullAnalytics/components/ByModelSection.tsx","line":44,"position":"jsx-text","key":"analytics.cache","value":"Cache","read":true}
+{"file":"src/pages/FullAnalytics/components/ByModelSection.tsx","line":46,"position":"jsx-text","key":"analytics.totalTokens","value":"Total Tokens","read":true}
+{"file":"src/pages/FullAnalytics/components/ByModelSection.tsx","line":49,"position":"jsx-text","key":"analytics.cost","value":"Cost","read":true}
+{"file":"src/pages/FullAnalytics/components/ByModelSection.tsx","line":57,"position":"expr","key":"analytics.unknownModel","value":"Unknown model","read":true}
+{"file":"src/pages/FullAnalytics/components/ChartsSection.tsx","line":48,"position":"jsx-text","key":"analytics.dailyCost","value":"Daily Cost","read":true}
+{"file":"src/pages/FullAnalytics/components/ChartsSection.tsx","line":51,"position":"jsx-text","key":"analytics.dataPoints","value":"{{count}} data points","read":true}
+{"file":"src/pages/FullAnalytics/components/ChartsSection.tsx","line":91,"position":"jsx-attr","key":"analytics.outputCost","value":"Output Cost","read":true}
+{"file":"src/pages/FullAnalytics/components/ChartsSection.tsx","line":101,"position":"jsx-attr","key":"analytics.inputCost","value":"Input Cost","read":true}
+{"file":"src/pages/FullAnalytics/components/ChartsSection.tsx","line":114,"position":"jsx-text","key":"analytics.notEnoughData","value":"Not enough data yet","read":true}
+{"file":"src/pages/FullAnalytics/components/ChartsSection.tsx","line":122,"position":"jsx-text","key":"analytics.inputCost","value":"Input Cost","read":true}
+{"file":"src/pages/FullAnalytics/components/ChartsSection.tsx","line":126,"position":"jsx-text","key":"analytics.outputCost","value":"Output Cost","read":true}
+{"file":"src/pages/FullAnalytics/components/ChartsSection.tsx","line":138,"position":"jsx-text","key":"analytics.costByAgent","value":"Cost by Agent","read":true}
+{"file":"src/pages/FullAnalytics/components/DailyBreakdownTable.tsx","line":43,"position":"jsx-text","key":"analytics.dailyBreakdown","value":"Daily Breakdown","read":true}
+{"file":"src/pages/FullAnalytics/components/DailyBreakdownTable.tsx","line":46,"position":"jsx-text","key":"analytics.days","value":"{{count}} days","read":true}
+{"file":"src/pages/FullAnalytics/components/DailyBreakdownTable.tsx","line":56,"position":"expr","key":"analytics.newest","value":"Newest","read":true}
+{"file":"src/pages/FullAnalytics/components/DailyBreakdownTable.tsx","line":57,"position":"expr","key":"analytics.oldest","value":"Oldest","read":true}
+{"file":"src/pages/FullAnalytics/components/DailyBreakdownTable.tsx","line":65,"position":"jsx-text","key":"analytics.date","value":"Date","read":true}
+{"file":"src/pages/FullAnalytics/components/DailyBreakdownTable.tsx","line":66,"position":"jsx-text","key":"analytics.input","value":"Input","read":true}
+{"file":"src/pages/FullAnalytics/components/DailyBreakdownTable.tsx","line":67,"position":"jsx-text","key":"analytics.output","value":"Output","read":true}
+{"file":"src/pages/FullAnalytics/components/DailyBreakdownTable.tsx","line":68,"position":"jsx-text","key":"analytics.cacheRead","value":"Cache Read","read":true}
+{"file":"src/pages/FullAnalytics/components/DailyBreakdownTable.tsx","line":69,"position":"jsx-text","key":"analytics.cacheWrite","value":"Cache Write","read":true}
+{"file":"src/pages/FullAnalytics/components/DailyBreakdownTable.tsx","line":70,"position":"jsx-text","key":"analytics.totalTokens","value":"Total Tokens","read":true}
+{"file":"src/pages/FullAnalytics/components/DailyBreakdownTable.tsx","line":71,"position":"jsx-text","key":"analytics.cost","value":"Cost","read":true}
+{"file":"src/pages/FullAnalytics/components/DailyBreakdownTable.tsx","line":120,"position":"jsx-text","key":"analytics.days","value":"{{count}} days","read":true}
+{"file":"src/pages/FullAnalytics/components/DailyBreakdownTable.tsx","line":120,"position":"jsx-text","key":"analytics.total","value":"Total","read":true}
+{"file":"src/pages/FullAnalytics/components/DailyBreakdownTable.tsx","line":152,"position":"jsx-text","key":"analytics.showLess","value":"Show less","read":true}
+{"file":"src/pages/FullAnalytics/components/DailyBreakdownTable.tsx","line":156,"position":"jsx-text","key":"analytics.showAll","value":"Show all {{count}} days","read":true}
+{"file":"src/pages/FullAnalytics/components/DateRangePicker.tsx","line":43,"position":"expr","key":"analytics.today","value":"Today","read":true}
+{"file":"src/pages/FullAnalytics/components/DateRangePicker.tsx","line":51,"position":"expr","key":"analytics.last7Days","value":"Last 7 Days","read":true}
+{"file":"src/pages/FullAnalytics/components/DateRangePicker.tsx","line":61,"position":"expr","key":"analytics.thisMonth","value":"This Month","read":true}
+{"file":"src/pages/FullAnalytics/components/DateRangePicker.tsx","line":72,"position":"expr","key":"analytics.last30Days","value":"Last 30 Days","read":true}
+{"file":"src/pages/FullAnalytics/components/DateRangePicker.tsx","line":82,"position":"expr","key":"analytics.last90Days","value":"Last 90 Days","read":true}
+{"file":"src/pages/FullAnalytics/components/DateRangePicker.tsx","line":92,"position":"expr","key":"analytics.allTime","value":"All Time","read":true}
+{"file":"src/pages/FullAnalytics/components/DateRangePicker.tsx","line":134,"position":"jsx-text","key":"analytics.dateRange","value":"Date Range","read":true}
+{"file":"src/pages/FullAnalytics/components/DateRangePicker.tsx","line":189,"position":"jsx-text","key":"analytics.apply","value":"Apply","read":true}
+{"file":"src/pages/FullAnalytics/components/ExportMenu.tsx","line":35,"position":"expr","key":"analytics.export","value":"Export","read":true}
+{"file":"src/pages/FullAnalytics/components/ExportMenu.tsx","line":35,"position":"expr","key":"analytics.copied","value":"Copied!","read":true}
+{"file":"src/pages/FullAnalytics/components/ExportMenu.tsx","line":53,"position":"jsx-text","key":"analytics.downloadCsv","value":"Download CSV","read":true}
+{"file":"src/pages/FullAnalytics/components/ExportMenu.tsx","line":60,"position":"jsx-text","key":"analytics.copySummary","value":"Copy Summary","read":true}
+{"file":"src/pages/FullAnalytics/components/OverviewCards.tsx","line":37,"position":"jsx-attr","key":"analytics.totalCost","value":"Total Cost","read":true}
+{"file":"src/pages/FullAnalytics/components/OverviewCards.tsx","line":52,"position":"jsx-attr","key":"analytics.totalTokens","value":"Total Tokens","read":true}
+{"file":"src/pages/FullAnalytics/components/OverviewCards.tsx","line":66,"position":"jsx-attr","key":"analytics.sessions","value":"Sessions","read":true}
+{"file":"src/pages/FullAnalytics/components/OverviewCards.tsx","line":77,"position":"jsx-attr","key":"analytics.apiCalls","value":"API Calls","read":true}
+{"file":"src/pages/FullAnalytics/components/OverviewCards.tsx","line":88,"position":"jsx-attr","key":"analytics.periodDays","value":"Days of Data","read":true}
+{"file":"src/pages/FullAnalytics/components/TokenBreakdownSection.tsx","line":25,"position":"expr","key":"analytics.inputTokens","value":"Input Tokens","read":true}
+{"file":"src/pages/FullAnalytics/components/TokenBreakdownSection.tsx","line":32,"position":"expr","key":"analytics.outputTokens","value":"Output Tokens","read":true}
+{"file":"src/pages/FullAnalytics/components/TokenBreakdownSection.tsx","line":39,"position":"expr","key":"analytics.cacheRead","value":"Cache Read","read":true}
+{"file":"src/pages/FullAnalytics/components/TokenBreakdownSection.tsx","line":46,"position":"expr","key":"analytics.cacheWrite","value":"Cache Write","read":true}
+{"file":"src/pages/FullAnalytics/components/TokenBreakdownSection.tsx","line":61,"position":"jsx-text","key":"analytics.tokenBreakdown","value":"Token Breakdown","read":true}
+{"file":"src/pages/FullAnalytics/components/TokenBreakdownSection.tsx","line":98,"position":"jsx-text","key":"analytics.tokens","value":"Tokens","read":true}
+{"file":"src/pages/FullAnalytics/components/TokenBreakdownSection.tsx","line":102,"position":"jsx-text","key":"analytics.cost","value":"Cost","read":true}
+{"file":"src/pages/FullAnalytics/components/TokenBreakdownSection.tsx","line":106,"position":"jsx-text","key":"analytics.ofTotal","value":"% of total","read":true}
+{"file":"src/pages/FullAnalytics/components/TokenBreakdownSection.tsx","line":129,"position":"jsx-text","key":"analytics.total","value":"Total","read":true}
+{"file":"src/pages/FullAnalytics/components/TokenBreakdownSection.tsx","line":139,"position":"jsx-text","key":"analytics.cacheSavings","value":"Cache read","read":true}
+{"file":"src/pages/FullAnalytics/components/TokenBreakdownSection.tsx","line":141,"position":"jsx-text","key":"analytics.cacheAtReduced","value":"tokens at reduced rate — significant savings!","read":true}
+{"file":"src/pages/FullAnalytics/helpers.ts","line":116,"position":"expr","key":"analytics.copyTitle","value":"📊 Full Analytics Report","read":true}
+{"file":"src/pages/FullAnalytics/helpers.ts","line":117,"position":"expr","key":"analytics.copyPeriod","value":"Period: {{start}} → {{end}} ({{days}} days)","read":true}
+{"file":"src/pages/FullAnalytics/helpers.ts","line":119,"position":"expr","key":"analytics.copyTotalCost","value":"Total Cost:     {{value}}","read":true}
+{"file":"src/pages/FullAnalytics/helpers.ts","line":120,"position":"expr","key":"analytics.copyTotalTokens","value":"Total Tokens:   {{value}}","read":true}
+{"file":"src/pages/FullAnalytics/helpers.ts","line":121,"position":"expr","key":"analytics.copyInput","value":"  Input:        {{tokens}} ({{cost}})","read":true}
+{"file":"src/pages/FullAnalytics/helpers.ts","line":122,"position":"expr","key":"analytics.copyOutput","value":"  Output:       {{tokens}} ({{cost}})","read":true}
+{"file":"src/pages/FullAnalytics/helpers.ts","line":123,"position":"expr","key":"analytics.copyCacheRead","value":"  Cache Read:   {{tokens}} ({{cost}})","read":true}
+{"file":"src/pages/FullAnalytics/helpers.ts","line":124,"position":"expr","key":"analytics.copyCacheWrite","value":"  Cache Write:  {{tokens}} ({{cost}})","read":true}
+{"file":"src/pages/FullAnalytics/helpers.ts","line":125,"position":"expr","key":"analytics.copySessions","value":"Sessions:       {{count}}","read":true}
+{"file":"src/pages/FullAnalytics/helpers.ts","line":126,"position":"expr","key":"analytics.copyApiCalls","value":"API Calls:      {{count}}","read":true}
+{"file":"src/pages/FullAnalytics/helpers.ts","line":131,"position":"expr","key":"analytics.copyByAgent","value":"By Agent:","read":true}
+{"file":"src/pages/FullAnalytics/helpers.ts","line":136,"position":"expr","key":"analytics.copyByAgentRow","value":"  {{agentId}}: {{tokens}} — {{cost}}","read":true}
+{"file":"src/pages/FullAnalytics/helpers.ts","line":143,"position":"expr","key":"analytics.copyByModel","value":"By Model:","read":true}
+{"file":"src/pages/FullAnalytics/helpers.ts","line":148,"position":"expr","key":"analytics.copyByModelRow","value":"  {{model}}: {{calls}} calls — {{tokens}} — {{cost}}","read":true}
+{"file":"src/pages/FullAnalytics/index.tsx","line":91,"position":"jsx-text","key":"analytics.title","value":"Full Analytics","read":true}
+{"file":"src/pages/FullAnalytics/index.tsx","line":98,"position":"expr","key":"analytics.liveData","value":"Live data — all-time statistics","read":true}
+{"file":"src/pages/FullAnalytics/index.tsx","line":99,"position":"expr","key":"analytics.liveDataFiltered","value":"Live data — filtered range","read":true}
+{"file":"src/pages/FullAnalytics/index.tsx","line":104,"position":"jsx-text","key":"analytics.disconnected","value":"Disconnected — showing cached data","read":true}
+{"file":"src/pages/FullAnalytics/index.tsx","line":110,"position":"jsx-text","key":"analytics.days","value":"{{count}} days","read":true}
+{"file":"src/pages/FullAnalytics/index.tsx","line":132,"position":"jsx-attr","key":"common.refresh","value":"Refresh","read":true}
+{"file":"src/pages/FullAnalytics/index.tsx","line":217,"position":"expr","key":"analytics.noData","value":"No analytics data available yet.","read":true}
+{"file":"src/pages/FullAnalytics/index.tsx","line":218,"position":"expr","key":"analytics.connectFirst","value":"Connect to Gateway to view analytics.","read":true}
+{"file":"src/pages/LogsViewer.tsx","line":155,"position":"jsx-text","key":"logs.noSessionsFound","value":"No sessions found","read":true}
+{"file":"src/pages/McpTools.tsx","line":106,"position":"jsx-text","key":"mcpTools.calls","value":"Calls","read":true}
+{"file":"src/pages/McpTools.tsx","line":117,"position":"jsx-text","key":"mcpTools.success","value":"Success","read":true}
+{"file":"src/pages/McpTools.tsx","line":132,"position":"jsx-text","key":"mcpTools.avg","value":"Avg","read":true}
+{"file":"src/pages/McpTools.tsx","line":201,"position":"expr","key":"mcpTools.unknownToolDesc","value":"Observed in current session","read":true}
+{"file":"src/pages/McpTools.tsx","line":202,"position":"expr","key":"mcpTools.categoryOther","value":"Other","read":true}
+{"file":"src/pages/McpTools.tsx","line":260,"position":"jsx-attr","key":"mcpTools.otherActiveTools","value":"Other Active Tools","read":true}
+{"file":"src/pages/McpTools.tsx","line":306,"position":"jsx-text","key":"mcpTools.comingSoonTitle","value":"MCP Integration — Coming Soon","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":164,"position":"expr","key":"memory.add","value":"Add Memory","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":164,"position":"expr","key":"memory.edit","value":"Edit","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":168,"position":"jsx-attr","key":"memory.contentPlaceholder","value":"Content...","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":171,"position":"jsx-text","key":"memory.category","value":"Category","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":187,"position":"jsx-text","key":"memory.importance","value":"Importance","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":193,"position":"jsx-attr","key":"memory.tagsPlaceholder","value":"Tags (comma separated)","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":197,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":203,"position":"jsx-text","key":"common.save","value":"Save","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":225,"position":"jsx-text","key":"memoryExplorer.title","value":"Memory Explorer","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":227,"position":"jsx-text","key":"memory.experimentalDesc","value":"Browse, search, and manage your agent's memories. Connect to a Memory API server or point to your local workspace folder containing .md files.","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":232,"position":"jsx-text","key":"memory.localOption","value":"Local Files","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":234,"position":"jsx-text","key":"memory.localOptionDesc","value":"Select your workspace folder with MEMORY.md and memory/ files","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":239,"position":"jsx-text","key":"memory.apiOption","value":"API Server","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":241,"position":"jsx-text","key":"memory.apiOptionDesc","value":"Connect to a Memory API server for semantic search and management","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":248,"position":"jsx-text","key":"memory.goToSettings","value":"Enable in Settings","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":287,"position":"jsx-text","key":"memoryExplorer.noMemoriesGraph","value":"No memories to visualize","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":413,"position":"jsx-text","key":"memoryExplorer.noMemoriesTimeline","value":"No memories yet","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":485,"position":"jsx-text","key":"memoryExplorer.noMemoriesCards","value":"No memories found","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":612,"position":"jsx-text","key":"memoryExplorer.importance","value":"importance","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":620,"position":"jsx-text","key":"common.edit","value":"Edit","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":625,"position":"jsx-text","key":"memory.confirmDelete","value":"Confirm Delete","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":630,"position":"jsx-text","key":"common.delete","value":"Delete","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":639,"position":"jsx-text","key":"memoryExplorer.content","value":"Content","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":647,"position":"jsx-text","key":"memoryExplorer.metadata","value":"Metadata","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":650,"position":"expr","key":"memoryExplorer.date","value":"Date","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":651,"position":"expr","key":"memory.category","value":"Category","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":652,"position":"expr","key":"memory.importance","value":"Importance","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":653,"position":"expr","key":"memoryExplorer.tags","value":"Tags","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":666,"position":"jsx-text","key":"memoryExplorer.relatedMemories","value":"Related Memories","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":832,"position":"jsx-attr","key":"memoryExplorer.searchPlaceholder","value":"Search memories...","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":840,"position":"jsx-text","key":"memoryExplorer.enterKey","value":"Enter","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":842,"position":"jsx-text","key":"memoryExplorer.enterToSearch","value":"to search","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":848,"position":"jsx-text","key":"memoryExplorer.catAll","value":"All","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":873,"position":"expr","key":"memoryExplorer.stats.memories","value":"Memories","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":874,"position":"expr","key":"memoryExplorer.stats.tags","value":"Tags","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":890,"position":"jsx-text","key":"memoryExplorer.recent","value":"Recent","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":913,"position":"jsx-text","key":"memoryExplorer.title","value":"Memory Explorer","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":925,"position":"jsx-text","key":"common.add","value":"Add","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":934,"position":"expr","key":"memoryExplorer.graphView","value":"🕸️ Graph","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":935,"position":"expr","key":"memoryExplorer.timelineView","value":"📅 Timeline","read":true}
+{"file":"src/pages/MemoryExplorer.tsx","line":936,"position":"expr","key":"memoryExplorer.cardsView","value":"🗃️ Cards","read":true}
+{"file":"src/pages/MultiAgentView.tsx","line":316,"position":"jsx-text","key":"common.refresh","value":"Refresh","read":true}
+{"file":"src/pages/MultiAgentView.tsx","line":510,"position":"jsx-text","key":"common.loading","value":"Loading...","read":true}
+{"file":"src/pages/PdfPreview.tsx","line":186,"position":"jsx-text","key":"fileManager.openExternal","value":"Open in system viewer","read":true}
+{"file":"src/pages/PdfPreview.tsx","line":197,"position":"jsx-text","key":"fileManager.openExternal","value":"Open in system viewer","read":true}
+{"file":"src/pages/PdfPreview.tsx","line":243,"position":"jsx-text","key":"fileManager.openExternal","value":"Open in system viewer","read":true}
+{"file":"src/pages/SessionManager.tsx","line":81,"position":"expr","key":"dashboard.mainSession","value":"Main Session","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":73,"position":"expr","key":"settings.managedFilesApiUnavailable","value":"Managed files API unavailable in this environment","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":78,"position":"expr","key":"settings.managedFilesListFailed","value":"Could not read the managed files index","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":98,"position":"expr","key":"settings.managedFilesListFailed","value":"Could not read the managed files index","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":147,"position":"jsx-text","key":"settingsExtra.platform","value":"Platform","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":149,"position":"jsx-text","key":"settingsExtra.wsUrlLabel","value":"WebSocket URL","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":150,"position":"jsx-text","key":"settingsExtra.gatewayTokenLabel","value":"Gateway Token","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":151,"position":"expr","key":"connection.disconnected","value":"Disconnected","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":151,"position":"expr","key":"connection.connected","value":"Connected","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":151,"position":"jsx-text","key":"settings.gateway","value":"Gateway","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":155,"position":"expr","key":"common.copied","value":"Copied","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":155,"position":"expr","key":"settingsExtra.copySystemInfo","value":"Copy System Info","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":170,"position":"expr","key":"common.copied","value":"Copied","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":170,"position":"expr","key":"settingsExtra.copySystemInfo","value":"Copy System Info","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":172,"position":"expr","key":"settings.attachmentsOperationFailed","value":"Attachment cleanup failed","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":172,"position":"expr","key":"settingsExtra.copySystemInfo","value":"Copy System Info","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":175,"position":"expr","key":"settings.attachmentsOperationFailed","value":"Attachment cleanup failed","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":175,"position":"expr","key":"settingsExtra.copySystemInfo","value":"Copy System Info","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":184,"position":"expr","key":"settings.managedFilesListFailed","value":"Could not read the managed files index","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":184,"position":"expr","key":"settings.openGatewayLogs","value":"Open gateway logs","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":186,"position":"expr","key":"settings.managedFilesListFailed","value":"Could not read the managed files index","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":186,"position":"expr","key":"settings.openGatewayLogs","value":"Open gateway logs","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":195,"position":"expr","key":"settings.managedFilesListFailed","value":"Could not read the managed files index","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":195,"position":"expr","key":"settings.openDesktopLogs","value":"Open desktop logs","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":206,"position":"expr","key":"settings.managedFilesListFailed","value":"Could not read the managed files index","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":206,"position":"expr","key":"settings.openDesktopLogs","value":"Open desktop logs","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":288,"position":"jsx-text","key":"settings.title","value":"Settings","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":296,"position":"jsx-text","key":"settings.language","value":"Language","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":328,"position":"jsx-text","key":"settings.theme","value":"Theme","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":341,"position":"jsx-text","key":"settings.themeDark","value":"Dark","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":353,"position":"jsx-text","key":"settings.themeLight","value":"Light","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":395,"position":"jsx-text","key":"settings.notifications","value":"Notifications","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":400,"position":"jsx-text","key":"settings.enableNotifications","value":"Enable Notifications","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":401,"position":"jsx-text","key":"settings.notificationsDesc","value":"Desktop notifications when messages arrive","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":410,"position":"jsx-text","key":"settings.sound","value":"Sound","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":412,"position":"jsx-text","key":"settings.soundDesc","value":"Play sound on notification","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":421,"position":"jsx-text","key":"settings.dnd","value":"Do Not Disturb","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":423,"position":"jsx-text","key":"settings.dndDesc","value":"Temporarily mute all notifications","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":429,"position":"expr","key":"settings.testNotification","value":"This is a test notification from OpenClaw Desktop!","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":432,"position":"jsx-text","key":"settings.testSound","value":"Test Notification","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":441,"position":"jsx-text","key":"settings.gateway","value":"Gateway","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":446,"position":"jsx-text","key":"settingsExtra.connectionStatus","value":"Connection Status","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":452,"position":"expr","key":"connection.disconnected","value":"Disconnected","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":452,"position":"expr","key":"connection.connecting","value":"Connecting...","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":452,"position":"expr","key":"connection.connected","value":"Connected","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":460,"position":"jsx-text","key":"settingsExtra.wsUrlLabel","value":"WebSocket URL","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":466,"position":"jsx-attr","key":"settingsExtra.wsUrlPlaceholder","value":"ws://127.0.0.1:18789","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":481,"position":"jsx-text","key":"settingsExtra.gatewayTokenLabel","value":"Gateway Token","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":487,"position":"jsx-attr","key":"settingsExtra.tokenPlaceholder","value":"Optional — for authentication","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":506,"position":"jsx-text","key":"settingsExtra.saveReconnect","value":"Save & Reconnect","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":515,"position":"jsx-text","key":"settings.testConnection","value":"Test Connection","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":523,"position":"jsx-text","key":"connection.reconnect","value":"Reconnect","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":542,"position":"jsx-text","key":"settings.attachmentsTemp","value":"Conversation files","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":545,"position":"jsx-text","key":"settings.attachmentsSectionHint","value":"Same index as File Manager (outputs, uploads, and voice). Delete or open files from the File Manager page.","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":549,"position":"jsx-text","key":"settings.attachmentsCount","value":"Indexed entries","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":553,"position":"jsx-text","key":"settings.attachmentsSize","value":"Estimated size","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":558,"position":"jsx-text","key":"settings.attachmentsSizePartial","value":"~sum from {{loaded}} loaded rows; {{total}} indexed total","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":565,"position":"jsx-text","key":"settings.attachmentsWorkspaceSample","value":"Sample workspace","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":577,"position":"expr","key":"settings.attachmentsReady","value":"Stats refreshed","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":578,"position":"expr","key":"settings.managedFilesListFailed","value":"Could not read the managed files index","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":580,"position":"expr","key":"settings.managedFilesListFailed","value":"Could not read the managed files index","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":594,"position":"expr","key":"settings.refresh","value":"Refresh","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":594,"position":"expr","key":"settings.refreshing","value":"Refreshing…","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":615,"position":"jsx-text","key":"app.clientSubtitle","value":"OpenClaw Desktop Client","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":620,"position":"expr","key":"settingsExtra.platform","value":"Platform","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":621,"position":"expr","key":"settings.gateway","value":"Gateway","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":633,"position":"jsx-text","key":"settingsExtra.copySystemInfo","value":"Copy System Info","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":642,"position":"jsx-text","key":"settings.openGatewayLogs","value":"Open gateway logs","read":true}
+{"file":"src/pages/SettingsPage.tsx","line":648,"position":"jsx-text","key":"settings.openDesktopLogs","value":"Open desktop logs","read":true}
+{"file":"src/pages/SkillsPage/components.tsx","line":138,"position":"jsx-text","key":"skillsExtra.featured","value":"⭐ Featured","read":true}
+{"file":"src/pages/SkillsPage/components.tsx","line":193,"position":"jsx-attr","key":"skills.deleteSkill","value":"Delete skill","read":true}
+{"file":"src/pages/SkillsPage/components.tsx","line":206,"position":"jsx-text","key":"skillsExtra.version","value":"Version","read":true}
+{"file":"src/pages/SkillsPage/components.tsx","line":418,"position":"expr","key":"skillsExtra.downloads","value":"Downloads","read":true}
+{"file":"src/pages/SkillsPage/components.tsx","line":419,"position":"expr","key":"skillsExtra.stars","value":"Stars","read":true}
+{"file":"src/pages/SkillsPage/components.tsx","line":420,"position":"expr","key":"skillsExtra.installs","value":"Installs","read":true}
+{"file":"src/pages/SkillsPage/components.tsx","line":511,"position":"expr","key":"skillsExtra.viewOnClawHub","value":"View on ClawHub","read":true}
+{"file":"src/pages/SkillsPage/components.tsx","line":521,"position":"jsx-text","key":"skillsExtra.requirements","value":"🔧 Requirements","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":837,"position":"expr","key":"skills.clawhubLoginUnavailable","value":"Unable to start the ClawHub login flow. Check that the ClawHub CLI is installed.","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1085,"position":"expr","key":"skills.deleteError","value":"Failed to delete: {{error}}","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1088,"position":"expr","key":"skills.deleteError","value":"Failed to delete: {{error}}","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1148,"position":"expr","key":"skills.skillshubInstallError","value":"SkillHub install failed","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1156,"position":"expr","key":"skills.clawhubInstallFailed","value":"ClawHub install failed","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1195,"position":"jsx-text","key":"skills.title","value":"Skills","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1201,"position":"expr","key":"skills.mySkills","value":"My Skills","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1202,"position":"expr","key":"skills.hubTab","value":"SkillHub","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1203,"position":"expr","key":"skills.clawHubTab","value":"ClawHub","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1239,"position":"expr","key":"skills.installedCount","value":"{{count}} skills installed","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1258,"position":"jsx-text","key":"skills.importLocal","value":"Import Local","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1280,"position":"jsx-text","key":"skills.importFromFolder","value":"From Folder","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1281,"position":"jsx-text","key":"skills.importFromFolderHint","value":"Select a folder containing SKILL.md","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1292,"position":"jsx-text","key":"skills.importFromZip","value":"From ZIP","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1293,"position":"jsx-text","key":"skills.importFromZipHint","value":"Select a zipped skill archive","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1322,"position":"expr","key":"skills.importSuccess","value":"\"{{name}}\" imported — restart Gateway to activate","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1341,"position":"jsx-text","key":"skills.noSkills","value":"No skills installed","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1342,"position":"jsx-text","key":"skills.noSkillsHint","value":"Browse the Marketplace tab to install skills","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1374,"position":"jsx-text","key":"skills.viewBrowse","value":"Browse All Skills","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1385,"position":"jsx-text","key":"skills.viewFeatured","value":"Featured TOP 50","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1397,"position":"jsx-attr","key":"skills.searchPlaceholder","value":"Search skills...","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1413,"position":"jsx-text","key":"skills.skillshubTop50Hint","value":"Official curated list from SkillHub — the most recommended skills","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1428,"position":"jsx-text","key":"skills.noResults","value":"No skills found","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1445,"position":"jsx-text","key":"skills.showingOf","value":"Showing {{shown}} of {{total}} skills","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1457,"position":"jsx-text","key":"skills.loadingMore","value":"Loading…","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1459,"position":"expr","key":"skills.loadMore","value":"Load {{count}} more","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1484,"position":"jsx-attr","key":"skills.searchPlaceholder","value":"Search skills...","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1514,"position":"jsx-text","key":"skills.noResults","value":"No skills found","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1540,"position":"jsx-attr","key":"skills.hubInstall","value":"Install Skill","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1541,"position":"jsx-attr","key":"skills.hubInstalling","value":"Installing…","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1542,"position":"jsx-attr","key":"skills.hubInstallDone","value":"✓ Installed","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1543,"position":"jsx-attr","key":"skills.hubInstallDoneHint","value":"Active on next conversation — no restart needed","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1544,"position":"jsx-attr","key":"skills.hubInstallError","value":"Retry Install","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1546,"position":"expr","key":"skills.clawhubLogin","value":"Sign in to ClawHub","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1554,"position":"expr","key":"skillsExtra.viewOnClawHub","value":"View on ClawHub","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1554,"position":"expr","key":"skills.skillshubOpenSite","value":"Browse SkillHub Website","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1586,"position":"jsx-text","key":"skills.deleteConfirmTitle","value":"Delete \"{{name}}\"?","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1589,"position":"jsx-text","key":"skills.deleteConfirmBody","value":"This will permanently remove the skill files from ~/.openclaw/skills/. The skill will be gone after Gateway restart.","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1599,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1610,"position":"jsx-text","key":"skills.deleteConfirmOk","value":"Delete","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1705,"position":"jsx-text","key":"skills.skillshubCliInstalled","value":"SkillHub CLI ready — installs use Tencent CDN","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1725,"position":"jsx-text","key":"skills.skillshubCliNeeded","value":"Enable China-accelerated installs","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1727,"position":"jsx-text","key":"skills.skillshubCliRequired","value":"SkillHub CLI is required to install skills. Click to auto-install.","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1733,"position":"jsx-text","key":"skills.skillshubCliInstalling","value":"Installing SkillHub CLI…","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1742,"position":"jsx-text","key":"skills.skillshubCliInstall","value":"Auto-Install SkillHub CLI","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1773,"position":"jsx-text","key":"skills.skillshubApiError","value":"SkillHub is only accessible from mainland China networks. Browse the website directly or search ClawHub above.","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1782,"position":"jsx-text","key":"skills.skillshubRetry","value":"Retry","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1789,"position":"jsx-text","key":"skills.skillshubOpenSite","value":"Browse SkillHub Website","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1814,"position":"expr","key":"skills.clawhubAuthChecking","value":"Checking ClawHub login status…","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1816,"position":"expr","key":"skills.clawhubAuthUnavailable","value":"ClawHub CLI login status is currently unavailable.","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1818,"position":"expr","key":"skills.clawhubAuthLoggedIn","value":"Signed in to ClawHub as {{identity}}","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1819,"position":"expr","key":"skills.clawhubAuthLoggedOut","value":"ClawHub is not signed in. Please sign in before installing.","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1846,"position":"jsx-text","key":"skills.clawhubRefreshStatus","value":"Refresh login status","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1854,"position":"jsx-text","key":"skills.clawhubLogin","value":"Sign in to ClawHub","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1878,"position":"jsx-text","key":"skills.clawhubRateLimited","value":"ClawHub is currently rate-limiting requests (429). Retry in {{seconds}}s; if you are not signed in yet, sign in first.","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1882,"position":"expr","key":"skills.clawhubAuthUnavailable","value":"ClawHub CLI login status is currently unavailable.","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1882,"position":"expr","key":"skills.clawhubNeedLoginFirst","value":"The current session is not signed in. This 429 is more likely a missing ClawHub login than a Desktop issue.","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1911,"position":"expr","key":"skills.clawhubApiError","value":"Unable to connect to ClawHub. Check your internet connection.","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1911,"position":"expr","key":"skills.clawhubRateLimited","value":"ClawHub is currently rate-limiting requests (429). Retry in {{seconds}}s; if you are not signed in yet, sign in first.","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1915,"position":"expr","key":"skills.clawhubAuthUnavailable","value":"ClawHub CLI login status is currently unavailable.","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1915,"position":"expr","key":"skills.clawhubNeedLoginFirst","value":"The current session is not signed in. This 429 is more likely a missing ClawHub login than a Desktop issue.","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1926,"position":"expr","key":"skills.skillshubRetry","value":"Retry","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1926,"position":"expr","key":"skills.clawhubRetryIn","value":"Retry in {{seconds}}s","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1933,"position":"jsx-text","key":"skills.clawhubLogin","value":"Sign in to ClawHub","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1941,"position":"jsx-text","key":"skills.clawhubRefreshStatus","value":"Refresh login status","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1962,"position":"expr","key":"skills.groupInstalled","value":"Installed Skills","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1968,"position":"expr","key":"skills.groupExtra","value":"Extra Skills","read":true}
+{"file":"src/pages/SkillsPage/index.tsx","line":1974,"position":"expr","key":"skills.groupBuiltin","value":"Built-In Skills","read":true}
+{"file":"src/pages/TerminalPage/index.tsx","line":291,"position":"jsx-text","key":"terminal.title","value":"Terminal","read":true}
+{"file":"src/pages/TerminalPage/index.tsx","line":293,"position":"jsx-text","key":"terminal.notAvailable","value":"Terminal is only available in the desktop app. The integrated terminal requires Electron and node-pty.","read":true}
+{"file":"src/pages/TerminalPage/index.tsx","line":358,"position":"jsx-text","key":"terminal.empty","value":"No terminal tabs open","read":true}
+{"file":"src/pages/TerminalPage/index.tsx","line":367,"position":"jsx-text","key":"terminal.newTab","value":"New Terminal","read":true}
+{"file":"src/pages/Workshop.tsx","line":75,"position":"expr","key":"workshopExtra.totalTasks","value":"Total Tasks","read":true}
+{"file":"src/pages/Workshop.tsx","line":76,"position":"expr","key":"workshopExtra.inQueue","value":"In Queue","read":true}
+{"file":"src/pages/Workshop.tsx","line":77,"position":"expr","key":"workshopExtra.inProgress","value":"In Progress","read":true}
+{"file":"src/pages/Workshop.tsx","line":78,"position":"expr","key":"workshopExtra.completed","value":"Completed","read":true}
+{"file":"src/pages/Workshop.tsx","line":140,"position":"jsx-text","key":"workshop.progress","value":"Progress","read":true}
+{"file":"src/pages/Workshop.tsx","line":155,"position":"expr","key":"workshopExtra.done","value":"Done","read":true}
+{"file":"src/pages/Workshop.tsx","line":156,"position":"expr","key":"workshopExtra.active","value":"Active","read":true}
+{"file":"src/pages/Workshop.tsx","line":157,"position":"expr","key":"workshopExtra.queue","value":"Queue","read":true}
+{"file":"src/pages/Workshop.tsx","line":234,"position":"expr","key":"workshop.doneUpper","value":"DONE","read":true}
+{"file":"src/pages/Workshop.tsx","line":300,"position":"jsx-text","key":"workshop.queue","value":"Queue","read":true}
+{"file":"src/pages/Workshop.tsx","line":309,"position":"jsx-text","key":"workshop.inProgress","value":"In Progress","read":true}
+{"file":"src/pages/Workshop.tsx","line":318,"position":"jsx-text","key":"workshop.done","value":"Done","read":true}
+{"file":"src/pages/Workshop.tsx","line":359,"position":"jsx-text","key":"workshop.activity.addedTo","value":"added to","read":true}
+{"file":"src/pages/Workshop.tsx","line":360,"position":"jsx-text","key":"workshop.queue","value":"Queue","read":true}
+{"file":"src/pages/Workshop.tsx","line":366,"position":"jsx-text","key":"workshop.activity.movedTo","value":"moved to","read":true}
+{"file":"src/pages/Workshop.tsx","line":373,"position":"jsx-text","key":"workshop.activity.completed","value":"completed","read":true}
+{"file":"src/pages/Workshop.tsx","line":379,"position":"jsx-text","key":"workshop.activity.progress","value":"progress","read":true}
+{"file":"src/pages/Workshop.tsx","line":386,"position":"jsx-text","key":"workshop.activity.deleted","value":"deleted","read":true}
+{"file":"src/pages/Workshop.tsx","line":463,"position":"jsx-text","key":"workshop.newTask","value":"New Task","read":true}
+{"file":"src/pages/Workshop.tsx","line":468,"position":"jsx-attr","key":"workshop.taskTitle","value":"Task title","read":true}
+{"file":"src/pages/Workshop.tsx","line":477,"position":"jsx-attr","key":"workshop.taskDescription","value":"Description (optional)","read":true}
+{"file":"src/pages/Workshop.tsx","line":484,"position":"jsx-text","key":"workshop.priority","value":"Priority","read":true}
+{"file":"src/pages/Workshop.tsx","line":503,"position":"jsx-text","key":"workshop.agent","value":"Agent","read":true}
+{"file":"src/pages/Workshop.tsx","line":506,"position":"jsx-attr","key":"workshop.none","value":"None","read":true}
+{"file":"src/pages/Workshop.tsx","line":516,"position":"jsx-attr","key":"workshop.tagsPlaceholder","value":"tag1, tag2, ...","read":true}
+{"file":"src/pages/Workshop.tsx","line":528,"position":"jsx-text","key":"common.cancel","value":"Cancel","read":true}
+{"file":"src/pages/Workshop.tsx","line":535,"position":"jsx-text","key":"workshop.create","value":"Create","read":true}
+{"file":"src/pages/Workshop.tsx","line":584,"position":"jsx-text","key":"workshop.title","value":"Workshop","read":true}
+{"file":"src/pages/Workshop.tsx","line":587,"position":"jsx-text","key":"workshop.subtitle","value":"Task Management — Queue → In Progress → Done","read":true}
+{"file":"src/pages/Workshop.tsx","line":620,"position":"expr","key":"workshop.filterByPriority","value":"Filter by priority","read":true}
+{"file":"src/pages/Workshop.tsx","line":621,"position":"expr","key":"workshop.showingPriority","value":"Showing: {{p}}","read":true}
+{"file":"src/pages/Workshop.tsx","line":652,"position":"jsx-text","key":"workshop.addTask","value":"New Task","read":true}
+{"file":"src/pages/Workshop.tsx","line":735,"position":"jsx-text","key":"workshop.empty","value":"No tasks","read":true}
+{"file":"src/services/gateway/ChatHandler.ts","line":904,"position":"expr","key":"errors.occurred","value":"An error occurred","read":true}
+{"file":"src/services/gateway/ChatHandler.ts","line":934,"position":"expr","key":"chat.stopped","value":"Stopped","read":true}
+{"file":"src/utils/format.ts","line":18,"position":"expr","key":"format.now","value":"now","read":true}
+{"file":"src/utils/format.ts","line":19,"position":"expr","key":"format.minutesShort","value":"{{n}}m","read":true}
+{"file":"src/utils/format.ts","line":20,"position":"expr","key":"format.hoursShort","value":"{{n}}h","read":true}
+{"file":"src/utils/format.ts","line":21,"position":"expr","key":"format.daysShort","value":"{{n}}d","read":true}
+{"file":"src/utils/format.ts","line":50,"position":"expr","key":"format.lessThanMinute","value":"<1m","read":true}
+{"file":"src/utils/format.ts","line":51,"position":"expr","key":"format.uptimeMinutes","value":"{{n}}m","read":true}
+{"file":"src/utils/format.ts","line":54,"position":"expr","key":"format.uptimeHoursOnly","value":"{{h}}h","read":true}
+{"file":"src/utils/format.ts","line":54,"position":"expr","key":"format.uptimeHoursMinutes","value":"{{h}}h {{m}}m","read":true}

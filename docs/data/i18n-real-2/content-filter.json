@@ -1,0 +1,343 @@
+{
+ "react": [
+  {
+   "repo": "TO-Bus/to-bus-ca",
+   "framework": "react",
+   "sha": "58e0b9163681f06badd8bb8276fa368e3902558c",
+   "locale_files": [
+    "src/i18n/en/locales.json"
+   ],
+   "files_read": 88,
+   "sites_read": 79,
+   "sites_unread": 0,
+   "skips_read": {
+    "dynamic_key": 4
+   },
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "repo": "caudal-labs/caudalflow",
+   "framework": "react",
+   "sha": "c9b030b3a5da77bce689d9193013c76ed7ba20f2",
+   "locale_files": [
+    "src/i18n/locales/en.json"
+   ],
+   "files_read": 63,
+   "sites_read": 115,
+   "sites_unread": 0,
+   "skips_read": {
+    "dynamic_key": 20,
+    "key_not_found": 28,
+    "multi_line": 1
+   },
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "repo": "PepperKUN/plasticity-radial-menu-editor",
+   "framework": "react",
+   "sha": "83876d7b3b22966c08b6e91cd67f3ce933d65b67",
+   "locale_files": [],
+   "pass": false,
+   "why": "no_english_json"
+  },
+  {
+   "repo": "EmmaStoneX/NetPulse",
+   "framework": "react",
+   "sha": "39612e4245e4679b4863e90b519572262d9493a4",
+   "locale_files": [
+    "locales/en/translation.json"
+   ],
+   "files_read": 38,
+   "sites_read": 115,
+   "sites_unread": 0,
+   "skips_read": {
+    "dynamic_key": 1,
+    "key_not_found": 1
+   },
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "repo": "jjsvs/Hashcat-Reactor",
+   "framework": "react",
+   "sha": "53261c1a2d3c7433d91ac05fb6d130dffd69eb0a",
+   "locale_files": [],
+   "pass": false,
+   "why": "no_english_json"
+  },
+  {
+   "repo": "wzdavid/openclaw-desktop",
+   "framework": "react",
+   "sha": "cbb43f8d4ab5c934d83b075a03129af17261a7fd",
+   "locale_files": [
+    "src/locales/en.json"
+   ],
+   "files_read": 159,
+   "sites_read": 1148,
+   "sites_unread": 0,
+   "skips_read": {
+    "dynamic_key": 38,
+    "key_not_found": 99,
+    "multi_line": 11,
+    "unwritable": 1
+   },
+   "pass": true,
+   "why": "ok"
+  }
+ ],
+ "vue": [
+  {
+   "repo": "WTWB-none/void",
+   "framework": "vue",
+   "sha": "203865a74e7624428b49bf8643b52a1730282409",
+   "locale_files": [
+    "src/locales/en.json"
+   ],
+   "files_read": 176,
+   "sites_read": 51,
+   "sites_unread": 0,
+   "skips_read": {
+    "key_not_found": 1
+   },
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "repo": "nineaiyu/xadmin-client",
+   "framework": "vue",
+   "sha": "cd13b75ee3882ece66006dd28f22c093bac01597",
+   "locale_files": [],
+   "pass": false,
+   "why": "no_english_json"
+  },
+  {
+   "repo": "huchenlei/sd-webui-openpose-editor",
+   "framework": "vue",
+   "sha": "0026f453f9ac9b7dec64129d2f2b83b04030c645",
+   "locale_files": [],
+   "pass": false,
+   "why": "no_english_json"
+  },
+  {
+   "repo": "FlowCI/flow-web-x",
+   "framework": "vue",
+   "sha": "611a61c8130537787a08459185b664926d8d4f0d",
+   "locale_files": [],
+   "pass": false,
+   "why": "no_english_json"
+  },
+  {
+   "repo": "xingrz/GerberViewer",
+   "framework": "vue",
+   "sha": "b387ac16f117eef5d90ab5ddc51cc03cfab9c137",
+   "locale_files": [],
+   "pass": false,
+   "why": "no_english_json"
+  },
+  {
+   "repo": "taovc/pr-cockpit",
+   "framework": "vue",
+   "sha": "f4da887231459fbbb0930ed25903d9b5d775700d",
+   "locale_files": [
+    "i18n/locales/en.json"
+   ],
+   "files_read": 889,
+   "sites_read": 688,
+   "sites_unread": 0,
+   "skips_read": {
+    "dynamic_key": 45,
+    "newline": 2
+   },
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "repo": "pa001024/riven-mirror",
+   "framework": "vue",
+   "sha": "71cdb9198f37224116832570eb4f5193f2688628",
+   "locale_files": [
+    "src/i18n/lang/en.json"
+   ],
+   "files_read": 144,
+   "sites_read": 440,
+   "sites_unread": 0,
+   "skips_read": {
+    "dynamic_key": 83,
+    "key_not_found": 21,
+    "multi_line": 1,
+    "unwritable": 2
+   },
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "repo": "telosnetwork/teloscan",
+   "framework": "vue",
+   "sha": "ae149542f28ed20989c937e7bac2f73b4592a521",
+   "locale_files": [],
+   "pass": false,
+   "why": "no_english_json"
+  },
+  {
+   "repo": "ConorSheehan1/spelling-bee",
+   "framework": "vue",
+   "sha": "56e0e1a4e5eaa2fafdb5c98de90d97679772802f",
+   "locale_files": [
+    "src/locales/en.json"
+   ],
+   "files_read": 19,
+   "sites_read": 32,
+   "sites_unread": 0,
+   "skips_read": {
+    "dynamic_key": 3
+   },
+   "pass": false,
+   "why": "too_few_sites"
+  },
+  {
+   "repo": "liaoqifeng/fex-wallet-app",
+   "framework": "vue",
+   "sha": "330e04d3557403364ce0c40d8e50a059a9ab0155",
+   "locale_files": [],
+   "pass": false,
+   "why": "no_english_json"
+  },
+  {
+   "repo": "Luzifer/password",
+   "framework": "vue",
+   "sha": "062c53b8b4c7716ec94a05c9764563bfd871cc17",
+   "locale_files": [
+    "src/i18n/en.json"
+   ],
+   "files_read": 8,
+   "sites_read": 20,
+   "sites_unread": 0,
+   "skips_read": {},
+   "pass": false,
+   "why": "too_few_sites"
+  },
+  {
+   "repo": "apache/echarts-handbook",
+   "framework": "vue",
+   "sha": "27e5d82c72bfe0ee5ec6e1cb9c3cee8971f9da50",
+   "locale_files": [],
+   "pass": false,
+   "why": "no_english_json"
+  },
+  {
+   "repo": "ldang264/vue-cron-generator",
+   "framework": "vue",
+   "sha": "14643521eb8b792d36eaeec8c05ea8e07282b5f1",
+   "locale_files": [],
+   "pass": false,
+   "why": "no_english_json"
+  },
+  {
+   "repo": "AndySkaura/crosssubtitle-ai",
+   "framework": "vue",
+   "sha": "6520e49066b70698bec4df966e1ab5f7c5a83a19",
+   "locale_files": [],
+   "pass": false,
+   "why": "no_english_json"
+  },
+  {
+   "repo": "NeverBehave/Motivation",
+   "framework": "vue",
+   "sha": "a98e7df538c8ff2b7bcd3118325eea7b90b9ca67",
+   "locale_files": [],
+   "pass": false,
+   "why": "no_english_json"
+  },
+  {
+   "repo": "omvjro/DOL-pancake",
+   "framework": "vue",
+   "sha": "7f6c2d25a2fcbd9014b88ce71eec401671dec2a7",
+   "locale_files": [
+    "src/locales/en.json"
+   ],
+   "files_read": 25,
+   "sites_read": 113,
+   "sites_unread": 0,
+   "skips_read": {
+    "key_not_found": 2,
+    "dynamic_key": 13,
+    "unwritable": 2
+   },
+   "pass": true,
+   "why": "ok"
+  }
+ ],
+ "html": [
+  {
+   "repo": "lmachens/sons-of-the-forest-map",
+   "framework": "html",
+   "sha": "03fa2370ed1bf95ea628332c357f43012524ab43",
+   "locale_files": [],
+   "pass": false,
+   "why": "no_english_json"
+  },
+  {
+   "repo": "chenyuan33/chenyuan33.github.io",
+   "framework": "html",
+   "sha": "a1d5bbe4a94f7132fdc3b8762aaf43694e9429c0",
+   "locale_files": [],
+   "pass": false,
+   "why": "no_english_json"
+  },
+  {
+   "repo": "LANGTAOSHA-prog/ZenTools",
+   "framework": "html",
+   "sha": "23aa0f29aead69da2bd7b9e22843996183bd1ee6",
+   "locale_files": [],
+   "pass": false,
+   "why": "no_english_json"
+  },
+  {
+   "repo": "joeartsea/node-red-contrib-ftp",
+   "framework": "html",
+   "sha": "5b730adf7229ea82914330525c85c05b0e08b5de",
+   "locale_files": [
+    "locales/en-US/ftp.json",
+    "locales/en-US/sftp.json"
+   ],
+   "files_read": 7,
+   "sites_read": 41,
+   "sites_unread": 0,
+   "skips_read": {},
+   "pass": true,
+   "why": "ok"
+  },
+  {
+   "repo": "nitr0yukkuri/githubplanet",
+   "framework": "html",
+   "sha": "b268cb244d6f8909c8b377859f8dbaa2917ac8ba",
+   "locale_files": [],
+   "pass": false,
+   "why": "no_english_json"
+  },
+  {
+   "repo": "barissurkit/barissurkit.com",
+   "framework": "html",
+   "sha": "8d1b28883bbc04bd2f95495b9ebb61c1c8f3e62b",
+   "locale_files": [],
+   "pass": false,
+   "why": "no_english_json"
+  },
+  {
+   "repo": "MEDELBOU3/SM4movies.v2.0.0",
+   "framework": "html",
+   "sha": "fba8a3c3bcfc88a14e431c7d7fbc144fc664de3e",
+   "locale_files": [
+    "locales/en.json"
+   ],
+   "files_read": 21,
+   "sites_read": 0,
+   "sites_unread": 0,
+   "skips_read": {},
+   "pass": false,
+   "why": "too_few_sites"
+  }
+ ]
+}

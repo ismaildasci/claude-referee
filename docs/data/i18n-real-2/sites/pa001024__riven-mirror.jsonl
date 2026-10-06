@@ -1,0 +1,440 @@
+{"file":"src/App.vue","line":48,"position":"vue-attr","key":"update.title","value":"Update Info","read":true}
+{"file":"src/App.vue","line":52,"position":"vue-binding","key":"zh","value":"","read":true}
+{"file":"src/App.vue","line":56,"position":"vue-text","key":"update.confirm","value":"I know","read":true}
+{"file":"src/components/AmpBuilder.vue","line":4,"position":"vue-text","key":"amp.selectPrism","value":"SELECT PRISM","read":true}
+{"file":"src/components/AmpBuilder.vue","line":17,"position":"vue-text","key":"amp.selectScaffold","value":"SELECT SCAFFOLD","read":true}
+{"file":"src/components/AmpBuilder.vue","line":30,"position":"vue-text","key":"amp.selectBrace","value":"SELECT BRACE","read":true}
+{"file":"src/components/AmpBuilder.vue","line":39,"position":"vue-text","key":"modular.critChance","value":"Crit chance","read":true}
+{"file":"src/components/AmpBuilder.vue","line":40,"position":"vue-text","key":"modular.status","value":"Status","read":true}
+{"file":"src/components/AmpBuilder.vue","line":41,"position":"vue-text","key":"modular.magazine","value":"Magazine","read":true}
+{"file":"src/components/AmpBuilder.vue","line":42,"position":"vue-text","key":"modular.reloadDelay","value":"Reload delay","read":true}
+{"file":"src/components/AmpBuilder.vue","line":43,"position":"vue-text","key":"modular.reloadSpeed","value":"Reload speed","read":true}
+{"file":"src/components/AmpBuilder.vue","line":50,"position":"vue-text","key":"amp.buildName","value":"BUILD NAME","read":true}
+{"file":"src/components/AmpBuilder.vue","line":53,"position":"vue-text","key":"amp.prism","value":"Prism","read":true}
+{"file":"src/components/AmpBuilder.vue","line":56,"position":"vue-text","key":"amp.scaffold","value":"Scaffold","read":true}
+{"file":"src/components/AmpBuilder.vue","line":59,"position":"vue-text","key":"amp.brace","value":"Brace","read":true}
+{"file":"src/components/AmpBuilder.vue","line":68,"position":"vue-text","key":"modular.fireRate","value":"Fire rate","read":true}
+{"file":"src/components/AmpBuilder.vue","line":71,"position":"vue-text","key":"modular.critDamage","value":"Crit damage","read":true}
+{"file":"src/components/AmpBuilder.vue","line":74,"position":"vue-text","key":"modular.critChance","value":"Crit chance","read":true}
+{"file":"src/components/AmpBuilder.vue","line":77,"position":"vue-text","key":"modular.status","value":"Status","read":true}
+{"file":"src/components/AmpBuilder.vue","line":80,"position":"vue-text","key":"modular.magazine","value":"Magazine","read":true}
+{"file":"src/components/AmpBuilder.vue","line":83,"position":"vue-text","key":"modular.reloadSpeed","value":"Reload speed","read":true}
+{"file":"src/components/AmpBuilder.vue","line":86,"position":"vue-text","key":"modular.reloadDelay","value":"Reload delay","read":true}
+{"file":"src/components/AmpBuilder.vue","line":89,"position":"vue-text","key":"modular.rangeLimit","value":"Range limit","read":true}
+{"file":"src/components/AmpBuilder.vue","line":91,"position":"vue-text","key":"modular.finish","value":"Finish","read":true}
+{"file":"src/components/BuffSelector.vue","line":55,"position":"expr","key":"buff.types.arcane","value":"ARCANE","read":true}
+{"file":"src/components/BuffSelector.vue","line":56,"position":"expr","key":"buff.types.baseDamage","value":"BASE DAMAGE","read":true}
+{"file":"src/components/BuffSelector.vue","line":57,"position":"expr","key":"buff.types.totalDamage","value":"TOTAL DAMAGE","read":true}
+{"file":"src/components/BuffSelector.vue","line":58,"position":"expr","key":"buff.types.elementDamage","value":"ELEMENT DAMAGE","read":true}
+{"file":"src/components/BuffSelector.vue","line":59,"position":"expr","key":"buff.types.critDamage","value":"CRIT DAMAGE","read":true}
+{"file":"src/components/BuffSelector.vue","line":60,"position":"expr","key":"buff.types.speed","value":"SPEED","read":true}
+{"file":"src/components/BuffSelector.vue","line":61,"position":"expr","key":"buff.types.other","value":"OTHER","read":true}
+{"file":"src/components/BuffSelector.vue","line":67,"position":"expr","key":"buff.types.arcane","value":"ARCANE","read":true}
+{"file":"src/components/BuffSelector.vue","line":68,"position":"expr","key":"buff.types.team","value":"TEAM","read":true}
+{"file":"src/components/BuffSelector.vue","line":69,"position":"expr","key":"buff.types.other","value":"OTHER","read":true}
+{"file":"src/components/BuildMinimap.vue","line":31,"position":"vue-text","key":"build.fireRate","value":"Fire Rate","read":true}
+{"file":"src/components/BuildMinimap.vue","line":35,"position":"vue-text","key":"build.crit","value":"Crit","read":true}
+{"file":"src/components/BuildMinimap.vue","line":39,"position":"vue-text","key":"build.proc","value":"Proc","read":true}
+{"file":"src/components/BuildMinimap.vue","line":99,"position":"expr","key":"otherinfo.wikiurl","value":"https://warframe.fandom.com/wiki/{0}","read":true}
+{"file":"src/components/BuildMinimap.vue","line":106,"position":"expr","key":"otherinfo.wikiurl","value":"https://warframe.fandom.com/wiki/{0}","read":true}
+{"file":"src/components/CopyText.vue","line":4,"position":"vue-text","key":"app.copy","value":"COPY","read":true}
+{"file":"src/components/CopyText.vue","line":22,"position":"expr","key":"app.copySuccess","value":"URL COPIED","read":true}
+{"file":"src/components/EnemyTimeline.vue","line":5,"position":"vue-text","key":"timeline.chart","value":"CHART","read":true}
+{"file":"src/components/EnemyTimeline.vue","line":12,"position":"vue-text","key":"timeline.table","value":"TABLE","read":true}
+{"file":"src/components/EnemyTimeline.vue","line":16,"position":"vue-text","key":"timeline.time","value":"TIME","read":true}
+{"file":"src/components/EnemyTimeline.vue","line":17,"position":"vue-text","key":"timeline.ammo","value":"AMMO","read":true}
+{"file":"src/components/EnemyTimeline.vue","line":17,"position":"vue-text","key":"timeline.hit","value":"DMG","read":true}
+{"file":"src/components/EnemyTimeline.vue","line":18,"position":"vue-text","key":"timeline.dot","value":"DoT DMG","read":true}
+{"file":"src/components/EnemyTimeline.vue","line":19,"position":"vue-text","key":"timeline.hp","value":"HP","read":true}
+{"file":"src/components/EnemyTimeline.vue","line":20,"position":"vue-text","key":"timeline.ar","value":"ARMOR","read":true}
+{"file":"src/components/EnemyTimeline.vue","line":119,"position":"expr","key":"timeline.reload","value":"RELOAD","read":true}
+{"file":"src/components/EnemyTimeline.vue","line":121,"position":"expr","key":"timeline.dead","value":"DEAD","read":true}
+{"file":"src/components/EnemyTimeline.vue","line":170,"position":"expr","key":"timeline.hp","value":"HP","read":true}
+{"file":"src/components/EnemyTimeline.vue","line":186,"position":"expr","key":"timeline.dot","value":"DoT DMG","read":true}
+{"file":"src/components/EnemyTimeline.vue","line":198,"position":"expr","key":"timeline.hit","value":"DMG","read":true}
+{"file":"src/components/EnemyTimeline.vue","line":210,"position":"expr","key":"timeline.ar","value":"ARMOR","read":true}
+{"file":"src/components/infobox/WeaponInfobox.vue","line":19,"position":"vue-text","key":"build.damage","value":"Damage","read":true}
+{"file":"src/components/infobox/WeaponInfobox.vue","line":32,"position":"vue-text","key":"build.fireRate","value":"Fire Rate","read":true}
+{"file":"src/components/infobox/WeaponInfobox.vue","line":36,"position":"vue-text","key":"build.crit","value":"Crit","read":true}
+{"file":"src/components/infobox/WeaponInfobox.vue","line":40,"position":"vue-text","key":"build.proc","value":"Proc","read":true}
+{"file":"src/components/infobox/WeaponInfobox.vue","line":44,"position":"vue-text","key":"build.ratio","value":"Ratio","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":4,"position":"vue-attr","key":"kitgun.selectChamber","value":"SELECT CHAMBER","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":5,"position":"vue-attr","key":"kitgun.selectGrip","value":"SELECT GRIP","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":6,"position":"vue-attr","key":"kitgun.selectLoader","value":"SELECT LOADER","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":36,"position":"vue-text","key":"modular.fireRate","value":"Fire rate","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":37,"position":"vue-text","key":"modular.damage","value":"Damage","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":53,"position":"vue-text","key":"modular.critDamage","value":"Crit damage","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":54,"position":"vue-text","key":"modular.critChance","value":"Crit chance","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":55,"position":"vue-text","key":"modular.status","value":"Status","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":56,"position":"vue-text","key":"modular.reload","value":"Reload","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":57,"position":"vue-text","key":"modular.magazine","value":"Magazine","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":64,"position":"vue-text","key":"kitgun.chamber","value":"Chamber","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":67,"position":"vue-text","key":"kitgun.grip","value":"Grip","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":70,"position":"vue-text","key":"kitgun.loader","value":"Loader","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":74,"position":"vue-text","key":"modular.damage","value":"Damage","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":77,"position":"vue-text","key":"build.ratio","value":"Ratio","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":85,"position":"vue-text","key":"modular.rangeLimit","value":"Range limit","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":88,"position":"vue-text","key":"modular.fireRate","value":"Fire rate","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":91,"position":"vue-text","key":"modular.status","value":"Status","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":94,"position":"vue-text","key":"modular.critDamage","value":"Crit damage","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":97,"position":"vue-text","key":"modular.critChance","value":"Crit chance","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":100,"position":"vue-text","key":"modular.magazine","value":"Magazine","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":103,"position":"vue-text","key":"modular.reload","value":"Reload","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":105,"position":"vue-text","key":"modular.lastStep","value":"Last step","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":110,"position":"vue-binding","key":"modular.nextStep","value":"Next step","read":true}
+{"file":"src/components/KitgunBuilder.vue","line":110,"position":"vue-binding","key":"modular.finish","value":"Finish","read":true}
+{"file":"src/components/LeveledModSlot.vue","line":15,"position":"vue-text","key":"build.total","value":"Total","read":true}
+{"file":"src/components/MiniClock.vue","line":4,"position":"vue-text","key":"reminder.title","value":"PLAIN TIME REMINDER","read":true}
+{"file":"src/components/MiniClock.vue","line":12,"position":"vue-text","key":"time.night","value":"Night","read":true}
+{"file":"src/components/MiniClock.vue","line":16,"position":"vue-text","key":"reminder.settingPrefix","value":"Remind me","read":true}
+{"file":"src/components/MiniClock.vue","line":18,"position":"vue-text","key":"reminder.settingSubfix","value":"minutes early","read":true}
+{"file":"src/components/MiniClock.vue","line":22,"position":"vue-text","key":"time.cetus","value":"Cetus","read":true}
+{"file":"src/components/MiniClock.vue","line":31,"position":"vue-text","key":"time.fortuna","value":"Fortuna","read":true}
+{"file":"src/components/MiniClock.vue","line":47,"position":"vue-text","key":"time.earth","value":"Earth","read":true}
+{"file":"src/components/MiniClock.vue","line":141,"position":"expr","key":"reminder.permissionDenied","value":"Notification permission is denied, cannot be displayed properly","read":true}
+{"file":"src/components/MoaBuilder.vue","line":36,"position":"vue-text","key":"modular.health","value":"Health","read":true}
+{"file":"src/components/MoaBuilder.vue","line":37,"position":"vue-text","key":"modular.shield","value":"Shield","read":true}
+{"file":"src/components/MoaBuilder.vue","line":38,"position":"vue-text","key":"modular.armor","value":"Armor","read":true}
+{"file":"src/components/MoaBuilder.vue","line":54,"position":"vue-text","key":"modular.health","value":"Health","read":true}
+{"file":"src/components/MoaBuilder.vue","line":55,"position":"vue-text","key":"modular.shield","value":"Shield","read":true}
+{"file":"src/components/MoaBuilder.vue","line":56,"position":"vue-text","key":"modular.armor","value":"Armor","read":true}
+{"file":"src/components/MoaBuilder.vue","line":96,"position":"vue-text","key":"modular.health","value":"Health","read":true}
+{"file":"src/components/MoaBuilder.vue","line":99,"position":"vue-text","key":"modular.shield","value":"Shield","read":true}
+{"file":"src/components/MoaBuilder.vue","line":102,"position":"vue-text","key":"modular.armor","value":"Armor","read":true}
+{"file":"src/components/MoaBuilder.vue","line":106,"position":"vue-text","key":"modular.lastStep","value":"Last step","read":true}
+{"file":"src/components/MoaBuilder.vue","line":111,"position":"vue-binding","key":"modular.nextStep","value":"Next step","read":true}
+{"file":"src/components/MoaBuilder.vue","line":111,"position":"vue-binding","key":"modular.finish","value":"Finish","read":true}
+{"file":"src/components/ModSelector.vue","line":6,"position":"vue-text","key":"modselector.fastSelect","value":"FAST SELECT","read":true}
+{"file":"src/components/ModSelector.vue","line":33,"position":"vue-text","key":"modselector.rivenMod","value":"RIVEN MOD","read":true}
+{"file":"src/components/ModSelector.vue","line":42,"position":"vue-text","key":"modselector.createRiven","value":"New Riven:","read":true}
+{"file":"src/components/ModSelector.vue","line":45,"position":"vue-text","key":"modselector.ok","value":"OK","read":true}
+{"file":"src/components/ModSelector.vue","line":199,"position":"expr","key":"modselector.weaponWarn","value":"WARNING","read":true}
+{"file":"src/components/ModSelector.vue","line":199,"position":"expr","key":"modselector.weaponWarnTip","value":"Chosen riven is not available for this weapon (you may choose wrong weapon), confirm operation?","read":true}
+{"file":"src/components/ModSelector.vue","line":234,"position":"expr","key":"modselector.tank","value":"Tank","read":true}
+{"file":"src/components/ModSelector.vue","line":239,"position":"expr","key":"modselector.other","value":"OTHER","read":true}
+{"file":"src/components/ModSelector.vue","line":252,"position":"expr","key":"modselector.common","value":"COMMON","read":true}
+{"file":"src/components/ModSelector.vue","line":255,"position":"expr","key":"modselector.other","value":"OTHER","read":true}
+{"file":"src/components/ModSelector.vue","line":269,"position":"expr","key":"modselector.sorted","value":"SORTED","read":true}
+{"file":"src/components/ModSelector.vue","line":278,"position":"expr","key":"modselector.damage","value":"DAMAGE","read":true}
+{"file":"src/components/ModSelector.vue","line":281,"position":"expr","key":"modselector.element","value":"ELEMENT","read":true}
+{"file":"src/components/ModSelector.vue","line":284,"position":"expr","key":"modselector.speed","value":"SPEED","read":true}
+{"file":"src/components/ModSelector.vue","line":289,"position":"expr","key":"modselector.other","value":"OTHER","read":true}
+{"file":"src/components/ModSelector.vue","line":306,"position":"expr","key":"modselector.ability","value":"Ability","read":true}
+{"file":"src/components/ModSelector.vue","line":311,"position":"expr","key":"modselector.tank","value":"Tank","read":true}
+{"file":"src/components/ModSelector.vue","line":316,"position":"expr","key":"modselector.speed","value":"SPEED","read":true}
+{"file":"src/components/ModSelector.vue","line":321,"position":"expr","key":"modselector.other","value":"OTHER","read":true}
+{"file":"src/components/ModSlot.vue","line":11,"position":"vue-text","key":"build.total","value":"Total","read":true}
+{"file":"src/components/OtherInfoDisplay.vue","line":8,"position":"vue-text","key":"otherinfo.wiki","value":"WIKI","read":true}
+{"file":"src/components/OtherInfoDisplay.vue","line":18,"position":"vue-text","key":"otherinfo.wm","value":"warframe.market","read":true}
+{"file":"src/components/OtherInfoDisplay.vue","line":31,"position":"vue-text","key":"otherinfo.wiki","value":"WIKI","read":true}
+{"file":"src/components/OtherInfoDisplay.vue","line":36,"position":"vue-text","key":"otherinfo.wm","value":"warframe.market","read":true}
+{"file":"src/components/OtherInfoDisplay.vue","line":58,"position":"expr","key":"otherinfo.wikiurl","value":"https://warframe.fandom.com/wiki/{0}","read":true}
+{"file":"src/components/OtherInfoDisplay.vue","line":71,"position":"expr","key":"otherinfo.wikiurl","value":"https://warframe.fandom.com/wiki/{0}","read":true}
+{"file":"src/components/ProbabilityVisualization.tsx","line":78,"position":"expr","key":"build.provislabel0","value":"{0} crit-level","read":true}
+{"file":"src/components/RivenEditor.vue","line":12,"position":"vue-attr","key":"rivenedit.selectWeapon","value":"Input weapon name","read":true}
+{"file":"src/components/RivenEditor.vue","line":23,"position":"vue-text","key":"rivenedit.isNegative","value":"Negative","read":true}
+{"file":"src/components/RivenEditor.vue","line":37,"position":"vue-binding","key":"rivenedit.selectProp","value":"Select prop","read":true}
+{"file":"src/components/RivenEditor.vue","line":50,"position":"vue-attr","key":"rivenedit.inputValue","value":"Input value","read":true}
+{"file":"src/components/RivenEditor.vue","line":78,"position":"vue-attr","key":"setting.legacyrivenTip","value":"Use old riven editor using text input","read":true}
+{"file":"src/components/RivenEditor.vue","line":154,"position":"expr","key":"zh","value":"","read":true}
+{"file":"src/components/RivenEditor.vue","line":155,"position":"expr","key":"zh","value":"","read":true}
+{"file":"src/components/RivenPrice.vue","line":4,"position":"vue-attr","key":"riven.viewprice","value":"View Price","read":true}
+{"file":"src/components/ShareQR.vue","line":8,"position":"vue-text","key":"riven.sharetip","value":"Scan or Paste on page","read":true}
+{"file":"src/components/StatusInfoDisplay.vue","line":5,"position":"vue-text","key":"statusinfo.total","value":"Total","read":true}
+{"file":"src/components/VisualSkill.vue","line":12,"position":"vue-attr","key":"ability.base","value":"BASE","read":true}
+{"file":"src/components/VisualSkill.vue","line":13,"position":"vue-attr","key":"ability.oneHand","value":"ONE HAND","read":true}
+{"file":"src/components/VisualSkill.vue","line":15,"position":"vue-attr","key":"ability.type","value":"TAG","read":true}
+{"file":"src/components/VisualSkill.vue","line":17,"position":"vue-attr","key":"ability.types.damage","value":"Damage","read":true}
+{"file":"src/components/VisualSkill.vue","line":18,"position":"vue-attr","key":"ability.types.buffDebuff","value":"Additional effect","read":true}
+{"file":"src/components/VisualSkill.vue","line":19,"position":"vue-attr","key":"ability.types.mobility","value":"Mobility","read":true}
+{"file":"src/components/VisualSkill.vue","line":20,"position":"vue-attr","key":"ability.types.perception","value":"Perception","read":true}
+{"file":"src/components/VisualSkill.vue","line":21,"position":"vue-attr","key":"ability.types.control","value":"Control","read":true}
+{"file":"src/components/VisualSkill.vue","line":22,"position":"vue-attr","key":"ability.types.summon","value":"Summon","read":true}
+{"file":"src/components/VisualSkill.vue","line":29,"position":"vue-attr","key":"ability.effects.damage","value":"Damage","read":true}
+{"file":"src/components/VisualSkill.vue","line":49,"position":"vue-attr","key":"ability.effects.buff","value":"Buff","read":true}
+{"file":"src/components/VisualSkill.vue","line":60,"position":"vue-attr","key":"ability.effects.debuff","value":"Debuff","read":true}
+{"file":"src/components/VisualSkill.vue","line":71,"position":"vue-attr","key":"ability.effects.summon","value":"Summon","read":true}
+{"file":"src/components/VisualSkill.vue","line":81,"position":"vue-attr","key":"ability.effects.damageReduce","value":"Damage reduce","read":true}
+{"file":"src/components/VisualSkill.vue","line":89,"position":"vue-attr","key":"ability.effects.control","value":"Control","read":true}
+{"file":"src/components/VisualSkill.vue","line":97,"position":"vue-attr","key":"ability.effects.special","value":"Special","read":true}
+{"file":"src/components/VisualSkill.vue","line":109,"position":"vue-attr","key":"ability.effects.move","value":"Move","read":true}
+{"file":"src/components/VisualSkill.vue","line":121,"position":"vue-attr","key":"ability.effects.exaltedWeapon","value":"Exalted weapon","read":true}
+{"file":"src/components/WarframeSelector.vue","line":22,"position":"vue-text","key":"warframeselector.companion","value":"COMPANION","read":true}
+{"file":"src/components/WarframeSelector.vue","line":99,"position":"expr","key":"warframeselector.notfound","value":"Can not find special warframe","read":true}
+{"file":"src/components/WarframeSelector.vue","line":107,"position":"expr","key":"warframeselector.notfound","value":"Can not find special warframe","read":true}
+{"file":"src/components/WeaponSelector.vue","line":30,"position":"vue-text","key":"kitgun.title","value":"KITGUN","read":true}
+{"file":"src/components/WeaponSelector.vue","line":36,"position":"vue-text","key":"zaw.title","value":"ZAW","read":true}
+{"file":"src/components/WeaponSelector.vue","line":42,"position":"vue-text","key":"amp.title","value":"AMP","read":true}
+{"file":"src/components/WeaponSelector.vue","line":95,"position":"expr","key":"weaponselector.notfound","value":"Can not find special weapon","read":true}
+{"file":"src/components/ZawBuilder.vue","line":4,"position":"vue-attr","key":"zaw.selectStrike","value":"SELECT STRIKE","read":true}
+{"file":"src/components/ZawBuilder.vue","line":5,"position":"vue-attr","key":"zaw.selectGrip","value":"SELECT GRIP","read":true}
+{"file":"src/components/ZawBuilder.vue","line":6,"position":"vue-attr","key":"zaw.selectLinks","value":"SELECT LINKS","read":true}
+{"file":"src/components/ZawBuilder.vue","line":20,"position":"vue-text","key":"modular.fireRate","value":"Fire rate","read":true}
+{"file":"src/components/ZawBuilder.vue","line":21,"position":"vue-text","key":"modular.damage","value":"Damage","read":true}
+{"file":"src/components/ZawBuilder.vue","line":40,"position":"vue-text","key":"modular.fireRate","value":"Fire rate","read":true}
+{"file":"src/components/ZawBuilder.vue","line":41,"position":"vue-text","key":"modular.damage","value":"Damage","read":true}
+{"file":"src/components/ZawBuilder.vue","line":57,"position":"vue-text","key":"modular.fireRate","value":"Fire rate","read":true}
+{"file":"src/components/ZawBuilder.vue","line":58,"position":"vue-text","key":"modular.damage","value":"Damage","read":true}
+{"file":"src/components/ZawBuilder.vue","line":59,"position":"vue-text","key":"modular.critChance","value":"Crit chance","read":true}
+{"file":"src/components/ZawBuilder.vue","line":60,"position":"vue-text","key":"modular.status","value":"Status","read":true}
+{"file":"src/components/ZawBuilder.vue","line":67,"position":"vue-text","key":"zaw.strike","value":"Strike","read":true}
+{"file":"src/components/ZawBuilder.vue","line":70,"position":"vue-text","key":"zaw.grip","value":"Grip","read":true}
+{"file":"src/components/ZawBuilder.vue","line":73,"position":"vue-text","key":"zaw.links","value":"Links","read":true}
+{"file":"src/components/ZawBuilder.vue","line":77,"position":"vue-text","key":"modular.damage","value":"Damage","read":true}
+{"file":"src/components/ZawBuilder.vue","line":80,"position":"vue-text","key":"build.ratio","value":"Ratio","read":true}
+{"file":"src/components/ZawBuilder.vue","line":83,"position":"vue-text","key":"modular.slideDamage","value":"Slide Damage","read":true}
+{"file":"src/components/ZawBuilder.vue","line":91,"position":"vue-text","key":"modular.range","value":"Range","read":true}
+{"file":"src/components/ZawBuilder.vue","line":94,"position":"vue-text","key":"modular.fireRate","value":"Fire rate","read":true}
+{"file":"src/components/ZawBuilder.vue","line":97,"position":"vue-text","key":"modular.critDamage","value":"Crit damage","read":true}
+{"file":"src/components/ZawBuilder.vue","line":100,"position":"vue-text","key":"modular.critChance","value":"Crit chance","read":true}
+{"file":"src/components/ZawBuilder.vue","line":103,"position":"vue-text","key":"modular.status","value":"Status","read":true}
+{"file":"src/components/ZawBuilder.vue","line":105,"position":"vue-text","key":"modular.lastStep","value":"Last step","read":true}
+{"file":"src/components/ZawBuilder.vue","line":110,"position":"vue-binding","key":"modular.nextStep","value":"Next step","read":true}
+{"file":"src/components/ZawBuilder.vue","line":110,"position":"vue-binding","key":"modular.finish","value":"Finish","read":true}
+{"file":"src/views/Alerts.vue","line":13,"position":"vue-text","key":"time.cetus","value":"Cetus","read":true}
+{"file":"src/views/Alerts.vue","line":21,"position":"vue-text","key":"time.fortuna","value":"Fortuna","read":true}
+{"file":"src/views/Alerts.vue","line":37,"position":"vue-text","key":"time.earth","value":"Earth","read":true}
+{"file":"src/views/Alerts.vue","line":47,"position":"vue-text","key":"alerting.sortie","value":"Sortie","read":true}
+{"file":"src/views/Alerts.vue","line":52,"position":"vue-text","key":"alerting.remaining","value":"Remaining","read":true}
+{"file":"src/views/Alerts.vue","line":66,"position":"vue-text","key":"alerting.sentientOutposts","value":"Sentient Outpost","read":true}
+{"file":"src/views/Alerts.vue","line":76,"position":"vue-text","key":"alerting.remaining","value":"Remaining","read":true}
+{"file":"src/views/Alerts.vue","line":81,"position":"vue-text","key":"alerting.inactive","value":"Inactive","read":true}
+{"file":"src/views/Alerts.vue","line":84,"position":"vue-text","key":"alerting.remaining","value":"Remaining","read":true}
+{"file":"src/views/Alerts.vue","line":93,"position":"vue-text","key":"alerting.arbitration","value":"Arbitration","read":true}
+{"file":"src/views/Alerts.vue","line":103,"position":"vue-text","key":"alerting.remaining","value":"Remaining","read":true}
+{"file":"src/views/Alerts.vue","line":112,"position":"vue-text","key":"alerting.alerts","value":"Alerts","read":true}
+{"file":"src/views/Alerts.vue","line":123,"position":"vue-text","key":"alerting.remaining","value":"Remaining","read":true}
+{"file":"src/views/Alerts.vue","line":132,"position":"vue-text","key":"alerting.nightwave","value":"Nightwave","read":true}
+{"file":"src/views/Alerts.vue","line":144,"position":"vue-text","key":"alerting.remaining","value":"Remaining","read":true}
+{"file":"src/views/Alerts.vue","line":153,"position":"vue-text","key":"alerting.news","value":"News","read":true}
+{"file":"src/views/Alerts.vue","line":165,"position":"vue-text","key":"alerting.voidTrader","value":"Void Trader","read":true}
+{"file":"src/views/Alerts.vue","line":170,"position":"vue-text","key":"alerting.remaining","value":"Remaining","read":true}
+{"file":"src/views/Alerts.vue","line":189,"position":"vue-text","key":"alerting.kuva","value":"Kuva","read":true}
+{"file":"src/views/Alerts.vue","line":199,"position":"vue-text","key":"alerting.remaining","value":"Remaining","read":true}
+{"file":"src/views/Alerts.vue","line":208,"position":"vue-text","key":"alerting.fissures","value":"Fissures","read":true}
+{"file":"src/views/Alerts.vue","line":219,"position":"vue-text","key":"alerting.remaining","value":"Remaining","read":true}
+{"file":"src/views/Alerts.vue","line":228,"position":"vue-text","key":"alerting.invasion","value":"Invasions","read":true}
+{"file":"src/views/Alerts.vue","line":243,"position":"vue-text","key":"alerting.progress","value":"Progress: ","read":true}
+{"file":"src/views/Alerts.vue","line":252,"position":"vue-text","key":"alerting.ostrons","value":"Earth Bounty Mission","read":true}
+{"file":"src/views/Alerts.vue","line":268,"position":"vue-text","key":"alerting.solarisUnited","value":"Venus Bounty Mission","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":9,"position":"vue-text","key":"buildview.score","value":"{0} score","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":10,"position":"vue-binding","key":"buildview.scoreResult","value":"Improve <span class='score-text'>{0}%</span> {1}","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":37,"position":"vue-text","key":"buildview.tobuild","value":"Show Detail","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":38,"position":"vue-text","key":"buildview.panelDamage","value":"Panel damage:","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":39,"position":"vue-text","key":"buildview.critChance","value":"Crit Chance:","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":40,"position":"vue-text","key":"buildview.critMul","value":"Crit Multiply:","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":41,"position":"vue-text","key":"buildview.fireRate","value":"Attack Speed:","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":42,"position":"vue-text","key":"buildview.magazine","value":"Magazine:","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":43,"position":"vue-text","key":"buildview.reload","value":"Reload:","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":44,"position":"vue-text","key":"buildview.status","value":"Status Chance(per bullet):","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":48,"position":"vue-text","key":"buildview.loading","value":"Loading...","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":60,"position":"vue-attr","key":"buildview.weapon","value":"Weapon","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":61,"position":"vue-attr","key":"buildview.selectWeapon","value":"Select weapon","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":66,"position":"vue-attr","key":"buildview.components","value":"Components","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":67,"position":"vue-attr","key":"kitgun.selectGrip","value":"SELECT GRIP","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":70,"position":"vue-attr","key":"kitgun.selectLoader","value":"SELECT LOADER","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":77,"position":"vue-attr","key":"buildview.totalDamageTip","value":"Damage per Hit","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":78,"position":"vue-text","key":"buildview.totalDamage","value":"Total Damage","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":80,"position":"vue-attr","key":"buildview.firstAmmoDamageTip","value":"Sniper First Ammo DPH","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":81,"position":"vue-text","key":"buildview.firstAmmoDamage","value":"1st-Ammo Damage","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":83,"position":"vue-attr","key":"buildview.burstDamageTip","value":"Burst DPS (no reload)","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":84,"position":"vue-text","key":"buildview.burstDamage","value":"Burst DPS","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":86,"position":"vue-attr","key":"buildview.sustainedDamageTip","value":"Sustained Damage (including reload time)","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":87,"position":"vue-text","key":"buildview.sustainedDamage","value":"Sustained DPS","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":92,"position":"vue-attr","key":"buildview.limitSlots","value":"Limit mod slots","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":93,"position":"vue-attr","key":"buildview.limitSlotsTip","value":"Add placeholders for other mods","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":98,"position":"vue-attr","key":"buildview.limitElementsType","value":"Limit elements type","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":99,"position":"vue-attr","key":"buildview.limitElementsTypeTip","value":"auto-fill will only use selected types","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":100,"position":"vue-attr","key":"buildview.unlimited","value":"Unlimited","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":106,"position":"vue-attr","key":"buildview.zoom","value":"Zoom","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":117,"position":"vue-attr","key":"buildview.headshotChance","value":"Headshot rate","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":118,"position":"vue-attr","key":"buildview.headshotChanceTip","value":"Crit damage is higher when headshot","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":123,"position":"vue-attr","key":"buildview.extraBaseDamage","value":"Extra base damage","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":127,"position":"vue-binding","key":"buildview.extraBaseDamageTip","value":"e.g. Chroma's \"Vex Armor\"","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":135,"position":"vue-attr","key":"buildview.extraOverall","value":"Extra overall damage","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":139,"position":"vue-binding","key":"buildview.extraOverallTip","value":"e.g. Mirage's \"Eclipse\" and Sniper's Shot Combo","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":147,"position":"vue-attr","key":"buildview.usemods","value":"Use mods","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":148,"position":"vue-text","key":"buildview.heavyCaliber","value":"Heavy Caliber","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":150,"position":"vue-binding","key":"buildview.deadlyEfficiency","value":"Deadly Efficiency","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":152,"position":"vue-text","key":"buildview.primedChamber","value":"Primed Chamber","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":153,"position":"vue-attr","key":"buildview.acolyteModsTip","value":"e.g. Argon Scope","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":154,"position":"vue-text","key":"buildview.acolyteMods","value":"Acolyte Mods","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":158,"position":"vue-text","key":"buildview.condiOver","value":"Condition Overload Quantization Calculation","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":162,"position":"vue-attr","key":"buildview.arcanes","value":"Arcanes","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":243,"position":"expr","key":"buildview.firstAmmoDamage","value":"1st-Ammo Damage","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":243,"position":"expr","key":"buildview.sustainedDamage","value":"Sustained DPS","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":243,"position":"expr","key":"buildview.burstDamage","value":"Burst DPS","read":true}
+{"file":"src/views/buildview/GunModBuildView.vue","line":243,"position":"expr","key":"buildview.totalDamage","value":"Total Damage","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":8,"position":"vue-text","key":"buildview.score","value":"{0} score","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":9,"position":"vue-binding","key":"buildview.scoreResult","value":"Improve <span class='score-text'>{0}%</span> {1}","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":36,"position":"vue-text","key":"buildview.tobuild","value":"Show Detail","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":37,"position":"vue-text","key":"buildview.panelDamage","value":"Panel damage:","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":38,"position":"vue-text","key":"buildview.critChance","value":"Crit Chance:","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":39,"position":"vue-text","key":"buildview.critMul","value":"Crit Multiply:","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":40,"position":"vue-text","key":"build.range","value":"Range","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":41,"position":"vue-text","key":"buildview.fireRate","value":"Attack Speed:","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":45,"position":"vue-text","key":"buildview.loading","value":"Loading...","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":57,"position":"vue-attr","key":"buildview.weapon","value":"Weapon","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":58,"position":"vue-attr","key":"buildview.selectWeapon","value":"Select weapon","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":64,"position":"vue-attr","key":"buildview.components","value":"Components","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":65,"position":"vue-attr","key":"zaw.selectGrip","value":"SELECT GRIP","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":68,"position":"vue-attr","key":"zaw.selectLinks","value":"SELECT LINKS","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":75,"position":"vue-text","key":"buildview.attackDamage","value":"Attack DPH","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":76,"position":"vue-text","key":"buildview.slideDamage","value":"Slide DPH","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":77,"position":"vue-text","key":"buildview.attackDamagePS","value":"Attack DPS","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":78,"position":"vue-text","key":"buildview.slideDamagePS","value":"Slide DPS","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":82,"position":"vue-attr","key":"buildview.limitSlots","value":"Limit mod slots","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":83,"position":"vue-attr","key":"buildview.limitSlotsTip","value":"Add placeholders for other mods","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":88,"position":"vue-attr","key":"buildview.comboMul","value":"Combo Multiplier","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":89,"position":"vue-attr","key":"buildview.comboMulTip","value":"Total base damage multiplier (Venka Prime will auto increase)","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":94,"position":"vue-attr","key":"buildview.limitElementsType","value":"Limit elements type","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":95,"position":"vue-attr","key":"buildview.limitElementsTypeTip","value":"auto-fill will only use selected types","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":96,"position":"vue-attr","key":"buildview.unlimited","value":"Unlimited","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":102,"position":"vue-attr","key":"buildview.extraBaseDamage","value":"Extra base damage","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":106,"position":"vue-binding","key":"buildview.extraBaseDamageTip","value":"e.g. Chroma's \"Vex Armor\"","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":114,"position":"vue-attr","key":"buildview.extraOverall","value":"Extra overall damage","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":118,"position":"vue-binding","key":"buildview.extraOverallTip","value":"e.g. Mirage's \"Eclipse\" and Sniper's Shot Combo","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":126,"position":"vue-attr","key":"buildview.usemods","value":"Use mods","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":128,"position":"vue-attr","key":"buildview.requireRangeTip","value":"After selected, Primed Reach will be add to build if the RIVEN MOD don't have a range property.","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":129,"position":"vue-text","key":"buildview.requireRange","value":"Require Range","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":132,"position":"vue-attr","key":"buildview.requireComboTip","value":"After selected, Drifting Contact will be add to build if the RIVEN MOD don't have a combo duration property.","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":133,"position":"vue-text","key":"buildview.requireCombo","value":"Require Combo","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":137,"position":"vue-text","key":"buildview.condiOver","value":"Condition Overload Quantization Calculation","read":true}
+{"file":"src/views/buildview/MeleeModBuildView.vue","line":141,"position":"vue-attr","key":"buildview.arcanes","value":"Arcanes","read":true}
+{"file":"src/views/ForgetPass.vue","line":6,"position":"vue-attr","key":"app.loginHint","value":"Please enter email","read":true}
+{"file":"src/views/ForgetPass.vue","line":11,"position":"vue-attr","key":"app.sendreset","value":"Reset password","read":true}
+{"file":"src/views/ForgetPass.vue","line":38,"position":"expr","key":"app.emailcheck","value":"Invalid email","read":true}
+{"file":"src/views/Huangli.vue","line":5,"position":"vue-text","key":"huangli.title","value":"Warframe's Almanac","read":true}
+{"file":"src/views/Huangli.vue","line":9,"position":"vue-text","key":"huangli.todayis","value":"Today is ","read":true}
+{"file":"src/views/Huangli.vue","line":13,"position":"vue-text","key":"huangli.goodfor","value":"Good for","read":true}
+{"file":"src/views/Huangli.vue","line":22,"position":"vue-text","key":"huangli.badfor","value":"Bad for","read":true}
+{"file":"src/views/Huangli.vue","line":32,"position":"vue-text","key":"huangli.faceto","value":"Direction: ","read":true}
+{"file":"src/views/Huangli.vue","line":35,"position":"vue-text","key":"huangli.planet","value":"Planet: ","read":true}
+{"file":"src/views/Huangli.vue","line":38,"position":"vue-text","key":"huangli.lucky","value":"Lucky Index: ","read":true}
+{"file":"src/views/Huangli.vue","line":42,"position":"vue-text","key":"huangli.tip","value":"*for reference only","read":true}
+{"file":"src/views/Info.vue","line":7,"position":"vue-binding","key":"zh","value":"","read":true}
+{"file":"src/views/Info.vue","line":8,"position":"vue-binding","key":"zh","value":"","read":true}
+{"file":"src/views/Info.vue","line":14,"position":"vue-attr","key":"info.data","value":"DATA","read":true}
+{"file":"src/views/Info.vue","line":15,"position":"vue-attr","key":"info.eco","value":"ECO","read":true}
+{"file":"src/views/Info.vue","line":16,"position":"vue-attr","key":"info.build","value":"BUILD","read":true}
+{"file":"src/views/Info.vue","line":27,"position":"vue-text","key":"info.nav","value":"NAV","read":true}
+{"file":"src/views/Info.vue","line":32,"position":"vue-text","key":"navigate.weapon","value":"Weapon Builder","read":true}
+{"file":"src/views/Info.vue","line":34,"position":"vue-binding","key":"otherinfo.wikiurl","value":"https://warframe.fandom.com/wiki/{0}","read":true}
+{"file":"src/views/Info.vue","line":35,"position":"vue-text","key":"otherinfo.wiki","value":"WIKI","read":true}
+{"file":"src/views/Info.vue","line":37,"position":"vue-binding","key":"zh","value":"","read":true}
+{"file":"src/views/Info.vue","line":41,"position":"vue-text","key":"otherinfo.wmriven","value":"WM Riven","read":true}
+{"file":"src/views/Info.vue","line":44,"position":"vue-text","key":"otherinfo.rm","value":"riven.market","read":true}
+{"file":"src/views/Info.vue","line":47,"position":"vue-text","key":"otherinfo.wm","value":"warframe.market","read":true}
+{"file":"src/views/Info.vue","line":52,"position":"vue-text","key":"info.riven","value":"RIVEN","read":true}
+{"file":"src/views/Intro.vue","line":23,"position":"vue-text","key":"navigate.index","value":"Realtime Events","read":true}
+{"file":"src/views/Intro.vue","line":32,"position":"vue-text","key":"navigate.riven","value":"Riven Analyzer","read":true}
+{"file":"src/views/Intro.vue","line":41,"position":"vue-text","key":"navigate.weapon","value":"Weapon Builder","read":true}
+{"file":"src/views/Intro.vue","line":50,"position":"vue-text","key":"navigate.warframe","value":"Tactics Builder","read":true}
+{"file":"src/views/Intro.vue","line":59,"position":"vue-text","key":"navigate.shawzin","value":"Shawzin Arranger","read":true}
+{"file":"src/views/Intro.vue","line":68,"position":"vue-text","key":"navigate.palette","value":"Palette Tools","read":true}
+{"file":"src/views/Intro.vue","line":83,"position":"vue-binding","key":"intro.w11","value":"Support OCR, fast import riven from <strong>screenshot</strong>","read":true}
+{"file":"src/views/Intro.vue","line":84,"position":"vue-binding","key":"intro.w12","value":"One-click generation <strong>best building</strong>","read":true}
+{"file":"src/views/Intro.vue","line":85,"position":"vue-binding","key":"intro.w13","value":"Quickly calculate <strong>Riven score</strong> based on comparison with the best Riven","read":true}
+{"file":"src/views/Intro.vue","line":91,"position":"vue-binding","key":"intro.w21","value":"<strong>Simulacrum</strong> corresponds to the real damage model","read":true}
+{"file":"src/views/Intro.vue","line":92,"position":"vue-binding","key":"intro.w22","value":"<strong>Eidolon</strong> unique algorithm is perfectly supported","read":true}
+{"file":"src/views/Intro.vue","line":93,"position":"vue-binding","key":"intro.w23","value":"Various <strong>buffs</strong> highly integrated","read":true}
+{"file":"src/views/Intro.vue","line":99,"position":"vue-binding","key":"intro.w31","value":"Plain time and alerting notice is in place","read":true}
+{"file":"src/views/Intro.vue","line":100,"position":"vue-binding","key":"intro.w32","value":"<strong>Color pick tool</strong>: find a best match from hundreds of colors","read":true}
+{"file":"src/views/Intro.vue","line":101,"position":"vue-binding","key":"intro.w33","value":"<s><strong>Build Share</strong> to get more fans</s>","read":true}
+{"file":"src/views/Intro.vue","line":146,"position":"vue-binding","key":"zh","value":"","read":true}
+{"file":"src/views/Login.vue","line":6,"position":"vue-attr","key":"app.loginHint","value":"Please enter email","read":true}
+{"file":"src/views/Login.vue","line":11,"position":"vue-attr","key":"app.passwordHint","value":"Please enter password","read":true}
+{"file":"src/views/Login.vue","line":16,"position":"vue-binding","key":"app.registerbtn","value":"Sign up","read":true}
+{"file":"src/views/Login.vue","line":16,"position":"vue-binding","key":"app.loginbtn","value":"Login","read":true}
+{"file":"src/views/Login.vue","line":17,"position":"vue-binding","key":"app.loginbtn","value":"Login","read":true}
+{"file":"src/views/Login.vue","line":17,"position":"vue-binding","key":"app.registerbtn","value":"Sign up","read":true}
+{"file":"src/views/Login.vue","line":48,"position":"expr","key":"app.emailcheck","value":"Invalid email","read":true}
+{"file":"src/views/Login.vue","line":51,"position":"expr","key":"app.passmiss","value":"Password required","read":true}
+{"file":"src/views/Login.vue","line":52,"position":"expr","key":"app.passcheck","value":"Invalid password","read":true}
+{"file":"src/views/Mod.vue","line":8,"position":"vue-attr","key":"riven.picupload","value":"Image upload","read":true}
+{"file":"src/views/Mod.vue","line":8,"position":"vue-attr","key":"riven.manualinput","value":"Manual input","read":true}
+{"file":"src/views/Mod.vue","line":14,"position":"vue-text","key":"riven.cancel","value":"Cancel","read":true}
+{"file":"src/views/Mod.vue","line":15,"position":"vue-text","key":"riven.confirm","value":"Confirm","read":true}
+{"file":"src/views/Mod.vue","line":18,"position":"vue-text","key":"riven.addriven","value":"New Riven Mod","read":true}
+{"file":"src/views/Mod.vue","line":22,"position":"vue-attr","key":"riven.pastehere","value":"Paste Here","read":true}
+{"file":"src/views/Mod.vue","line":34,"position":"vue-binding","key":"riven.uploadtip","value":"Drag file to here, or <em>click here</em> to upload, also allow direct paste(Ctrl+V)","read":true}
+{"file":"src/views/Mod.vue","line":36,"position":"vue-text","key":"riven.uploadlimit","value":"only allow jpg/png file, and max size is 500kb","read":true}
+{"file":"src/views/Mod.vue","line":59,"position":"vue-binding","key":"riven.range","value":"Range: {0} ~ {1} (±10%)","read":true}
+{"file":"src/views/Mod.vue","line":61,"position":"vue-binding","key":"riven.lower","value":"DOWN","read":true}
+{"file":"src/views/Mod.vue","line":61,"position":"vue-binding","key":"riven.higher","value":"UP","read":true}
+{"file":"src/views/Mod.vue","line":63,"position":"vue-text","key":"riven.average","value":"Average","read":true}
+{"file":"src/views/Mod.vue","line":67,"position":"vue-text","key":"riven.rank","value":"Rank: ","read":true}
+{"file":"src/views/Mod.vue","line":72,"position":"vue-text","key":"riven.level","value":"Level: ","read":true}
+{"file":"src/views/Mod.vue","line":74,"position":"vue-text","key":"riven.star","value":"Disposition: {0}","read":true}
+{"file":"src/views/Mod.vue","line":87,"position":"vue-text","key":"riven.history","value":"History","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":4,"position":"vue-text","key":"shawzin.help","value":"User Guide","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":9,"position":"vue-attr","key":"shawzin.piano","value":"Piano","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":10,"position":"vue-attr","key":"shawzin.shawzin","value":"Shawzin","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":11,"position":"vue-attr","key":"shawzin.lotus","value":"Lotus","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":25,"position":"vue-attr","key":"shawzin.name","value":"Name","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":25,"position":"vue-attr","key":"shawzin.number","value":"Number","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":29,"position":"vue-attr","key":"shawzin.downshift","value":"Downshift","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":29,"position":"vue-attr","key":"shawzin.upshift","value":"Upshift","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":33,"position":"vue-attr","key":"shawzin.staff","value":"Staff","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":37,"position":"vue-text","key":"shawzin.transpose","value":"Transpose","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":56,"position":"vue-attr","key":"shawzin.importNumberSeqs","value":"Import Number Code","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":59,"position":"vue-attr","key":"shawzin.copyNumberSeqs","value":"Copy Number Code","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":63,"position":"vue-attr","key":"shawzin.importMidi","value":"Import MIDI File","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":81,"position":"vue-text","key":"shawzin.quarter","value":"Quarter","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":82,"position":"vue-text","key":"shawzin.half","value":"Half","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":83,"position":"vue-text","key":"shawzin.full","value":"Full","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":93,"position":"vue-attr","key":"shawzin.importCode","value":"Import Code","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":96,"position":"vue-attr","key":"shawzin.copyCode","value":"Copy Code","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":102,"position":"vue-text","key":"shawzin.clearConfirm","value":"Are you sure to clear all the notes?","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":104,"position":"vue-text","key":"riven.cancel","value":"Cancel","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":112,"position":"vue-text","key":"riven.confirm","value":"Confirm","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":117,"position":"vue-attr","key":"shawzin.empty","value":"Empty","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":129,"position":"vue-text","key":"shawzin.note","value":"notes","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":188,"position":"vue-attr","key":"shawzin.help","value":"User Guide","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":194,"position":"vue-text","key":"update.confirm","value":"I know","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":468,"position":"expr","key":"zh","value":"","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":728,"position":"expr","key":"shawzin.blockCopied","value":"Notes copied","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":738,"position":"expr","key":"shawzin.blockCopied","value":"Notes copied","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":1240,"position":"expr","key":"shawzin.importCode","value":"Import Code","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":1252,"position":"expr","key":"shawzin.codeCopied","value":"Code copied","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":1258,"position":"expr","key":"shawzin.importNumberSeqs","value":"Import Number Code","read":true}
+{"file":"src/views/music/MusicEdit.vue","line":1270,"position":"expr","key":"shawzin.numCopied","value":"Number Code Copied","read":true}
+{"file":"src/views/Palette.vue","line":7,"position":"vue-text","key":"palette.title","value":"SELECT COLOR","read":true}
+{"file":"src/views/Palette.vue","line":11,"position":"vue-binding","key":"palette.uploadtip","value":"Drag or <em>upload file</em> to pick colors automaticly","read":true}
+{"file":"src/views/Palette.vue","line":28,"position":"vue-text","key":"palette.deltaE","value":"Tolerance:","read":true}
+{"file":"src/views/Palette.vue","line":32,"position":"vue-text","key":"palette.recommand","value":"Recommand:","read":true}
+{"file":"src/views/Palette.vue","line":50,"position":"vue-text","key":"palette.limited","value":"LIMITED","read":true}
+{"file":"src/views/Setting.vue","line":6,"position":"vue-text","key":"setting.lang","value":"Language Setting","read":true}
+{"file":"src/views/Setting.vue","line":9,"position":"vue-text","key":"setting.default","value":"Default","read":true}
+{"file":"src/views/Setting.vue","line":20,"position":"vue-text","key":"setting.bugreport","value":"Bug Report","read":true}
+{"file":"src/views/Setting.vue","line":23,"position":"vue-binding","key":"zh","value":"","read":true}
+{"file":"src/views/Setting.vue","line":33,"position":"vue-text","key":"setting.ui","value":"User Interface","read":true}
+{"file":"src/views/Setting.vue","line":39,"position":"vue-text","key":"setting.platform","value":"Platform","read":true}
+{"file":"src/views/Setting.vue","line":44,"position":"vue-text","key":"setting.pc","value":"PC","read":true}
+{"file":"src/views/Setting.vue","line":45,"position":"vue-text","key":"setting.ps4","value":"PS4","read":true}
+{"file":"src/views/Setting.vue","line":46,"position":"vue-text","key":"setting.xb1","value":"XBOX","read":true}
+{"file":"src/views/Setting.vue","line":47,"position":"vue-text","key":"setting.swi","value":"SWITCH","read":true}
+{"file":"src/views/Setting.vue","line":54,"position":"vue-text","key":"setting.nightmode","value":"Night Mode","read":true}
+{"file":"src/views/Setting.vue","line":64,"position":"vue-text","key":"setting.bigmode","value":"High DPI Mode","read":true}
+{"file":"src/views/Setting.vue","line":65,"position":"vue-attr","key":"setting.bigmodeTip","value":"Scale more small when use High DPI Phone","read":true}
+{"file":"src/views/Setting.vue","line":75,"position":"vue-text","key":"setting.legacyriven","value":"Old Riven Editor","read":true}
+{"file":"src/views/Setting.vue","line":76,"position":"vue-attr","key":"setting.legacyrivenTip","value":"Use old riven editor using text input","read":true}
+{"file":"src/views/Setting.vue","line":86,"position":"vue-text","key":"setting.burstsamplesize","value":"Burst Sample Size","read":true}
+{"file":"src/views/Setting.vue","line":87,"position":"vue-attr","key":"setting.burstsamplesizeTip","value":"Calculate the average damage of the weapon for a specified number of seconds (△t in △x/△t)","read":true}
+{"file":"src/views/Setting.vue","line":102,"position":"vue-text","key":"setting.savedBuilds","value":"Saved builds","read":true}
+{"file":"src/views/Setting.vue","line":106,"position":"vue-text","key":"setting.clear","value":"CLEAR ALL","read":true}
+{"file":"src/views/Setting.vue","line":209,"position":"expr","key":"setting.cleared","value":"Cleared","read":true}
+{"file":"src/views/Simulator.vue","line":7,"position":"vue-binding","key":"simulator.pleaseWait","value":"Please wait {0} seconds","read":true}
+{"file":"src/views/Simulator.vue","line":9,"position":"vue-text","key":"simulator.random","value":"Random","read":true}
+{"file":"src/views/Simulator.vue","line":10,"position":"vue-text","key":"simulator.rifle","value":"Rifle","read":true}
+{"file":"src/views/Simulator.vue","line":11,"position":"vue-text","key":"simulator.shotgun","value":"Shotgun","read":true}
+{"file":"src/views/Simulator.vue","line":12,"position":"vue-text","key":"simulator.secondary","value":"Pistol","read":true}
+{"file":"src/views/Simulator.vue","line":13,"position":"vue-text","key":"simulator.melee","value":"Melee","read":true}
+{"file":"src/views/Simulator.vue","line":18,"position":"vue-binding","key":"simulator.recycle","value":"Recycle","read":true}
+{"file":"src/views/Simulator.vue","line":18,"position":"vue-binding","key":"simulator.pleaseWait","value":"Please wait {0} seconds","read":true}
+{"file":"src/views/Simulator.vue","line":42,"position":"vue-text","key":"riven.sharetip","value":"Scan or Paste on page","read":true}
+{"file":"src/views/Simulator.vue","line":44,"position":"vue-text","key":"simulator.analyze","value":"Analyze","read":true}
+{"file":"src/views/Simulator.vue","line":46,"position":"vue-text","key":"simulator.choose","value":"Confirm","read":true}
+{"file":"src/views/Simulator.vue","line":72,"position":"vue-text","key":"riven.sharetip","value":"Scan or Paste on page","read":true}
+{"file":"src/views/Simulator.vue","line":74,"position":"vue-text","key":"simulator.analyze","value":"Analyze","read":true}
+{"file":"src/views/Simulator.vue","line":76,"position":"vue-text","key":"simulator.choose","value":"Confirm","read":true}

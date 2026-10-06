@@ -1,0 +1,41 @@
+{"file":"ftp.html","line":23,"position":"html-text","key":"ftp.label.host","value":"Host","read":true}
+{"file":"ftp.html","line":25,"position":"html-text","key":"ftp.label.port","value":"Port","read":true}
+{"file":"ftp.html","line":29,"position":"html-text","key":"ftp.label.user","value":"User","read":true}
+{"file":"ftp.html","line":33,"position":"html-text","key":"ftp.label.password","value":"Password","read":true}
+{"file":"ftp.html","line":37,"position":"html-text","key":"ftp.label.connTimeout","value":"Connection Timeout","read":true}
+{"file":"ftp.html","line":41,"position":"html-text","key":"ftp.label.pasvTimeout","value":"PASV Timeout","read":true}
+{"file":"ftp.html","line":45,"position":"html-text","key":"ftp.label.keepalive","value":"Keepalive","read":true}
+{"file":"ftp.html","line":49,"position":"html-text","key":"ftp.label.secure","value":"Data connection encryption","read":true}
+{"file":"ftp.html","line":51,"position":"html-text","key":"ftp.label.secureOptions","value":"Secure Options","read":true}
+{"file":"ftp.html","line":163,"position":"html-text","key":"ftp_in.label.filename","value":"Filename","read":true}
+{"file":"ftp.html","line":164,"position":"html-attr","key":"[placeholder]ftp_in.placeholder.filename","value":"Filename","read":true}
+{"file":"ftp.html","line":167,"position":"html-text","key":"ftp_in.label.localFilename","value":"Local Filename","read":true}
+{"file":"ftp.html","line":168,"position":"html-attr","key":"[placeholder]ftp_in.placeholder.localFilename","value":"Local Filename","read":true}
+{"file":"ftp.html","line":171,"position":"html-text","key":"ftp_in.label.name","value":"Name","read":true}
+{"file":"ftp.html","line":172,"position":"html-attr","key":"[placeholder]ftp_in.placeholder.name","value":"Name","read":true}
+{"file":"sftp.html","line":23,"position":"html-text","key":"sftp.label.host","value":"Host","read":true}
+{"file":"sftp.html","line":25,"position":"html-text","key":"sftp.label.port","value":"Port","read":true}
+{"file":"sftp.html","line":31,"position":"html-text","key":"sftp.label.forceIPv4","value":"Only connect via IPv4 address","read":true}
+{"file":"sftp.html","line":36,"position":"html-text","key":"sftp.label.forceIPv6","value":"Only connect via IPv6 address","read":true}
+{"file":"sftp.html","line":39,"position":"html-text","key":"sftp.label.username","value":"username","read":true}
+{"file":"sftp.html","line":43,"position":"html-text","key":"sftp.label.password","value":"Password","read":true}
+{"file":"sftp.html","line":47,"position":"html-text","key":"sftp.label.privateKey","value":"privateKey","read":true}
+{"file":"sftp.html","line":51,"position":"html-text","key":"sftp.label.passphrase","value":"passphrase","read":true}
+{"file":"sftp.html","line":52,"position":"html-attr","key":"[placeholder]sftp.placeholder.passphrase","value":"For an encrypted private key","read":true}
+{"file":"sftp.html","line":55,"position":"html-text","key":"sftp.label.agent","value":"agent","read":true}
+{"file":"sftp.html","line":59,"position":"html-text","key":"sftp.label.readyTimeout","value":"readyTimeout","read":true}
+{"file":"sftp.html","line":64,"position":"html-text","key":"sftp.label.strictVendor","value":"Performs a strict server vendor check","read":true}
+{"file":"sftp.html","line":67,"position":"html-text","key":"sftp.label.debug","value":"debug","read":true}
+{"file":"sftp.html","line":77,"position":"html-text","key":"sftp.label.retries","value":"retries","read":true}
+{"file":"sftp.html","line":79,"position":"html-text","key":"sftp.label.retry_factor","value":"retry factor","read":true}
+{"file":"sftp.html","line":81,"position":"html-text","key":"sftp.label.retry_minTimeout","value":"retry minTimeout","read":true}
+{"file":"sftp.html","line":182,"position":"html-text","key":"sftp_in.label.path","value":"Directory path","read":true}
+{"file":"sftp.html","line":183,"position":"html-attr","key":"[placeholder]sftp_in.placeholder.path","value":"Remote directory path","read":true}
+{"file":"sftp.html","line":186,"position":"html-text","key":"sftp_in.label.pattern","value":"Pattern","read":true}
+{"file":"sftp.html","line":187,"position":"html-attr","key":"[placeholder]sftp_in.placeholder.pattern","value":"A pattern used to filter","read":true}
+{"file":"sftp.html","line":190,"position":"html-text","key":"sftp_in.label.filename","value":"Filename","read":true}
+{"file":"sftp.html","line":191,"position":"html-attr","key":"[placeholder]sftp_in.placeholder.filename","value":"Remote Filename","read":true}
+{"file":"sftp.html","line":194,"position":"html-text","key":"sftp_in.label.localFilename","value":"Local Filename","read":true}
+{"file":"sftp.html","line":195,"position":"html-attr","key":"[placeholder]sftp_in.placeholder.localFilename","value":"Local Filename","read":true}
+{"file":"sftp.html","line":198,"position":"html-text","key":"sftp_in.label.name","value":"Name","read":true}
+{"file":"sftp.html","line":199,"position":"html-attr","key":"[placeholder]sftp_in.placeholder.name","value":"Name","read":true}
