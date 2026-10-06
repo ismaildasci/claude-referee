@@ -1,5 +1,5 @@
 // Step 4 of the i18n real-code hold-out: blind labels back to ids, the registered scored label per item, and the suite.
-// Usage: node assemble.mjs --out DIR --labels1 FILE --labels2 FILE --suite DIR. Writes the suite's cases.jsonl, labels-1.jsonl, labels-2.jsonl, dropped.json, agreement.json.
+// Usage: node assemble.mjs --out DIR --labels1 FILE --labels2 FILE --suite DIR [--part dev|holdout]. Writes the suite's cases.jsonl, labels-1.jsonl, labels-2.jsonl, dropped.json, agreement.json.
 
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -11,11 +11,13 @@ const OUT = flag("out");
 const SUITE = flag("suite");
 if (!OUT || !SUITE || !flag("labels1") || !flag("labels2")) throw new Error("--out, --labels1, --labels2 and --suite are required");
 const jsonl = (file) => readFileSync(file, "utf8").trim().split("\n").filter(Boolean).map((l) => JSON.parse(l));
-const items = jsonl(join(OUT, "items.jsonl"));
+const prefix = flag("part") ? `${flag("part")}-` : "";
+const split = flag("part") ?? "holdout";
+const items = jsonl(join(OUT, `${prefix}items.jsonl`));
 mkdirSync(SUITE, { recursive: true });
 
 const labels = [1, 2].map((n) => {
-  const keys = JSON.parse(readFileSync(join(OUT, "keys", `labeller-${n}.json`), "utf8"));
+  const keys = JSON.parse(readFileSync(join(OUT, "keys", `${prefix}labeller-${n}.json`), "utf8"));
   const rows = jsonl(flag(`labels${n}`));
   const byId = new Map();
   for (const r of rows) {
@@ -43,7 +45,7 @@ for (const i of items) {
     if (a !== b) { dropped.o_disagree.push(i.id); continue; }
     expected = a;
   }
-  cases.push({ id: i.id, split: "holdout", expected, repo: i.repo, framework: i.framework, origin: i.origin, contains_removed_value: i.contains_removed_value, kind: i.kind, text: i.text, context: i.context });
+  cases.push({ id: i.id, split, expected, repo: i.repo, framework: i.framework, origin: i.origin, contains_removed_value: i.contains_removed_value, kind: i.kind, text: i.text, context: i.context });
 }
 writeFileSync(join(SUITE, "cases.jsonl"), cases.map((c) => JSON.stringify(c)).join("\n") + "\n");
 writeFileSync(join(SUITE, "dropped.json"), `${JSON.stringify(dropped, null, 1)}\n`);

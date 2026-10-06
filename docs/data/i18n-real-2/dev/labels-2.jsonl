@@ -1,0 +1,122 @@
+{"id":"caudal-labs__caudalflow:src/components/ui/SettingsPanel.tsx:263","label":"yes","low_confidence":false,"why":"Form field label"}
+{"id":"caudal-labs__caudalflow:src/components/ui/WorkspaceSelector.tsx:212","label":"yes","low_confidence":false,"why":"Button/menu label text"}
+{"id":"caudal-labs__caudalflow:src/components/ui/WorkspaceSelector.tsx:199","label":"yes","low_confidence":false,"why":"Button tooltip"}
+{"id":"caudal-labs__caudalflow:src/components/ui/HelpGuide.tsx:44","label":"yes","low_confidence":false,"why":"Section heading in help guide"}
+{"id":"caudal-labs__caudalflow:src/components/ui/WelcomePopup.tsx:58","label":"yes","low_confidence":false,"why":"Welcome popup instruction text"}
+{"id":"caudal-labs__caudalflow:src/components/canvas/MergeSelectionPopup.tsx:112","label":"yes","low_confidence":false,"why":"Button label text"}
+{"id":"caudal-labs__caudalflow:src/components/ui/SettingsPanel.tsx:282","label":"yes","low_confidence":false,"why":"Settings section heading"}
+{"id":"caudal-labs__caudalflow:src/components/ui/SettingsPanel.tsx:136","label":"yes","low_confidence":false,"why":"Input placeholder"}
+{"id":"caudal-labs__caudalflow:src/components/ui/SettingsPanel.tsx:147","label":"yes","low_confidence":false,"why":"Settings help text"}
+{"id":"caudal-labs__caudalflow:src/components/ui/WorkspaceSelector.tsx:250","label":"yes","low_confidence":false,"why":"Link tooltip"}
+{"id":"caudal-labs__caudalflow:src/components/copilot/canvasHandlers.ts:156","label":"yes","low_confidence":true,"why":"Node label shown on canvas"}
+{"id":"caudal-labs__caudalflow:docs/index.html:1914","label":"yes","low_confidence":false,"why":"Accessible name of theme button"}
+{"id":"caudal-labs__caudalflow:src/components/nodes/ChatMessage.tsx:133#2","label":"yes","low_confidence":false,"why":"Accessible name of copy button"}
+{"id":"caudal-labs__caudalflow:apps/bff/src/server-new.ts:87","label":"no","low_confidence":false,"why":"LLM tool description, not shown in UI"}
+{"id":"caudal-labs__caudalflow:src/components/copilot/CustomCopilotChat.tsx:98","label":"no","low_confidence":false,"why":"JSX code fragment, not text"}
+{"id":"caudal-labs__caudalflow:src/services/providers/anthropic.ts:106","label":"no","low_confidence":false,"why":"String matched against error message in code"}
+{"id":"caudal-labs__caudalflow:docs/index.html:2149","label":"no","low_confidence":true,"why":"Mock terminal output of a dev tool"}
+{"id":"caudal-labs__caudalflow:src/components/nodes/ChatMessage.tsx:111","label":"yes","low_confidence":false,"why":"Role label shown on chat message"}
+{"id":"caudal-labs__caudalflow:docs/index.html:2042","label":"yes","low_confidence":false,"why":"Accessible name of send button"}
+{"id":"caudal-labs__caudalflow:docs/index.html:2089","label":"no","low_confidence":true,"why":"Company/product name, not translated"}
+{"id":"caudal-labs__caudalflow:docs/index.html:2089#4","label":"no","low_confidence":true,"why":"Product name, not translated"}
+{"id":"caudal-labs__caudalflow:apps/bff/src/server-new.ts:41","label":"no","low_confidence":true,"why":"Backend API error for developers"}
+{"id":"caudal-labs__caudalflow:src/components/nodes/ChatMessage.tsx:138","label":"no","low_confidence":false,"why":"JSX code fragment, not text"}
+{"id":"caudal-labs__caudalflow:apps/bff/src/server-new.ts:115","label":"no","low_confidence":false,"why":"LLM tool description, not shown in UI"}
+{"id":"caudal-labs__caudalflow:docs/index.html:2089#3","label":"no","low_confidence":true,"why":"Product name, not translated"}
+{"id":"caudal-labs__caudalflow:apps/bff/src/server-new.ts:46","label":"no","low_confidence":false,"why":"Server config error naming env variable"}
+{"id":"caudal-labs__caudalflow:apps/bff/src/server.ts:89","label":"no","low_confidence":false,"why":"Server config error naming env variable"}
+{"id":"caudal-labs__caudalflow:apps/bff/src/server-new.ts:79","label":"no","low_confidence":false,"why":"LLM tool description, not shown in UI"}
+{"id":"caudal-labs__caudalflow:apps/bff/src/server-new.ts:161","label":"no","low_confidence":false,"why":"Server config error naming env variable"}
+{"id":"caudal-labs__caudalflow:docs/index.html:1984","label":"yes","low_confidence":false,"why":"Accessible name of zoom button"}
+{"id":"EmmaStoneX__NetPulse:App.tsx:211","label":"yes","low_confidence":false,"why":"Navigation link text"}
+{"id":"EmmaStoneX__NetPulse:components/ShareModal.tsx:149","label":"yes","low_confidence":false,"why":"Checkbox label"}
+{"id":"EmmaStoneX__NetPulse:components/ShareModal.tsx:257","label":"yes","low_confidence":false,"why":"Confirmation message to user"}
+{"id":"EmmaStoneX__NetPulse:components/ShareModal.tsx:138","label":"yes","low_confidence":false,"why":"Accessible name of close button"}
+{"id":"EmmaStoneX__NetPulse:components/SharedView.tsx:55","label":"yes","low_confidence":false,"why":"Button text"}
+{"id":"EmmaStoneX__NetPulse:components/UsageIndicator.tsx:39","label":"yes","low_confidence":false,"why":"Tooltip with words around values"}
+{"id":"EmmaStoneX__NetPulse:components/SharedView.tsx:92","label":"yes","low_confidence":false,"why":"Button text"}
+{"id":"EmmaStoneX__NetPulse:components/ShareModal.tsx:214","label":"yes","low_confidence":false,"why":"Section label in modal"}
+{"id":"EmmaStoneX__NetPulse:components/ShareModal.tsx:217","label":"yes","low_confidence":false,"why":"Modal paragraph text"}
+{"id":"EmmaStoneX__NetPulse:components/ShareButton.tsx:49","label":"yes","low_confidence":false,"why":"Button label text"}
+{"id":"EmmaStoneX__NetPulse:public/about.html:1023","label":"yes","low_confidence":false,"why":"Section heading"}
+{"id":"EmmaStoneX__NetPulse:public/about.html:875","label":"yes","low_confidence":false,"why":"Accessible name of menu button"}
+{"id":"EmmaStoneX__NetPulse:public/privacy.html:193","label":"yes","low_confidence":false,"why":"Bold term in privacy page"}
+{"id":"EmmaStoneX__NetPulse:backend/worker-i18n-v2.js:1248","label":"no","low_confidence":true,"why":"Backend API error payload"}
+{"id":"EmmaStoneX__NetPulse:public/about.html:959","label":"yes","low_confidence":false,"why":"Feature heading"}
+{"id":"EmmaStoneX__NetPulse:public/about.html:1151","label":"yes","low_confidence":false,"why":"Call-to-action text"}
+{"id":"EmmaStoneX__NetPulse:public/about.html:1032","label":"yes","low_confidence":false,"why":"About page paragraph"}
+{"id":"EmmaStoneX__NetPulse:public/privacy.html:221","label":"yes","low_confidence":false,"why":"Privacy policy list item text"}
+{"id":"EmmaStoneX__NetPulse:public/about.html:14","label":"yes","low_confidence":true,"why":"Open Graph title shown in link previews"}
+{"id":"EmmaStoneX__NetPulse:index.html:110","label":"yes","low_confidence":false,"why":"Visible tagline paragraph"}
+{"id":"EmmaStoneX__NetPulse:public/about.html:947","label":"yes","low_confidence":false,"why":"Section heading"}
+{"id":"EmmaStoneX__NetPulse:public/about.html:929","label":"yes","low_confidence":true,"why":"Visible stat value with time unit on about page"}
+{"id":"EmmaStoneX__NetPulse:public/about.html:907","label":"yes","low_confidence":false,"why":"Call-to-action text"}
+{"id":"EmmaStoneX__NetPulse:index.html:136#2","label":"no","low_confidence":true,"why":"Third-party product name"}
+{"id":"EmmaStoneX__NetPulse:public/about.html:1044#2","label":"yes","low_confidence":false,"why":"About page paragraph"}
+{"id":"EmmaStoneX__NetPulse:components/TrendingSection.tsx:65","label":"yes","low_confidence":false,"why":"Visible source attribution text"}
+{"id":"EmmaStoneX__NetPulse:public/terms.html:177","label":"yes","low_confidence":false,"why":"Last-updated note on terms page"}
+{"id":"EmmaStoneX__NetPulse:public/privacy.html:234","label":"yes","low_confidence":false,"why":"Privacy page heading"}
+{"id":"EmmaStoneX__NetPulse:public/privacy.html:292","label":"yes","low_confidence":false,"why":"Visible link/label text"}
+{"id":"EmmaStoneX__NetPulse:components/Header.tsx:135","label":"yes","low_confidence":false,"why":"Accessible name of GitHub link"}
+{"id":"WTWB-none__void:src/views/Global.vue:44","label":"yes","low_confidence":false,"why":"Settings label text"}
+{"id":"WTWB-none__void:src/components/ui/settings/SettingsPopup.vue:35","label":"yes","low_confidence":false,"why":"Settings heading"}
+{"id":"WTWB-none__void:src/views/Global.vue:17","label":"yes","low_confidence":false,"why":"Page heading"}
+{"id":"WTWB-none__void:src/views/SettingsSelector.vue:46","label":"yes","low_confidence":false,"why":"Select item label"}
+{"id":"WTWB-none__void:src/views/Global.vue:24","label":"yes","low_confidence":false,"why":"Settings description text"}
+{"id":"WTWB-none__void:src/views/Loader.vue:116","label":"yes","low_confidence":true,"why":"Visible tagline heading, though stylized Latin"}
+{"id":"WTWB-none__void:src/views/WelcomeSetup.vue:51","label":"yes","low_confidence":false,"why":"Onboarding heading question"}
+{"id":"WTWB-none__void:src/views/SettingsSelector.vue:43","label":"yes","low_confidence":false,"why":"Select item label"}
+{"id":"WTWB-none__void:src/views/Global.vue:39","label":"yes","low_confidence":false,"why":"Settings label text"}
+{"id":"WTWB-none__void:src/views/Plugins.vue:68","label":"yes","low_confidence":false,"why":"Paragraph text shown to user"}
+{"id":"WTWB-none__void:src/components/ui/sidebar/SidebarRail.vue:19","label":"yes","low_confidence":false,"why":"Button tooltip"}
+{"id":"WTWB-none__void:src/views/Home.vue:51","label":"yes","low_confidence":false,"why":"Card title shown on home view"}
+{"id":"WTWB-none__void:src/views/Home.vue:44","label":"yes","low_confidence":false,"why":"Card description shown on home view"}
+{"id":"WTWB-none__void:src/views/Home.vue:52","label":"yes","low_confidence":false,"why":"Card description shown on home view"}
+{"id":"WTWB-none__void:src/views/Home.vue:28","label":"yes","low_confidence":false,"why":"Card description shown on home view"}
+{"id":"WTWB-none__void:src/views/Home.vue:35","label":"yes","low_confidence":false,"why":"Card title shown on home view"}
+{"id":"WTWB-none__void:src/components/ui/sidebar/Sidebar.vue:36","label":"yes","low_confidence":false,"why":"Accessible sheet title"}
+{"id":"WTWB-none__void:src/components/ui/file-upload/FileUpload.vue:65","label":"no","low_confidence":false,"why":"Size value with unit only, no words"}
+{"id":"WTWB-none__void:src/views/Home.vue:27","label":"yes","low_confidence":false,"why":"Card title shown on home view"}
+{"id":"WTWB-none__void:src/views/Home.vue:47","label":"yes","low_confidence":false,"why":"Card title shown on home view"}
+{"id":"WTWB-none__void:src/components/ui/sidebar/Sidebar.vue:37","label":"yes","low_confidence":false,"why":"Accessible sheet description for screen readers"}
+{"id":"WTWB-none__void:src/components/ui/interactive-hover-button/InteractiveHoverButton.vue:37","label":"yes","low_confidence":true,"why":"Default button text if none passed"}
+{"id":"WTWB-none__void:src/views/Home.vue:39","label":"yes","low_confidence":false,"why":"Card title shown on home view"}
+{"id":"WTWB-none__void:src/views/Home.vue:31","label":"yes","low_confidence":false,"why":"Card title shown on home view"}
+{"id":"WTWB-none__void:src/views/Home.vue:48","label":"yes","low_confidence":false,"why":"Card description shown on home view"}
+{"id":"WTWB-none__void:src/components/ui/profile/Card.vue:17","label":"yes","low_confidence":false,"why":"Card paragraph text"}
+{"id":"WTWB-none__void:src/views/Home.vue:32","label":"yes","low_confidence":false,"why":"Card description shown on home view"}
+{"id":"WTWB-none__void:src/components/ui/sheet/SheetContent.vue:59","label":"yes","low_confidence":false,"why":"Screen-reader text for close button"}
+{"id":"WTWB-none__void:src/components/ui/file-upload/FileUpload.vue:85","label":"yes","low_confidence":false,"why":"Visible word around date value"}
+{"id":"WTWB-none__void:src/views/JournalContent.vue:32","label":"yes","low_confidence":false,"why":"Accessible name for next-page button"}
+{"id":"pa001024__riven-mirror:src/components/MiniClock.vue:16","label":"yes","low_confidence":false,"why":"Visible setting text"}
+{"id":"pa001024__riven-mirror:src/components/VisualSkill.vue:20","label":"yes","low_confidence":true,"why":"Checkbox label, may double as value"}
+{"id":"pa001024__riven-mirror:src/components/MoaBuilder.vue:99","label":"yes","low_confidence":false,"why":"Visible label word around value"}
+{"id":"pa001024__riven-mirror:src/components/ModSelector.vue:33","label":"yes","low_confidence":false,"why":"Visible tab label"}
+{"id":"pa001024__riven-mirror:src/components/AmpBuilder.vue:59","label":"yes","low_confidence":false,"why":"Visible label word around value"}
+{"id":"pa001024__riven-mirror:src/views/buildview/MeleeModBuildView.vue:102","label":"yes","low_confidence":false,"why":"Form field label"}
+{"id":"pa001024__riven-mirror:src/components/ZawBuilder.vue:73","label":"yes","low_confidence":false,"why":"Visible label word around value"}
+{"id":"pa001024__riven-mirror:src/views/Intro.vue:32","label":"yes","low_confidence":true,"why":"Descriptive app name shown on intro"}
+{"id":"pa001024__riven-mirror:src/views/music/MusicEdit.vue:112","label":"yes","low_confidence":false,"why":"Button text"}
+{"id":"pa001024__riven-mirror:src/components/ZawBuilder.vue:41","label":"yes","low_confidence":false,"why":"Visible damage label with value"}
+{"id":"pa001024__riven-mirror:src/views/Huangli.vue:35#3","label":"yes","low_confidence":false,"why":"Visible tip text"}
+{"id":"pa001024__riven-mirror:src/components/infobox/WeaponInfobox.vue:37","label":"no","low_confidence":false,"why":"Numeric format with symbols only, no words"}
+{"id":"pa001024__riven-mirror:src/components/vse/TargetItem.vue:4","label":"yes","low_confidence":false,"why":"Select option label"}
+{"id":"pa001024__riven-mirror:src/views/Intro.vue:163","label":"no","low_confidence":true,"why":"Proper name of a group"}
+{"id":"pa001024__riven-mirror:src/views/EULA.vue:19","label":"yes","low_confidence":false,"why":"EULA content text"}
+{"id":"pa001024__riven-mirror:src/views/Master.vue:31","label":"yes","low_confidence":false,"why":"Radio option text shown to user"}
+{"id":"pa001024__riven-mirror:src/views/Setting.vue:23","label":"yes","low_confidence":false,"why":"Feedback link text"}
+{"id":"pa001024__riven-mirror:src/views/Huangli.vue:35#2","label":"yes","low_confidence":false,"why":"Visible word in tip line"}
+{"id":"pa001024__riven-mirror:src/views/buildview/GunModBuildView.vue:149","label":"yes","low_confidence":true,"why":"Checkbox label, game term"}
+{"id":"pa001024__riven-mirror:src/views/Setting.vue:47","label":"no","low_confidence":false,"why":"Radio value identifier"}
+{"id":"pa001024__riven-mirror:src/views/Master.vue:15","label":"yes","low_confidence":false,"why":"Progress label text"}
+{"id":"pa001024__riven-mirror:src/views/Setting.vue:24","label":"yes","low_confidence":false,"why":"Feedback link text"}
+{"id":"pa001024__riven-mirror:src/views/EULA.vue:7","label":"yes","low_confidence":false,"why":"EULA content text"}
+{"id":"pa001024__riven-mirror:src/views/Setting.vue:11","label":"no","low_confidence":true,"why":"Language autonym in switcher, kept untranslated"}
+{"id":"pa001024__riven-mirror:src/App.vue:150","label":"yes","low_confidence":false,"why":"Toast message shown to user"}
+{"id":"pa001024__riven-mirror:src/views/Huangli.vue:6","label":"yes","low_confidence":true,"why":"Visible beta badge"}
+{"id":"pa001024__riven-mirror:src/components/VisualSkill.vue:112","label":"yes","low_confidence":false,"why":"Select placeholder text"}
+{"id":"pa001024__riven-mirror:src/views/ErrorPage.vue:8","label":"yes","low_confidence":false,"why":"Error page paragraph text"}
+{"id":"pa001024__riven-mirror:src/views/music/MusicEdit.vue:43","label":"no","low_confidence":true,"why":"Musical note letter, notation symbol"}
+{"id":"pa001024__riven-mirror:src/components/vse/EffectEditor.vue:4","label":"yes","low_confidence":false,"why":"Select placeholder text"}
+{"id":"joeartsea__node-red-contrib-ftp:sftp.js:76","label":"yes","low_confidence":true,"why":"Node status text shown in editor"}
+{"id":"joeartsea__node-red-contrib-ftp:ftp.js:65","label":"yes","low_confidence":true,"why":"Node status text shown in editor"}

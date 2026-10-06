@@ -1,0 +1,48 @@
+{
+ "all": {
+  "n": 122,
+  "agree": 121,
+  "kappa": 0.972755694506476,
+  "yes_1": 99,
+  "yes_2": 100,
+  "low_confidence_1": 22,
+  "low_confidence_2": 21
+ },
+ "Y": {
+  "n": 40,
+  "agree": 40,
+  "kappa": 1,
+  "yes_1": 40,
+  "yes_2": 40,
+  "low_confidence_1": 3,
+  "low_confidence_2": 3
+ },
+ "O": {
+  "n": 82,
+  "agree": 81,
+  "kappa": 0.9693801344286781,
+  "yes_1": 59,
+  "yes_2": 60,
+  "low_confidence_1": 19,
+  "low_confidence_2": 18
+ },
+ "O_flagged": {
+  "n": 1,
+  "agree": 1,
+  "kappa": 1,
+  "yes_1": 1,
+  "yes_2": 1,
+  "low_confidence_1": 0,
+  "low_confidence_2": 1
+ },
+ "O_unflagged": {
+  "n": 81,
+  "agree": 80,
+  "kappa": 0.9692366122293959,
+  "yes_1": 58,
+  "yes_2": 59,
+  "low_confidence_1": 19,
+  "low_confidence_2": 17
+ },
+ "y_with_one_no": []
+}
