@@ -1,0 +1,120 @@
+{"id":"TO-Bus__to-bus-ca:src/components/fetch/FetchTtcLineStop.tsx:121","label":"yes","low_confidence":false,"why":"Empty-state message"}
+{"id":"TO-Bus__to-bus-ca:src/components/countdown/CountdownSec.tsx:70","label":"no","low_confidence":false,"why":"Number with seconds unit glyph only"}
+{"id":"TO-Bus__to-bus-ca:src/routes/LineStopPrediction.tsx:21","label":"yes","low_confidence":false,"why":"Heading with words Line and Stop"}
+{"id":"TO-Bus__to-bus-ca:src/routes/Error.tsx:12","label":"yes","low_confidence":false,"why":"Error page message"}
+{"id":"TO-Bus__to-bus-ca:src/components/countdown/CountdownSec.tsx:63","label":"no","low_confidence":false,"why":"Number with minutes unit glyph only"}
+{"id":"TO-Bus__to-bus-ca:src/components/settings/Settings.tsx:151#2","label":"yes","low_confidence":false,"why":"Link tooltip"}
+{"id":"TO-Bus__to-bus-ca:src/components/nearby/Nearby.tsx:136","label":"yes","low_confidence":false,"why":"Switch label"}
+{"id":"TO-Bus__to-bus-ca:src/components/settings/Settings.tsx:163","label":"yes","low_confidence":false,"why":"Radio label"}
+{"id":"TO-Bus__to-bus-ca:src/components/alerts/AlertsPage.tsx:43","label":"yes","low_confidence":false,"why":"Tab label"}
+{"id":"TO-Bus__to-bus-ca:src/components/settings/Settings.tsx:156","label":"yes","low_confidence":false,"why":"Section heading"}
+{"id":"TO-Bus__to-bus-ca:src/components/alerts/bsky-alerts/AllBskyAlerts.tsx:120","label":"yes","low_confidence":false,"why":"Section heading"}
+{"id":"TO-Bus__to-bus-ca:src/components/yrt/YRTstop.tsx:46","label":"yes","low_confidence":false,"why":"Document title with words"}
+{"id":"TO-Bus__to-bus-ca:src/routes/About.tsx:24","label":"yes","low_confidence":false,"why":"About page paragraph"}
+{"id":"TO-Bus__to-bus-ca:src/components/display/VehicleLocation.tsx:97","label":"yes","low_confidence":false,"why":"Visible text with word Speed"}
+{"id":"TO-Bus__to-bus-ca:src/components/etaCard/EtaCard.tsx:218#2","label":"yes","low_confidence":false,"why":"Button tooltip fallback text"}
+{"id":"TO-Bus__to-bus-ca:src/components/yrt/YRTstop.tsx:125","label":"yes","low_confidence":false,"why":"Heading with word STOP"}
+{"id":"TO-Bus__to-bus-ca:index.html:36","label":"yes","low_confidence":true,"why":"Page title users see; app name"}
+{"id":"TO-Bus__to-bus-ca:src/components/eta/FavouriteEta.tsx:89","label":"yes","low_confidence":false,"why":"Offline warning message"}
+{"id":"TO-Bus__to-bus-ca:src/components/display/VehicleLocation.tsx:98","label":"yes","low_confidence":false,"why":"Visible text with word Heading"}
+{"id":"TO-Bus__to-bus-ca:src/components/display/VehicleLocation.tsx:55","label":"yes","low_confidence":false,"why":"Error heading with word Error"}
+{"id":"TO-Bus__to-bus-ca:src/components/etaCard/EtaCard.tsx:222","label":"yes","low_confidence":false,"why":"Button text"}
+{"id":"TO-Bus__to-bus-ca:src/components/display/VehicleLocation.tsx:95","label":"yes","low_confidence":false,"why":"Heading with word Route"}
+{"id":"TO-Bus__to-bus-ca:src/routes/About.tsx:27","label":"yes","low_confidence":false,"why":"About page paragraph"}
+{"id":"TO-Bus__to-bus-ca:src/components/etaCard/EtaCard.tsx:118","label":"yes","low_confidence":false,"why":"Button tooltip"}
+{"id":"TO-Bus__to-bus-ca:src/routes/About.tsx:12","label":"yes","low_confidence":false,"why":"Section heading"}
+{"id":"TO-Bus__to-bus-ca:src/components/etaCard/EtaCard.tsx:132","label":"yes","low_confidence":false,"why":"Dialog title"}
+{"id":"TO-Bus__to-bus-ca:src/routes/Error.tsx:11","label":"yes","low_confidence":false,"why":"Error page heading"}
+{"id":"TO-Bus__to-bus-ca:src/routes/About.tsx:39#2","label":"yes","low_confidence":false,"why":"About page paragraph"}
+{"id":"TO-Bus__to-bus-ca:src/routes/Line.tsx:23","label":"yes","low_confidence":false,"why":"Loading message"}
+{"id":"TO-Bus__to-bus-ca:src/routes/About.tsx:25","label":"yes","low_confidence":false,"why":"Section heading"}
+{"id":"wzdavid__openclaw-desktop:src/pages/SkillsPage/index.tsx:1773","label":"yes","low_confidence":false,"why":"Informational paragraph"}
+{"id":"wzdavid__openclaw-desktop:src/pages/FullAnalytics/components/AgentBreakdownSection.tsx:67","label":"yes","low_confidence":false,"why":"Visible label"}
+{"id":"wzdavid__openclaw-desktop:src/pages/FullAnalytics/components/ByModelSection.tsx:44","label":"yes","low_confidence":false,"why":"Table column header"}
+{"id":"wzdavid__openclaw-desktop:src/pages/ConfigManager/ToolsTab.tsx:618","label":"yes","low_confidence":false,"why":"Option label shown to users"}
+{"id":"wzdavid__openclaw-desktop:src/pages/ConfigManager/ToolsTab.tsx:367","label":"yes","low_confidence":false,"why":"Form field label"}
+{"id":"wzdavid__openclaw-desktop:src/pages/ConfigManager/AgentsTab.tsx:775","label":"yes","low_confidence":false,"why":"Textarea placeholder"}
+{"id":"wzdavid__openclaw-desktop:src/pages/ConfigManager/SecretsTab.tsx:193","label":"yes","low_confidence":false,"why":"Empty-state message"}
+{"id":"wzdavid__openclaw-desktop:src/components/CommandPalette.tsx:164","label":"yes","low_confidence":false,"why":"Input placeholder"}
+{"id":"wzdavid__openclaw-desktop:src/pages/AgentHub/AgentSettingsPanel.tsx:893","label":"yes","low_confidence":false,"why":"Button label"}
+{"id":"wzdavid__openclaw-desktop:src/components/Chat/MessageBubble.tsx:462","label":"yes","low_confidence":false,"why":"Button label"}
+{"id":"wzdavid__openclaw-desktop:src/pages/CodeInterpreter.tsx:163","label":"no","low_confidence":false,"why":"Number with seconds unit glyph only"}
+{"id":"wzdavid__openclaw-desktop:src/components/Chat/ChatImage.tsx:197","label":"yes","low_confidence":false,"why":"Button tooltip"}
+{"id":"wzdavid__openclaw-desktop:src/pages/ConfigManager/providerTemplates.ts:781","label":"yes","low_confidence":true,"why":"Provider name label users read; brand"}
+{"id":"wzdavid__openclaw-desktop:src/components/Chat/ToolCallBubble.tsx:151","label":"yes","low_confidence":false,"why":"Section label"}
+{"id":"wzdavid__openclaw-desktop:src/pages/ConfigManager/ToolsTab.tsx:580","label":"yes","low_confidence":false,"why":"Option label shown to users"}
+{"id":"wzdavid__openclaw-desktop:src/pages/ConfigManager/ToolsTab.tsx:555","label":"yes","low_confidence":false,"why":"Option label shown to users"}
+{"id":"wzdavid__openclaw-desktop:src/pages/ConfigManager/providerTemplates.ts:808","label":"yes","low_confidence":true,"why":"Provider name label users read; brand, may stay untranslated"}
+{"id":"wzdavid__openclaw-desktop:src/components/GatewayErrorScreen.tsx:258","label":"yes","low_confidence":false,"why":"Button state label"}
+{"id":"wzdavid__openclaw-desktop:src/components/Chat/ToolCallBubble.tsx:37","label":"yes","low_confidence":false,"why":"Label shown to users"}
+{"id":"wzdavid__openclaw-desktop:src/pages/SkillsPage/components.tsx:80","label":"yes","low_confidence":false,"why":"Category label"}
+{"id":"wzdavid__openclaw-desktop:src/pages/ConfigManager/AgentsTab.tsx:46","label":"yes","low_confidence":false,"why":"Option label shown to users"}
+{"id":"wzdavid__openclaw-desktop:src/pages/ConfigManager/providerTemplates.ts:398","label":"yes","low_confidence":false,"why":"Hint text shown to users"}
+{"id":"wzdavid__openclaw-desktop:src/pages/SkillsPage/components.tsx:273","label":"no","low_confidence":false,"why":"Version format prefix, no translatable words"}
+{"id":"wzdavid__openclaw-desktop:src/pages/CodeInterpreter.tsx:172","label":"yes","low_confidence":false,"why":"Section label"}
+{"id":"wzdavid__openclaw-desktop:src/components/GatewayErrorScreen.tsx:82","label":"yes","low_confidence":false,"why":"Error screen title"}
+{"id":"wzdavid__openclaw-desktop:src/components/Chat/ToolCallBubble.tsx:34","label":"yes","low_confidence":false,"why":"Label shown to users"}
+{"id":"wzdavid__openclaw-desktop:electron/main.ts:1862","label":"yes","low_confidence":false,"why":"Window title with word Preview"}
+{"id":"wzdavid__openclaw-desktop:src/pages/SkillsPage/components.tsx:78","label":"yes","low_confidence":false,"why":"Category label"}
+{"id":"wzdavid__openclaw-desktop:src/pages/SkillsPage/components.tsx:568","label":"no","low_confidence":false,"why":"Version format prefix, no translatable words"}
+{"id":"wzdavid__openclaw-desktop:src/pages/AgentHub/index.tsx:897","label":"yes","low_confidence":false,"why":"Status text with words around count"}
+{"id":"taovc__pr-cockpit:app/components/PrDetailDrawer.vue:356","label":"yes","low_confidence":false,"why":"Tab button label"}
+{"id":"taovc__pr-cockpit:app/components/ProjectConfig.vue:390","label":"yes","low_confidence":false,"why":"Loading message"}
+{"id":"taovc__pr-cockpit:app/components/RunHostStrip.vue:23#2","label":"yes","low_confidence":false,"why":"Visible cost text with words this turn"}
+{"id":"taovc__pr-cockpit:app/pages/dashboard.vue:152","label":"yes","low_confidence":false,"why":"Empty-state paragraph for users"}
+{"id":"taovc__pr-cockpit:app/components/ReviewPanel.vue:309","label":"yes","low_confidence":false,"why":"Button tooltip"}
+{"id":"taovc__pr-cockpit:app/pages/dashboard.vue:73","label":"yes","low_confidence":false,"why":"Page heading"}
+{"id":"taovc__pr-cockpit:app/components/session/CommandPalette.vue:30","label":"yes","low_confidence":true,"why":"Command palette label; product name"}
+{"id":"taovc__pr-cockpit:app/pages/dashboard.vue:174#4","label":"yes","low_confidence":false,"why":"Table column header"}
+{"id":"taovc__pr-cockpit:app/pages/dashboard.vue:174","label":"yes","low_confidence":false,"why":"Table column header"}
+{"id":"taovc__pr-cockpit:app/pages/agent-config.vue:227","label":"yes","low_confidence":false,"why":"Visible empty-state word"}
+{"id":"taovc__pr-cockpit:electron/main.mjs:291","label":"yes","low_confidence":false,"why":"Menu label with words"}
+{"id":"taovc__pr-cockpit:tests/helpers/mockCodexAppServer.mjs:123","label":"no","low_confidence":false,"why":"Protocol event name in test helper"}
+{"id":"taovc__pr-cockpit:core/pipeline.ts:30","label":"yes","low_confidence":false,"why":"Localized task title shown in the interface"}
+{"id":"taovc__pr-cockpit:core/codex/codexHost.ts:490","label":"yes","low_confidence":false,"why":"Error explaining unsupported feature to user"}
+{"id":"taovc__pr-cockpit:core/host/readonly.ts:57","label":"no","low_confidence":true,"why":"Permission denial returned to the agent model, not the user"}
+{"id":"taovc__pr-cockpit:app/app.vue:7","label":"yes","low_confidence":true,"why":"Page title users see; product name"}
+{"id":"taovc__pr-cockpit:tests/helpers/mockCodexAppServer.mjs:39","label":"no","low_confidence":false,"why":"Protocol event name in test helper"}
+{"id":"taovc__pr-cockpit:core/eval/runner.ts:165","label":"no","low_confidence":true,"why":"Internal eval run title, developer-facing jargon"}
+{"id":"taovc__pr-cockpit:core/codex/codexHost.ts:302","label":"yes","low_confidence":true,"why":"Status message emitted to session stream user watches"}
+{"id":"taovc__pr-cockpit:server/plugins/recover.ts:78","label":"yes","low_confidence":false,"why":"Review error message telling user to retry"}
+{"id":"taovc__pr-cockpit:app/components/PrDetailDrawer.vue:400","label":"yes","low_confidence":false,"why":"Visible badge text"}
+{"id":"taovc__pr-cockpit:core/pipeline.ts:330","label":"yes","low_confidence":false,"why":"Run error status shown in the interface"}
+{"id":"taovc__pr-cockpit:core/host/claudeHost.ts:229","label":"yes","low_confidence":false,"why":"Turn error message shown to the user"}
+{"id":"taovc__pr-cockpit:core/pipeline.ts:42","label":"yes","low_confidence":false,"why":"Localized task title shown in the interface"}
+{"id":"taovc__pr-cockpit:core/host/claudeHost.ts:179","label":"yes","low_confidence":true,"why":"Text emitted to session stream, though diagnostic in tone"}
+{"id":"taovc__pr-cockpit:app/app.vue:89#2","label":"yes","low_confidence":true,"why":"Visible brand text in header"}
+{"id":"taovc__pr-cockpit:electron/main.mjs:178","label":"yes","low_confidence":true,"why":"Window title users see; product name, may stay untranslated"}
+{"id":"taovc__pr-cockpit:core/codex/codexHost.ts:330","label":"yes","low_confidence":true,"why":"Status message emitted to session stream user watches"}
+{"id":"taovc__pr-cockpit:app/components/session/SessionView.vue:609","label":"yes","low_confidence":true,"why":"Button text naming an editor product"}
+{"id":"taovc__pr-cockpit:core/agent/guard.ts:74","label":"no","low_confidence":true,"why":"Permission denial returned to the agent model, not the user"}
+{"id":"omvjro__DOL-pancake:src/components/panel/SkillCheck.vue:80","label":"yes","low_confidence":false,"why":"Input placeholder"}
+{"id":"omvjro__DOL-pancake:src/components/panel/ColouredText.vue:98","label":"yes","low_confidence":true,"why":"Visible option text, though odd syntax-like word"}
+{"id":"omvjro__DOL-pancake:src/App.vue:178","label":"yes","low_confidence":false,"why":"Form label"}
+{"id":"omvjro__DOL-pancake:src/components/panel/SaveManage.vue:128","label":"yes","low_confidence":false,"why":"Visible dropdown option text"}
+{"id":"omvjro__DOL-pancake:src/App.vue:226","label":"yes","low_confidence":false,"why":"Input placeholder"}
+{"id":"omvjro__DOL-pancake:src/App.vue:209","label":"yes","low_confidence":false,"why":"Menu item text"}
+{"id":"omvjro__DOL-pancake:src/components/panel/SaveManage.vue:122","label":"yes","low_confidence":false,"why":"Warning message with word Duplicated"}
+{"id":"omvjro__DOL-pancake:src/components/panel/CustomWidget.vue:114","label":"yes","low_confidence":false,"why":"Visible dropdown option text"}
+{"id":"omvjro__DOL-pancake:src/App.vue:243","label":"yes","low_confidence":true,"why":"Visible item text, possibly a field name"}
+{"id":"omvjro__DOL-pancake:src/components/panel/CustomWidget.vue:117","label":"yes","low_confidence":false,"why":"Button label"}
+{"id":"omvjro__DOL-pancake:src/components/panel/SaveManage.vue:120","label":"yes","low_confidence":true,"why":"Visible dropdown option text, though it looks like an enum value"}
+{"id":"omvjro__DOL-pancake:src/App.vue:241","label":"yes","low_confidence":true,"why":"Visible option text, could be color value"}
+{"id":"omvjro__DOL-pancake:src/App.vue:217","label":"yes","low_confidence":false,"why":"Visible dropdown option text"}
+{"id":"omvjro__DOL-pancake:src/App.vue:224","label":"yes","low_confidence":false,"why":"Visible dropdown option text"}
+{"id":"omvjro__DOL-pancake:src/App.vue:171","label":"yes","low_confidence":true,"why":"Theme name option users read; proper name"}
+{"id":"omvjro__DOL-pancake:index.html:7","label":"yes","low_confidence":true,"why":"Page title users see; app name"}
+{"id":"omvjro__DOL-pancake:src/App.vue:187","label":"no","low_confidence":false,"why":"Locale code"}
+{"id":"omvjro__DOL-pancake:src/App.vue:189","label":"no","low_confidence":false,"why":"Locale code"}
+{"id":"omvjro__DOL-pancake:src/App.vue:136#2","label":"yes","low_confidence":false,"why":"Accessible name"}
+{"id":"omvjro__DOL-pancake:src/components/panel/SaveManage.vue:132","label":"yes","low_confidence":true,"why":"Visible dropdown option text, though it looks like an enum value"}
+{"id":"omvjro__DOL-pancake:src/components/panel/CustomWidget.vue:132","label":"yes","low_confidence":true,"why":"Visible label, but is a format name"}
+{"id":"omvjro__DOL-pancake:src/App.vue:223","label":"yes","low_confidence":false,"why":"Visible dropdown option text"}
+{"id":"omvjro__DOL-pancake:src/App.vue:136","label":"yes","low_confidence":false,"why":"Button tooltip"}
+{"id":"omvjro__DOL-pancake:src/App.vue:190","label":"no","low_confidence":false,"why":"Locale code"}
+{"id":"omvjro__DOL-pancake:src/App.vue:181","label":"yes","low_confidence":false,"why":"Visible dropdown option text"}
+{"id":"omvjro__DOL-pancake:src/App.vue:172","label":"yes","low_confidence":true,"why":"Theme name option users read; proper name"}
+{"id":"omvjro__DOL-pancake:src/App.vue:173","label":"yes","low_confidence":true,"why":"Theme name option users read; proper name"}
+{"id":"omvjro__DOL-pancake:src/App.vue:220","label":"yes","low_confidence":false,"why":"Visible dropdown option text"}
+{"id":"omvjro__DOL-pancake:src/App.vue:219","label":"yes","low_confidence":false,"why":"Visible dropdown option text"}
+{"id":"omvjro__DOL-pancake:src/App.vue:218","label":"yes","low_confidence":false,"why":"Visible dropdown option text"}

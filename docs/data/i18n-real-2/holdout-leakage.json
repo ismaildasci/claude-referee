@@ -1,0 +1,33 @@
+{
+ "Y": {
+  "n": 40,
+  "placeholder_text": 0.1,
+  "brace_text": 0.125,
+  "context_shows_translation_call": 0,
+  "kinds": {
+   "jsx-text": 10,
+   "jsx-expr-string": 3,
+   "jsx-attr": 6,
+   "ui-prop": 2,
+   "vue-text": 16,
+   "vue-attr": 3
+  }
+ },
+ "O": {
+  "n": 80,
+  "placeholder_text": 0.113,
+  "brace_text": 0.188,
+  "context_shows_translation_call": 0,
+  "kinds": {
+   "jsx-text": 19,
+   "ui-assign": 1,
+   "jsx-attr": 3,
+   "jsx-expr-string": 4,
+   "html-text": 2,
+   "ui-prop": 27,
+   "ui-call": 2,
+   "vue-text": 20,
+   "vue-attr": 2
+  }
+ }
+}

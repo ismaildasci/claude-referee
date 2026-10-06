@@ -1,0 +1,10 @@
+{
+ "y_both_no": [
+  "TO-Bus__to-bus-ca:src/components/countdown/CountdownSec.tsx:70",
+  "TO-Bus__to-bus-ca:src/components/countdown/CountdownSec.tsx:63"
+ ],
+ "o_disagree": [
+  "taovc__pr-cockpit:core/host/readonly.ts:57",
+  "taovc__pr-cockpit:core/agent/guard.ts:74"
+ ]
+}
