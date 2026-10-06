@@ -1,0 +1,1 @@
+{"command":"judge","question":"string.translatable","pack":"i18n-w1","positive":"yes","note":"The frozen candidate wording i18n-w1 on the same hold-out cases as jev-evals/judge-i18n-real-2 (docs/decisions/i18n-real-2.md). Needs REFEREE_PACKS_DIR=docs/data/i18n-real-2/wordings."}
