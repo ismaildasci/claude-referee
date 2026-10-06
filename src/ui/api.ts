@@ -3,9 +3,11 @@
 
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { readCache } from "../engine/cache.ts";
+import type { Answer } from "../engine/client.ts";
 import type { Env } from "../engine/config.ts";
 import { dirSize, projectId, tildify } from "../engine/datadir.ts";
-import { readReceipts, type Receipt } from "../engine/receipts.ts";
+import { readOverruled, readReceipts, type Receipt } from "../engine/receipts.ts";
 import { loadPack, packDirs, threshold } from "../engine/pack.ts";
 import { loadProject } from "../engine/project.ts";
 import { clopperPearson, suggestThreshold } from "../engine/stopgate/interval.ts";
@@ -109,6 +111,109 @@ export function overview(ctx: UiContext) {
     stops: { ...stats, precision_ci95: interval(stats.right, stats.labelled), false_block_rate_ci95: interval(stats.wrong, stats.labelled) },
     threshold_suggestion: suggestThreshold(stops, current),
   };
+}
+
+export const FLOW_DAYS = [1, 7, 30] as const;
+const FLOW_LIMIT = 200;
+const FLOW_ANSWERS = 40;
+const FLOW_OPTIONS = 6;
+const CACHE_KEY = /^[0-9a-f]{64}$/;
+
+function num(v: unknown): number | null {
+  return typeof v === "number" && Number.isFinite(v) ? v : null;
+}
+
+function answerView(id: string, a: Answer) {
+  const base = { id: visible(id), type: a.type };
+  if (a.type === "noul") {
+    const yes = num(a.noul);
+    if (yes === null) return { ...base, value: "?", p: null, options: [] };
+    return { ...base, value: yes >= 0.5 ? "yes" : "no", p: yes >= 0.5 ? yes : Math.round((1 - yes) * 10_000) / 10_000, options: [] };
+  }
+  if (a.type === "score") return { ...base, value: num(a.score)?.toFixed(2) ?? "?", p: num(a.confidence), options: [] };
+  if (a.type === "choice") {
+    const options = Object.entries(a.probabilities ?? {})
+      .flatMap(([label, p]) => (num(p) === null ? [] : [{ label: visible(label), p: p as number }]))
+      .sort((x, y) => y.p - x.p)
+      .slice(0, FLOW_OPTIONS);
+    return { ...base, value: visible(String(a.choice)), p: num(a.confidence), options };
+  }
+  return null;
+}
+
+function jevAnswers(ctx: UiContext, keys: readonly string[] | undefined) {
+  const found: { model: string; answered_at: string; questions: NonNullable<ReturnType<typeof answerView>>[] }[] = [];
+  let missing = 0;
+  for (const key of keys ?? []) {
+    const entry = CACHE_KEY.test(key) ? readCache(ctx.dataDir, key, ctx.now(), Number.POSITIVE_INFINITY) : null;
+    if (!entry || typeof entry.answers !== "object" || entry.answers === null) {
+      missing++;
+      continue;
+    }
+    const questions = Object.entries(entry.answers)
+      .slice(0, FLOW_ANSWERS)
+      .flatMap(([id, a]) => (a && typeof a === "object" ? (answerView(id, a) ?? []) : []));
+    found.push({ model: visible(String(entry.model)), answered_at: new Date(entry.ts).toISOString(), questions });
+  }
+  return { answers: found, answers_missing: missing };
+}
+
+function shortSession(id: string | undefined): string | null {
+  return typeof id === "string" && id !== "unknown" && id !== "" ? visible(id.slice(0, 8)) : null;
+}
+
+export function flow(ctx: UiContext, query: { days?: unknown; command?: unknown } = {}) {
+  const days = (FLOW_DAYS as readonly number[]).includes(Number(query.days)) ? Number(query.days) : 7;
+  const since = new Date(ctx.now() - days * DAY_MS).toISOString();
+  const receipts = readReceipts(ctx.dataDir, projectId(ctx.cwd)).filter((r) => r.ts >= since);
+  const stops = projectStops(ctx).filter((r) => r.ts >= since);
+  const commands = [...new Set(receipts.map((r) => r.command))].sort();
+  if (stops.length) commands.push("stop");
+  const command = typeof query.command === "string" && commands.includes(query.command) ? query.command : "all";
+  const voided = readOverruled(ctx.dataDir);
+  const calls = command === "stop" ? [] : receipts.filter((r) => command === "all" || r.command === command);
+  const stopRows = command === "all" || command === "stop" ? stops : [];
+  const rows = [...calls.map((r) => ({ ts: r.ts, r })), ...stopRows.map((s) => ({ ts: s.ts, s }))].sort((a, b) => (a.ts < b.ts ? 1 : a.ts > b.ts ? -1 : 0));
+  const events = rows.slice(0, FLOW_LIMIT).map((row) => {
+    if ("r" in row) {
+      const r = row.r;
+      return {
+        kind: "call" as const,
+        id: r.id,
+        ts: r.ts,
+        command: visible(r.command),
+        pack: r.pack === undefined ? null : visible(r.pack),
+        model: r.model === undefined ? null : visible(r.model),
+        verdict: r.verdict === undefined ? null : visible(r.verdict),
+        error: r.error === undefined ? null : visible(r.error),
+        requests: r.requests,
+        cached: r.cached,
+        input_tokens: r.input_tokens,
+        cost_usd: r.cost_usd,
+        ms: r.ms,
+        session: shortSession(r.session_id),
+        overruled: voided.has(r.id),
+        ...jevAnswers(ctx, r.cache_keys),
+      };
+    }
+    const s = row.s;
+    return {
+      kind: "stop" as const,
+      id: s.id,
+      ts: s.ts,
+      mode: s.mode,
+      session: shortSession(s.session_id),
+      skipped: s.skipped ?? null,
+      edits: s.edits,
+      checks: s.checks,
+      ms: s.ms,
+      claims_done: s.decision?.claims_done ?? null,
+      claims_verified: s.decision?.claims_verified ?? null,
+      would_block: s.decision?.would_block ?? null,
+      label: s.label ?? null,
+    };
+  });
+  return { days, command, commands, total: rows.length, shown: events.length, events };
 }
 
 const SENT = [

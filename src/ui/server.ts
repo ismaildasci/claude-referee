@@ -5,7 +5,7 @@ import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import type { AddressInfo } from "node:net";
 import { RefereeError } from "../engine/errors.ts";
-import { exportKind, label, overview, privacy, queue, type UiContext } from "./api.ts";
+import { exportKind, flow, label, overview, privacy, queue, type UiContext } from "./api.ts";
 import { APP_CSS, APP_JS, INDEX_HTML } from "./page.ts";
 
 export const TOKEN_HEADER = "x-referee-token";
@@ -97,6 +97,7 @@ export async function startUi(ctx: UiContext, requestedPort = 0): Promise<UiServ
     if (!tokenOk(req)) return json(res, 401, { error: "bad_token" });
 
     if (req.method === "GET") {
+      if (route === "/api/flow") return json(res, 200, flow(ctx, { days: url.searchParams.get("days"), command: url.searchParams.get("command") }));
       if (route === "/api/queue") return json(res, 200, queue(ctx));
       if (route === "/api/overview") return json(res, 200, overview(ctx));
       if (route === "/api/privacy") return json(res, 200, privacy(ctx));

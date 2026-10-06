@@ -9,7 +9,9 @@ import { test } from "node:test";
 import { Script } from "node:vm";
 import { commands } from "../src/cli/commands/index.ts";
 import { run } from "../src/cli/run.ts";
+import { writeCache } from "../src/engine/cache.ts";
 import { projectId } from "../src/engine/datadir.ts";
+import { appendReceipt, overruleReceipt, type Receipt } from "../src/engine/receipts.ts";
 import { appendStop, labelsFile, readStops } from "../src/engine/stopgate/stops.ts";
 import type { StopRecord } from "../src/engine/stopgate/types.ts";
 import { startUi, type UiServer } from "../src/ui/server.ts";
@@ -116,7 +118,7 @@ test("a missing or wrong token is rejected on every API route", async () => {
   try {
     const host = s.auth["host"] ?? "";
     const bad = [undefined, "", "0".repeat(32), s.ui.token.slice(0, -1), s.ui.token + "0", s.ui.token.toUpperCase()];
-    for (const path of ["/api/queue", "/api/overview", "/api/privacy", "/api/export?kind=stops"]) {
+    for (const path of ["/api/flow", "/api/queue", "/api/overview", "/api/privacy", "/api/export?kind=stops"]) {
       for (const token of bad) {
         const r = await raw(s.ui.port, { path, headers: token === undefined ? { host } : { host, "x-referee-token": token } });
         assert.equal(r.status, 401, `${path} ${String(token)}`);
@@ -187,7 +189,7 @@ test("the weak hint is shown in the queue and never applied as a label", async (
 test("excerpts only ever leave as JSON or a download, and the page never parses HTML", async () => {
   const s = await setup();
   try {
-    for (const path of ["/api/queue", "/api/overview", "/api/privacy", "/api/export?kind=stops", "/api/export?kind=receipts", "/api/export?kind=labels", "/api/nope", "/nope"]) {
+    for (const path of ["/api/flow", "/api/queue", "/api/overview", "/api/privacy", "/api/export?kind=stops", "/api/export?kind=receipts", "/api/export?kind=labels", "/api/nope", "/nope"]) {
       const r = await s.get(path);
       const type = String(r.headers["content-type"]);
       assert.doesNotMatch(type, /html/, path);
@@ -371,7 +373,11 @@ class FakeNode {
   focus(): void {}
 }
 
-function fakePage(hash: string, queue: unknown, routes: Record<string, unknown> = {}) {
+const FIRST_FLOW = "/api/flow?days=7&command=all";
+const EMPTY_FLOW = { days: 7, command: "all", commands: [], total: 0, shown: 0, events: [] };
+
+function fakePage(hash: string, queue: unknown, more: Record<string, unknown> = {}) {
+  const routes: Record<string, unknown> = { [FIRST_FLOW]: EMPTY_FLOW, ...more };
   const nodes: Record<string, FakeNode> = { main: new FakeNode("main"), status: new FakeNode("p"), tabs: new FakeNode("nav") };
   const on: Record<string, (() => void)[]> = {};
   const location = { hash, pathname: "/" };
@@ -403,18 +409,26 @@ test("the tokened URL opened again in the same tab is picked up without a reload
   page.location.hash = "#t=abc123";
   page.fire("hashchange");
   await settle();
-  assert.deepEqual(page.fetched, [{ path: "/api/queue", token: "abc123" }]);
+  assert.deepEqual(page.fetched, [{ path: FIRST_FLOW, token: "abc123" }]);
   assert.equal(page.location.hash, "");
-  assert.match(page.main.textContent, /Nothing to label/);
+  assert.match(page.main.textContent, /Nothing in this period/);
 });
+
+async function openTab(page: ReturnType<typeof fakePage>, name: string): Promise<void> {
+  await settle();
+  const tab = page.tabs.children.find((b) => b.textContent === name);
+  assert.ok(tab, name);
+  tab.click();
+  await settle();
+}
 
 test("the queue card counts edits and checks in the singular and the plural", async () => {
   const card = (edits: number, checks: number) => ({ id: "s1", ts: "2026-10-06T06:00:00.000Z", edits, checks, claims_done: 0.9, claims_verified: 0.1, task_excerpt: "t", final_excerpt: "f", suggestion: null });
   const one = fakePage("#t=tok", { total: 1, stops: [card(1, 1)] });
-  await settle();
+  await openTab(one, "Labelling queue");
   assert.match(one.main.textContent, /- 1 edit, 1 check - done score 0\.90/);
   const many = fakePage("#t=tok", { total: 1, stops: [card(2, 0)] });
-  await settle();
+  await openTab(many, "Labelling queue");
   assert.match(many.main.textContent, /- 2 edits, 0 checks - done score 0\.90/);
 });
 
@@ -438,13 +452,13 @@ test("the queue API carries the stored stop marks, zero when a stop has none", a
 test("the queue card lists the marks a stop has and says nothing when it has none", async () => {
   const card = (marks: unknown) => ({ id: "s1", ts: "2026-10-06T06:00:00.000Z", edits: 1, checks: 1, claims_done: 0.9, claims_verified: 0.1, task_excerpt: "t", final_excerpt: "f", suggestion: null, marks });
   const marked = fakePage("#t=tok", { total: 1, stops: [card({ truncated_checks: 2, subagent_calls: 1, subagent_reports: 1, stale_pass: true })] });
-  await settle();
+  await openTab(marked, "Labelling queue");
   assert.match(marked.main.textContent, /Marks \(read in code, not sent to Jev\): 2 checks with cut-off output; 1 subagent call; 1 subagent or background task finished; a check passed in the previous turn, none after this turn's edits/);
   const plain = fakePage("#t=tok", { total: 1, stops: [card({ truncated_checks: 0, subagent_calls: 0, subagent_reports: 0, stale_pass: false })] });
-  await settle();
+  await openTab(plain, "Labelling queue");
   assert.doesNotMatch(plain.main.textContent, /Marks/);
   const older = fakePage("#t=tok", { total: 1, stops: [{ ...card(undefined), marks: undefined }] });
-  await settle();
+  await openTab(older, "Labelling queue");
   assert.doesNotMatch(older.main.textContent, /Marks/);
 });
 
@@ -469,4 +483,143 @@ test("overview numbers are grouped by thousands", async () => {
   fractional.tabs.children.find((b) => b.textContent === "Overview")?.click();
   await settle();
   assert.match(fractional.main.textContent, /1234\.5678/);
+});
+
+function receipt(id: string, project: string, ts: string, extra: Partial<Receipt> = {}): Receipt {
+  return { id, ts, command: "done", project, requests: 1, cached: 0, input_tokens: 100, cost_usd: 0.00001, ms: 500, ...extra };
+}
+
+const hexKey = (c: string) => c.repeat(64);
+
+async function flowServer(fill: (dataDir: string, project: string) => void) {
+  const dataDir = tempDir();
+  const cwd = tempDir();
+  const home = tempDir();
+  fill(dataDir, projectId(cwd));
+  const ui = await startUi({ dataDir, cwd, home, env: { HOME: home }, now: () => Date.parse("2026-09-30T12:00:00Z") });
+  const get = async (query = "") => JSON.parse((await raw(ui.port, { path: `/api/flow${query}`, headers: { host: `127.0.0.1:${ui.port}`, "x-referee-token": ui.token } })).body) as Record<string, unknown> & { events: Record<string, unknown>[]; commands: string[] };
+  return { ui, dataDir, get };
+}
+
+test("the flow API joins this project's receipts to Jev's stored answers and its stops, newest first", async () => {
+  const s = await flowServer((dataDir, project) => {
+    writeCache(dataDir, hexKey("a"), { ts: Date.parse("2026-09-30T11:00:00Z"), model: "jev-1.13.0", inputTokens: 1234, answers: { c1: { type: "noul", noul: 0.98 } } });
+    writeCache(dataDir, hexKey("b"), {
+      ts: Date.parse("2026-09-30T10:00:00Z"),
+      model: "jev-1.13.0",
+      inputTokens: 300,
+      answers: {
+        injection: { type: "noul", noul: 0.04 },
+        "claim:1:a": { type: "choice", choice: "supports", confidence: 0.9, probabilities: { says_nothing: 0, contradicts: 0.1, supports: 0.9 } },
+        [XSS]: { type: "score", score: 3.5, confidence: 0.7, legend: {} },
+      } as never,
+    });
+    writeCache(dataDir, hexKey("e"), { ts: Date.parse("2026-09-30T09:00:00Z"), model: "jev-1.13.0", inputTokens: 1, answers: { c1: { type: "noul", noul: 0.5 } } });
+    writeFileSync(join(tempDir(), "outside.json"), "{}");
+    appendReceipt(dataDir, receipt("rA", project, "2026-09-30T11:00:00.000Z", { verdict: "met", pack: "generic", model: "jev-1.13.0", input_tokens: 1234, ms: 820, cache_keys: [hexKey("a")], session_id: "abcdef1234567" }));
+    appendReceipt(dataDir, receipt("rB", project, "2026-09-30T10:00:00.000Z", { command: "claims", verdict: "supported", cache_keys: [hexKey("b"), "../../outside", hexKey("f")] }));
+    appendReceipt(dataDir, receipt("rC", project, "2026-09-20T10:00:00.000Z", { command: "decide", verdict: "clear" }));
+    appendReceipt(dataDir, receipt("rD", "otherproject1", "2026-09-30T11:30:00.000Z", { verdict: "met" }));
+    appendReceipt(dataDir, receipt("rE", project, "2026-09-30T09:00:00.000Z", { verdict: "met", cache_keys: [hexKey("e")] }));
+    overruleReceipt(dataDir, "rE", "2026-09-30T09:30:00.000Z");
+    appendStop(dataDir, stop("s1", project, { ts: "2026-09-30T11:30:00.000Z", label: "right" }));
+    const { decision: _asked, ...skipped } = stop("s2", project, { ts: "2026-09-30T08:00:00.000Z", skipped: "no_edits", edits: 0 });
+    appendStop(dataDir, skipped);
+  });
+  try {
+    const all = await s.get();
+    assert.equal(all["days"], 7);
+    assert.equal(all["command"], "all");
+    assert.deepEqual(all.commands, ["claims", "done", "stop"]);
+    assert.deepEqual(all.events.map((e) => e["id"]), ["s1", "rA", "rB", "rE", "s2"]);
+    assert.equal(all["total"], 5);
+    const [s1, rA, rB, rE, s2] = all.events;
+    assert.deepEqual({ kind: rA?.["kind"], session: rA?.["session"], verdict: rA?.["verdict"], ms: rA?.["ms"], missing: rA?.["answers_missing"] }, { kind: "call", session: "abcdef12", verdict: "met", ms: 820, missing: 0 });
+    assert.deepEqual(rA?.["answers"], [{ model: "jev-1.13.0", answered_at: "2026-09-30T11:00:00.000Z", questions: [{ id: "c1", type: "noul", value: "yes", p: 0.98, options: [] }] }]);
+    const bq = (rB?.["answers"] as { questions: { id: string; value: string; p: number; options: { label: string; p: number }[] }[] }[])[0]?.questions ?? [];
+    assert.equal(rB?.["answers_missing"], 2);
+    assert.deepEqual(bq.find((q) => q.id === "injection"), { id: "injection", type: "noul", value: "no", p: 0.96, options: [] });
+    assert.deepEqual(bq.find((q) => q.id === "claim:1:a")?.options, [{ label: "supports", p: 0.9 }, { label: "contradicts", p: 0.1 }, { label: "says_nothing", p: 0 }]);
+    assert.deepEqual(bq.find((q) => q.id === XSS), { id: XSS, type: "score", value: "3.50", p: 0.7, options: [] });
+    assert.deepEqual({ overruled: rE?.["overruled"], missing: rE?.["answers_missing"] }, { overruled: true, missing: 1 });
+    assert.deepEqual({ kind: s1?.["kind"], would_block: s1?.["would_block"], label: s1?.["label"], session: s1?.["session"] }, { kind: "stop", would_block: true, label: "right", session: "sess-ui" });
+    assert.deepEqual({ skipped: s2?.["skipped"], would_block: s2?.["would_block"], claims_done: s2?.["claims_done"] }, { skipped: "no_edits", would_block: null, claims_done: null });
+    const month = await s.get("?days=30");
+    assert.deepEqual(month.commands, ["claims", "decide", "done", "stop"]);
+    assert.equal(month.events.some((e) => e["id"] === "rC"), true);
+    assert.deepEqual((await s.get("?command=stop")).events.map((e) => e["id"]), ["s1", "s2"]);
+    assert.deepEqual((await s.get("?command=done")).events.map((e) => e["id"]), ["rA", "rE"]);
+    const odd = await s.get("?days=5&command=constructor");
+    assert.deepEqual({ days: odd["days"], command: odd["command"], n: odd.events.length }, { days: 7, command: "all", n: 5 });
+  } finally {
+    await s.ui.close();
+  }
+});
+
+test("the flow API shows the newest 200 events and reports the total", async () => {
+  const s = await flowServer((dataDir, project) => {
+    for (let i = 0; i < 205; i++) appendReceipt(dataDir, receipt(`r${i}`, project, new Date(Date.parse("2026-09-30T00:00:00Z") + i * 60_000).toISOString()));
+  });
+  try {
+    const d = await s.get();
+    assert.deepEqual({ total: d["total"], shown: d["shown"], n: d.events.length, first: d.events[0]?.["id"] }, { total: 205, shown: 200, n: 200, first: "r204" });
+  } finally {
+    await s.ui.close();
+  }
+});
+
+function findAll(node: FakeNode, pred: (n: FakeNode) => boolean, out: FakeNode[] = []): FakeNode[] {
+  if (pred(node)) out.push(node);
+  node.children.forEach((c) => findAll(c, pred, out));
+  return out;
+}
+
+test("the flow tab draws each call as ask, Jev, verdict, with answers on demand and filters that refetch", async () => {
+  const call = (id: string, extra: Record<string, unknown>) => ({ kind: "call", id, ts: "2026-10-06T09:00:00.000Z", command: "done", pack: "generic", model: "jev-1.13.0", verdict: "met", error: null, requests: 1, cached: 0, input_tokens: 1234, cost_usd: 0.0001, ms: 820, session: "abcdef12", overruled: false, answers: [], answers_missing: 0, ...extra });
+  const flowData = {
+    days: 7,
+    command: "all",
+    commands: ["claims", "done", "stop"],
+    total: 9,
+    shown: 7,
+    events: [
+      call("c1", { answers: [{ model: "jev-1.13.0", answered_at: "2026-10-06T09:00:00.000Z", questions: [{ id: "claim:1:a", type: "choice", value: "supports", p: 0.9, options: [{ label: "supports", p: 0.9 }, { label: "contradicts", p: 0.1 }] }] }], answers_missing: 1 }),
+      call("c2", { requests: 0, cached: 1, ms: 22 }),
+      call("c3", { requests: 0, cached: 0, ms: 5, verdict: "missing" }),
+      call("c4", { verdict: null, error: "timeout", command: "claims" }),
+      call("c5", { overruled: true, verdict: "unsure" }),
+      { kind: "stop", id: "s1", ts: "2026-10-05T09:00:00.000Z", mode: "shadow", session: "sess-ui", skipped: null, edits: 2, checks: 1, ms: 800, claims_done: 0.9, claims_verified: 0.1, would_block: true, label: "right" },
+      { kind: "stop", id: "s2", ts: "2026-10-05T08:00:00.000Z", mode: "shadow", session: null, skipped: "no_edits", edits: 0, checks: 0, ms: 3, claims_done: null, claims_verified: null, would_block: null, label: null },
+    ],
+  };
+  const page = fakePage("#t=tok", { total: 0, stops: [] }, { [FIRST_FLOW]: flowData, "/api/flow?days=30&command=all": EMPTY_FLOW });
+  await settle();
+  const text = page.main.textContent;
+  for (const s of [
+    "5 calls (3 requests to Jev, 1 answer from the cache), 2 done-gate stops",
+    "Showing the newest 7 of 9",
+    "Jev: 1 request, 1,234 tokens, 820 ms",
+    "From the cache: 1 stored answer, 22 ms",
+    "Decided in code, nothing sent to Jev, 5 ms",
+    "Failed: timeout",
+    "Overruled: voided",
+    "Done-gate stop",
+    "Jev: done 0.90, verified 0.10, 800 ms",
+    "would block, labelled right",
+    "Not asked: no edits",
+    "Jev's answers: 1 question",
+    "supports 0.90, contradicts 0.10",
+    "1 stored answer is gone",
+  ]) assert.ok(text.includes(s), s);
+  const outs = findAll(page.main, (n) => n.className.startsWith("out ")).map((n) => [n.textContent, n.className]);
+  assert.deepEqual(outs, [["met", "out v-ok"], ["met", "out v-ok"], ["missing", "out v-bad"], ["error", "out v-bad"], ["unsure", "out v-mid"], ["would block, labelled right", "out v-bad"], ["skipped", "out v-mid"]]);
+  assert.equal(findAll(page.main, (n) => n.tag === "h3").length, 2);
+  assert.equal(findAll(page.main, (n) => n.tag === "details").length, 1);
+  const period = findAll(page.main, (n) => n.tag === "select")[0];
+  assert.ok(period);
+  (period as unknown as { value: string }).value = "30";
+  (period.listeners["change"] ?? []).forEach((f) => f());
+  await settle();
+  assert.equal(page.fetched.at(-1)?.path, "/api/flow?days=30&command=all");
+  assert.match(page.main.textContent, /Nothing in this period/);
 });

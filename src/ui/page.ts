@@ -24,8 +24,8 @@ export const INDEX_HTML = `<!doctype html>
 </html>
 `;
 
-export const APP_CSS = `:root{--bg:#fbfbfa;--fg:#1c1c1a;--muted:#5e5e59;--line:#d9d9d3;--card:#fff;--accent:#1f5fbf;--ok:#1b7a3d;--bad:#b3261e;--focus:#1f5fbf}
-@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#ecece8;--muted:#a3a39c;--line:#363633;--card:#1e1e1c;--accent:#7aa7f0;--ok:#6fcf8f;--bad:#f08a82;--focus:#7aa7f0}}
+export const APP_CSS = `:root{--bg:#fbfbfa;--fg:#1c1c1a;--muted:#5e5e59;--line:#d9d9d3;--card:#fff;--accent:#1f5fbf;--ok:#1b7a3d;--bad:#b3261e;--warn:#8a5a00;--focus:#1f5fbf}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--fg:#ecece8;--muted:#a3a39c;--line:#363633;--card:#1e1e1c;--accent:#7aa7f0;--ok:#6fcf8f;--bad:#f08a82;--warn:#e3b45c;--focus:#7aa7f0}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
 header{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 24px;padding:16px;border-bottom:1px solid var(--line)}
@@ -55,6 +55,31 @@ th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
 td.n{font-variant-numeric:tabular-nums}
 .status{max-width:860px;margin:0 auto;padding:0 16px 24px;color:var(--muted);min-height:1.5em}
 kbd{font:13px ui-monospace,Menlo,monospace;border:1px solid var(--line);border-radius:4px;padding:0 5px;background:var(--bg)}
+select{font:inherit;font-size:15px;background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:4px 8px}
+.controls{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;margin:8px 0}
+.controls label{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:15px}
+h3{font-size:15px;font-weight:600;color:var(--muted);margin:24px 0 0;padding-bottom:4px;border-bottom:2px solid var(--line)}
+.flow{padding:12px 0;border-bottom:1px solid var(--line)}
+.lane{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1.5fr) minmax(0,.85fr);gap:4px 0;align-items:baseline}
+.lane li{padding-right:12px;overflow-wrap:anywhere}
+.lane li+li::before{content:"\\2192" / "";color:var(--muted);margin-right:10px}
+.when{color:var(--muted);font-variant-numeric:tabular-nums;margin-right:8px}
+.cmd{font-weight:600}
+.sub{display:block;color:var(--muted);font-size:14px}
+.jev{font-variant-numeric:tabular-nums}
+.out{font-weight:600}
+.v-ok{color:var(--ok)}
+.v-bad{color:var(--bad)}
+.v-mid{color:var(--warn)}
+.flow details{margin:8px 0 0}
+.flow summary{cursor:pointer;color:var(--accent);font-size:14px;width:max-content}
+.flow details table{margin-top:4px;font-size:14px}
+meter{width:72px;height:8px;vertical-align:middle;margin-right:6px}
+meter::-webkit-meter-bar{background:var(--line);border:0;border-radius:4px}
+meter::-webkit-meter-optimum-value{background:var(--accent);border-radius:4px}
+meter::-moz-meter-bar{background:var(--accent)}
+.opts{display:block;color:var(--muted);font-size:13px}
+@media (max-width:620px){.lane{grid-template-columns:1fr}.lane li+li::before{content:"\\2193" / ""}}
 @media (max-width:520px){main{padding:12px}button.act{flex:1 1 100%}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 `;
@@ -68,8 +93,9 @@ history.replaceState(null, "", location.pathname);
 var main = document.getElementById("main");
 var statusEl = document.getElementById("status");
 var tabsEl = document.getElementById("tabs");
-var TABS = [["queue", "Labelling queue"], ["overview", "Overview"], ["privacy", "Privacy"], ["export", "Export"]];
-var current = "queue";
+var TABS = [["flow", "Flow"], ["queue", "Labelling queue"], ["overview", "Overview"], ["privacy", "Privacy"], ["export", "Export"]];
+var current = "flow";
+var flowQuery = { days: "7", command: "all" };
 var items = [];
 var index = 0;
 
@@ -146,6 +172,7 @@ function show(name) {
   say("");
   clear(main);
   add(main, el("p", "Loading"));
+  if (name === "flow") return getJson("/api/flow?days=" + encodeURIComponent(flowQuery.days) + "&command=" + encodeURIComponent(flowQuery.command)).then(renderFlow).catch(fail);
   if (name === "queue") return getJson("/api/queue").then(function (d) { items = d.stops; index = 0; renderQueue(d.total); }).catch(fail);
   if (name === "overview") return getJson("/api/overview").then(renderOverview).catch(fail);
   if (name === "privacy") return getJson("/api/privacy").then(renderPrivacy).catch(fail);
@@ -225,8 +252,143 @@ window.addEventListener("hashchange", function () {
   if (!t) return;
   token = t;
   history.replaceState(null, "", location.pathname);
-  show("queue");
+  show("flow");
 });
+
+function pad(n) { return n < 10 ? "0" + n : String(n); }
+function day(ts) { var d = new Date(ts); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+function clock(ts) { var d = new Date(ts); return pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds()); }
+function p2(v) { return typeof v === "number" ? v.toFixed(2) : "n/a"; }
+function msText(v) { return typeof v === "number" ? int(Math.round(v)) + " ms" : ""; }
+function tone(v) {
+  if (/^(met|supported|clear|pass|passed|ok|yes)$/.test(v)) return "v-ok";
+  if (/^(missing|contradicted|unsupported|violated|fail|failed|no|error)$/.test(v)) return "v-bad";
+  return "v-mid";
+}
+
+function picker(text, value, options, onPick) {
+  var wrap = el("label", text);
+  var s = el("select");
+  options.forEach(function (o) {
+    var opt = el("option", o[1]);
+    opt.value = o[0];
+    if (o[0] === value) opt.selected = true;
+    s.appendChild(opt);
+  });
+  s.addEventListener("change", function () { onPick(s.value); });
+  return add(wrap, s);
+}
+
+function jevText(e) {
+  if (e.error) return "Failed: " + e.error;
+  if (e.requests > 0) return "Jev: " + plural(e.requests, "request", "requests") + (e.cached > 0 ? " and " + plural(e.cached, "stored answer", "stored answers") : "") + ", " + int(e.input_tokens) + " tokens, " + msText(e.ms);
+  if (e.cached > 0) return "From the cache: " + plural(e.cached, "stored answer", "stored answers") + ", " + msText(e.ms);
+  return "Decided in code, nothing sent to Jev, " + msText(e.ms);
+}
+
+function stopJevText(e) {
+  if (e.skipped) return "Not asked: " + e.skipped.replace(/_/g, " ");
+  if (e.claims_done === null) return "No answer stored";
+  return "Jev: done " + p2(e.claims_done) + ", verified " + p2(e.claims_verified) + ", " + msText(e.ms);
+}
+
+function answersBlock(e) {
+  var count = 0;
+  e.answers.forEach(function (a) { count += a.questions.length; });
+  if (count === 0 && !e.answers_missing) return null;
+  var box = el("details");
+  add(box, el("summary", count ? "Jev's answers: " + plural(count, "question", "questions") : "Jev's answers"));
+  e.answers.forEach(function (a) {
+    add(box, el("p", a.model + ", answered " + day(a.answered_at) + " " + clock(a.answered_at), "meta"));
+    var t = el("table");
+    var hr = el("tr");
+    ["Question", "Answer", "Probability of that answer"].forEach(function (h) { var th = el("th", h); th.scope = "col"; hr.appendChild(th); });
+    add(t, add(el("thead"), hr));
+    var body = el("tbody");
+    a.questions.forEach(function (q) {
+      var tr = el("tr");
+      tr.appendChild(el("td", q.id));
+      var answer = el("td", q.value);
+      if (q.options.length) add(answer, el("span", q.options.map(function (o) { return o.label + " " + p2(o.p); }).join(", "), "opts"));
+      tr.appendChild(answer);
+      var prob = el("td", null, "n");
+      if (typeof q.p === "number") {
+        var m = el("meter");
+        m.min = 0;
+        m.max = 1;
+        m.value = q.p;
+        m.setAttribute("aria-hidden", "true");
+        add(prob, m, el("span", p2(q.p)));
+      } else add(prob, el("span", "n/a"));
+      tr.appendChild(prob);
+      body.appendChild(tr);
+    });
+    add(box, add(t, body));
+  });
+  if (e.answers_missing) add(box, el("p", plural(e.answers_missing, "stored answer is", "stored answers are") + " gone: expired, removed by an overrule, or never written.", "meta"));
+  return box;
+}
+
+function flowItem(e) {
+  var item = el("article", null, "flow");
+  var lane = el("ol", null, "lane");
+  var first = el("li");
+  add(first, el("span", clock(e.ts), "when"));
+  var out;
+  if (e.kind === "stop") {
+    item.setAttribute("aria-label", "Done-gate stop at " + clock(e.ts));
+    add(first, el("span", "Done-gate stop", "cmd"), el("span", e.mode + " mode, " + plural(e.edits, "edit", "edits") + ", " + plural(e.checks, "check", "checks") + (e.session ? ", session " + e.session : ""), "sub"));
+    var outText = e.would_block === null ? "skipped" : e.would_block ? "would block" : "would pass";
+    if (e.label) outText += ", labelled " + e.label;
+    out = el("li", outText, "out " + (e.would_block === null ? "v-mid" : e.would_block ? "v-bad" : "v-ok"));
+    add(lane, first, el("li", stopJevText(e), "jev"), out);
+    return add(item, lane);
+  }
+  item.setAttribute("aria-label", e.command + " at " + clock(e.ts));
+  var sub = [];
+  if (e.pack) sub.push(e.pack + " pack");
+  if (e.model) sub.push(e.model);
+  if (e.session) sub.push("session " + e.session);
+  add(first, el("span", e.command, "cmd"), el("span", sub.join(", "), "sub"));
+  var verdict = e.verdict || (e.error ? "error" : "no verdict");
+  out = el("li", verdict, "out " + tone(verdict));
+  add(lane, first, el("li", jevText(e), "jev"), out);
+  add(item, lane);
+  if (e.overruled) add(item, el("p", "Overruled: voided with receipts overrule; its stored answers were deleted.", "meta"));
+  var answers = answersBlock(e);
+  if (answers) add(item, answers);
+  return item;
+}
+
+function renderFlow(d) {
+  clear(main);
+  add(main, el("h2", "What went to Jev and what came back, this project"));
+  var controls = el("div", null, "controls");
+  add(controls,
+    picker("Period", String(d.days), [["1", "Last 24 hours"], ["7", "Last 7 days"], ["30", "Last 30 days"]], function (v) { flowQuery.days = v; show("flow"); }),
+    picker("Show", d.command, [["all", "Everything"]].concat(d.commands.map(function (c) { return [c, c === "stop" ? "Done-gate stops" : c]; })), function (v) { flowQuery.command = v; show("flow"); }));
+  add(main, controls);
+  if (d.total === 0) {
+    add(main, el("p", "Nothing in this period. Every claude-referee command run in this project, and every done-gate stop, shows up here; pick a longer period to look further back."));
+    say("");
+    return;
+  }
+  var calls = 0, requests = 0, cached = 0, stops = 0;
+  d.events.forEach(function (e) { if (e.kind === "stop") stops++; else { calls++; requests += e.requests; cached += e.cached; } });
+  var parts = [];
+  if (calls) parts.push(plural(calls, "call", "calls") + " (" + plural(requests, "request", "requests") + " to Jev, " + plural(cached, "answer", "answers") + " from the cache)");
+  if (stops) parts.push(plural(stops, "done-gate stop", "done-gate stops"));
+  var line = parts.join(", ");
+  if (d.total > d.shown) line += ". Showing the newest " + int(d.shown) + " of " + int(d.total) + "; pick a command or a shorter period to see the rest.";
+  add(main, el("p", line, "meta"));
+  var last = "";
+  d.events.forEach(function (e) {
+    var dd = day(e.ts);
+    if (dd !== last) { add(main, el("h3", dd)); last = dd; }
+    add(main, flowItem(e));
+  });
+  say("");
+}
 
 function renderOverview(d) {
   clear(main);
@@ -309,7 +471,7 @@ if (!token) {
   clear(main);
   add(main, el("p", "No session token. Open the URL printed in the terminal by claude-referee ui."));
 } else {
-  show("queue");
+  show("flow");
 }
 })();
 `;
