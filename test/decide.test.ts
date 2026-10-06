@@ -184,3 +184,34 @@ test("decide counts a margin of exactly 0.1 as weak, not a tie", async () => {
   assert.equal(out["lean"], "redis");
   assert.equal(out["verdict"], "weak");
 });
+
+const slotBonus = (base: Record<string, number>, bonus: number): Answerer => (r) => {
+  const ls = labels(r);
+  const raw = Object.fromEntries(ls.map((l, i) => [l, (base[l] ?? 0) + (i === 0 ? bonus : 0)]));
+  const total = Object.values(raw).reduce((a, b) => a + b, 0);
+  return { best: { type: "choice", choice: ls[0], confidence: 0.6, probabilities: Object.fromEntries(ls.map((l) => [l, raw[l]! / total])) } };
+};
+
+test("a two-order tie asks the other balanced orders and takes lean and verdict from the mean of all 2n", async () => {
+  const { out, requests } = await decideWith(slotBonus({ redis: 0.5, memory: 0.2, postgres: 0.15, edge: 0.15 }, 0.4), { decision: "Where should rate-limit counters live?", options: OPTIONS });
+  const names = OPTIONS.map((o) => o.name);
+  const rot = (i: number) => [...names.slice(i), ...names.slice(0, i)];
+  const expected = [0, 1, 2, 3].flatMap((i) => [rot(i).join(","), [...rot(i)].reverse().join(",")]);
+  assert.equal(requests.length, 8);
+  assert.deepEqual(requests.map((r) => labels(r).join(",")).sort(), [...expected].sort());
+  assert.deepEqual(requests.slice(0, 2).map((r) => labels(r).join(",")), [rot(0).join(","), [...rot(0)].reverse().join(",")]);
+  assert.equal(out["orders"], 8);
+  assert.equal(out["order_disagrees"], true);
+  assert.equal(out["lean"], "redis");
+  assert.equal(out["verdict"], "weak");
+  assert.equal((out["p"] as Record<string, number>)["redis"], 0.42);
+});
+
+test("two agreeing orders and two-option ties stay at two requests", async () => {
+  const agree = await decideWith(favour({ redis: 0.6, memory: 0.2, postgres: 0.1, edge: 0.1 }), { decision: "d", options: OPTIONS });
+  assert.equal(agree.requests.length, 2);
+  assert.equal(agree.out["orders"], 2);
+  const two = await decideWith(favour({ redis: 0.52, memory: 0.48 }), { decision: "d", options: OPTIONS.slice(0, 2) });
+  assert.equal(two.requests.length, 2);
+  assert.equal(two.out["verdict"], "tie");
+});

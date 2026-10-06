@@ -1918,7 +1918,9 @@ async function jevCommand(context, command, pack, planned, finish, options = {})
     return flags.pretty ? result : fitLine(result);
   }
   try {
-    const outcomes = await session.run(planned, options);
+    const first = await session.run(planned, options);
+    const more = options.followUp?.(first) ?? [];
+    const outcomes = more.length > 0 ? [...first, ...await session.run(more, options)] : first;
     const result = finish(outcomes, session);
     const receipt = session.record(typeof result["verdict"] === "string" ? { verdict: result["verdict"] } : {});
     if (!session.saved()) io.warn("[claude-referee] Could not write to the data directory; this run was not cached or logged.\n");
@@ -2031,7 +2033,8 @@ function argmax(p) {
   return Object.entries(p).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "";
 }
 __name(argmax, "argmax");
-function planDecide(pack, thresholds, state, options, ablation) {
+var rotate = /* @__PURE__ */ __name((list2, i) => [...list2.slice(i), ...list2.slice(0, i)], "rotate");
+function planDecide(pack, thresholds, state, options, ablation, balancedOrders = true) {
   const best = question(pack, "decide.best");
   const ask = /* @__PURE__ */ __name((list2) => ({ best: { ...best, criteria: Object.fromEntries(list2.map((o) => [o.name, o.text])) } }), "ask");
   const stateTokens = estimateTokens(JSON.stringify(state));
@@ -2045,9 +2048,18 @@ function planDecide(pack, thresholds, state, options, ablation) {
   const qid = perOption ? "decide.fit" : "decide.best";
   const clearAt = threshold(pack, thresholds, qid, "clear", 0.85);
   const margin = threshold(pack, thresholds, qid, "margin", 0.1);
+  const balanced = perOption || ablation || !balancedOrders || options.length < 3 ? [] : Array.from({ length: options.length - 1 }, (_, k) => rotate(options, k + 1)).flatMap((order, k) => [
+    { id: `rot:${k + 1}`, state, questions: ask(order) },
+    { id: `revrot:${k + 1}`, state, questions: ask([...order].reverse()) }
+  ]);
+  const probs = /* @__PURE__ */ __name((byId, id) => {
+    const answer = byId.get(id)?.["best"];
+    return answer?.type === "choice" ? { ...answer.probabilities } : null;
+  }, "probs");
   const summarize2 = /* @__PURE__ */ __name((byId) => {
     const mean = {};
     let disagree = false;
+    let orders = 0;
     if (perOption) {
       for (const o of options) {
         const answer = byId.get(`fit:${o.name}`)?.["fit"];
@@ -2055,22 +2067,24 @@ function planDecide(pack, thresholds, state, options, ablation) {
         mean[o.name] = answer?.type === "score" ? answer.score / Math.max(levels - 1, 1) : 0;
       }
     } else {
-      const probs = /* @__PURE__ */ __name((id) => {
-        const answer = byId.get(id)?.["best"];
-        return answer?.type === "choice" ? { ...answer.probabilities } : {};
-      }, "probs");
-      const written = probs("written");
-      const reversed = ablation === "reversed" ? written : probs("reversed");
-      for (const o of options) mean[o.name] = ((written[o.name] ?? 0) + (reversed[o.name] ?? 0)) / 2;
+      const written = probs(byId, "written") ?? {};
+      const reversed = ablation === "reversed" ? written : probs(byId, "reversed") ?? {};
       disagree = argmax(written) !== argmax(reversed);
+      const extra = balanced.map((p) => probs(byId, p.id));
+      const all = extra.length > 0 && extra.every((x) => x !== null) ? [written, reversed, ...extra] : [written, reversed];
+      for (const o of options) mean[o.name] = all.reduce((sum3, p) => sum3 + (p[o.name] ?? 0), 0) / all.length;
+      orders = ablation === "reversed" ? 1 : all.length;
     }
     const ranked = Object.entries(mean).sort((a, b) => b[1] - a[1]);
     const [lean = "", p1 = 0] = ranked[0] ?? [];
     const p2 = ranked[1]?.[1] ?? 0;
-    const verdict = !disagree && atLeast(p1, clearAt) && atLeast(p1 - p2, margin) ? "clear" : !disagree && atLeast(p1 - p2, margin) ? "weak" : "tie";
-    return { mean, lean, verdict, disagree };
+    const unanimous = orders <= 2;
+    const blocked = unanimous && disagree;
+    const verdict = !blocked && atLeast(p1, clearAt) && atLeast(p1 - p2, margin) ? "clear" : !blocked && atLeast(p1 - p2, margin) ? "weak" : "tie";
+    return { mean, lean, verdict, disagree, orders };
   }, "summarize");
-  return { planned, perOption, summarize: summarize2 };
+  const followUp = /* @__PURE__ */ __name((byId) => balanced.length > 0 && summarize2(byId).verdict === "tie" ? balanced : [], "followUp");
+  return { planned, perOption, followUp, summarize: summarize2 };
 }
 __name(planDecide, "planDecide");
 var decide = {
@@ -2086,8 +2100,9 @@ var decide = {
     outputs: {
       verdict: "clear, weak or tie",
       lean: "The option with the highest mean probability",
-      p: "Mean probability per option name across both orders (per_option mode: normalised fit score)",
-      order_disagrees: "True when the two orders picked different leaders; the verdict can't be clear then",
+      p: "Mean probability per option name across the orders asked (per_option mode: normalised fit score)",
+      order_disagrees: "True when the written and reversed orders picked different leaders; with two orders the verdict is then tie",
+      orders: "How many option orders were asked: 2, or 2n when the first two tie and there are 3 to 6 options (every option in every slot, plus reversals; the verdict then comes from their mean)",
       mode: "per_option when the options don't fit one request",
       read: "Context files read, with sizes",
       flags: "Micro rules that failed, by option and rule id",
@@ -2095,7 +2110,7 @@ var decide = {
     },
     errors: [...JEV_ERRORS],
     effects: JEV_EFFECTS,
-    cost: `${JEV_COST} decide makes 2 requests, plus one per option with micro questions.`
+    cost: `${JEV_COST} decide makes 2 requests; when those tie and there are 3 to 6 options, 2n - 2 more (4 to 10); plus one per option with micro questions.`
   },
   options: { in: { type: "string" } },
   async run(context) {
@@ -2120,9 +2135,10 @@ var decide = {
       );
       for (const o of input.options) planned.push({ id: `micro:${o.name}`, state: { ...state, option: o.text }, questions: micro });
     }
+    const byIdOf = /* @__PURE__ */ __name((outcomes) => new Map(outcomes.map((o) => [o.id, o.answers])), "byIdOf");
     return jevCommand(context, "decide", pack, planned, (outcomes) => {
-      const byId = new Map(outcomes.map((o) => [o.id, o.answers]));
-      const { mean, lean, verdict, disagree } = plan.summarize(byId);
+      const byId = byIdOf(outcomes);
+      const { mean, lean, verdict, disagree, orders } = plan.summarize(byId);
       const flags = input.options.flatMap(
         (o) => micros.flatMap((m) => {
           const answer = byId.get(`micro:${o.name}`)?.[m.id];
@@ -2136,12 +2152,12 @@ var decide = {
         verdict,
         lean,
         p: mean,
-        ...perOption ? { mode: "per_option" } : { order_disagrees: disagree },
+        ...perOption ? { mode: "per_option" } : { order_disagrees: disagree, orders },
         ...read2.length ? { read: read2 } : {},
         ...flags.length ? { flags } : {},
         next_step: verdict === "clear" ? void 0 : `${why}Add the missing fact to context; if the decision is easy to undo, go with ${lean}. Asking the same question again won't change it.`
       };
-    });
+    }, { followUp: /* @__PURE__ */ __name((outcomes) => plan.followUp(byIdOf(outcomes)), "followUp") });
   }
 };
 
@@ -5655,14 +5671,20 @@ function stopRequest(pack, suite, item) {
 __name(stopRequest, "stopRequest");
 function decideCaseRequest(pack, suite, item, ablation) {
   const input = parseInput(JSON.stringify({ decision: item["decision"], context: item["context"], options: item["options"] }));
-  const plan = planDecide(pack, void 0, { decision: input.decision, ...input.context && ablation !== "context" ? { context: input.context } : {} }, input.options, ablation === "reversed" ? "reversed" : void 0);
+  const plan = planDecide(pack, void 0, { decision: input.decision, ...input.context && ablation !== "context" ? { context: input.context } : {} }, input.options, ablation === "reversed" ? "reversed" : void 0, !ablation);
   if (plan.perOption) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: the options do not fit one request.`);
   if (!input.options.some((o) => o.name === item.expected)) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: expected must name one of the options.`);
+  const first = /* @__PURE__ */ __name((outcomes) => new Map(plan.planned.map((p, i) => [p.id, outcomes[i]?.answers ?? null])), "first");
+  const followUp = /* @__PURE__ */ __name((outcomes) => plan.followUp(first(outcomes)), "followUp");
   return {
     planned: plan.planned,
+    followUp,
+    maxFollowUp: ablation || input.options.length < 3 ? 0 : 2 * input.options.length - 2,
     finish: /* @__PURE__ */ __name((outcomes) => {
-      const out = plan.summarize(new Map(outcomes.map((o, i) => [plan.planned[i]?.id ?? o.id, o.answers])));
-      return { verdict: out.verdict, lean: out.lean, p: out.mean[out.lean] ?? 0, order_disagrees: out.disagree };
+      const byId = first(outcomes);
+      followUp(outcomes).forEach((p, j) => byId.set(p.id, outcomes[plan.planned.length + j]?.answers ?? null));
+      const out = plan.summarize(byId);
+      return { verdict: out.verdict, lean: out.lean, p: out.mean[out.lean] ?? 0, order_disagrees: out.disagree, orders: out.orders };
     }, "finish")
   };
 }
@@ -5673,8 +5695,10 @@ function request(context, pack, suite, item, ablation) {
   if (ablation && command !== "decide") throw new RefereeError("bad_input", `--ablation applies to decide suites; suite ${suite.name} uses ${command}.`);
   let planned;
   let finish;
+  let stage;
   if (command === "decide") {
-    ({ planned, finish } = decideCaseRequest(pack, suite, item, ablation));
+    stage = decideCaseRequest(pack, suite, item, ablation);
+    ({ planned, finish } = stage);
   } else if (command === "stop") {
     ({ planned, finish } = stopRequest(pack, suite, item));
   } else if (command === "done") {
@@ -5693,12 +5717,16 @@ function request(context, pack, suite, item, ablation) {
     ({ planned, finish } = verifyRequest(pack, void 0, [{ id: "1", text: claim }], source));
   }
   const first = planned[0];
-  if (!first) return { suite, item, planned: [], finish, qhash: "code", shash: "code" };
+  const none = /* @__PURE__ */ __name(() => [], "none");
+  if (!first) return { suite, item, planned: [], finish, followUp: none, maxFollowUp: 0, qhash: "code", shash: "code" };
   const redacted = redactRequest(first, context.io.home, pack.redact);
-  const ids = planned.map((p) => `${suite.name}/${item.id}` + (planned.length > 1 ? `:${p.id}` : ""));
-  return { suite, item, planned: planned.map((p, i) => ({ ...p, id: ids[i] })), finish, qhash: questionHash(first.questions), shash: stateHash(redacted.body.state) };
+  const prefix = /* @__PURE__ */ __name((id) => `${suite.name}/${item.id}` + (planned.length > 1 ? `:${id}` : ""), "prefix");
+  const followUp = stage?.followUp ? (outcomes) => (stage.followUp?.(outcomes) ?? []).map((p) => ({ ...p, id: prefix(p.id) })) : none;
+  return { suite, item, planned: planned.map((p) => ({ ...p, id: prefix(p.id) })), finish, followUp, maxFollowUp: stage?.maxFollowUp ?? 0, qhash: questionHash(first.questions), shash: stateHash(redacted.body.state) };
 }
 __name(request, "request");
+var lineAnswers = /* @__PURE__ */ __name((line) => [line.answers, ...Array.isArray(line["also"]) ? line["also"] : []], "lineAnswers");
+var asOutcomes = /* @__PURE__ */ __name((planned, answers, from = 0) => planned.map((p, i) => ({ id: p.id, answers: answers[from + i] ?? null, stopped: [], cached: true })), "asOutcomes");
 function cap3(context, flag) {
   const raw = str(context, flag);
   if (raw === void 0) return void 0;
@@ -5742,61 +5770,84 @@ async function record(context, fallback, list2) {
     fresh: true
   });
   const todo = [];
+  const topUps = [];
   let skipped = 0;
   for (const suite of list2) {
     for (const item of suite.cases.filter((c) => !split2 || c.split === split2)) {
       const req = request(context, pack, suite, item, ablation);
-      const found = lookup(suite, item, req, session.model, ablation).status === "ok";
+      const look = lookup(suite, item, req, session.model, ablation);
+      const found = look.status === "ok";
       if (ablation === "reversed" && req.planned.length > 0 && !found) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: --ablation reversed is rescored from the full recording and records nothing.`, { next_step: `Run eval record --suite ${suite.name} without --ablation first.` });
       if (req.planned.length === 0) skipped += 1;
-      else if ((!flags.fresh || ablation === "reversed") && found) skipped += 1;
-      else todo.push(req);
+      else if ((!flags.fresh || ablation === "reversed") && look.status === "ok") {
+        const answers = lineAnswers(look.line).slice(0, req.planned.length);
+        const follow = answers.every(Boolean) && answers.length === req.planned.length ? req.followUp(asOutcomes(req.planned, answers)) : [];
+        const recorded2 = lineAnswers(look.line);
+        if (follow.some((_, j) => !recorded2[req.planned.length + j])) topUps.push({ req, answers, follow });
+        else skipped += 1;
+      } else todo.push(req);
     }
   }
-  const plans = todo.flatMap((t) => t.planned);
-  const tokens2 = plans.reduce((sum3, p) => sum3 + estimateTokens(JSON.stringify([p.state, p.questions])), 0);
+  const plans = [...todo.flatMap((t) => t.planned), ...topUps.flatMap((t) => t.follow)];
+  const most = plans.length + todo.reduce((sum3, t) => sum3 + t.maxFollowUp, 0);
+  const perRequest = /* @__PURE__ */ __name((p) => estimateTokens(JSON.stringify([p.state, p.questions])), "perRequest");
+  const tokens2 = plans.reduce((sum3, p) => sum3 + perRequest(p), 0) + todo.reduce((sum3, t) => sum3 + t.maxFollowUp * (t.planned[0] ? perRequest(t.planned[0]) : 0), 0);
   const usd = costUsd(session.model, tokens2);
-  if (!flags.dryRun && maxRequests !== void 0 && plans.length > maxRequests) {
-    throw new RefereeError("bad_input", `Recording would send ${plans.length} requests; --max-requests is ${maxRequests}. Nothing was sent.`, { next_step: "Record fewer cases (a smaller suite or --split) or raise the cap." });
+  if (!flags.dryRun && maxRequests !== void 0 && most > maxRequests) {
+    throw new RefereeError("bad_input", `Recording could send up to ${most} requests (including the balanced orders a tied decide case adds); --max-requests is ${maxRequests}. Nothing was sent.`, { next_step: "Record fewer cases (a smaller suite or --split) or raise the cap." });
   }
   if (!flags.dryRun && maxUsd !== void 0 && usd !== null && usd > maxUsd) {
     throw new RefereeError("bad_input", `Recording would cost about ${usd.toFixed(6)} USD (an estimate from about ${tokens2} input tokens); --max-usd is ${maxUsd}. Nothing was sent.`, { next_step: "Record fewer cases or raise the cap." });
   }
-  if (flags.dryRun) return fitLine({ ...session.dryRun(plans), skipped });
-  const outcomes = todo.length ? await session.run(plans, { partial: true }) : [];
+  if (flags.dryRun) return fitLine({ ...session.dryRun(plans), skipped, ...most > plans.length ? { may_add: most - plans.length } : {} });
+  const firstPlans = todo.flatMap((t) => t.planned);
+  const outcomes = firstPlans.length ? await session.run(firstPlans, { partial: true }) : [];
+  const stages = [];
   const failed = [];
-  let recorded = 0;
   let at = 0;
   todo.forEach((req) => {
     const rest = outcomes.slice(at, at + req.planned.length);
     at += req.planned.length;
-    const outcome = rest[0];
-    if (!outcome?.answers || rest.some((o) => !o.answers)) {
-      failed.push(`${req.suite.name}/${req.item.id}`);
-      return;
-    }
+    if (!rest[0]?.answers || rest.some((o) => !o.answers)) failed.push(`${req.suite.name}/${req.item.id}`);
+    else stages.push({ req, answers: rest.map((o) => o.answers), follow: req.followUp(rest), isNew: true });
+  });
+  for (const t of topUps) stages.push({ ...t, isNew: false });
+  const secondPlans = stages.flatMap((s) => s.follow);
+  const second = secondPlans.length ? await session.run(secondPlans, { partial: true }) : [];
+  let recorded = 0;
+  let toppedUp = 0;
+  at = 0;
+  for (const stage of stages) {
+    const extra = second.slice(at, at + stage.follow.length);
+    at += stage.follow.length;
+    const complete = extra.every((o) => o.answers);
+    if (!complete) failed.push(`${stage.req.suite.name}/${stage.req.item.id}`);
+    if (!complete && !stage.isNew) continue;
+    const all = [...stage.answers, ...complete ? extra.map((o) => o.answers) : []];
     const line = {
-      suite: req.suite.name,
-      case: req.item.id,
-      split: req.item.split,
+      suite: stage.req.suite.name,
+      case: stage.req.item.id,
+      split: stage.req.item.split,
       model: session.model,
       pack: `${pack.name}@${pack.version}`,
-      qhash: req.qhash,
-      shash: req.shash,
+      qhash: stage.req.qhash,
+      shash: stage.req.shash,
       ...ablation ? { ablation } : {},
-      answers: outcome.answers,
-      ...rest.length > 1 ? { also: rest.slice(1).map((o) => o.answers) } : {},
+      answers: all[0],
+      ...all.length > 1 ? { also: all.slice(1) } : {},
       recorded_at: new Date(io.now()).toISOString()
     };
-    appendFileSync2(join8(req.suite.dir, "recorded.jsonl"), JSON.stringify(line) + "\n");
-    recorded += 1;
-  });
+    appendFileSync2(join8(stage.req.suite.dir, "recorded.jsonl"), JSON.stringify(line) + "\n");
+    if (stage.isNew) recorded += 1;
+    else toppedUp += 1;
+  }
   const receipt = session.record({ verdict: failed.length ? "partial" : "recorded" });
   return reorder({
     ok: true,
     verdict: failed.length ? "partial" : "recorded",
     suites: list2.map((s) => s.name),
     recorded,
+    ...toppedUp ? { topped_up: toppedUp } : {},
     skipped,
     ...failed.length ? { failed: failed.slice(0, LIST_LIMIT2) } : {},
     ...session.stats(),
@@ -5814,10 +5865,15 @@ function replay(context, pack, suite, item, model, ablation) {
     const flag = ablation ? ` --ablation ${ablation}` : "";
     throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: ${why}${ablation ? ` with the ${ablation} ablation` : ""}.`, { next_step: `Run eval record --suite ${suite.name}${flag} with a key.` });
   }
-  const answers = [found.line.answers, ...Array.isArray(found.line["also"]) ? found.line["also"] : []];
+  const answers = lineAnswers(found.line);
   const missing = req.planned.findIndex((_, i) => !answers[i]);
   if (missing >= 0) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: the recording has ${answers.filter(Boolean).length} of ${req.planned.length} answers.`, { next_step: `Run eval record --suite ${suite.name} --fresh with a key.` });
-  return req.finish(req.planned.map((p, i) => ({ id: p.id, answers: answers[i] ?? null, stopped: [], cached: true })));
+  const first = asOutcomes(req.planned, answers);
+  const follow = req.followUp(first);
+  if (follow.some((_, j) => !answers[req.planned.length + j])) {
+    throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: the two recorded orders tie, and the ${follow.length} balanced orders decide then asks are not recorded.`, { next_step: `Run eval record --suite ${suite.name} with a key; it records only the missing orders.` });
+  }
+  return req.finish([...first, ...asOutcomes(follow, answers, req.planned.length)]);
 }
 __name(replay, "replay");
 function scoreDecide(context, pack, suite, model, split2) {

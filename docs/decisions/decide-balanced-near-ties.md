@@ -34,3 +34,12 @@ The first 8 decisions with 4 or more options, in the study's case order, on whic
 ## If a gate fails
 
 Gate 1 is run before the code is written; if it fails, nothing is built and the result is added here. If gate 2 fails, the change is reverted and the result is added here. Either way the measurement is reported.
+
+## Results, 2026-10-06
+
+All three gates were run in the registered order: gate 1 before any code, then the code, then gates 2 and 3. The change ships.
+
+- **Gate 1 passed** under all three references (`node scripts/decide-scale/adaptive.mjs`, [results-adaptive.json](../../jev-evals/decide-scale/results-adaptive.json)). The script first reproduced the published `wr` and `latin_rev` numbers (near-tie agreement 0.656 and 0.9375, verdict agreement 0.91, 0.81 and 0.96, 1 false `clear` of 72 for `wr`). `adaptive` on the 211 decisions with 4 or more options: near-tie agreement 0.9375 against 0.656 (criterion 1: +0.28, needed +0.15); agreement over all 0.990 against 0.938 (criterion 2); 1 false `clear` of 72 clear verdicts, 0.014 (criterion 3; the study's definition, the share of `clear` verdicts that the reference does not call `clear`; 1 of 211 decisions as a share of all); verdict agreement 0.953 (leave-out) and 0.957 (full set, replicate) against 0.900 and 0.910 (criterion 4). It fired on 20.9% of those decisions, 3.49 requests per decision on average. Three options (41 decisions): it fired on 1; agreement stayed 1.0 under the full-set and replicate references (with all 6 orders asked, the leave-out reference has none left for that decision). The one false `clear` is the same two-order decision for `wr` and `adaptive` (`a/a44-barn-dance`).
+- **Gate 2 passed** (`node scripts/decide-scale/live-check.mjs`, [gate2-live.json](../../jev-evals/decide-scale/gate2-live.json)): over the 8 decisions, the mean absolute difference between the live `decide --fresh` mean and the recorded mean over the same orders was 0.0078 with the CLI's two-decimal rounding applied to both and 0.0084 without it (bar 0.02). 7 of 8 tied live and asked 8 orders; one (`va1-flags-nobudget`) had a margin of 0.1 or more in the fresh two orders and stopped there. 7 of 8 kept the recorded leader; the exception (`ba1-cache-stampede`) is a `tie` in both.
+- **Gate 3, reported:** `eval record --suite decide-best` topped up the 14 tied cases with only their 6 missing orders (84 requests; the recorded two-order answers stayed). Agreement with the author labels 16 of 39 before and after; verdicts 0 `clear`, 25 `weak`, 14 `tie` before and 0, 28, 11 after.
+

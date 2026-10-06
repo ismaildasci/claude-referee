@@ -33,7 +33,7 @@ Bir Jev isteği bir sentin çok küçük bir kesrine mal olur. Etrafındaki Clau
 
 ## 5. Yeniden sorma, daha iyi sor
 
-Aynı soruyu Jev'e iki kez sormak cevabı yaklaşık 0,01 oynatır. Seçeneklerin sırasını değiştirmek ise testlerimizde bir seçeneği 0,52'ye kadar oynattı. Bu yüzden bir seçim iki sırayla sorulur ve beraberlik, soruyu yeniden sorarak değil eksik olguyu ekleyerek çözülür.
+Aynı soruyu Jev'e iki kez sormak cevabı yaklaşık 0,01 oynatır. Seçeneklerin sırasını değiştirmek ise testlerimizde bir seçeneği 0,52'ye kadar oynattı. Bu yüzden bir seçim iki sırayla (bu ikisi berabere kalırsa dengeli bir sıra setiyle) sorulur ve beraberlik, soruyu yeniden sorarak değil eksik olguyu ekleyerek çözülür.
 
 ## 6. En azını gönder
 

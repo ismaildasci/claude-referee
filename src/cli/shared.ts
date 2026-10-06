@@ -91,7 +91,7 @@ export async function jevCommand(
   pack: Pack,
   planned: readonly Planned[],
   finish: (outcomes: Outcome[], session: Session) => Result,
-  options: { batch?: boolean; partial?: boolean } = {},
+  options: { batch?: boolean; partial?: boolean; followUp?: (outcomes: Outcome[]) => readonly Planned[] } = {},
 ): Promise<Result> {
   const { io, flags } = context;
   const session = new Session({
@@ -110,7 +110,9 @@ export async function jevCommand(
     return flags.pretty ? result : fitLine(result);
   }
   try {
-    const outcomes = await session.run(planned, options);
+    const first = await session.run(planned, options);
+    const more = options.followUp?.(first) ?? [];
+    const outcomes = more.length > 0 ? [...first, ...(await session.run(more, options))] : first;
     const result = finish(outcomes, session);
     const receipt = session.record(typeof result["verdict"] === "string" ? { verdict: result["verdict"] } : {});
     if (!session.saved()) io.warn("[claude-referee] Could not write to the data directory; this run was not cached or logged.\n");

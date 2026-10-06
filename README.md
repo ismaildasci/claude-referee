@@ -75,7 +75,7 @@ Most numbers here come from one private codebase, one team and one author: the k
   <img alt="Horizontal bars on a 0 to 0.6 axis. Same request asked again: at most 0.01. Fresh re-run with the cache bypassed: at most 0.02. Options reordered: 0.20 on average, at most 0.52. Measured on 20 real 4-option decisions from one private codebase, 24 orders each." src="assets/charts/order-vs-retry-light.png" width="100%">
 </picture>
 
-In the earlier kit, when the same options were listed in a different order, Jev's probability for one option moved by up to 0.52. Asking the exact same question again moved it by 0.01 at most. So `decide` asks every choice twice, once in your order and once reversed, and averages the two. It never tells Claude to simply ask again: a tie is settled by adding the missing fact. On claude-referee's own public set of 20 decisions, 19 of them with a leader at 0.9 or more, order moved it by up to 0.13 and asking again by up to 0.04. On a pre-registered set of 39 close-call decisions, order moved it by 0.26 on average and up to 0.42, and the reversed order brought the answer closer to the all-orders answer than asking the written order twice did.
+In the earlier kit, when the same options were listed in a different order, Jev's probability for one option moved by up to 0.52. Asking the exact same question again moved it by 0.01 at most. So `decide` asks every choice twice, once in your order and once reversed, and averages the two; when those two tie and there are 3 to 6 options, it also asks the other balanced orders (below). It never tells Claude to simply ask again: a tie is settled by adding the missing fact. On claude-referee's own public set of 20 decisions, 19 of them with a leader at 0.9 or more, order moved it by up to 0.13 and asking again by up to 0.04. On a pre-registered set of 39 close-call decisions, order moved it by 0.26 on average and up to 0.42, and the reversed order brought the answer closer to the all-orders answer than asking the written order twice did.
 
 ### Two orders are enough
 
@@ -84,7 +84,7 @@ In the earlier kit, when the same options were listed in a different order, Jev'
   <img alt="Five ordering policies compared by Jev requests per decision and by how many of 20 decisions matched the all-orders leader. Written order only: 1 request, 18 of 20. Written plus reversed: 2 requests, 20 of 20. Four rotations: 4 requests, 19 of 20. Two orders, all 24 if unsure: 10.8 requests on average, 20 of 20. All 24 orders: 24 requests, the reference." src="assets/charts/policies-compare-light.png" width="100%">
 </picture>
 
-Asking in your order and in reverse picked the same winner as trying all 24 orders, in 20 of 20 decisions, with 2 requests instead of 24.
+Asking in your order and in reverse picked the same winner as trying all 24 orders, in 20 of 20 decisions, with 2 requests instead of 24. Near ties are the exception: in a later study of 252 decisions, two orders matched the all-orders leader on 21 of 32 near ties, and a balanced set of 2n orders (every option in every slot, plus the reverses) on 30 of 32. So when the two orders tie, `decide` now asks the rest of that set and takes the verdict from the mean of all 2n; replayed on that study, this fired on 21% of decisions with 4 or more options and lost nothing elsewhere ([record](docs/decisions/decide-balanced-near-ties.md)).
 
 ### The bill is the Claude turn, not Jev
 

@@ -1,5 +1,5 @@
-// decide: picks among 2-6 options. The best Choice is asked twice, in the written and the reversed order, because
-// option order moved Jev's pick by up to 0.52 in earlier measurements while asking again moved it by 0.01.
+// decide: picks among 2-6 options. The best Choice is asked in the written and the reversed order (order moved Jev's pick by up to 0.52,
+// asking again by 0.01); when those two tie and there are 3 to 6 options, the other balanced orders follow (docs/decisions/decide-balanced-near-ties.md).
 // Per-option micro questions go in one request per option and are reported as flags; they never change the verdict.
 
 import { readFileSync, statSync } from "node:fs";
@@ -104,10 +104,13 @@ function argmax(p: Readonly<Record<string, number>>): string {
 export interface DecidePlan {
   readonly planned: Planned[];
   readonly perOption: boolean;
-  readonly summarize: (byId: ReadonlyMap<string, Outcome["answers"]>) => { mean: Record<string, number>; lean: string; verdict: "clear" | "weak" | "tie"; disagree: boolean };
+  readonly followUp: (byId: ReadonlyMap<string, Outcome["answers"]>) => Planned[];
+  readonly summarize: (byId: ReadonlyMap<string, Outcome["answers"]>) => { mean: Record<string, number>; lean: string; verdict: "clear" | "weak" | "tie"; disagree: boolean; orders: number };
 }
 
-export function planDecide(pack: Pack, thresholds: Thresholds | undefined, state: Record<string, unknown>, options: readonly Option[], ablation?: "reversed"): DecidePlan {
+const rotate = <T>(list: readonly T[], i: number): T[] => [...list.slice(i), ...list.slice(0, i)];
+
+export function planDecide(pack: Pack, thresholds: Thresholds | undefined, state: Record<string, unknown>, options: readonly Option[], ablation?: "reversed", balancedOrders = true): DecidePlan {
   const best = question(pack, "decide.best");
   const ask = (list: readonly Option[]): Questions => ({ best: { ...best, criteria: Object.fromEntries(list.map((o) => [o.name, o.text])) } as Questions[string] });
   const stateTokens = estimateTokens(JSON.stringify(state));
@@ -123,9 +126,21 @@ export function planDecide(pack: Pack, thresholds: Thresholds | undefined, state
   const qid = perOption ? "decide.fit" : "decide.best";
   const clearAt = threshold(pack, thresholds, qid, "clear", 0.85);
   const margin = threshold(pack, thresholds, qid, "margin", 0.1);
+  const balanced: Planned[] =
+    perOption || ablation || !balancedOrders || options.length < 3
+      ? []
+      : Array.from({ length: options.length - 1 }, (_, k) => rotate(options, k + 1)).flatMap((order, k) => [
+          { id: `rot:${k + 1}`, state: state as Planned["state"], questions: ask(order) },
+          { id: `revrot:${k + 1}`, state: state as Planned["state"], questions: ask([...order].reverse()) },
+        ]);
+  const probs = (byId: ReadonlyMap<string, Outcome["answers"]>, id: string): Record<string, number> | null => {
+    const answer = byId.get(id)?.["best"];
+    return answer?.type === "choice" ? { ...(answer.probabilities as Record<string, number>) } : null;
+  };
   const summarize: DecidePlan["summarize"] = (byId) => {
     const mean: Record<string, number> = {};
     let disagree = false;
+    let orders = 0;
     if (perOption) {
       for (const o of options) {
         const answer = byId.get(`fit:${o.name}`)?.["fit"];
@@ -133,22 +148,24 @@ export function planDecide(pack: Pack, thresholds: Thresholds | undefined, state
         mean[o.name] = answer?.type === "score" ? answer.score / Math.max(levels - 1, 1) : 0;
       }
     } else {
-      const probs = (id: string): Record<string, number> => {
-        const answer = byId.get(id)?.["best"];
-        return answer?.type === "choice" ? { ...(answer.probabilities as Record<string, number>) } : {};
-      };
-      const written = probs("written");
-      const reversed = ablation === "reversed" ? written : probs("reversed");
-      for (const o of options) mean[o.name] = ((written[o.name] ?? 0) + (reversed[o.name] ?? 0)) / 2;
+      const written = probs(byId, "written") ?? {};
+      const reversed = ablation === "reversed" ? written : (probs(byId, "reversed") ?? {});
       disagree = argmax(written) !== argmax(reversed);
+      const extra = balanced.map((p) => probs(byId, p.id));
+      const all = extra.length > 0 && extra.every((x) => x !== null) ? [written, reversed, ...(extra as Record<string, number>[])] : [written, reversed];
+      for (const o of options) mean[o.name] = all.reduce((sum, p) => sum + (p[o.name] ?? 0), 0) / all.length;
+      orders = ablation === "reversed" ? 1 : all.length;
     }
     const ranked = Object.entries(mean).sort((a, b) => b[1] - a[1]);
     const [lean = "", p1 = 0] = ranked[0] ?? [];
     const p2 = ranked[1]?.[1] ?? 0;
-    const verdict = !disagree && atLeast(p1, clearAt) && atLeast(p1 - p2, margin) ? "clear" : !disagree && atLeast(p1 - p2, margin) ? "weak" : "tie";
-    return { mean, lean, verdict, disagree };
+    const unanimous = orders <= 2;
+    const blocked = unanimous && disagree;
+    const verdict = !blocked && atLeast(p1, clearAt) && atLeast(p1 - p2, margin) ? "clear" : !blocked && atLeast(p1 - p2, margin) ? "weak" : "tie";
+    return { mean, lean, verdict, disagree, orders };
   };
-  return { planned, perOption, summarize };
+  const followUp: DecidePlan["followUp"] = (byId) => (balanced.length > 0 && summarize(byId).verdict === "tie" ? balanced : []);
+  return { planned, perOption, followUp, summarize };
 }
 
 export const decide: Command = {
@@ -165,8 +182,9 @@ export const decide: Command = {
     outputs: {
       verdict: "clear, weak or tie",
       lean: "The option with the highest mean probability",
-      p: "Mean probability per option name across both orders (per_option mode: normalised fit score)",
-      order_disagrees: "True when the two orders picked different leaders; the verdict can't be clear then",
+      p: "Mean probability per option name across the orders asked (per_option mode: normalised fit score)",
+      order_disagrees: "True when the written and reversed orders picked different leaders; with two orders the verdict is then tie",
+      orders: "How many option orders were asked: 2, or 2n when the first two tie and there are 3 to 6 options (every option in every slot, plus reversals; the verdict then comes from their mean)",
       mode: "per_option when the options don't fit one request",
       read: "Context files read, with sizes",
       flags: "Micro rules that failed, by option and rule id",
@@ -174,7 +192,7 @@ export const decide: Command = {
     },
     errors: [...JEV_ERRORS],
     effects: JEV_EFFECTS,
-    cost: `${JEV_COST} decide makes 2 requests, plus one per option with micro questions.`,
+    cost: `${JEV_COST} decide makes 2 requests; when those tie and there are 3 to 6 options, 2n - 2 more (4 to 10); plus one per option with micro questions.`,
   },
   options: { in: { type: "string" } },
   async run(context) {
@@ -202,9 +220,10 @@ export const decide: Command = {
       );
       for (const o of input.options) planned.push({ id: `micro:${o.name}`, state: { ...state, option: o.text }, questions: micro });
     }
+    const byIdOf = (outcomes: readonly Outcome[]) => new Map(outcomes.map((o) => [o.id, o.answers]));
     return jevCommand(context, "decide", pack, planned, (outcomes: Outcome[]) => {
-      const byId = new Map(outcomes.map((o) => [o.id, o.answers]));
-      const { mean, lean, verdict, disagree } = plan.summarize(byId);
+      const byId = byIdOf(outcomes);
+      const { mean, lean, verdict, disagree, orders } = plan.summarize(byId);
       const flags = input.options.flatMap((o) =>
         micros.flatMap((m) => {
           const answer = byId.get(`micro:${o.name}`)?.[m.id];
@@ -218,12 +237,12 @@ export const decide: Command = {
         verdict,
         lean,
         p: mean,
-        ...(perOption ? { mode: "per_option" } : { order_disagrees: disagree }),
+        ...(perOption ? { mode: "per_option" } : { order_disagrees: disagree, orders }),
         ...(read.length ? { read } : {}),
         ...(flags.length ? { flags } : {}),
         next_step:
           verdict === "clear" ? undefined : `${why}Add the missing fact to context; if the decision is easy to undo, go with ${lean}. Asking the same question again won't change it.`,
       };
-    });
+    }, { followUp: (outcomes) => plan.followUp(byIdOf(outcomes)) });
   },
 };

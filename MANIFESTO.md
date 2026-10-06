@@ -33,7 +33,7 @@ A Jev request costs a fraction of a cent. The Claude turn around it re-reads the
 
 ## 5. Ask better, not again
 
-Asking Jev the same question twice moves the answer by about 0.01. Changing the order of the options moved one option by as much as 0.52 in our tests. So a choice is asked in two orders, and a tie is broken by adding the missing fact, not by asking again.
+Asking Jev the same question twice moves the answer by about 0.01. Changing the order of the options moved one option by as much as 0.52 in our tests. So a choice is asked in two orders (and in a balanced set of orders when those two tie), and a tie is broken by adding the missing fact, not by asking again.
 
 ## 6. Send the minimum
 

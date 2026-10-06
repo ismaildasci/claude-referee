@@ -1,0 +1,113 @@
+{
+ "rows": [
+  {
+   "id": "close/va1-flags-nobudget",
+   "orders": 2,
+   "triggered": false,
+   "live_lean": "dbtable",
+   "recorded_lean": "dbtable",
+   "verdict": "weak",
+   "mae_floored": 0.0075,
+   "mae_raw": 0.0075,
+   "requests": 2,
+   "cached": 0,
+   "receipt": "rmuwfqahzc1ww"
+  },
+  {
+   "id": "close/vb1-repo-rareshared",
+   "orders": 8,
+   "triggered": true,
+   "live_lean": "monorepo",
+   "recorded_lean": "monorepo",
+   "verdict": "tie",
+   "mae_floored": 0.0025,
+   "mae_raw": 0.005,
+   "requests": 8,
+   "cached": 0,
+   "receipt": "rmuwfqayjezij"
+  },
+  {
+   "id": "close/ba1-cache-stampede",
+   "orders": 8,
+   "triggered": true,
+   "live_lean": "earlyrefresh",
+   "recorded_lean": "redislock",
+   "verdict": "tie",
+   "mae_floored": 0.0075,
+   "mae_raw": 0.0069,
+   "requests": 8,
+   "cached": 0,
+   "receipt": "rmuwfqbqz0gw1"
+  },
+  {
+   "id": "close/ba1-tenant-isolation",
+   "orders": 8,
+   "triggered": true,
+   "live_lean": "schemaper",
+   "recorded_lean": "schemaper",
+   "verdict": "tie",
+   "mae_floored": 0,
+   "mae_raw": 0.0025,
+   "requests": 8,
+   "cached": 0,
+   "receipt": "rmuwfqcfkales"
+  },
+  {
+   "id": "close/bb1-flaky-tests",
+   "orders": 8,
+   "triggered": true,
+   "live_lean": "fakebroker",
+   "recorded_lean": "fakebroker",
+   "verdict": "weak",
+   "mae_floored": 0.0125,
+   "mae_raw": 0.015,
+   "requests": 8,
+   "cached": 0,
+   "receipt": "rmuwfqd8pgtuj"
+  },
+  {
+   "id": "close/bb1-release-cadence",
+   "orders": 8,
+   "triggered": true,
+   "live_lean": "train",
+   "recorded_lean": "train",
+   "verdict": "weak",
+   "mae_floored": 0.005,
+   "mae_raw": 0.0044,
+   "requests": 8,
+   "cached": 0,
+   "receipt": "rmuwfqdzu7c4p"
+  },
+  {
+   "id": "close/bb1-recovery-policy",
+   "orders": 8,
+   "triggered": true,
+   "live_lean": "flagoff",
+   "recorded_lean": "flagoff",
+   "verdict": "tie",
+   "mae_floored": 0.0175,
+   "mae_raw": 0.0144,
+   "requests": 8,
+   "cached": 0,
+   "receipt": "rmuwfqeudvsta"
+  },
+  {
+   "id": "close/bb1-product-rendering",
+   "orders": 8,
+   "triggered": true,
+   "live_lean": "isr",
+   "recorded_lean": "isr",
+   "verdict": "weak",
+   "mae_floored": 0.01,
+   "mae_raw": 0.0119,
+   "requests": 8,
+   "cached": 0,
+   "receipt": "rmuwfqfkugw4s"
+  }
+ ],
+ "mean_mae_floored": 0.0078,
+ "mean_mae_raw": 0.0084,
+ "triggered": 7,
+ "same_leader": 7,
+ "pass": true
+}

@@ -69,7 +69,7 @@ Buradaki sayıların çoğu tek bir özel kod tabanından, tek ekipten ve tek ya
   <img alt="0 ile 0,6 arası yatay çubuklar. Aynı istek yeniden: en fazla 0,01. Önbellek atlanarak taze koşu: en fazla 0,02. Seçeneklerin sırası değişince: ortalama 0,20, en fazla 0,52. Tek bir özel kod tabanından 20 gerçek, 4 seçenekli karar; her biri 24 sırayla." src="assets/charts/order-vs-retry-light.png" width="100%">
 </picture>
 
-Önceki kitte aynı seçenekler farklı sırayla yazılınca Jev'in bir seçeneğe verdiği olasılık 0,52'ye kadar değişti. Aynı soruyu birebir yeniden sormak ise en fazla 0,01 değiştirdi. Bu yüzden `decide` her seçimi iki kez sorar, bir kez senin sıranla, bir kez ters sırayla, ve ikisinin ortalamasını alır. Claude'a asla "yeniden sor" demez: beraberlik, eksik olgu eklenerek çözülür. claude-referee'nin 19'unda liderin 0,9 ya da üstünde olduğu 20 kararlık kendi açık setinde sıra en fazla 0,13, yeniden sormak en fazla 0,04 değiştirdi. Önceden kayda geçirilmiş 39 yakın kararlık sette ise sıra olasılığı ortalama 0,26, en fazla 0,42 değiştirdi; ters sıra, yazılan sırayı iki kez sormaktan daha çok 24 sıranın ortalamasına yaklaştırdı.
+Önceki kitte aynı seçenekler farklı sırayla yazılınca Jev'in bir seçeneğe verdiği olasılık 0,52'ye kadar değişti. Aynı soruyu birebir yeniden sormak ise en fazla 0,01 değiştirdi. Bu yüzden `decide` her seçimi iki kez sorar, bir kez senin sıranla, bir kez ters sırayla, ve ikisinin ortalamasını alır; bu ikisi berabere kalırsa ve 3 ile 6 arası seçenek varsa dengeli kalan sıraları da sorar (aşağıda). Claude'a asla "yeniden sor" demez: beraberlik, eksik olgu eklenerek çözülür. claude-referee'nin 19'unda liderin 0,9 ya da üstünde olduğu 20 kararlık kendi açık setinde sıra en fazla 0,13, yeniden sormak en fazla 0,04 değiştirdi. Önceden kayda geçirilmiş 39 yakın kararlık sette ise sıra olasılığı ortalama 0,26, en fazla 0,42 değiştirdi; ters sıra, yazılan sırayı iki kez sormaktan daha çok 24 sıranın ortalamasına yaklaştırdı.
 
 ### İki sıra yeterli
 
@@ -78,7 +78,7 @@ Buradaki sayıların çoğu tek bir özel kod tabanından, tek ekipten ve tek ya
   <img alt="Beş sıralama politikası, karar başına Jev isteği ve 20 kararın kaçında tüm sıraların lideriyle eşleştiğine göre. Yalnızca yazıldığı sıra: 1 istek, 20'de 18. Yazıldığı sıra ve tersi: 2 istek, 20'de 20. Dört dönüş: 4 istek, 20'de 19. İki sıra, emin değilse 24'ü: ortalama 10,8 istek, 20'de 20. 24 sıranın tamamı: 24 istek, referans." src="assets/charts/policies-compare-light.png" width="100%">
 </picture>
 
-Senin sıran ve tersiyle sormak, 24 sıranın hepsini denemekle aynı kazananı 20 kararın 20'sinde buldu; 24 yerine 2 istekle.
+Senin sıran ve tersiyle sormak, 24 sıranın hepsini denemekle aynı kazananı 20 kararın 20'sinde buldu; 24 yerine 2 istekle. İstisna neredeyse berabere kararlar: 252 kararlık sonraki bir çalışmada iki sıra, 32 neredeyse beraberliğin 21'inde tüm sıraların lideriyle eşleşti; dengeli 2n sıralık bir set (her seçenek her konumda, artı tersleri) ise 30'unda. Bu yüzden iki sıra berabere kalınca `decide` artık setin kalanını da sorar ve verdict'i 2n sıranın ortalamasından alır; o çalışmaya yeniden uygulandığında bu, 4 ve daha fazla seçenekli kararların %21'inde devreye girdi ve başka hiçbir yerde kayıp vermedi ([kayıt](docs/decisions/decide-balanced-near-ties.md)).
 
 ### Fatura Jev'de değil, Claude turunda
 

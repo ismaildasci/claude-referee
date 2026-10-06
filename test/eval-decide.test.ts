@@ -203,3 +203,57 @@ test("a line recorded under another ablation is ignored by the full score", asyn
   assert.equal(code, 0);
   assert.equal(out["order_disagrees"], 1);
 });
+
+const THREE = [
+  { name: "a", text: "Option a" },
+  { name: "b", text: "Option b" },
+  { name: "c", text: "Option c" },
+];
+const TIES = [
+  { id: "agree", split: "dev", expected: "b", decision: "d1", context: "favour:b", options: THREE },
+  { id: "split", split: "holdout", expected: "a", decision: "d2", options: THREE },
+];
+const lines = (root: string) => readFileSync(join(root, "s1", "recorded.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l) as { case: string; answers: unknown; also?: unknown[]; ablation?: string });
+
+test("eval record adds the balanced orders when a decide case's two orders tie, and score replays them", async () => {
+  const root = suite(TIES);
+  const rec = await record(root);
+  assert.equal(rec.code, 0, JSON.stringify(rec.out));
+  assert.equal(rec.requests, 2 + 6);
+  const byCase = Object.fromEntries(lines(root).map((l) => [l.case, l]));
+  assert.equal(byCase["agree"]?.also?.length, 1);
+  assert.equal(byCase["split"]?.also?.length, 5);
+  const { code, out } = await score(root);
+  assert.equal(code, 0, JSON.stringify(out));
+  assert.equal(out["cases"], 2);
+  assert.deepEqual(out["verdicts"], { clear: 1, weak: 0, tie: 1 });
+});
+
+test("a decide recording without the balanced orders fails scoring and is topped up with only the missing orders", async () => {
+  const root = suite(TIES);
+  await record(root);
+  const old = lines(root).map((l) => ({ ...l, ...(l.also ? { also: l.also.slice(0, 1) } : {}) }));
+  writeFileSync(join(root, "s1", "recorded.jsonl"), old.map((l) => JSON.stringify(l)).join("\n") + "\n");
+  const before = await score(root);
+  assert.equal(before.code, 1);
+  assert.match(String(before.out["message"]), /balanced/);
+  const top = await record(root);
+  assert.equal(top.code, 0, JSON.stringify(top.out));
+  assert.equal(top.requests, 4);
+  const after = lines(root).filter((l) => l.case === "split").at(-1);
+  assert.deepEqual([after?.answers, after?.also?.[0]], [old.find((l) => l.case === "split")?.answers, old.find((l) => l.case === "split")?.also?.[0]]);
+  assert.equal(after?.also?.length, 5);
+  assert.equal((await score(root)).code, 0);
+});
+
+test("ablations keep two orders, and the request cap counts the balanced orders a case could add", async () => {
+  const root = suite(TIES);
+  const capped = await record(root, ["--max-requests", "4"]);
+  assert.equal(capped.out["error"], "bad_input");
+  assert.equal(capped.requests, 0);
+  await record(root);
+  const context = await record(root, ["--ablation", "context"]);
+  assert.equal(context.requests, 2, "two orders for the case with context; the case without context reuses its full recording");
+  assert.equal((await score(root, ["--ablation", "context"])).code, 0);
+  assert.equal((await score(root, ["--ablation", "reversed"])).code, 0);
+});

@@ -21,7 +21,7 @@ Setup: 20 real decisions with 4 options each, asked in all 24 orders, twice. No 
 
 The comparison is with the average over all orders, not with a known right answer.
 
-**What changed:** `decide` asks the choice twice, in the written and the reversed order, and averages the two.
+**What changed:** `decide` asks the choice twice, in the written and the reversed order, and averages the two. Since 2026-10-06, when those two tie it also asks the rest of a balanced set of orders ([below](#decide-with-a-balanced-set-of-orders-on-ties)).
 
 ## Asking again barely changes the answer
 
@@ -415,3 +415,12 @@ Three of six are met (stop count, on synthetic ground truth rather than human la
 ### decide against author-labelled best options
 
 `jev-evals/decide-best`, `jev-1.13.0`, 2026-10-02, `eval record` then `eval score` ([metric and record](decisions/decide-eval-metric.md)): the 39 close-call decisions of `decide-close`, each with one best option written by the repo author before any answer was recorded. The leader matched the label in 16 of 39 cases (0.41). The verdicts were 0 clear, 25 weak and 14 tie; the written and reversed orders picked different leaders in 12 cases. Several options are defensible in every case by construction and the labels are one author's judgement, so this is a description of how Jev behaves on close calls, not an accuracy and not a pass or fail result. (Measured)
+
+### decide with a balanced set of orders on ties
+
+Registered in [decide-balanced-near-ties.md](decisions/decide-balanced-near-ties.md) before the replay and before any code (83129ee). When the written and the reversed order tie and there are 3 to 6 options, `decide` now also asks the other 2n - 2 orders of a balanced set (the n rotations of the written order and their reverses) and takes lean and verdict from the mean of all 2n.
+
+- **Replay on the order study's recorded answers** (252 decisions, 211 with 4 or more options, 32 near ties; the script first reproduced the study's published `wr` and `latin_rev` numbers): near-tie leader agreement 30 of 32 (0.94) against 21 of 32 (0.66) for two orders, leader agreement over all 211 decisions 0.99 against 0.94, verdict agreement 0.95 to 0.96 against 0.90 to 0.91, 1 false `clear` of 72 for both (the same two-order decision). Same under the leave-out, full-set and replicate references. It fired on 44 of 211 decisions (21%), 3.5 requests per decision on average instead of 2. This is the data the design came from, so it checks the implementation, not an unseen case. Results: [results-adaptive.json](../jev-evals/decide-scale/results-adaptive.json).
+- **The shipped command against the study's harness** (live, 2026-10-06, 8 decisions, 58 requests): mean absolute difference between the live mean and the recorded mean over the same orders 0.008 (bar 0.02); 7 of the 8 tied again live and asked 8 orders, and 7 kept the recorded leader (the other is a `tie` both ways).
+- **The labelled decide suite** (`decide-best`, 14 tied cases topped up with their 6 extra orders, 84 requests): agreement with the author's labels 16 of 39 before and after; verdicts went from 0 `clear`, 25 `weak`, 14 `tie` to 0, 28, 11.
+- Limits: invented public decisions, one model version; on a near tie the leader is close to arbitrary whichever policy picks it, so the gain is in agreement with a larger set of orders, not a shown gain in decision quality.
