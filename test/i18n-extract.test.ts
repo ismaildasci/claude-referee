@@ -117,6 +117,23 @@ notify({ title: "Upload complete" });
   assert.deepEqual(found("src/A.vue", vue), ["vue-attr:Remove item", "vue-text:Add to cart", "vue-text:Your cart is empty", "vue-text:Sign in", "vue-attr:Type a message", "ui-prop:Upload complete"]);
 });
 
+test("Vue: a mustache with braces in its expression is still a mustache, on one line or several", () => {
+  const vue = `<template>
+  <p>{{ $t('e', { x: 1 }) }}</p>
+  <p>{{
+    $t('global.form.valueMustBeBetween', {
+      min: 0,
+      max: 65535,
+    })
+  }}</p>
+  <p>{{ fmt({ a: '}}' }) }} / {{ b }}</p>
+  <p>Total: {{ sum({ a: 1 }) }} items</p>
+  <p>{{ 'Literal text' }}</p>
+</template>
+`;
+  assert.deepEqual(found("src/B.vue", vue), ["vue-text:Total: {{ sum({ a: 1 }) }} items", "vue-text:Literal text"]);
+});
+
 test("HTML: text, attributes, meta description and submit buttons are found; scripts, code, pre and translate markers are not", () => {
   const html = `<!doctype html><html><head><title>Pricing and plans</title>
 <meta name="description" content="Plan your trips with friends">

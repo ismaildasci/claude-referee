@@ -526,6 +526,34 @@ interface HtmlTag {
   readonly skipText: boolean;
 }
 
+function withoutMustaches(s: string): string | null {
+  let out = "";
+  let i = 0;
+  while (i < s.length) {
+    const open = s.indexOf("{{", i);
+    if (open < 0) return out + s.slice(i);
+    out += `${s.slice(i, open)} `;
+    let depth = 0;
+    let quote = "";
+    let j = open + 2;
+    for (; j < s.length; j++) {
+      const c = s[j];
+      if (quote) {
+        if (c === "\\") j++;
+        else if (c === quote) quote = "";
+      } else if (c === "'" || c === '"' || c === "`") quote = c;
+      else if (c === "{") depth++;
+      else if (c === "}") {
+        if (depth === 0 && s[j + 1] === "}") break;
+        depth--;
+      }
+    }
+    if (j >= s.length) return null;
+    i = j + 2;
+  }
+  return out;
+}
+
 function scanHtml(src: string, from: number, to: number, vue: boolean, out: Pending[]): void {
   const stack: HtmlTag[] = [];
   let i = from;
@@ -537,7 +565,7 @@ function scanHtml(src: string, from: number, to: number, vue: boolean, out: Pend
     const kind = vue ? "vue-text" : "html-text";
     const literal = /^\{\{\s*(['"`])(.*)\1\s*\}\}$/.exec(value);
     if (literal) value = literal[2] as string;
-    else if (vue && /^\{\{[^}]*\}\}$/.test(value)) return;
+    else if (vue && !/\p{L}/u.test(withoutMustaches(value) ?? "x")) return;
     if (!value || looksTechnical(value)) return;
     out.push({ kind, text: value, offset: offset + lead, where: () => `${kind} in ${parent?.text ?? "document"}` });
   };
