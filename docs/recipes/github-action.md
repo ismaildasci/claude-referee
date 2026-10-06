@@ -40,6 +40,10 @@ jobs:
 
 Keep your real test step failing the job as before; the log step above only captures output so the exit code line lands in the file. `done` needs that line (or a recognised runner summary) to ever say `met`.
 
+## How it is tested
+
+`test/action.test.ts` runs `action/run.sh` against a stub CLI: the skip path without a key, the key reaching the CLI only as `TYPESAFE_API_KEY` and never printed, `--fail-on` exit codes, the claims source rules and the outputs. This repository's self-test workflow runs the action on a GitHub-hosted runner without a key, so only the skip path has run there. A real request from a hosted runner (the path with a key) has not been run: this repository keeps no TypeSafe key. Your first run with your own key is that test; check that `done-verdict` and the receipts artifact appear.
+
 ## Inputs
 
 | Input | Default | Meaning |
