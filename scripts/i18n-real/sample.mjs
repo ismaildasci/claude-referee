@@ -1,16 +1,24 @@
 // Step 3 of the i18n real-code hold-out: extract on the copies, the found rule, recall, the judge sample and the blind label files.
-// Usage: node sample.mjs --out DIR. Writes DIR/recall.json, DIR/items.jsonl, DIR/leakage.json, DIR/blind/labeller-{1,2}.jsonl and DIR/keys/labeller-{1,2}.json.
+// Usage: node sample.mjs --out DIR [--split FILE --part dev|holdout] [--y N] [--o N] [--seed S]. Writes DIR/recall.json (all repositories) and, for the part
+// (prefix "<part>-" when given), items.jsonl, leakage.json, blind/labeller-{1,2}.jsonl and keys/labeller-{1,2}.json. Defaults reproduce the first sample.
 
 import { randomBytes } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { extractPaths } from "../../src/engine/i18n-extract.ts";
 import { clopperPearson } from "../real-ci/lib.mjs";
-import { amendedMatch, matchFound, normalizeForMatch, PER_ORIGIN, seededOrder } from "./lib.mjs";
+import { amendedMatch, matchFound, normalizeForMatch, PER_ORIGIN, SEED, seededOrder } from "./lib.mjs";
 
 const args = process.argv.slice(2);
-const OUT = args.includes("--out") ? args[args.indexOf("--out") + 1] : undefined;
+const flag = (name, fallback) => (args.includes(`--${name}`) ? args[args.indexOf(`--${name}`) + 1] : fallback);
+const OUT = flag("out");
 if (!OUT) throw new Error("--out DIR is required");
+const PART = flag("part");
+const SPLIT = PART ? JSON.parse(readFileSync(flag("split"), "utf8")).split : null;
+const Y_CAP = Number(flag("y", String(PER_ORIGIN)));
+const O_CAP = Number(flag("o", String(PER_ORIGIN)));
+const SEED_ARG = flag("seed", SEED);
+const prefix = PART ? `${PART}-` : "";
 const slug = (repo) => repo.replace("/", "__");
 const repos = JSON.parse(readFileSync(join(OUT, "repos.json"), "utf8"));
 const rate = (k, n) => ({ k, n, share: n ? Number((k / n).toFixed(3)) : null, ci95: clopperPearson(k, n) });
@@ -61,8 +69,9 @@ for (const r of repos) {
   const toItem = (c, origin) => ({ id: `${s}:${c.id}`, repo: r.repo, framework: r.framework, origin, contains_removed_value: amendedIds.has(c.id) || matched.has(c.id), kind: c.kind, text: c.text, context: c.context });
   const y = new Map(candidates.filter((c) => matched.has(c.id)).map((c) => [c.id, c]));
   const o = new Map(candidates.filter((c) => !matched.has(c.id)).map((c) => [c.id, c]));
-  for (const id of seededOrder([...y.keys()]).slice(0, PER_ORIGIN)) items.push(toItem(y.get(id), "Y"));
-  for (const id of seededOrder([...o.keys()]).slice(0, PER_ORIGIN)) items.push(toItem(o.get(id), "O"));
+  if (SPLIT && SPLIT[r.repo] !== PART) continue;
+  for (const id of seededOrder([...y.keys()], SEED_ARG).slice(0, Y_CAP)) items.push(toItem(y.get(id), "Y"));
+  for (const id of seededOrder([...o.keys()], SEED_ARG).slice(0, O_CAP)) items.push(toItem(o.get(id), "O"));
 }
 const recall = {};
 for (const rule of ["registered", "amended"]) {
@@ -71,7 +80,7 @@ for (const rule of ["registered", "amended"]) {
 }
 recall.registered_match_not_equal = Object.fromEntries(Object.entries(notEqual).map(([p, v]) => [p, rate(v.k, v.n)]));
 writeFileSync(join(OUT, "recall.json"), `${JSON.stringify(recall, null, 1)}\n`);
-writeFileSync(join(OUT, "items.jsonl"), items.map((i) => JSON.stringify(i)).join("\n") + "\n");
+writeFileSync(join(OUT, `${prefix}items.jsonl`), items.map((i) => JSON.stringify(i)).join("\n") + "\n");
 
 const share = (list, test) => (list.length ? Number((list.filter(test).length / list.length).toFixed(3)) : null);
 const leak = {};
@@ -87,7 +96,7 @@ for (const origin of ["Y", "O"]) {
     kinds,
   };
 }
-writeFileSync(join(OUT, "leakage.json"), `${JSON.stringify(leak, null, 1)}\n`);
+writeFileSync(join(OUT, `${prefix}leakage.json`), `${JSON.stringify(leak, null, 1)}\n`);
 
 mkdirSync(join(OUT, "blind"), { recursive: true });
 mkdirSync(join(OUT, "keys"), { recursive: true });
@@ -95,7 +104,7 @@ for (const n of [1, 2]) {
   const keyed = items.map((i) => ({ key: randomBytes(4).toString("hex"), id: i.id, text: i.text, context: i.context }));
   if (new Set(keyed.map((k) => k.key)).size !== keyed.length) throw new Error("key collision; run again");
   keyed.sort((a, b) => (a.key < b.key ? -1 : 1));
-  writeFileSync(join(OUT, "blind", `labeller-${n}.jsonl`), keyed.map(({ key, text, context }) => JSON.stringify({ key, text, context })).join("\n") + "\n");
-  writeFileSync(join(OUT, "keys", `labeller-${n}.json`), `${JSON.stringify(Object.fromEntries(keyed.map((k) => [k.key, k.id])), null, 1)}\n`);
+  writeFileSync(join(OUT, "blind", `${prefix}labeller-${n}.jsonl`), keyed.map(({ key, text, context }) => JSON.stringify({ key, text, context })).join("\n") + "\n");
+  writeFileSync(join(OUT, "keys", `${prefix}labeller-${n}.json`), `${JSON.stringify(Object.fromEntries(keyed.map((k) => [k.key, k.id])), null, 1)}\n`);
 }
 console.error(`recall registered ${rules.registered.k}/${rules.registered.n}, amended ${rules.amended.k}/${rules.amended.n}; items ${items.length} (Y ${items.filter((i) => i.origin === "Y").length}, O ${items.filter((i) => i.origin === "O").length})`);
