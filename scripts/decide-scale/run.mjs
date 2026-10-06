@@ -1,5 +1,5 @@
 // Runs the option-order scale study through the repo's Session (redaction, cache, retry budget, one receipt per batch); appends answers to jev-evals/decide-scale/recorded-<stage>.jsonl.
-// Usage: node scripts/decide-scale/run.mjs --stage main|rename|screen|wave2|rep [--only <src>] [--limit n] [--dry-run] [--batch 240]; resumable: recorded requests are skipped.
+// Usage: node scripts/decide-scale/run.mjs --stage main|rename|rename-rep|screen|wave2|rep [--only <src>] [--limit n] [--dry-run] [--batch 240]; resumable: recorded requests are skipped.
 
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
@@ -16,7 +16,7 @@ const only = flag("--only", null);
 const limit = Number(flag("--limit", "0"));
 const batchSize = Number(flag("--batch", "240"));
 const dry = args.includes("--dry-run");
-if (!["main", "rename", "screen", "wave2", "rep"].includes(stage)) throw new Error("--stage must be main, rename, screen, wave2 or rep");
+if (!["main", "rename", "rename-rep", "screen", "wave2", "rep"].includes(stage)) throw new Error("--stage must be main, rename, rename-rep, screen, wave2 or rep");
 
 const dir = join(ROOT, "jev-evals", "decide-scale");
 const recordedPath = join(dir, `recorded-${stage}.jsonl`);
@@ -35,6 +35,7 @@ if (stage === "wave2" || stage === "rep") {
 }
 if (only) cases = cases.filter((c) => c.src === only);
 if (stage === "rename") cases = cases.filter((c) => ["close", "a", "b"].includes(c.src));
+if (stage === "rename-rep") cases = cases.filter((c) => c.src === "close");
 if (limit > 0) cases = cases.slice(0, limit);
 
 const done = new Set(existsSync(recordedPath) ? readFileSync(recordedPath, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)).map((r) => `${r.case}|${r.naming}|${r.order.join(",")}`) : []);
@@ -42,8 +43,8 @@ const done = new Set(existsSync(recordedPath) ? readFileSync(recordedPath, "utf8
 const tasks = [];
 for (const c of cases) {
   const plan = orderPlan(c);
-  const naming = stage === "rename" ? "neutral" : "orig";
-  const orders = stage === "rename" ? plan.pool : stage === "screen" ? plan.screen : [...plan.pool, ...plan.extra];
+  const naming = stage.startsWith("rename") ? "neutral" : "orig";
+  const orders = stage.startsWith("rename") ? plan.pool : stage === "screen" ? plan.screen : [...plan.pool, ...plan.extra];
   const map = naming === "neutral" ? neutralNames(c) : null;
   for (const order of orders) {
     const id = `${c.id}|${naming}|${key(order)}`;
@@ -55,7 +56,7 @@ for (const c of cases) {
 }
 console.log(`${cases.length} decisions, ${tasks.length} requests to send (${done.size} already recorded), stage ${stage}`);
 
-const sessionOptions = () => ({ command: `decide-scale-${stage}`, env: process.env, cwd: ROOT, home: homedir(), platform: process.platform, now: () => Date.now(), pack: packRef, deadlineMs: 900_000, ...(stage === "rep" ? { fresh: true } : {}) });
+const sessionOptions = () => ({ command: `decide-scale-${stage}`, env: process.env, cwd: ROOT, home: homedir(), platform: process.platform, now: () => Date.now(), pack: packRef, deadlineMs: 900_000, ...(stage === "rep" || stage === "rename-rep" ? { fresh: true } : {}) });
 
 if (dry) {
   const session = new Session(sessionOptions());
