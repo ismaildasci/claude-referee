@@ -1,0 +1,53 @@
+# Runs this repository's own Action (uses: ./) on its own test log, on a hosted runner.
+# Without the TYPESAFE_API_KEY secret it checks the skip path; with it, done must say met on the passing suite.
+name: Action self-test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - action.yml
+      - action/**
+      - plugins/claude-referee/dist/cli.mjs
+      - .github/workflows/action-selftest.yml
+
+permissions:
+  contents: read
+
+jobs:
+  selftest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Run the tests and keep the log
+        run: |
+          set +e
+          { npm test; echo "exit code: $?"; } > test.log 2>&1
+          tail -n 12 test.log
+          exit 0
+      - id: referee
+        uses: ./
+        with:
+          typesafe-api-key: ${{ secrets.TYPESAFE_API_KEY }}
+          log-file: test.log
+          criteria: all tests pass
+          fail-on: missing,unsure
+          base-sha: ""
+          artifact-name: claude-referee-selftest-receipts
+      - name: Check the outputs
+        env:
+          SKIPPED: ${{ steps.referee.outputs.skipped }}
+          DONE: ${{ steps.referee.outputs.done-verdict }}
+        run: |
+          echo "skipped=$SKIPPED done=$DONE"
+          if [[ "$SKIPPED" == "true" ]]; then
+            [[ -z "$DONE" ]] || { echo "::error::skipped but done ran"; exit 1; }
+          else
+            [[ "$SKIPPED" == "false" && "$DONE" == "met" ]] || { echo "::error::expected done met on the passing suite"; exit 1; }
+          fi
