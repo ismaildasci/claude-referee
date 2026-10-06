@@ -51,6 +51,72 @@ With 46 `no` items, zero wrong `yes` bounds the true rate to about 6% at 95% con
 
 Pick several public repositories that use React, Vue and plain HTML and that already keep strings in a translation file, chosen before looking at results. Strip the translation calls from a copy, run `extract`, and treat the original `t("...")` sites as the labelled `yes` set; label a random sample of the remaining candidates by hand with two labellers. Report extractor recall against the removed calls, and judge accuracy on the sample. Not started.
 
+### Amendment, 2026-10-06: protocol of the public-repo hold-out, fixed before any repository is downloaded
+
+The plan above names the idea; this fixes the details. The commit that adds this section is the registration. Done before it: three GitHub search probes to see that the queries return applications (lists of repository names only; nothing cloned, extracted or sent to Jev), checking that the frozen pack files still have the hashes above (they do), and running `extract` on a hand-written fixture to see how it emits the three placeholder forms below (it keeps `{name}`, `{{ name }}` and `${name}` in the candidate text as written).
+
+#### What is measured
+
+1. **Extractor recall on real code**: of the translation calls removed from a copy (below), the share that `extract` lists as a candidate.
+2. **Judge errors on real candidates**: the same question, bands and model as the synthetic hold-out (`i18n@0.1.0`, `string.translatable`, the two SHA-256 hashes above, `jev-1.13.0`), on a sample of the candidates `extract` lists.
+
+#### Repositories (rule fixed now)
+
+- **Three frameworks, two repositories each**: React with an i18next-style `t("key")`, Vue with vue-i18n (`$t("key")`, `t("key")`), plain HTML with `data-i18n="key"` attributes.
+- **Search lists**: `gh search code "useTranslation" --extension tsx`, `gh search code '$t(' --extension vue`, `gh search code "data-i18n" --extension html`; up to 300 results each, repositories in first-seen order. The raw lists are committed with their fetch time.
+- **Metadata filter**: not a fork, not archived, licence MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC or 0BSD (so short strings can be committed with attribution), at least 25 stars, pushed since 2023-10-06.
+- **Content filter**, on a shallow clone of the default branch (commit SHA recorded): an English locale in JSON (`en.json`, `en-US.json`, `en_US.json` or `en/*.json`, a folder merged by file name as namespace) and at least 40 removable calls in files `extract` reads.
+- The first two repositories in list order that pass both filters are taken; later ones are not looked at. If fewer than two pass among a list's results, fewer are used and that is reported.
+
+#### Removing the translation calls (in a copy)
+
+A call is replaced only when its first argument is a single string literal that resolves to a string in the English locale and the call sits on one line; the line count of every file stays the same.
+
+Key resolution, in this order: an explicit `ns:key`; else the namespace named by `useTranslation(...)` (or `useI18n`/`withTranslation`) in the same file, with its `keyPrefix`; else the default namespace (`translation`, or the only file when the locale is a single file); else every namespace, accepted only when exactly one resolves. Nested keys resolve by dots. Function names: `t`, `i18n.t`, `i18next.t` (React); `$t`, `t`, `this.$t`, `i18n.global.t` (Vue). Replacement by position, so the copy reads like code written without i18n:
+
+- JSX child `{t("k")}` becomes the value as JSX text; an i18next placeholder `{{name}}` becomes `{name}`.
+- JSX attribute `attr={t("k")}` becomes `attr="value"`.
+- Vue template `{{ $t("k") }}` becomes the value as text, a placeholder `{name}` becomes `{{ name }}`; a bound attribute `:attr="$t('k')"` becomes `attr="value"`; any other call inside a binding becomes a string literal in place.
+- Any other expression position becomes a string literal; with placeholders, a template literal with `${name}`.
+- HTML: an element whose `data-i18n` is a plain key and whose content has no child element gets the value as its content and loses the attribute; `[attr]key` sets that attribute instead.
+
+Skipped, counted by reason: dynamic key, key not in the English locale (including plural-only keys), a key that resolves in more than one namespace, multi-line call, a value containing a newline, a value that cannot be written at that position (a quote in an attribute, `<` or braces in text after the placeholder rule), `<Trans>` and similar components. Every replaced site is recorded: repository, file, line, position type, value.
+
+#### Recall
+
+`extract` runs on the copy with `--keep-duplicates`, default file rules (tests excluded). A replaced site in a file `extract` reads counts as **found** when a candidate on the same file and line has a text that, with every `{...}`, `{{...}}` and `${...}` token removed and whitespace collapsed, contains the site's value treated the same way, and that value is not empty after the removal (a site whose value is only a placeholder is skipped). Reported per repository, per position type and pooled, as k of n with an exact two-sided 95% Clopper-Pearson interval. Sites in files `extract` does not read are counted separately and are not in n.
+
+#### Judge sample
+
+Per repository, seeded by `sha256("i18n-real-v1:" + id)` ascending: up to 25 candidates that matched a replaced site (**origin Y**) and up to 25 that did not (**origin O**). At most 300 items, one Jev request each. Items are exactly what `extract` emits (text and context), with paths relative to the repository root.
+
+#### Labels
+
+- **Origin Y** items are `yes` by construction: the maintainers put the string in a translation file. A locale file can also hold strings the pack's criteria call technical (a date or number format, a locale code, a unit symbol), so: a Y item that both blind labellers call `no` is dropped from scoring and listed by id; a Y item with one `no` stays `yes` and is reported.
+- **Origin O** items are labelled by two blind labeller subagents, each in its own session: all sampled items (Y and O mixed), shuffled under random keys, only `text` and `context`, the pack's question and criteria as the rubric, a label and a short reason per item, told to read no other file. The key-to-id map stays outside their reach. Before the file is handed over, a script checks for leakage: only the three fields, no id order, and the share of placeholder shapes (`{{`, `${`), of contexts that still show a translation call (`t(`, `$t(`, `data-i18n`) and of each `kind` in Y against O is reported. 300 items for each of two labellers is about twice the labelling of the synthetic suite (135 items, one second labeller).
+- An O item's scored label is the label both labellers give; disagreements are dropped from scoring and listed by id. The labellers' answers on Y items are reported as agreement with the construction label and change nothing.
+- The labellers are model sessions, not people, and one model family.
+
+#### Order of commits
+
+This amendment; then the raw search lists and the metadata filter's result, before anything is cloned; then the content filter's table and `repos.json`; then the strip, sample and score scripts with unit tests of their pure functions; then both blind label files; then `cases.jsonl` and `suite.json`; then `recorded.jsonl`, in the same commit as the allowance in `suite.json` if the bar fails. Commit times and receipt times give the order.
+
+#### Recording
+
+A new suite `jev-evals/judge-i18n-real` (all items in `holdout`; fields id, expected, repo, framework, origin, kind, text, context), committed before recording. Recorded once with `eval record` (no `--fresh`, no dev split, nothing reworded). The two pack hashes are checked again just before the first request.
+
+#### Bar and what is said afterwards
+
+- **Bar, the same as the synthetic hold-out**: 0 wrong `yes` among scored `no` items and 0 wrong `no` among scored `yes` items.
+- If it holds, the recipe may say that on N real candidates from the named repositories the bands made no wrong call, with the rule-of-three bound. If it fails, the recipe gives the counts with exact intervals and the wrong items are listed; the question is not tuned on these items, and `suite.json` takes the observed counts as its allowance (a regression tripwire, as in the done-v2 hold-outs).
+- Reported, not part of the bar: coverage (definite verdicts), recall of `yes`, per framework, per origin, per `kind`, per repository.
+
+#### Limits, stated now
+
+- Origin Y is easier to label than to judge: a string a maintainer chose to translate is UI text, but the copy shows it where the call was, so it is real code made to look un-translated, not code that never had i18n.
+- O items in a repository that already translates are mostly technical; real code without i18n may have more UI strings among them.
+- Six repositories, two per framework: per-framework numbers are small and are reported as counts, not rates.
+
 ## Status
 
 Recorded on 2026-10-06, `jev-1.13.0`, one request per case. (The build session could not run `eval record`: its sandbox refused every command containing the word eval.) Dev first (receipt `rmuwd71k1p62l`), then the amendment above was committed (8fe449d), then the hold-out once with `eval record --suite judge-i18n --split holdout` (95 requests, receipt `rmuwdlnekxqiv`, no `--fresh`). Order, checkable in the repository: dev `recorded_at` 2026-10-06T07:36:03Z, amendment commit 8fe449d at 07:47:08Z, first hold-out `recorded_at` 07:47:28Z. Nothing was reworded or relabelled.
