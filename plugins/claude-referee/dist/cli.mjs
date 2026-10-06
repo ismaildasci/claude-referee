@@ -686,17 +686,17 @@ var init_dist = __esm({
       }
     };
     parseBody = /* @__PURE__ */ __name(async (res) => {
-      const text = await res.text();
-      if (text.length === 0) return void 0;
+      const text2 = await res.text();
+      if (text2.length === 0) return void 0;
       if ((res.headers.get("content-type") ?? "").includes("application/json")) try {
-        return JSON.parse(text);
+        return JSON.parse(text2);
       } catch {
-        return text;
+        return text2;
       }
       try {
-        return JSON.parse(text);
+        return JSON.parse(text2);
       } catch {
-        return text;
+        return text2;
       }
     }, "parseBody");
   }
@@ -752,8 +752,8 @@ function costUsd(model, inputTokens) {
   return price === void 0 ? null : inputTokens * price / 1e6;
 }
 __name(costUsd, "costUsd");
-function estimateTokens(text) {
-  return Math.ceil(text.length / 3);
+function estimateTokens(text2) {
+  return Math.ceil(text2.length / 3);
 }
 __name(estimateTokens, "estimateTokens");
 
@@ -971,8 +971,8 @@ function renderError(error, pretty = false) {
   if (error.details.status !== void 0) body["status"] = error.details.status;
   if (error.details.retry_after_ms !== void 0) body["retry_after_ms"] = error.details.retry_after_ms;
   if (error.details.next_step !== void 0) body["next_step"] = error.details.next_step.slice(0, 600);
-  const text = pretty ? JSON.stringify(body, null, 2) : JSON.stringify(body);
-  return text.length <= ERROR_LIMIT ? text : JSON.stringify({ ok: false, error: error.code });
+  const text2 = pretty ? JSON.stringify(body, null, 2) : JSON.stringify(body);
+  return text2.length <= ERROR_LIMIT ? text2 : JSON.stringify({ ok: false, error: error.code });
 }
 __name(renderError, "renderError");
 
@@ -1076,8 +1076,8 @@ __name(recordBreaker, "recordBreaker");
 import { createHash as createHash2 } from "node:crypto";
 import { mkdirSync as mkdirSync3, readFileSync as readFileSync4, writeFileSync as writeFileSync3 } from "node:fs";
 import { join as join5 } from "node:path";
-function sha256(text) {
-  return createHash2("sha256").update(text).digest("hex");
+function sha256(text2) {
+  return createHash2("sha256").update(text2).digest("hex");
 }
 __name(sha256, "sha256");
 function cacheKey(parts) {
@@ -1552,12 +1552,12 @@ function compile(specs, global) {
   });
 }
 __name(compile, "compile");
-function stopsIn(text, extra) {
+function stopsIn(text2, extra) {
   const kinds = [];
   for (const { kind, regex } of [...STOP, ...extra]) {
-    if (regex.test(text)) kinds.push(kind);
+    if (regex.test(text2)) kinds.push(kind);
   }
-  for (const match of text.matchAll(ASSIGNMENT)) {
+  for (const match of text2.matchAll(ASSIGNMENT)) {
     if (looksSecret(match[1] ?? "", match[2] ?? "")) {
       kinds.push("secret_assignment");
       break;
@@ -1566,17 +1566,17 @@ function stopsIn(text, extra) {
   return kinds;
 }
 __name(stopsIn, "stopsIn");
-function isVersionContext(text, start, end) {
-  const before = text.slice(Math.max(0, start - 10), start);
-  const after = text.slice(end, end + 2);
+function isVersionContext(text2, start, end) {
+  const before = text2.slice(Math.max(0, start - 10), start);
+  const after = text2.slice(end, end + 2);
   return /(?:\bv|version|ver|@|=|[\d.])\s*$/i.test(before) || /^(?:\.\d|[-+][0-9A-Za-z])/.test(after);
 }
 __name(isVersionContext, "isVersionContext");
-function replaceIn(text, home, extra, counts3) {
+function replaceIn(text2, home, extra, counts3) {
   const bump = /* @__PURE__ */ __name((kind) => {
     counts3[kind] = (counts3[kind] ?? 0) + 1;
   }, "bump");
-  let out = text;
+  let out = text2;
   if (home && home.length > 1 && out.includes(home)) {
     out = out.split(home).join("~");
     bump("home");
@@ -1858,9 +1858,9 @@ function list(context, key) {
 __name(list, "list");
 async function readSource(context, source, what) {
   if (source === void 0 || source === "-") {
-    const text = await context.io.readStdin();
-    if (!text.trim()) throw new RefereeError("bad_input", `No ${what} on stdin.`, { next_step: `Pipe the ${what} in, or pass a file path.` });
-    return text;
+    const text2 = await context.io.readStdin();
+    if (!text2.trim()) throw new RefereeError("bad_input", `No ${what} on stdin.`, { next_step: `Pipe the ${what} in, or pass a file path.` });
+    return text2;
   }
   const path = resolve2(context.io.cwd, source);
   try {
@@ -1872,15 +1872,15 @@ async function readSource(context, source, what) {
   }
 }
 __name(readSource, "readSource");
-function stripAnsi(text) {
-  return text.replace(/\u001b\[[0-9;?]*[ -/]*[@-~]/g, "");
+function stripAnsi(text2) {
+  return text2.replace(/\u001b\[[0-9;?]*[ -/]*[@-~]/g, "");
 }
 __name(stripAnsi, "stripAnsi");
-function clip(text, head, tail) {
-  if (text.length <= head + tail) return text;
-  return `${text.slice(0, head)}
-[… ${text.length - head - tail} characters omitted …]
-${text.slice(-tail)}`;
+function clip(text2, head, tail) {
+  if (text2.length <= head + tail) return text2;
+  return `${text2.slice(0, head)}
+[… ${text2.length - head - tail} characters omitted …]
+${text2.slice(-tail)}`;
 }
 __name(clip, "clip");
 function openPack(context) {
@@ -1968,10 +1968,10 @@ __name(reorder, "reorder");
 var NAME2 = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,39}$/;
 var FILE_LIMIT = 1e5;
 var FILES_LIMIT = 2e5;
-function parseInput(text) {
+function parseInput(text2) {
   let raw;
   try {
-    raw = JSON.parse(text);
+    raw = JSON.parse(text2);
   } catch {
     throw new RefereeError("bad_input", "decide expects a JSON object.", { next_step: "Run decide --describe for the input shape." });
   }
@@ -2255,8 +2255,8 @@ var ANSI = /\u001b(?:\[[0-?]*[ -/]*[@-~]|\][^\u0007\u001b]*(?:\u0007|\u001b\\)?)
 var MAX_FAILING = 10;
 var MAX_NAME = 120;
 var MAX_SUMMARY = 200;
-function prepare(text) {
-  return text.replace(ANSI, "").split(/\r?\n/);
+function prepare(text2) {
+  return text2.replace(ANSI, "").split(/\r?\n/);
 }
 __name(prepare, "prepare");
 function facts(runner, passed, failed, errors, skipped, ids, summary, incomplete = false) {
@@ -2285,8 +2285,8 @@ var GO_RUN = /^\s*=== (?:RUN|PAUSE|CONT)\s/;
 var GO_RUN_ID = /^\s*=== RUN\s+(\S+)/;
 var go = {
   name: "go test",
-  parse(text) {
-    const lines3 = prepare(text);
+  parse(text2) {
+    const lines3 = prepare(text2);
     const summaries = [];
     const failedIds = /* @__PURE__ */ new Set();
     const passedIds = /* @__PURE__ */ new Set();
@@ -2354,8 +2354,8 @@ var CARGO_COMPILE = /^error\[E\d+\]/;
 var CARGO_LIST_ITEM = /^ {4}([\w:]+|\S+ - .+ \(line \d+\))$/;
 var cargo = {
   name: "cargo test",
-  parse(text) {
-    const lines3 = prepare(text);
+  parse(text2) {
+    const lines3 = prepare(text2);
     const results = [];
     const failedIds = /* @__PURE__ */ new Set();
     const compile3 = /* @__PURE__ */ new Set();
@@ -2420,8 +2420,8 @@ var VSTEST_COUNT = /^\s+(Passed|Failed|Skipped):\s*(\d+)\s*$/;
 var DOTNET_ERROR = /^(.*?)\s*(?:\[[^\]]*\.\w*proj\])?\s*$/;
 var dotnet = {
   name: "dotnet test",
-  parse(text) {
-    const lines3 = prepare(text);
+  parse(text2) {
+    const lines3 = prepare(text2);
     const summaries = [];
     const failedIds = /* @__PURE__ */ new Set();
     const buildErrors = /* @__PURE__ */ new Set();
@@ -2507,7 +2507,7 @@ var ANSI2 = /\u001b(?:\[[0-?]*[ -/]*[@-~]|\][^\u0007\u001b]*(?:\u0007|\u001b\\)?
 var MAX_FAILING2 = 10;
 var MAX_NAME2 = 120;
 var MAX_SUMMARY2 = 200;
-var prepare2 = /* @__PURE__ */ __name((text) => text.replace(ANSI2, "").split(/\r?\n/), "prepare");
+var prepare2 = /* @__PURE__ */ __name((text2) => text2.replace(ANSI2, "").split(/\r?\n/), "prepare");
 var clip2 = /* @__PURE__ */ __name((value, max) => value.trim().slice(0, max), "clip");
 function mk(runner, counts3, failing, summary, incomplete) {
   return {
@@ -2542,8 +2542,8 @@ var BIOME_HEADER = /^(\S+?)(?::\d+:\d+)? (\S+)(?:\s+(?:FIXABLE|INTERNAL|DEPRECAT
 var BIOME_CMD = /\bbiome (?:check|lint|ci|format)\b/;
 var biome = {
   name: "biome",
-  parse(text) {
-    const lines3 = prepare2(text);
+  parse(text2) {
+    const lines3 = prepare2(text2);
     let checked = null;
     let foundErrors = 0;
     let foundWarnings = 0;
@@ -2593,8 +2593,8 @@ var NEXT_ERROR = /^(?:Failed to compile\.|> Build error occurred|Failed to type 
 var NEXT_WARNING = /^(?:\d+:\d+\s+Warning: |\s*⚠ )|Compiled with warnings/;
 var nextBuild = {
   name: "next build",
-  parse(text) {
-    const lines3 = prepare2(text);
+  parse(text2) {
+    const lines3 = prepare2(text2);
     if (!lines3.some((l) => NEXT_MARK.test(l))) return null;
     let errors = 0;
     let warnings = 0;
@@ -2613,8 +2613,8 @@ var NIX_CMD = /\bnix(?:-build| build| flake check| flake build| develop)\b|\bnix
 var NIX_FAILURE = /^error: (?:builder for '|Cannot build '|build of '|\d+ dependencies of derivation)/;
 var nix = {
   name: "nix build",
-  parse(text) {
-    const lines3 = prepare2(text);
+  parse(text2) {
+    const lines3 = prepare2(text2);
     const cmd = lines3.some((l) => NIX_CMD.test(l));
     if (!cmd && !lines3.some((l) => NIX_FAILURE.test(l))) return null;
     const errorLines = lines3.filter((l) => /^\s*error:(?:\s|$)/.test(l));
@@ -2630,8 +2630,8 @@ var ANSI3 = /\u001b\[[0-9;?]*[ -/]*[@-~]/g;
 var MAX_FAILING3 = 10;
 var MAX_NAME3 = 120;
 var MAX_SUMMARY3 = 200;
-function toLines(text) {
-  return text.replace(ANSI3, "").split(/\r\n|\r|\n/);
+function toLines(text2) {
+  return text2.replace(ANSI3, "").split(/\r\n|\r|\n/);
 }
 __name(toLines, "toLines");
 function clip3(line) {
@@ -2675,8 +2675,8 @@ function facts2(runner, f) {
   return { runner, passed: f.passed, failed: f.failed, errors: f.errors, skipped: f.skipped, failing: listFailing(f.failing), summary_line: clip3(f.summary) };
 }
 __name(facts2, "facts");
-function parseJest(text) {
-  const lines3 = toLines(text);
+function parseJest(text2) {
+  const lines3 = toLines(text2);
   const tests = tally(lines3, /^\s*Tests:\s+(?=.*\b\d+\s+(?:failed|passed|skipped|todo|total)\b)(\d.*)$/);
   const suites2 = tally(lines3, /^\s*Test Suites:\s+(\d.*)$/);
   const noTests = lines3.find((l) => /^\s*No tests found\b/.test(l)) ?? null;
@@ -2707,8 +2707,8 @@ function parseJest(text) {
   });
 }
 __name(parseJest, "parseJest");
-function parseVitest(text) {
-  const lines3 = toLines(text);
+function parseVitest(text2) {
+  const lines3 = toLines(text2);
   const tests = tally(lines3, /^\s*Tests\s+(\d.*)$/);
   const files = tally(lines3, /^\s*Test Files\s+(\d.*)$/);
   const noFiles = lines3.find((l) => /^\s*No test files found\b/.test(l)) ?? null;
@@ -2746,8 +2746,8 @@ function parseVitest(text) {
   });
 }
 __name(parseVitest, "parseVitest");
-function parseMocha(text) {
-  const lines3 = toLines(text);
+function parseMocha(text2) {
+  const lines3 = toLines(text2);
   let passLine = null;
   let failLine = null;
   let pendLine = null;
@@ -2791,8 +2791,8 @@ function parseMocha(text) {
   });
 }
 __name(parseMocha, "parseMocha");
-function parseEslint(text) {
-  const lines3 = toLines(text);
+function parseEslint(text2) {
+  const lines3 = toLines(text2);
   let summary = null;
   let errorsMax = 0;
   let warningsMax = 0;
@@ -2821,8 +2821,8 @@ function parseEslint(text) {
   return { ...facts2("eslint", { passed: 0, failed: 0, errors: Math.max(errorsMax, entries.size), skipped: 0, failing: entries, summary }), warnings: Math.max(warningsMax, warned.size) };
 }
 __name(parseEslint, "parseEslint");
-function parseTsc(text) {
-  const lines3 = toLines(text);
+function parseTsc(text2) {
+  const lines3 = toLines(text2);
   let summary = null;
   let errorsMax = 0;
   const entries = /* @__PURE__ */ new Set();
@@ -2847,8 +2847,8 @@ function parseTsc(text) {
   return facts2("tsc", { passed: summary !== null && errors === 0 ? 1 : 0, failed: 0, errors, skipped: 0, failing: entries, summary });
 }
 __name(parseTsc, "parseTsc");
-function parseNodeTest(text) {
-  const lines3 = toLines(text);
+function parseNodeTest(text2) {
+  const lines3 = toLines(text2);
   const num2 = /* @__PURE__ */ __name((key) => {
     const hit = [...lines3].reverse().map((l) => new RegExp(`^(?:ℹ|#) ${key} (\\d+)\\s*$`).exec(l)).find((m) => m !== null);
     return hit ? Number(hit[1]) : null;
@@ -2885,7 +2885,7 @@ var ANSI4 = /\u001b(?:\[[0-?]*[ -/]*[@-~]|\][^\u0007\u001b]*(?:\u0007|\u001b\\)?
 var MAX_FAILING4 = 10;
 var MAX_NAME4 = 120;
 var MAX_SUMMARY4 = 200;
-var prepare3 = /* @__PURE__ */ __name((text) => text.replace(ANSI4, "").split(/\r?\n/), "prepare");
+var prepare3 = /* @__PURE__ */ __name((text2) => text2.replace(ANSI4, "").split(/\r?\n/), "prepare");
 var clip4 = /* @__PURE__ */ __name((value, max) => value.trim().slice(0, max), "clip");
 var UT_RAN = /^Ran (\d+) tests? in [\d.]+s\s*$/;
 var UT_RESULT = /^(OK|FAILED|NO TESTS RAN)(?: \(([^)]*)\))?\s*$/;
@@ -2898,8 +2898,8 @@ function utCount(detail, key) {
 __name(utCount, "utCount");
 var unittest = {
   name: "unittest",
-  parse(text) {
-    const lines3 = prepare3(text);
+  parse(text2) {
+    const lines3 = prepare3(text2);
     const names = /* @__PURE__ */ new Set();
     let best = null;
     let ok = 0;
@@ -2958,8 +2958,8 @@ var CLIPPY_ERROR = /^error(?:\[E\d+\])?: (?!could not compile|aborting due to)/;
 var CLIPPY_COMPILE = /^error: could not compile `[^`]+`(?: \([^)]*\))?(?: due to (\d+) previous errors?)?/;
 var clippy = {
   name: "clippy",
-  parse(text) {
-    const lines3 = prepare3(text);
+  parse(text2) {
+    const lines3 = prepare3(text2);
     if (!lines3.some(clippyMarked)) return null;
     let generated = 0;
     let headers = 0;
@@ -2998,8 +2998,8 @@ var GOLANGCI_AFTER = /Issues before processing: \d+, after processing: (\d+)/;
 var GOLANGCI_COUNT = /^(\d+) issues?:\s*$/;
 var golangci = {
   name: "golangci-lint",
-  parse(text) {
-    const lines3 = prepare3(text);
+  parse(text2) {
+    const lines3 = prepare3(text2);
     if (!lines3.some((l) => GOLANGCI_MARK.test(l))) return null;
     let after = 0;
     let counted = 0;
@@ -3029,8 +3029,8 @@ var VITE_ERROR = /^(?:error during build:|✗ Build failed in\b|\[vite[:\]])/;
 var VITE_WARN = /^\(!\) /;
 var viteParser = {
   name: "vite",
-  parse(text) {
-    const lines3 = prepare3(text);
+  parse(text2) {
+    const lines3 = prepare3(text2);
     if (!lines3.some((l) => VITE_MARK.test(l))) return null;
     let errors = 0;
     let warnings = 0;
@@ -3055,8 +3055,8 @@ var CARGO_COMPOSITE = /&&|;|\|\|?/;
 var CARGO_TRAILING = /^(?:\s*|(?:warning|note|help): .*|.{0,60}?\bexit (?:code|status)\s*[:=]?\s*-?\d+.*)$/i;
 var cargoBuild = {
   name: "cargo build",
-  parse(text) {
-    const lines3 = prepare3(text);
+  parse(text2) {
+    const lines3 = prepare3(text2);
     if (lines3.some((l) => clippyMarked(l) || NEXTEST_MARK.test(l) || CARGO_TEST_OUTPUT.test(l))) return null;
     const echoes = lines3.map((l) => CARGO_ECHO.exec(l)?.[1]).filter((c) => c !== void 0);
     if (echoes.some((c) => CARGO_TEST_CMD.test(c))) return null;
@@ -3110,8 +3110,8 @@ var EX_FAILURE = /^ {1,4}\d+\) (?:test|doctest|property) (.*)$/;
 var EX_ERROR = /^\*\* \(|^== Compilation error in file /;
 var mixTest = {
   name: "mix test",
-  parse(text) {
-    const lines3 = prepare2(text);
+  parse(text2) {
+    const lines3 = prepare2(text2);
     let starts = 0;
     let summaries = 0;
     let ran = 0;
@@ -3174,8 +3174,8 @@ var CT_ITEM = /^\s+\d+ - (\S+) \((.*)\)(?:\s+\S.*)?$/;
 var CT_RESULT = /^\s*\d+\/\d+ Test\s+#\d+: (\S+) \.+\s*(?:\*\*\*)?(Passed|Failed|Not Run|Skipped|Timeout|Exception[^ ]*|SEGFAULT|Subprocess aborted|Bad Command|Disabled)\b/;
 var ctest = {
   name: "ctest",
-  parse(text) {
-    const lines3 = prepare2(text);
+  parse(text2) {
+    const lines3 = prepare2(text2);
     let claimed = false;
     let summaries = 0;
     let total = 0;
@@ -3239,8 +3239,8 @@ var RUBO_WARNING = /^(?:Warning|Notice|Deprecat\w*)\b|\bdeprecated\b/i;
 var RUBO_ERROR = /^Error: |^An error occurred while \S+ cop was inspecting /;
 var rubocop = {
   name: "rubocop",
-  parse(text) {
-    const lines3 = prepare2(text);
+  parse(text2) {
+    const lines3 = prepare2(text2);
     let inspecting = 0;
     let summaries = 0;
     let inspected = 0;
@@ -3290,8 +3290,8 @@ var MESON_TEST = /^\s*\d+\/\d+ \S.* \/ \S.*\s(?:OK|FAIL|SKIP|TIMEOUT|EXPECTEDFAI
 var NINJA_ERROR = /^FAILED: |^ninja: (?:build stopped|error|fatal)/;
 var ninja = {
   name: "ninja",
-  parse(text) {
-    const lines3 = prepare2(text);
+  parse(text2) {
+    const lines3 = prepare2(text2);
     let claimed = false;
     let status = null;
     let statusIndex = -1;
@@ -3325,8 +3325,8 @@ var MSB_COUNT = /^\s*(\d+) (Warning|Error)\(s\)\s*$/;
 var MSB_DIAG = /: (error|warning) ((?:CS|VB|FS|BC|MSB|NETSDK|NU|CA|IDE|SYSLIB|RZ|WIX)\d{3,5}): /;
 var msbuild = {
   name: "msbuild",
-  parse(text) {
-    const lines3 = prepare2(text);
+  parse(text2) {
+    const lines3 = prepare2(text2);
     let ok = 0;
     let failed = false;
     let errorCount = 0;
@@ -3367,8 +3367,8 @@ var DK_CANCELED = /^#\d+ CANCELED\s*$/;
 var DK_WARN = /^(\d+) warnings? found\b/;
 var docker = {
   name: "docker build",
-  parse(text) {
-    const lines3 = prepare2(text);
+  parse(text2) {
+    const lines3 = prepare2(text2);
     const done2 = /* @__PURE__ */ new Set();
     const exporting = /* @__PURE__ */ new Set();
     let hasVertex = false;
@@ -3403,8 +3403,8 @@ var MAKE_FAIL = /^(?:g|mingw32-)?make(?:\[\d+\])?: (?:\*\*\* |\[[^\]]*\] Error \
 var MAKE_WARN = /^(?:g|mingw32-)?make(?:\[\d+\])?: warning:/;
 var make = {
   name: "make",
-  parse(text) {
-    const lines3 = prepare2(text);
+  parse(text2) {
+    const lines3 = prepare2(text2);
     if (!lines3.some((l) => MAKE_LINE.test(l))) return null;
     let errors = 0;
     let warnings = 0;
@@ -3431,8 +3431,8 @@ var TESTING_KNOWN = /^(?:\S )?Test .* recorded a known issue\b/;
 var TESTING_TAIL = /(\d+) (known issues?|issues?|warnings?)\b/g;
 var swiftBuild = {
   name: "swift build",
-  parse(text) {
-    const lines3 = prepare2(text);
+  parse(text2) {
+    const lines3 = prepare2(text2);
     if (!lines3.some((l) => SWIFT_BUILD_MARK.test(l))) return null;
     if (lines3.some((l) => XCTEST_MARK.test(l) || TESTING_RUN.test(l))) return null;
     let ok = 0;
@@ -3457,8 +3457,8 @@ var TESTING_FAIL = /^(?:\S )?Test "(.*)" failed after\b/;
 var TESTING_SKIP = /^(?:\S )?Test "(.*)" skipped\b/;
 var swiftTest = {
   name: "swift test",
-  parse(text) {
-    const lines3 = prepare2(text);
+  parse(text2) {
+    const lines3 = prepare2(text2);
     if (!lines3.some((l) => XCTEST_MARK.test(l) || TESTING_RUN.test(l) || TESTING_FAIL.test(l))) return null;
     const alls = [];
     const bundles = [];
@@ -3554,8 +3554,8 @@ var MVN_FAIL = /^\[ERROR\] (?:BUILD FAILURE|COMPILATION ERROR\b|Failed to execut
 var MVN_REACTOR_FAIL = /^\[(?:INFO|ERROR)\] \S.* \.{3,} FAILURE \[/;
 var maven = {
   name: "maven",
-  parse(text) {
-    const lines3 = prepare2(text);
+  parse(text2) {
+    const lines3 = prepare2(text2);
     if (!lines3.some((l) => MVN_MARK.test(l))) return null;
     let ok = 0;
     let errors = 0;
@@ -3592,8 +3592,8 @@ var parsers6 = [ninja, msbuild, docker, make, maven, swiftBuild, swiftTest];
 var MAX_FAILING5 = 10;
 var MAX_NAME5 = 120;
 var MAX_SUMMARY5 = 200;
-function lines(text) {
-  return text.replace(/\x1b\[[0-9;?]*[ -/]*[@-~]/g, "").split(/\r\n|\r|\n/).map((l) => l.replace(/\s+$/, ""));
+function lines(text2) {
+  return text2.replace(/\x1b\[[0-9;?]*[ -/]*[@-~]/g, "").split(/\r\n|\r|\n/).map((l) => l.replace(/\s+$/, ""));
 }
 __name(lines, "lines");
 function cap(s, n) {
@@ -3621,8 +3621,8 @@ function counts(rest) {
 __name(counts, "counts");
 var phpunit = {
   name: "phpunit",
-  parse(text) {
-    const all = lines(text);
+  parse(text2) {
+    const all = lines(text2);
     const candidates = [];
     const failureIds = /* @__PURE__ */ new Map();
     const errorIds = /* @__PURE__ */ new Map();
@@ -3697,8 +3697,8 @@ var phpunit = {
 };
 var rspec = {
   name: "rspec",
-  parse(text) {
-    const all = lines(text);
+  parse(text2) {
+    const all = lines(text2);
     const summaries = [];
     const numbered = /* @__PURE__ */ new Map();
     const located = /* @__PURE__ */ new Map();
@@ -3777,8 +3777,8 @@ var RUFF_FIXABLE = /^\[\*\] (\d+) fixable with the .{0,4}--fix.{0,4} option/;
 var RUFF_CONCISE = /^(\S+?):(\d+):(\d+): ([A-Z]{1,4}\d{2,4})(?: |$)/;
 var RUFF_HEADER = /^([A-Z]{1,4}\d{2,4}) (?:\[\*\] )?\S/;
 var RUFF_ARROW = /^\s*--> (\S+?):(\d+):(\d+)$/;
-function lines2(text) {
-  return text.replace(ANSI5, "").split(/\r\n|\r|\n/);
+function lines2(text2) {
+  return text2.replace(ANSI5, "").split(/\r\n|\r|\n/);
 }
 __name(lines2, "lines");
 function cap2(value, max) {
@@ -3796,14 +3796,14 @@ function counts2(line) {
 __name(counts2, "counts");
 var pytest = {
   name: "pytest",
-  parse(text) {
+  parse(text2) {
     const failedIds = /* @__PURE__ */ new Set();
     const errorIds = /* @__PURE__ */ new Set();
     const summaries = [];
     let empty = null;
     let failuresBlock = false;
     let errorsBlock = false;
-    for (const raw of lines2(text)) {
+    for (const raw of lines2(text2)) {
       const line = raw.trim();
       const bare = line.replace(/^=+\s*|\s*=+$/g, "");
       if (PYTEST_SUMMARY.test(bare) || PYTEST_NO_TESTS.test(bare)) {
@@ -3856,14 +3856,14 @@ var pytest = {
 };
 var ruff = {
   name: "ruff",
-  parse(text) {
+  parse(text2) {
     const violations = /* @__PURE__ */ new Set();
     let found = 0;
     let fixable = 0;
     let clean = false;
     let summary = null;
     let header = null;
-    for (const raw of lines2(text)) {
+    for (const raw of lines2(text2)) {
       const line = raw.trim();
       const f = RUFF_FOUND.exec(line);
       if (f) {
@@ -3920,8 +3920,8 @@ var PROVE_REPORT = /^(\S+\.t) \(Wstat: \d+ Tests: \d+ Failed: (\d+)\)/;
 var PROVE_DIRECTIVE = /^\s*(?:not )?ok \d+\b.*# (?:skip|todo)\b/i;
 var prove = {
   name: "prove",
-  parse(text) {
-    const lines3 = prepare2(text);
+  parse(text2) {
+    const lines3 = prepare2(text2);
     let files = null;
     let result = null;
     let successful = false;
@@ -3973,8 +3973,8 @@ var BEHAVE_LISTED = /^\s+(\S+\.feature:\d+)\s+(.*)$/;
 var BEHAVE_ERROR_PARTS = /^(?:error|hook_error|cleanup_error)s?$/;
 var behave = {
   name: "behave",
-  parse(text) {
-    const lines3 = prepare2(text);
+  parse(text2) {
+    const lines3 = prepare2(text2);
     let passed = null;
     let passedFeatures = 0;
     let failed = 0;
@@ -4033,8 +4033,8 @@ var TOX3_SEPARATOR = /^_{3,} summary _{3,}$/;
 var TOX3_ENV = /^(ERROR:|SKIPPED:)?\s+(\S+): (.+)$/;
 var tox = {
   name: "tox",
-  parse(text) {
-    const lines3 = prepare2(text);
+  parse(text2) {
+    const lines3 = prepare2(text2);
     let ok = 0;
     let bad = 0;
     let skipped = 0;
@@ -4097,8 +4097,8 @@ function nxCount(details, word) {
 __name(nxCount, "nxCount");
 var nextest = {
   name: "cargo nextest",
-  parse(text) {
-    const lines3 = prepare2(text);
+  parse(text2) {
+    const lines3 = prepare2(text2);
     if (!lines3.some((l) => NEXTEST_MARK.test(l))) return null;
     const failing = /* @__PURE__ */ new Set();
     let best = null;
@@ -4153,8 +4153,8 @@ var DART_PROGRESS = /^(?:\d+:)?\d{2}:\d{2} \+(\d+)(?: ~(\d+))?(?: -(\d+))?: (.*)
 var DART_FINAL = /^(?:All tests passed!|All tests skipped\.|Some tests failed\.|No tests ran\.)$/;
 var dart = {
   name: "dart test",
-  parse(text) {
-    const lines3 = prepare2(text);
+  parse(text2) {
+    const lines3 = prepare2(text2);
     let passed = 0;
     let skipped = 0;
     let failed = 0;
@@ -4206,8 +4206,8 @@ function columns(header, from) {
 __name(columns, "columns");
 var julia = {
   name: "julia test",
-  parse(text) {
-    const lines3 = prepare2(text);
+  parse(text2) {
+    const lines3 = prepare2(text2);
     const totals = { Pass: 0, Fail: 0, Error: 0, Broken: 0 };
     const failing = /* @__PURE__ */ new Set();
     let tables = 0;
@@ -4273,8 +4273,8 @@ var KAOCHA_DOTS = /^\[[().FEP]+\]?$/;
 var KAOCHA_WARN = /^WARNING: (?:No tests were found|All \d+ tests were skipped)/;
 var kaocha = {
   name: "kaocha",
-  parse(text) {
-    const lines3 = prepare2(text);
+  parse(text2) {
+    const lines3 = prepare2(text2);
     const failing = /* @__PURE__ */ new Set();
     let best = null;
     let dots = false;
@@ -4310,15 +4310,15 @@ var parsers10 = [nextest, dart, julia, kaocha];
 
 // src/engine/runners/index.ts
 var PARSERS = [...parsers8, ...parsers3, ...parsers, ...parsers7, ...parsers4, ...parsers10, ...parsers9, ...parsers2, ...parsers6, ...parsers5];
-function parseEvidence(text) {
-  const runners = PARSERS.map((p) => p.parse(text)).filter((r) => r !== null);
-  const exitMatches = [...text.matchAll(/^.{0,60}?\bexit (?:code|status)\s*[:=]?\s*(-?\d+)/gim)];
+function parseEvidence(text2) {
+  const runners = PARSERS.map((p) => p.parse(text2)).filter((r) => r !== null);
+  const exitMatches = [...text2.matchAll(/^.{0,60}?\bexit (?:code|status)\s*[:=]?\s*(-?\d+)/gim)];
   const exit = exitMatches.map((m) => Number(m[1]));
   const exit_lines = exitMatches.slice(0, 3).map((m) => m[0].trim().slice(0, 80));
   const exit_code = exit.length === 0 ? null : exit.some((c) => c !== 0) ? exit.find((c) => c !== 0) : 0;
   const conflict = runners.some((r) => r.failed + r.errors > 0) && (runners.some((r) => r.failed + r.errors === 0 && r.passed > 0) || exit_code === 0);
   const trust = runners.length > 0 ? "parsed" : exit_code !== null ? "exit_code" : "unparsed";
-  return { trust, exit_code, exit_lines, runners, conflict, lines: text.split("\n").length };
+  return { trust, exit_code, exit_lines, runners, conflict, lines: text2.split("\n").length };
 }
 __name(parseEvidence, "parseEvidence");
 
@@ -4367,9 +4367,9 @@ function skipTokens(line) {
   return tokens2 > 0 ? total : 0;
 }
 __name(skipTokens, "skipTokens");
-function skipMarkers(text) {
+function skipMarkers(text2) {
   const found = [];
-  for (const raw of text.replace(ANSI6, "").split(/\r?\n/)) {
+  for (const raw of text2.replace(ANSI6, "").split(/\r?\n/)) {
     const line = raw.trim();
     if (line === "" || ECHO.test(line) || line.startsWith("> Task ")) continue;
     if (DIRECTIVES.some((d) => d.test(line)) || skipTokens(line) > 0) found.push(line.slice(0, 120));
@@ -4383,8 +4383,8 @@ var NEXT = {
   missing: "The evidence doesn't show the criterion. Run the check that proves it and pipe its output in; the same evidence gives the same answer.",
   unsure: "The evidence is ambiguous. Pipe the full output of the check that proves the criterion, or narrow the criterion."
 };
-function doneEvidence(text) {
-  return clip(stripAnsi(text), 2e3, 12e3);
+function doneEvidence(text2) {
+  return clip(stripAnsi(text2), 2e3, 12e3);
 }
 __name(doneEvidence, "doneEvidence");
 var SKIPPED_NEXT = "Some tests were skipped, risky, incomplete or ended in an expected failure (a known issue), so done won't say met. Look at them: if they are expected (a platform-only test), say so yourself; otherwise run the skipped ones.";
@@ -4741,11 +4741,11 @@ function promptText(entry) {
   if (!entry || entry.type !== "user" || entry.isSidechain === true || entry.isMeta === true || entry.isCompactSummary === true) return null;
   const content = entry.message?.content;
   if (Array.isArray(content) && content.some((b) => b && b.type === "tool_result")) return null;
-  const text = textOf(content);
-  const trimmed = text.trim();
+  const text2 = textOf(content);
+  const trimmed = text2.trim();
   if (!trimmed || trimmed.startsWith("<local-command-") || trimmed.startsWith("[Request interrupted")) return null;
   if (isNotification(entry, trimmed)) return null;
-  return text;
+  return text2;
 }
 __name(promptText, "promptText");
 function isNotification(entry, trimmed) {
@@ -4754,13 +4754,13 @@ function isNotification(entry, trimmed) {
 __name(isNotification, "isNotification");
 function notificationText(entry) {
   if (!entry || entry.type !== "user" || entry.isSidechain === true || entry.isMeta === true) return null;
-  const text = textOf(entry.message?.content).trim();
-  return text && isNotification(entry, text) ? text : null;
+  const text2 = textOf(entry.message?.content).trim();
+  return text2 && isNotification(entry, text2) ? text2 : null;
 }
 __name(notificationText, "notificationText");
-function userPrompts(text) {
+function userPrompts(text2) {
   const out = [];
-  for (const line of text.split("\n")) {
+  for (const line of text2.split("\n")) {
     if (!isPromptCandidate(line)) continue;
     const entry = parseLine(line);
     const found = promptText(entry);
@@ -4773,12 +4773,12 @@ function isPromptCandidate(line) {
   return USER_LINE.test(line) && !TOOL_RESULT_LINE.test(line);
 }
 __name(isPromptCandidate, "isPromptCandidate");
-function firstPrompt(text) {
+function firstPrompt(text2) {
   let pos = 0;
-  while (pos < text.length) {
-    let end = text.indexOf("\n", pos);
-    if (end === -1) end = text.length;
-    const line = text.slice(pos, end);
+  while (pos < text2.length) {
+    let end = text2.indexOf("\n", pos);
+    if (end === -1) end = text2.length;
+    const line = text2.slice(pos, end);
     if (isPromptCandidate(line)) {
       const found = promptText(parseLine(line));
       if (found !== null) return found;
@@ -4788,11 +4788,11 @@ function firstPrompt(text) {
   return "";
 }
 __name(firstPrompt, "firstPrompt");
-function lastPromptEnd(text) {
-  let end = text.length;
+function lastPromptEnd(text2) {
+  let end = text2.length;
   while (end > 0) {
-    const nl = text.lastIndexOf("\n", end - 1);
-    const line = text.slice(nl + 1, end);
+    const nl = text2.lastIndexOf("\n", end - 1);
+    const line = text2.slice(nl + 1, end);
     if (isPromptCandidate(line)) {
       const found = promptText(parseLine(line));
       if (found !== null) return { start: end + 1, lineStart: nl + 1, prompt: found };
@@ -4806,8 +4806,8 @@ function fullResultText(content) {
   return typeof content === "string" ? content : Array.isArray(content) ? content.map((b) => b && typeof b.text === "string" ? b.text : "").join("\n") : "";
 }
 __name(fullResultText, "fullResultText");
-function isTruncated(text) {
-  return TRUNCATED.some((re) => re.test(text));
+function isTruncated(text2) {
+  return TRUNCATED.some((re) => re.test(text2));
 }
 __name(isTruncated, "isTruncated");
 var DENIAL_TEXT = [
@@ -4831,26 +4831,26 @@ function statusOf(full, isError, silent, denialKind) {
   return { status: truncated && status === "passed" ? "unknown" : status, truncated };
 }
 __name(statusOf, "statusOf");
-function rawStatus(text, isError, silent) {
-  const ev = parseEvidence(text);
+function rawStatus(text2, isError, silent) {
+  const ev = parseEvidence(text2);
   const bad = ev.runners.some((r) => r.failed + r.errors > 0);
   if (isError || bad || ev.exit_code !== null && ev.exit_code !== 0) return "failed";
   if (ev.trust === "parsed" && !ev.conflict) return "passed";
   if (ev.exit_code === 0) return "passed";
-  if (silent && !FAILURE_MARKER.test(text)) return "passed";
+  if (silent && !FAILURE_MARKER.test(text2)) return "passed";
   return "unknown";
 }
 __name(rawStatus, "rawStatus");
-function scanTurn(text, from, to) {
+function scanTurn(text2, from, to) {
   const out = { edits: [], calls: [], finalMessage: "", lastEdit: -1, subagentCalls: 0, subagentReports: 0 };
   const byId = /* @__PURE__ */ new Map();
   const seen = /* @__PURE__ */ new Set();
   let seq = 0;
   let pos = from;
   while (pos < to) {
-    let end = text.indexOf("\n", pos);
+    let end = text2.indexOf("\n", pos);
     if (end === -1 || end > to) end = to;
-    const line = text.slice(pos, end);
+    const line = text2.slice(pos, end);
     pos = end + 1;
     if (!line.trim()) continue;
     if (TOOL_RESULT_LINE.test(line)) {
@@ -4905,18 +4905,18 @@ function scanTurn(text, from, to) {
 }
 __name(scanTurn, "scanTurn");
 var passedAfterLastEdit = /* @__PURE__ */ __name((scan) => scan.calls.some((c) => c.seq > scan.lastEdit && c.status === "passed"), "passedAfterLastEdit");
-function analyzeTranscript(text) {
+function analyzeTranscript(text2) {
   const empty = { task: "", finalMessage: "", edits: [], checks: [], passedCheckAfterLastEdit: false, marks: { truncatedChecks: 0, subagentCalls: 0, subagentReports: 0, stalePass: false } };
   try {
-    if (typeof text !== "string" || !text) return empty;
-    const task = firstPrompt(text).slice(0, TASK_MAX);
-    const { start, lineStart } = lastPromptEnd(text);
-    const turn = scanTurn(text, start, text.length);
+    if (typeof text2 !== "string" || !text2) return empty;
+    const task = firstPrompt(text2).slice(0, TASK_MAX);
+    const { start, lineStart } = lastPromptEnd(text2);
+    const turn = scanTurn(text2, start, text2.length);
     const passedCheckAfterLastEdit = turn.lastEdit >= 0 && passedAfterLastEdit(turn);
     let stalePass = false;
     if (turn.edits.length > 0 && !passedCheckAfterLastEdit && lineStart > 0) {
-      const previous = lastPromptEnd(text.slice(0, lineStart));
-      const before = scanTurn(text, previous.start, lineStart);
+      const previous = lastPromptEnd(text2.slice(0, lineStart));
+      const before = scanTurn(text2, previous.start, lineStart);
       stalePass = before.lastEdit >= 0 ? passedAfterLastEdit(before) : before.calls.some((c) => c.status === "passed");
     }
     const checks = turn.calls.map((c) => ({ cmd: c.cmd, status: c.status, ...c.truncated ? { truncated: true } : {} }));
@@ -4930,9 +4930,9 @@ __name(analyzeTranscript, "analyzeTranscript");
 
 // src/engine/evals.ts
 var MIN_PER_CLASS = 10;
-function parseCases(text) {
+function parseCases(text2) {
   const seen = /* @__PURE__ */ new Set();
-  return text.split(/\r?\n/).filter((line) => line.trim()).map((line, i) => {
+  return text2.split(/\r?\n/).filter((line) => line.trim()).map((line, i) => {
     let raw;
     try {
       raw = JSON.parse(line);
@@ -4949,8 +4949,8 @@ function parseCases(text) {
   });
 }
 __name(parseCases, "parseCases");
-function parseRecordings(text) {
-  return text.split(/\r?\n/).filter((line) => line.trim()).flatMap((line) => {
+function parseRecordings(text2) {
+  return text2.split(/\r?\n/).filter((line) => line.trim()).flatMap((line) => {
     try {
       return [JSON.parse(line)];
     } catch {
@@ -5048,19 +5048,19 @@ import { existsSync as existsSync4, mkdirSync as mkdirSync5, readFileSync as rea
 import { dirname as dirname3 } from "node:path";
 var BASELINE_VERSION = 1;
 var HASH = /^[0-9a-f]{16}$/;
-function normalise(text) {
-  return text.normalize("NFC").replace(/\s+/g, " ").trim();
+function normalise(text2) {
+  return text2.normalize("NFC").replace(/\s+/g, " ").trim();
 }
 __name(normalise, "normalise");
-function itemHash(question3, text) {
-  return createHash4("sha256").update(`v${BASELINE_VERSION}\0${question3}\0${normalise(text)}`).digest("hex").slice(0, 16);
+function itemHash(question3, text2) {
+  return createHash4("sha256").update(`v${BASELINE_VERSION}\0${question3}\0${normalise(text2)}`).digest("hex").slice(0, 16);
 }
 __name(itemHash, "itemHash");
-function parseBaseline(text) {
+function parseBaseline(text2) {
   const bad = /* @__PURE__ */ __name((why) => new RefereeError("bad_input", `The baseline file is not valid: ${why}.`, { next_step: "Record it again with --baseline-write." }), "bad");
   let raw;
   try {
-    raw = JSON.parse(text);
+    raw = JSON.parse(text2);
   } catch {
     throw bad("not JSON");
   }
@@ -5135,8 +5135,8 @@ __name(split, "split");
 // src/cli/commands/judge.ts
 var MAX_ITEMS = 500;
 var LIST_LIMIT = 20;
-function parseItems(text) {
-  const trimmed = text.trim();
+function parseItems(text2) {
+  const trimmed = text2.trim();
   const toItem = /* @__PURE__ */ __name((value, i) => {
     if (typeof value === "string") return value.trim() ? { id: String(i + 1), text: value } : null;
     const { id, text: body, context } = value ?? {};
@@ -5150,7 +5150,7 @@ function parseItems(text) {
       throw new RefereeError("bad_input", "Items look like a JSON array but don't parse.");
     }
   }
-  const lines3 = text.split(/\r?\n/);
+  const lines3 = text2.split(/\r?\n/);
   const jsonl = lines3.filter((l) => l.trim()).every((l) => l.trim().startsWith("{"));
   return lines3.map((line, i) => {
     if (!line.trim()) return null;
@@ -5163,11 +5163,11 @@ function parseItems(text) {
   }).filter((x) => x !== null);
 }
 __name(parseItems, "parseItems");
-function judgeRequest(pack, thresholds, id, text, shared) {
+function judgeRequest(pack, thresholds, id, text2, shared) {
   const q = question(pack, id);
   if (q.type !== "noul") throw new RefereeError("bad_input", `judge needs yes/no questions; ${id} is a ${q.type}.`);
   const band = threshold(pack, thresholds, id, "auto", 0.9);
-  const planned = [{ id: "item", state: { item: clip(text, 4e3, 4e3), ...shared ? { context: shared } : {} }, questions: { [id]: q } }];
+  const planned = [{ id: "item", state: { item: clip(text2, 4e3, 4e3), ...shared ? { context: shared } : {} }, questions: { [id]: q } }];
   const finish = /* @__PURE__ */ __name(([outcome]) => {
     const answer = outcome?.answers?.[id];
     const p = answer?.type === "noul" ? answer.noul : 0.5;
@@ -5324,24 +5324,24 @@ var VERSION3 = /^v?\d+(?:\.\d+){2,}$|^v\d/;
 var ORDINAL = /^(?:st|nd|rd|th)(?![\p{L}])/iu;
 var LETTER = new RegExp("^\\p{L}", "u");
 var MAX_SMALL_INT = 10;
-function baseNormalize(text) {
-  return text.normalize("NFKC").replace(DASHES, "-").replace(CURLY_DOUBLE, '"').replace(CURLY_SINGLE, "'");
+function baseNormalize(text2) {
+  return text2.normalize("NFKC").replace(DASHES, "-").replace(CURLY_DOUBLE, '"').replace(CURLY_SINGLE, "'");
 }
 __name(baseNormalize, "baseNormalize");
 function isWordChar(char) {
   return char !== void 0 && /[\p{L}\p{N}]/u.test(char);
 }
 __name(isWordChar, "isWordChar");
-function stripEmphasis(text) {
+function stripEmphasis(text2) {
   let out = "";
-  for (let i = 0; i < text.length; i++) {
-    const char = text[i];
+  for (let i = 0; i < text2.length; i++) {
+    const char = text2[i];
     if (char === "*") continue;
     if (char === "_") {
       let end = i;
-      while (text[end + 1] === "_") end++;
-      const edge = !isWordChar(text[i - 1]) || !isWordChar(text[end + 1]);
-      if (!edge) out += text.slice(i, end + 1);
+      while (text2[end + 1] === "_") end++;
+      const edge = !isWordChar(text2[i - 1]) || !isWordChar(text2[end + 1]);
+      if (!edge) out += text2.slice(i, end + 1);
       i = end;
       continue;
     }
@@ -5350,8 +5350,8 @@ function stripEmphasis(text) {
   return out;
 }
 __name(stripEmphasis, "stripEmphasis");
-function normalizeForQuote(text) {
-  return stripEmphasis(baseNormalize(text)).replace(SPACES, " ").trim().toLowerCase();
+function normalizeForQuote(text2) {
+  return stripEmphasis(baseNormalize(text2)).replace(SPACES, " ").trim().toLowerCase();
 }
 __name(normalizeForQuote, "normalizeForQuote");
 function extractQuotes(claim) {
@@ -5369,8 +5369,8 @@ function extractQuotes(claim) {
     }
     const closes = open === "`" ? char === "`" : char === '"' || char === "”";
     if (!closes) continue;
-    const text = claim.slice(start, i).trim();
-    if (text.length >= 3) found.add(text);
+    const text2 = claim.slice(start, i).trim();
+    if (text2.length >= 3) found.add(text2);
     open = null;
   }
   return [...found];
@@ -5393,11 +5393,11 @@ function isIgnoredSmallInteger(token, after) {
   return !LETTER.test(after) || ORDINAL.test(after);
 }
 __name(isIgnoredSmallInteger, "isIgnoredSmallInteger");
-function extractNumbers(text) {
+function extractNumbers(text2) {
   const found = /* @__PURE__ */ new Set();
-  for (const match of text.matchAll(new RegExp(NUMBER_SOURCE, "gu"))) {
+  for (const match of text2.matchAll(new RegExp(NUMBER_SOURCE, "gu"))) {
     const token = match[0];
-    const after = text.slice(match.index + token.length, match.index + token.length + 3);
+    const after = text2.slice(match.index + token.length, match.index + token.length + 3);
     if (!isIgnoredSmallInteger(token, after)) found.add(token);
   }
   return [...found];
@@ -5581,7 +5581,7 @@ var claims = {
     const inline = list(context, "claim");
     if (claimsFile && inline.length) throw new RefereeError("bad_input", "Use --claim or --claims, not both.");
     if (claimsFile === "-" && (str(context, "source") ?? "-") === "-") throw new RefereeError("bad_input", "Only one of --source and --claims can read stdin.");
-    const claims2 = (claimsFile ? parseItems(await readSource(context, claimsFile, "claims")) : inline.map((text, i) => ({ id: String(i + 1), text }))).filter(
+    const claims2 = (claimsFile ? parseItems(await readSource(context, claimsFile, "claims")) : inline.map((text2, i) => ({ id: String(i + 1), text: text2 }))).filter(
       (c) => c.text.trim()
     );
     if (claims2.length === 0) throw new RefereeError("bad_input", "Give at least one --claim or a --claims file.");
@@ -5706,10 +5706,10 @@ function request(context, pack, suite, item, ablation) {
     if (!evidence.trim()) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: the evidence is empty.`);
     ({ planned, finish } = doneRequest(pack, void 0, criteriaFor(suite, item), evidence));
   } else if (command === "judge") {
-    const text = typeof item["text"] === "string" ? item["text"] : "";
+    const text2 = typeof item["text"] === "string" ? item["text"] : "";
     if (!suite.config.question) throw new RefereeError("bad_input", `Suite ${suite.name}: a judge suite needs "question" in suite.json.`);
-    if (!text.trim()) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: a judge case needs text.`);
-    ({ planned, finish } = judgeRequest(pack, void 0, suite.config.question, text, typeof item["context"] === "string" ? item["context"] : void 0));
+    if (!text2.trim()) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: a judge case needs text.`);
+    ({ planned, finish } = judgeRequest(pack, void 0, suite.config.question, text2, typeof item["context"] === "string" ? item["context"] : void 0));
   } else {
     const claim = typeof item["claim"] === "string" ? item["claim"] : "";
     const source = typeof item["source"] === "string" ? item["source"] : "";
@@ -6035,8 +6035,8 @@ var MAX_FILE = 1e6;
 var decode = /* @__PURE__ */ __name((s) => s.replace(/&(?:#(\d+)|#x([0-9a-f]+)|([a-z]+));/gi, (m, d, h, n) => d ? String.fromCodePoint(Number(d)) : h ? String.fromCodePoint(parseInt(h, 16)) : ENTITIES[String(n).toLowerCase()] ?? m), "decode");
 var collapse = /* @__PURE__ */ __name((s) => s.replace(/\s+/g, " ").trim(), "collapse");
 var clipTag = /* @__PURE__ */ __name((s) => collapse(s).length > 90 ? collapse(s).slice(0, 87) + "..." : collapse(s), "clipTag");
-function looksTechnical(text) {
-  const t = text.trim();
+function looksTechnical(text2) {
+  const t = text2.trim();
   if (!new RegExp("\\p{L}", "u").test(t)) return true;
   const bare = t.replace(/\$\{[^}]*\}|\{\{[^}]*\}\}|\{[^}\s]*\}|%[sdif]/g, " ").trim();
   if (!new RegExp("\\p{L}", "u").test(bare)) return true;
@@ -6116,9 +6116,9 @@ var Scanner = class {
       } else return;
     }
   }
-  emit(kind, text, offset, where) {
+  emit(kind, text2, offset, where) {
     if (this.suppressed()) return;
-    const value = collapse(text);
+    const value = collapse(text2);
     if (!value || looksTechnical(value)) return;
     this.out.push({ kind, text: value, offset, where });
   }
@@ -6504,7 +6504,7 @@ __name(withoutMustaches, "withoutMustaches");
 function scanHtml(src, from, to, vue, out) {
   const stack = [];
   let i = from;
-  const text = /* @__PURE__ */ __name((chunk, offset) => {
+  const text2 = /* @__PURE__ */ __name((chunk, offset) => {
     if (!chunk.trim() || stack.some((t) => t.skipText)) return;
     const parent = stack.at(-1);
     const lead = chunk.length - chunk.trimStart().length;
@@ -6519,7 +6519,7 @@ function scanHtml(src, from, to, vue, out) {
   while (i < to) {
     let lt = src.indexOf("<", i);
     if (lt < 0 || lt >= to) lt = to;
-    text(src.slice(i, lt), i);
+    text2(src.slice(i, lt), i);
     if (lt >= to) break;
     if (src.startsWith("<!--", lt)) {
       const e = src.indexOf("-->", lt + 4);
@@ -6801,14 +6801,14 @@ function lintQuestions(questions, model) {
   if (typeof model !== "string" || !model.trim() || /latest/i.test(model)) add("model", "warn", "(pack)", "pack.json should pin a model such as jev-1.13.0, not leave it open or use a latest alias.");
   for (const [id, q] of Object.entries(questions)) {
     const raw = q;
-    const text = raw.instructions?.question;
-    if (typeof text !== "string" || !text.trim()) {
+    const text2 = raw.instructions?.question;
+    if (typeof text2 !== "string" || !text2.trim()) {
       add("instructions", "error", id, "The question has no instructions.question text.");
       continue;
     }
     const type = raw.type;
     if (type === "noul") {
-      if (COMPOUND.test(text)) add("compound", "warn", id, "The question contains and/or: split it so each Noul asks one thing.");
+      if (COMPOUND.test(text2)) add("compound", "warn", id, "The question contains and/or: split it so each Noul asks one thing.");
       const c = raw.criteria;
       if (typeof c?.true !== "string" || typeof c?.false !== "string") add("criteria", "error", id, "A Noul needs true and false criteria.");
       else if (c.true.trim() === c.false.trim() || c.true.includes(c.false) || c.false.includes(c.true)) add("contradiction", "warn", id, "The true and false criteria are the same or one contains the other; state what separates them.");
@@ -6826,7 +6826,7 @@ function lintQuestions(questions, model) {
       if (!Array.isArray(levels) || levels.length < 2 || levels.length > 10) add("levels", "error", id, "A Score needs 2 to 10 levels.");
       else if (levels.some((l) => typeof l !== "string" || !l.trim() || /^[\d.\s]+$/.test(l))) add("levels", "warn", id, "Every Score level needs a description, not only a number.");
     }
-    if (COUNTING.test(text)) add("counting", "warn", id, "Counting, summing and date comparison belong in code, not in a question to Jev.");
+    if (COUNTING.test(text2)) add("counting", "warn", id, "Counting, summing and date comparison belong in code, not in a question to Jev.");
   }
   return out;
 }
@@ -6993,9 +6993,9 @@ function labelsFile(dataDir) {
   return join11(dataDir, "labels.jsonl");
 }
 __name(labelsFile, "labelsFile");
-function parseLines(text) {
+function parseLines(text2) {
   const out = [];
-  for (const line of text.split("\n")) {
+  for (const line of text2.split("\n")) {
     if (!line.trim()) continue;
     try {
       const value = JSON.parse(line);
@@ -7108,8 +7108,8 @@ var HYPOTHETICAL = new RegExp(
   `${W}(?:if|whether|unless|when|should|would|could|might|ensure|until|eğer|ise|olursa|olsa)${E}|make sure|in case|^\\s*(?:please\\s+)?(?:fix|add|write|create|make|handle|implement|update|remove)${E}|\\bm[ıiuü]${E}`,
   "iu"
 );
-function reportsBreakage(text) {
-  for (const sentence of text.match(/[^.!?;\n]+[.!?;\n]*/g) ?? []) {
+function reportsBreakage(text2) {
+  for (const sentence of text2.match(/[^.!?;\n]+[.!?;\n]*/g) ?? []) {
     if (sentence.includes("?")) continue;
     for (const clause of sentence.split(/,|\s+(?:but|and|so|then)\s+/i)) {
       if (HYPOTHETICAL.test(clause)) continue;
@@ -7123,8 +7123,8 @@ __name(reportsBreakage, "reportsBreakage");
 var SCAN_CHARS = 1e3;
 var MIN_TOKENS = 3;
 var REASK_JACCARD = 0.6;
-function tokens(text) {
-  return new Set((text.slice(0, SCAN_CHARS).toLowerCase().match(/[\p{L}\p{N}]+/gu) ?? []).filter((t) => t.length >= 3));
+function tokens(text2) {
+  return new Set((text2.slice(0, SCAN_CHARS).toLowerCase().match(/[\p{L}\p{N}]+/gu) ?? []).filter((t) => t.length >= 3));
 }
 __name(tokens, "tokens");
 function classifyNext(next, previous) {
@@ -7158,21 +7158,21 @@ function suggestForStops(dirs, stops) {
   const load = /* @__PURE__ */ __name((session) => {
     if (!/^[A-Za-z0-9._-]+$/.test(session)) return null;
     if (cache.has(session)) return cache.get(session) ?? null;
-    let text = null;
+    let text2 = null;
     for (const dir of dirs) {
       try {
-        text = readFileSync13(join12(dir, `${session}.jsonl`), "utf8");
+        text2 = readFileSync13(join12(dir, `${session}.jsonl`), "utf8");
         break;
       } catch {
         continue;
       }
     }
-    cache.set(session, text);
-    return text;
+    cache.set(session, text2);
+    return text2;
   }, "load");
   for (const stop of stops) {
-    const text = load(stop.session_id);
-    const found = text ? suggestFromTranscript(text, stop.ts) : null;
+    const text2 = load(stop.session_id);
+    const found = text2 ? suggestFromTranscript(text2, stop.ts) : null;
     if (found) out.set(stop.id, found);
   }
   return out;
@@ -7536,8 +7536,8 @@ var QUEUE_LIMIT = 50;
 var EXCERPT_CHARS = 2e3;
 var STOP_ID = /^[A-Za-z0-9_-]{1,40}$/;
 var BIDI_CONTROL = /[؜‎‏‪-‮⁦-⁩]/g;
-function visible(text) {
-  return text.replace(BIDI_CONTROL, (c) => `[U+${c.charCodeAt(0).toString(16).toUpperCase().padStart(4, "0")}]`);
+function visible(text2) {
+  return text2.replace(BIDI_CONTROL, (c) => `[U+${c.charCodeAt(0).toString(16).toUpperCase().padStart(4, "0")}]`);
 }
 __name(visible, "visible");
 function projectStops(ctx) {
@@ -7621,6 +7621,10 @@ function num(v) {
   return typeof v === "number" && Number.isFinite(v) ? v : null;
 }
 __name(num, "num");
+function text(v) {
+  return typeof v === "string" ? visible(v) : null;
+}
+__name(text, "text");
 function answerView(id, a) {
   const base2 = { id: visible(id), type: a.type };
   if (a.type === "noul") {
@@ -7639,14 +7643,15 @@ __name(answerView, "answerView");
 function jevAnswers(ctx, keys) {
   const found = [];
   let missing = 0;
-  for (const key of keys ?? []) {
-    const entry = CACHE_KEY.test(key) ? readCache(ctx.dataDir, key, ctx.now(), Number.POSITIVE_INFINITY) : null;
-    if (!entry || typeof entry.answers !== "object" || entry.answers === null) {
+  for (const key of Array.isArray(keys) ? keys : []) {
+    const entry = typeof key === "string" && CACHE_KEY.test(key) ? readCache(ctx.dataDir, key, ctx.now(), Number.POSITIVE_INFINITY) : null;
+    const at = entry && num(entry.ts) !== null ? new Date(entry.ts) : null;
+    if (!entry || !at || Number.isNaN(at.getTime()) || typeof entry.answers !== "object" || entry.answers === null) {
       missing++;
       continue;
     }
     const questions = Object.entries(entry.answers).slice(0, FLOW_ANSWERS).flatMap(([id, a]) => a && typeof a === "object" ? answerView(id, a) ?? [] : []);
-    found.push({ model: visible(String(entry.model)), answered_at: new Date(entry.ts).toISOString(), questions });
+    found.push({ model: visible(String(entry.model)), answered_at: at.toISOString(), questions });
   }
   return { answers: found, answers_missing: missing };
 }
@@ -7660,7 +7665,7 @@ function flow(ctx, query = {}) {
   const since = new Date(ctx.now() - days * DAY_MS).toISOString();
   const receipts2 = readReceipts(ctx.dataDir, projectId(ctx.cwd)).filter((r) => r.ts >= since);
   const stops = projectStops(ctx).filter((r) => r.ts >= since);
-  const commands2 = [...new Set(receipts2.map((r) => r.command))].sort();
+  const commands2 = [...new Set(receipts2.flatMap((r) => typeof r.command === "string" ? [r.command] : []))].sort();
   if (stops.length) commands2.push("stop");
   const command = typeof query.command === "string" && commands2.includes(query.command) ? query.command : "all";
   const voided = readOverruled(ctx.dataDir);
@@ -7674,16 +7679,16 @@ function flow(ctx, query = {}) {
         kind: "call",
         id: r.id,
         ts: r.ts,
-        command: visible(r.command),
-        pack: r.pack === void 0 ? null : visible(r.pack),
-        model: r.model === void 0 ? null : visible(r.model),
-        verdict: r.verdict === void 0 ? null : visible(r.verdict),
-        error: r.error === void 0 ? null : visible(r.error),
-        requests: r.requests,
-        cached: r.cached,
-        input_tokens: r.input_tokens,
-        cost_usd: r.cost_usd,
-        ms: r.ms,
+        command: text(r.command) ?? "unknown",
+        pack: text(r.pack),
+        model: text(r.model),
+        verdict: text(r.verdict),
+        error: text(r.error),
+        requests: num(r.requests) ?? 0,
+        cached: num(r.cached) ?? 0,
+        input_tokens: num(r.input_tokens) ?? 0,
+        cost_usd: num(r.cost_usd) ?? 0,
+        ms: num(r.ms),
         session: shortSession(r.session_id),
         overruled: voided.has(r.id),
         ...jevAnswers(ctx, r.cache_keys)
@@ -7694,16 +7699,16 @@ function flow(ctx, query = {}) {
       kind: "stop",
       id: s.id,
       ts: s.ts,
-      mode: s.mode,
+      mode: text(s.mode) ?? "unknown",
       session: shortSession(s.session_id),
-      skipped: s.skipped ?? null,
-      edits: s.edits,
-      checks: s.checks,
-      ms: s.ms,
-      claims_done: s.decision?.claims_done ?? null,
-      claims_verified: s.decision?.claims_verified ?? null,
-      would_block: s.decision?.would_block ?? null,
-      label: s.label ?? null
+      skipped: text(s.skipped),
+      edits: num(s.edits) ?? 0,
+      checks: num(s.checks) ?? 0,
+      ms: num(s.ms),
+      claims_done: num(s.decision?.claims_done),
+      claims_verified: num(s.decision?.claims_verified),
+      would_block: typeof s.decision?.would_block === "boolean" ? s.decision.would_block : null,
+      label: s.label === "right" || s.label === "wrong" ? s.label : null
     };
   });
   return { days, command, commands: commands2, total: rows.length, shown: events.length, events };
@@ -8452,8 +8457,8 @@ function processIo() {
     home: homedir(),
     platform: process.platform,
     readStdin: /* @__PURE__ */ __name(() => readAll(process.stdin), "readStdin"),
-    write: /* @__PURE__ */ __name((text) => void process.stdout.write(text), "write"),
-    warn: /* @__PURE__ */ __name((text) => void process.stderr.write(text), "warn"),
+    write: /* @__PURE__ */ __name((text2) => void process.stdout.write(text2), "write"),
+    warn: /* @__PURE__ */ __name((text2) => void process.stderr.write(text2), "warn"),
     now: /* @__PURE__ */ __name(() => Date.now(), "now")
   };
 }

@@ -1,5 +1,5 @@
 // Data side of the local dashboard: reads the JSON lines in the data directory and shapes them for the page.
-// Labels go through labelStop (labels.jsonl); nothing here touches the network or rewrites a store.
+// Labels go through labelStop (labels.jsonl); nothing here touches the network or rewrites a store. Stored fields are untrusted: flow turns a malformed one into a placeholder.
 
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -123,6 +123,10 @@ function num(v: unknown): number | null {
   return typeof v === "number" && Number.isFinite(v) ? v : null;
 }
 
+function text(v: unknown): string | null {
+  return typeof v === "string" ? visible(v) : null;
+}
+
 function answerView(id: string, a: Answer) {
   const base = { id: visible(id), type: a.type };
   if (a.type === "noul") {
@@ -141,24 +145,25 @@ function answerView(id: string, a: Answer) {
   return null;
 }
 
-function jevAnswers(ctx: UiContext, keys: readonly string[] | undefined) {
+function jevAnswers(ctx: UiContext, keys: unknown) {
   const found: { model: string; answered_at: string; questions: NonNullable<ReturnType<typeof answerView>>[] }[] = [];
   let missing = 0;
-  for (const key of keys ?? []) {
-    const entry = CACHE_KEY.test(key) ? readCache(ctx.dataDir, key, ctx.now(), Number.POSITIVE_INFINITY) : null;
-    if (!entry || typeof entry.answers !== "object" || entry.answers === null) {
+  for (const key of Array.isArray(keys) ? keys : []) {
+    const entry = typeof key === "string" && CACHE_KEY.test(key) ? readCache(ctx.dataDir, key, ctx.now(), Number.POSITIVE_INFINITY) : null;
+    const at = entry && num(entry.ts) !== null ? new Date(entry.ts) : null;
+    if (!entry || !at || Number.isNaN(at.getTime()) || typeof entry.answers !== "object" || entry.answers === null) {
       missing++;
       continue;
     }
     const questions = Object.entries(entry.answers)
       .slice(0, FLOW_ANSWERS)
       .flatMap(([id, a]) => (a && typeof a === "object" ? (answerView(id, a) ?? []) : []));
-    found.push({ model: visible(String(entry.model)), answered_at: new Date(entry.ts).toISOString(), questions });
+    found.push({ model: visible(String(entry.model)), answered_at: at.toISOString(), questions });
   }
   return { answers: found, answers_missing: missing };
 }
 
-function shortSession(id: string | undefined): string | null {
+function shortSession(id: unknown): string | null {
   return typeof id === "string" && id !== "unknown" && id !== "" ? visible(id.slice(0, 8)) : null;
 }
 
@@ -167,7 +172,7 @@ export function flow(ctx: UiContext, query: { days?: unknown; command?: unknown 
   const since = new Date(ctx.now() - days * DAY_MS).toISOString();
   const receipts = readReceipts(ctx.dataDir, projectId(ctx.cwd)).filter((r) => r.ts >= since);
   const stops = projectStops(ctx).filter((r) => r.ts >= since);
-  const commands = [...new Set(receipts.map((r) => r.command))].sort();
+  const commands = [...new Set(receipts.flatMap((r) => (typeof r.command === "string" ? [r.command] : [])))].sort();
   if (stops.length) commands.push("stop");
   const command = typeof query.command === "string" && commands.includes(query.command) ? query.command : "all";
   const voided = readOverruled(ctx.dataDir);
@@ -181,16 +186,16 @@ export function flow(ctx: UiContext, query: { days?: unknown; command?: unknown 
         kind: "call" as const,
         id: r.id,
         ts: r.ts,
-        command: visible(r.command),
-        pack: r.pack === undefined ? null : visible(r.pack),
-        model: r.model === undefined ? null : visible(r.model),
-        verdict: r.verdict === undefined ? null : visible(r.verdict),
-        error: r.error === undefined ? null : visible(r.error),
-        requests: r.requests,
-        cached: r.cached,
-        input_tokens: r.input_tokens,
-        cost_usd: r.cost_usd,
-        ms: r.ms,
+        command: text(r.command) ?? "unknown",
+        pack: text(r.pack),
+        model: text(r.model),
+        verdict: text(r.verdict),
+        error: text(r.error),
+        requests: num(r.requests) ?? 0,
+        cached: num(r.cached) ?? 0,
+        input_tokens: num(r.input_tokens) ?? 0,
+        cost_usd: num(r.cost_usd) ?? 0,
+        ms: num(r.ms),
         session: shortSession(r.session_id),
         overruled: voided.has(r.id),
         ...jevAnswers(ctx, r.cache_keys),
@@ -201,16 +206,16 @@ export function flow(ctx: UiContext, query: { days?: unknown; command?: unknown 
       kind: "stop" as const,
       id: s.id,
       ts: s.ts,
-      mode: s.mode,
+      mode: text(s.mode) ?? "unknown",
       session: shortSession(s.session_id),
-      skipped: s.skipped ?? null,
-      edits: s.edits,
-      checks: s.checks,
-      ms: s.ms,
-      claims_done: s.decision?.claims_done ?? null,
-      claims_verified: s.decision?.claims_verified ?? null,
-      would_block: s.decision?.would_block ?? null,
-      label: s.label ?? null,
+      skipped: text(s.skipped),
+      edits: num(s.edits) ?? 0,
+      checks: num(s.checks) ?? 0,
+      ms: num(s.ms),
+      claims_done: num(s.decision?.claims_done),
+      claims_verified: num(s.decision?.claims_verified),
+      would_block: typeof s.decision?.would_block === "boolean" ? s.decision.would_block : null,
+      label: s.label === "right" || s.label === "wrong" ? s.label : null,
     };
   });
   return { days, command, commands, total: rows.length, shown: events.length, events };

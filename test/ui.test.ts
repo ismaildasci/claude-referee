@@ -623,3 +623,27 @@ test("the flow tab draws each call as ask, Jev, verdict, with answers on demand 
   assert.equal(page.fetched.at(-1)?.path, "/api/flow?days=30&command=all");
   assert.match(page.main.textContent, /Nothing in this period/);
 });
+
+test("a corrupt receipt or cache entry degrades to placeholders instead of failing the flow route", async () => {
+  const s = await flowServer((dataDir, project) => {
+    const dir = join(dataDir, "cache");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, `${hexKey("1")}.json`), JSON.stringify({ ts: 1e20, model: "m", answers: { c1: { type: "noul", noul: 0.9 } } }));
+    writeFileSync(join(dir, `${hexKey("2")}.json`), JSON.stringify({ ts: Date.parse("2026-09-30T10:00:00Z"), model: 7, answers: { a: "x", b: null, c: { type: "other" }, d: { type: "choice", choice: "k", confidence: "high", probabilities: { k: "x", j: 0.2 } }, e: { type: "noul", noul: "0.9" } } }));
+    appendReceipt(dataDir, receipt("rOk", project, "2026-09-30T11:00:00.000Z", { verdict: "met", cache_keys: [hexKey("1"), hexKey("2")] }));
+    appendReceipt(dataDir, { ...receipt("rBad", project, "2026-09-30T10:00:00.000Z"), command: 5, verdict: 1, error: null, pack: {}, requests: "2", cache_keys: 5 } as unknown as Receipt);
+  });
+  try {
+    const d = await s.get();
+    assert.deepEqual(d.events.map((e) => e["id"]), ["rOk", "rBad"]);
+    assert.deepEqual(d.commands, ["done"]);
+    const [ok, bad] = d.events;
+    assert.equal(ok?.["answers_missing"], 1);
+    const qs = (ok?.["answers"] as { model: string; questions: { id: string; value: string; p: number | null; options: unknown[] }[] }[])[0];
+    assert.equal(qs?.model, "7");
+    assert.deepEqual(qs?.questions, [{ id: "d", type: "choice", value: "k", p: null, options: [{ label: "j", p: 0.2 }] }, { id: "e", type: "noul", value: "?", p: null, options: [] }]);
+    assert.deepEqual({ command: bad?.["command"], verdict: bad?.["verdict"], error: bad?.["error"], pack: bad?.["pack"], requests: bad?.["requests"], answers: bad?.["answers"], missing: bad?.["answers_missing"] }, { command: "unknown", verdict: null, error: null, pack: null, requests: 0, answers: [], missing: 0 });
+  } finally {
+    await s.ui.close();
+  }
+});
