@@ -21,3 +21,10 @@ In the [second real-code sample](i18n-real-2.md) the one HTML repository, `joear
 ## Limits
 
 One repository motivated the rule; other template systems with their own syntax (Handlebars, Angular inline templates, Svelte) are not read.
+
+## Result, 2026-10-06
+
+Code after this registration (cdf2b29): `HTML_TEMPLATE_TYPES` in `src/engine/i18n-extract.ts`, test "HTML templates inside script elements are scanned; other scripts are not" in `test/i18n-extract.test.ts`.
+
+- **No regression**: the candidate sets of the 12 other copies (4 of the first sample, 8 of the second) are identical before and after, kind, id and text, 0 removed and 0 added in each.
+- **Fitted check** on `node-red-contrib-ftp`: removed calls found under the registered rule went from 0 of 41 to **39 of 41**; the copy now gives 293 candidates instead of 2 (the editor labels, placeholders and help text). The two still missed are values that read as identifiers, `privateKey` and `readyTimeout`, which `extract` drops by shape as before. This repository is the one the rule was written for, so it is not a test of the rule elsewhere and the judge was not re-run.

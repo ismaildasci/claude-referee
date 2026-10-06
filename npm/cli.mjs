@@ -6021,6 +6021,7 @@ var UI_CALL = /(?:^|\.)(?:alert|confirm|prompt|toast|notify|showToast|showAlert|
 var ASSIGN_UI = /\.(?:title|textContent|innerText|placeholder|ariaLabel|alt)$/;
 var TRANS_TAGS = /* @__PURE__ */ new Set(["Trans", "FormattedMessage", "Translation", "I18nText", "Translate"]);
 var RAW_TAGS = /* @__PURE__ */ new Set(["code", "pre", "kbd", "samp", "var", "script", "style", "textarea"]);
+var HTML_TEMPLATE_TYPES = /* @__PURE__ */ new Set(["text/html", "text/x-red", "text/template", "text/x-template", "text/ng-template"]);
 var VOID = /* @__PURE__ */ new Set(["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]);
 var WRAP_ATTRS = /* @__PURE__ */ new Set(["data-i18n", "i18n", "data-i18n-key", "v-t", "x-i18n", "i18nkey"]);
 var KEYWORDS = /* @__PURE__ */ new Set(["return", "typeof", "instanceof", "in", "of", "new", "delete", "void", "throw", "case", "do", "else", "yield", "await", "default", "export"]);
@@ -6608,7 +6609,10 @@ function scanHtml(src, from, to, vue, out) {
     }
     if (name === "script" || name === "style") {
       const e = src.toLowerCase().indexOf(`</${name}`, j);
-      i = e < 0 ? to : e;
+      const end = e < 0 ? to : e;
+      const type = (attrs.find((a) => a.name.toLowerCase() === "type")?.value ?? "").trim().toLowerCase();
+      if (name === "script" && HTML_TEMPLATE_TYPES.has(type) && !wrapped && !stack.some((t) => t.skipText)) scanHtml(src, j, end, vue, out);
+      i = end;
       continue;
     }
     if (!self && !VOID.has(name)) stack.push({ name, text: tagText, skipText: wrapped || RAW_TAGS.has(name) });

@@ -117,6 +117,25 @@ notify({ title: "Upload complete" });
   assert.deepEqual(found("src/A.vue", vue), ["vue-attr:Remove item", "vue-text:Add to cart", "vue-text:Your cart is empty", "vue-text:Sign in", "vue-attr:Type a message", "ui-prop:Upload complete"]);
 });
 
+test("HTML templates inside script elements are scanned; other scripts are not", () => {
+  const html = `<script type="text/javascript">RED.nodes.registerType("ftp", { label: "Not me" });</script>
+<script type="text/x-red" data-template-name="ftp">
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> <span>Connection name</span></label>
+    <input type="text" id="node-input-name" placeholder="Leave empty for the host name">
+    <label for="node-input-host"><span data-i18n="ftp.label.host"></span></label>
+    <input type="text" id="node-input-port" data-i18n="[placeholder]ftp.placeholder.port">
+  </div>
+</script>
+<script type="text/html" data-help-name="ftp"><p>Uploads a file to the server.</p><pre>ftp://host</pre></script>
+<script type="text/markdown" data-help-name="ftp-md">Downloads a file from the server.</script>
+<script type="module">document.title = "Also not me";</script>
+<p>Outside text</p>`;
+  assert.deepEqual(found("ftp.html", html), ["html-text:Connection name", "html-attr:Leave empty for the host name", "html-text:Uploads a file to the server.", "html-text:Outside text"]);
+  assert.deepEqual(found("open.html", `<script type="text/template"><p>Never closed`), ["html-text:Never closed"]);
+  assert.deepEqual(found("B.vue", `<template>\n  <div>\n    <script type="text/x-template" id="row"><span>Row label</span></script>\n  </div>\n</template>\n`), ["vue-text:Row label"]);
+});
+
 test("Vue: a mustache with braces in its expression is still a mustache, on one line or several", () => {
   const vue = `<template>
   <p>{{ $t('e', { x: 1 }) }}</p>

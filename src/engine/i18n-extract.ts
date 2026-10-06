@@ -25,6 +25,7 @@ const UI_CALL = /(?:^|\.)(?:alert|confirm|prompt|toast|notify|showToast|showAler
 const ASSIGN_UI = /\.(?:title|textContent|innerText|placeholder|ariaLabel|alt)$/;
 const TRANS_TAGS = new Set(["Trans", "FormattedMessage", "Translation", "I18nText", "Translate"]);
 const RAW_TAGS = new Set(["code", "pre", "kbd", "samp", "var", "script", "style", "textarea"]);
+const HTML_TEMPLATE_TYPES = new Set(["text/html", "text/x-red", "text/template", "text/x-template", "text/ng-template"]);
 const VOID = new Set(["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]);
 const WRAP_ATTRS = new Set(["data-i18n", "i18n", "data-i18n-key", "v-t", "x-i18n", "i18nkey"]);
 const KEYWORDS = new Set(["return", "typeof", "instanceof", "in", "of", "new", "delete", "void", "throw", "case", "do", "else", "yield", "await", "default", "export"]);
@@ -662,7 +663,10 @@ function scanHtml(src: string, from: number, to: number, vue: boolean, out: Pend
     }
     if (name === "script" || name === "style") {
       const e = src.toLowerCase().indexOf(`</${name}`, j);
-      i = e < 0 ? to : e;
+      const end = e < 0 ? to : e;
+      const type = (attrs.find((a) => a.name.toLowerCase() === "type")?.value ?? "").trim().toLowerCase();
+      if (name === "script" && HTML_TEMPLATE_TYPES.has(type) && !wrapped && !stack.some((t) => t.skipText)) scanHtml(src, j, end, vue, out);
+      i = end;
       continue;
     }
     if (!self && !VOID.has(name)) stack.push({ name, text: tagText, skipText: wrapped || RAW_TAGS.has(name) });
