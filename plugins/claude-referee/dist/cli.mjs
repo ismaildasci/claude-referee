@@ -5599,7 +5599,8 @@ function readSuite(root, name) {
     ...typeof raw["question"] === "string" ? { question: raw["question"] } : {},
     positive: typeof raw["positive"] === "string" ? raw["positive"] : "met",
     max_wrong_positive: typeof raw["max_wrong_positive"] === "number" ? raw["max_wrong_positive"] : 0,
-    ...typeof raw["max_wrong_negative"] === "number" ? { max_wrong_negative: raw["max_wrong_negative"] } : {}
+    ...typeof raw["max_wrong_negative"] === "number" ? { max_wrong_negative: raw["max_wrong_negative"] } : {},
+    ...typeof raw["pack"] === "string" && raw["pack"].trim() ? { pack: raw["pack"].trim() } : {}
   };
   const recorded = join8(dir, "recorded.jsonl");
   return {
@@ -5617,6 +5618,17 @@ function suites(root, name) {
   return readdirSync4(root, { withFileTypes: true }).filter((d) => d.isDirectory() && existsSync5(join8(root, d.name, "suite.json"))).map((d) => readSuite(root, d.name)).sort((a, b) => a.name.localeCompare(b.name));
 }
 __name(suites, "suites");
+function packOf(context, fallback) {
+  const loaded = /* @__PURE__ */ new Map();
+  return (suite) => {
+    const name = context.flags.pack ? void 0 : suite.config.pack;
+    if (!name) return fallback;
+    const pack = loaded.get(name) ?? loadPack(name, packDirs(context.io.env));
+    loaded.set(name, pack);
+    return pack;
+  };
+}
+__name(packOf, "packOf");
 function criteriaFor(suite, item) {
   const own = item["criteria"] ?? item["criterion"] ?? suite.config.criteria;
   const list2 = (Array.isArray(own) ? own : [own]).filter((c) => typeof c === "string" && c.trim() !== "");
@@ -5708,7 +5720,11 @@ function ablationFlag(context) {
   return raw;
 }
 __name(ablationFlag, "ablationFlag");
-async function record(context, pack, list2) {
+async function record(context, fallback, list2) {
+  const of = packOf(context, fallback);
+  const packs = [...new Map(list2.map((s) => of(s)).map((p) => [`${p.name}@${p.version}+${p.hash}`, p])).values()];
+  if (packs.length > 1) throw new RefereeError("bad_input", `The suites use different packs (${packs.map((p) => p.name).join(", ")}); record them one --suite at a time.`);
+  const pack = packs[0] ?? fallback;
   const ablation = ablationFlag(context);
   const maxRequests = cap3(context, "max-requests");
   const maxUsd = cap3(context, "max-usd");
@@ -5845,10 +5861,11 @@ function splitFlag(context) {
   return split2;
 }
 __name(splitFlag, "splitFlag");
-function score2(context, pack, list2, all) {
+function score2(context, fallback, list2, all) {
+  const of = packOf(context, fallback);
   const model = resolveModel(context.io.env);
   const split2 = splitFlag(context);
-  const scored = (all ? list2.filter((s) => s.recordings.length > 0) : list2).map((s) => scoreSuite(context, pack, s, model, split2, str(context, "sweep")));
+  const scored = (all ? list2.filter((s) => s.recordings.length > 0) : list2).map((s) => scoreSuite(context, of(s), s, model, split2, str(context, "sweep")));
   const verdict = scored.some((s) => s["verdict"] === "violated") ? "violated" : "pass";
   if (!all && scored[0]) {
     const { suite, verdict: v, ...rest } = scored[0];
@@ -5869,7 +5886,7 @@ var evalCommand = {
     inputs: {
       "record | score": "Positional action.",
       "--suite <name|all>": "A directory under the evals dir with suite.json, cases.jsonl and, once recorded, recorded.jsonl. 'all' takes every suite; score then skips suites without recordings.",
-      "--evals-dir <dir>": "Where the suites live; default jev-evals in the current directory. A suite.json names its command: done, verify, judge, stop or decide (a decide case has decision, context, options and an expected option name; a judge suite also names its question, and its cases have text and an expected yes, no or review).",
+      "--evals-dir <dir>": "Where the suites live; default jev-evals in the current directory. A suite.json names its command (done, verify, judge, stop or decide) and may name a pack, which an explicit --pack overrides (a decide case has decision, context, options and an expected option name; a judge suite also names its question, and its cases have text and an expected yes, no or review).",
       "--split <dev|holdout>": "record and score: only cases from this split, so dev can be recorded before the hold-out.",
       "--sweep <from:to:step>": "score: precision, recall and wrong positives per threshold; suggests one only with at least 10 cases per class.",
       "--ablation <context|reversed>": "decide suites only. record: record answers with the context text left out of the request (reversed needs no new recording). score: rescore with that element removed and report the change against the full run; context needs those answers recorded first.",

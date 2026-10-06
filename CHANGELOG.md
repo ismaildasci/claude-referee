@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Added
 
 - `done` parsers for `mix test` (ExUnit summary, excluded tests count as skipped and cap `met`), `ctest` (summary, `Total Test time`, failed and not-run blocks) and `rubocop` (summary, offenses, corrected offenses, warnings and notices), written from the dev half of the second real-log sample (`docs/decisions/real-logs-2-split.md`, `docs/decisions/real-logs-2-parsers.md`). `cmake --build`, `make`, wrapper builds, `phpstan` and `xcodebuild` were skipped (too few dev examples, or no success marker in the tool's output). Five synthetic cases of `done-v2-h3` and `done-v2-h4` were re-recorded because their logs are now parsed; no suite allowance moved.
+- An eval `suite.json` may name a `pack`; `eval record` and `eval score` use it for that suite, an explicit `--pack` still wins, and `eval score --suite all` scores each suite with its own pack. Before, a suite on a pack other than the project's (such as `judge-i18n` on `i18n`) failed `--suite all` with `bad_pack` as soon as it had a recording. `eval record` refuses to record suites on different packs in one run.
 
 ### Changed
 

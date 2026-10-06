@@ -10,7 +10,7 @@ import { analyzeTranscript } from "../../engine/stopgate/transcript.ts";
 import { RefereeError } from "../../engine/errors.ts";
 import { decideMetrics, decideShift, findRecording, metrics, parseCases, parseRecordings, parseSweep, sweep, type DecideScored, type EvalCase, type Recording } from "../../engine/evals.ts";
 import type { Result } from "../../engine/output.ts";
-import type { Pack } from "../../engine/pack.ts";
+import { loadPack, packDirs, type Pack } from "../../engine/pack.ts";
 import { Session, questionHash, redactRequest, stateHash, type Outcome, type Planned } from "../../engine/session.ts";
 import type { Command, Context } from "../types.ts";
 import { JEV_ERRORS, fitLine, openPack, reorder, str } from "../shared.ts";
@@ -26,6 +26,7 @@ interface SuiteConfig {
   readonly positive: string;
   readonly max_wrong_positive: number;
   readonly max_wrong_negative?: number;
+  readonly pack?: string;
 }
 
 interface Suite {
@@ -68,6 +69,7 @@ function readSuite(root: string, name: string): Suite {
     positive: typeof raw["positive"] === "string" ? raw["positive"] : "met",
     max_wrong_positive: typeof raw["max_wrong_positive"] === "number" ? raw["max_wrong_positive"] : 0,
     ...(typeof raw["max_wrong_negative"] === "number" ? { max_wrong_negative: raw["max_wrong_negative"] } : {}),
+    ...(typeof raw["pack"] === "string" && raw["pack"].trim() ? { pack: raw["pack"].trim() } : {}),
   };
   const recorded = join(dir, "recorded.jsonl");
   return {
@@ -86,6 +88,17 @@ function suites(root: string, name: string): Suite[] {
     .filter((d) => d.isDirectory() && existsSync(join(root, d.name, "suite.json")))
     .map((d) => readSuite(root, d.name))
     .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function packOf(context: Context, fallback: Pack): (suite: Suite) => Pack {
+  const loaded = new Map<string, Pack>();
+  return (suite) => {
+    const name = context.flags.pack ? undefined : suite.config.pack;
+    if (!name) return fallback;
+    const pack = loaded.get(name) ?? loadPack(name, packDirs(context.io.env));
+    loaded.set(name, pack);
+    return pack;
+  };
 }
 
 function criteriaFor(suite: Suite, item: EvalCase): string[] {
@@ -181,7 +194,11 @@ function ablationFlag(context: Context): Ablation | undefined {
   return raw as Ablation;
 }
 
-async function record(context: Context, pack: Pack, list: readonly Suite[]): Promise<Result> {
+async function record(context: Context, fallback: Pack, list: readonly Suite[]): Promise<Result> {
+  const of = packOf(context, fallback);
+  const packs = [...new Map(list.map((s) => of(s)).map((p) => [`${p.name}@${p.version}+${p.hash}`, p])).values()];
+  if (packs.length > 1) throw new RefereeError("bad_input", `The suites use different packs (${packs.map((p) => p.name).join(", ")}); record them one --suite at a time.`);
+  const pack = packs[0] ?? fallback;
   const ablation = ablationFlag(context);
   const maxRequests = cap(context, "max-requests");
   const maxUsd = cap(context, "max-usd");
@@ -321,10 +338,11 @@ function splitFlag(context: Context): string | undefined {
   return split;
 }
 
-function score(context: Context, pack: Pack, list: readonly Suite[], all: boolean): Result {
+function score(context: Context, fallback: Pack, list: readonly Suite[], all: boolean): Result {
+  const of = packOf(context, fallback);
   const model = resolveModel(context.io.env);
   const split = splitFlag(context);
-  const scored = (all ? list.filter((s) => s.recordings.length > 0) : list).map((s) => scoreSuite(context, pack, s, model, split, str(context, "sweep")));
+  const scored = (all ? list.filter((s) => s.recordings.length > 0) : list).map((s) => scoreSuite(context, of(s), s, model, split, str(context, "sweep")));
   const verdict = scored.some((s) => s["verdict"] === "violated") ? "violated" : "pass";
   if (!all && scored[0]) {
     const { suite, verdict: v, ...rest } = scored[0];
@@ -345,7 +363,7 @@ export const evalCommand: Command = {
     inputs: {
       "record | score": "Positional action.",
       "--suite <name|all>": "A directory under the evals dir with suite.json, cases.jsonl and, once recorded, recorded.jsonl. 'all' takes every suite; score then skips suites without recordings.",
-      "--evals-dir <dir>": "Where the suites live; default jev-evals in the current directory. A suite.json names its command: done, verify, judge, stop or decide (a decide case has decision, context, options and an expected option name; a judge suite also names its question, and its cases have text and an expected yes, no or review).",
+      "--evals-dir <dir>": "Where the suites live; default jev-evals in the current directory. A suite.json names its command (done, verify, judge, stop or decide) and may name a pack, which an explicit --pack overrides (a decide case has decision, context, options and an expected option name; a judge suite also names its question, and its cases have text and an expected yes, no or review).",
       "--split <dev|holdout>": "record and score: only cases from this split, so dev can be recorded before the hold-out.",
       "--sweep <from:to:step>": "score: precision, recall and wrong positives per threshold; suggests one only with at least 10 cases per class.",
       "--ablation <context|reversed>": "decide suites only. record: record answers with the context text left out of the request (reversed needs no new recording). score: rescore with that element removed and report the change against the full run; context needs those answers recorded first.",

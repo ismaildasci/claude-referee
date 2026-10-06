@@ -211,3 +211,49 @@ test("eval record --split records only that split, so dev can be recorded before
   const bad = await record(root, ["--split", "test"]);
   assert.equal(bad.out["error"], "bad_input");
 });
+
+function twoPackRoot(): string {
+  const root = tempDir("referee-evals-");
+  const write = (name: string, config: object, cases: object[]) => {
+    mkdirSync(join(root, name));
+    writeFileSync(join(root, name, "suite.json"), JSON.stringify(config));
+    writeFileSync(join(root, name, "cases.jsonl"), cases.map((c) => JSON.stringify(c)).join("\n") + "\n");
+  };
+  write("a-done", { command: "done", criteria: "all tests pass" }, CASES);
+  write("b-i18n", { command: "judge", question: "string.translatable", positive: "yes", pack: "i18n" }, [{ id: "btn", split: "dev", expected: "yes", text: "Save changes", context: "src/a.tsx:1 jsx-text in <button>" }]);
+  return root;
+}
+
+async function evalRun(args: string[]) {
+  const server = await fakeJev((r) => Object.fromEntries(Object.keys(r.questions).map((id) => [id, { type: "noul", noul: 0.95 }])));
+  try {
+    const io = memoryIo({ env: { TYPESAFE_API_KEY: "ts_test_secret_key_123", REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: tempDir() } });
+    const code = await run(["eval", ...args], io, commands);
+    return { code, out: io.json(), requests: server.requests.length };
+  } finally {
+    await server.close();
+  }
+}
+
+test("a suite.json pack is used by record and by score --suite all next to suites on the default pack", async () => {
+  const root = twoPackRoot();
+  assert.equal((await evalRun(["record", "--suite", "a-done", "--evals-dir", root])).code, 0);
+  const rec = await evalRun(["record", "--suite", "b-i18n", "--evals-dir", root]);
+  assert.equal(rec.code, 0, JSON.stringify(rec.out));
+  assert.equal(rec.requests, 1);
+  assert.equal((JSON.parse(readFileSync(join(root, "b-i18n", "recorded.jsonl"), "utf8")) as { pack: string }).pack, "i18n@0.1.0");
+  const all = await evalRun(["score", "--suite", "all", "--evals-dir", root]);
+  assert.equal(all.code, 0, JSON.stringify(all.out));
+  assert.match(JSON.stringify(all.out), /b-i18n/);
+});
+
+test("record refuses suites on different packs in one run, and --pack still overrides a suite's pack", async () => {
+  const root = twoPackRoot();
+  const both = await evalRun(["record", "--suite", "all", "--evals-dir", root]);
+  assert.equal(both.out["error"], "bad_input");
+  assert.match(String(both.out["message"]), /different packs/);
+  assert.equal(both.requests, 0);
+  await evalRun(["record", "--suite", "b-i18n", "--evals-dir", root]);
+  const forced = await evalRun(["score", "--suite", "b-i18n", "--evals-dir", root, "--pack", "generic"]);
+  assert.equal(forced.out["error"], "bad_pack");
+});
