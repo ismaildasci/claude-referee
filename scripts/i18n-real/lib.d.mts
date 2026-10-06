@@ -20,3 +20,6 @@ export function stripHtml(rel: string, source: string, resolve: (key: string) =>
 export function normalizeForMatch(text: string): string;
 export function matchFound(candidateText: string, value: string): boolean;
 export function seededOrder(ids: string[], seed?: string): string[];
+export const AMENDED_WINDOW: number;
+export interface Cand { file: string; line: number; text: string; id: string }
+export function amendedMatch(site: Site, candidates: Cand[], unchanged: Set<string>): Cand[] | null;

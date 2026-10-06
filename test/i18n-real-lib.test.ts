@@ -2,7 +2,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { fileNamespace, localeNamespace, matchFound, metadataVerdict, normalizeForMatch, resolveKey, seededOrder, stripHtml, stripScript, vueSections } from "../scripts/i18n-real/lib.mjs";
+import { amendedMatch, fileNamespace, localeNamespace, matchFound, metadataVerdict, normalizeForMatch, resolveKey, seededOrder, stripHtml, stripScript, vueSections } from "../scripts/i18n-real/lib.mjs";
 
 const ok = { fork: false, archived: false, license: "MIT", stars: 40, pushed_at: "2025-01-01T00:00:00Z" };
 
@@ -154,4 +154,14 @@ test("seeded order is stable and depends on the seed", () => {
   const ids = ["a", "b", "c", "d", "e"];
   assert.deepEqual(seededOrder(ids), seededOrder([...ids].reverse()));
   assert.notDeepEqual(seededOrder(ids), seededOrder(ids, "other-seed"));
+});
+
+test("amended found rule: nearest new candidate within 20 lines above, never one the clone already had", () => {
+  const site = { file: "a.tsx", line: 24, position: "jsx-text", key: "k", value: "Remove token" };
+  const c = (line: number, text: string, file = "a.tsx") => ({ file, line, text, id: `${file}:${line}` });
+  assert.deepEqual(amendedMatch(site, [c(21, "{x} Remove token"), c(18, "Remove token now")], new Set())?.map((x) => x.line), [21]);
+  assert.equal(amendedMatch(site, [c(3, "Remove token")], new Set()), null);
+  assert.equal(amendedMatch(site, [c(25, "Remove token")], new Set()), null);
+  assert.equal(amendedMatch(site, [c(21, "Remove token", "b.tsx")], new Set()), null);
+  assert.equal(amendedMatch(site, [c(24, "Remove token")], new Set(["a.tsx\u000024\u0000Remove token"])), null);
 });

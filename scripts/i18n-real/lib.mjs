@@ -279,3 +279,16 @@ export function seededOrder(ids, seed = SEED) {
     return ha < hb ? -1 : ha > hb ? 1 : 0;
   });
 }
+
+export const AMENDED_WINDOW = 20;
+
+// Amended found rule (post hoc, see the note of 2026-10-06 in the registration): extract reports a text run at its first line,
+// so a removed call inside a multi-line run sits below it. Same file, candidate line in [site line - 20, site line], the containment
+// rule above, and the candidate is not in the clone's extraction with the same file, line and text; the nearest one wins.
+export function amendedMatch(site, candidates, unchanged) {
+  const hits = candidates.filter((c) => c.file === site.file && c.line <= site.line && site.line - c.line <= AMENDED_WINDOW
+    && matchFound(c.text, site.value) && !unchanged.has(`${c.file}\0${c.line}\0${c.text}`));
+  if (hits.length === 0) return null;
+  const nearest = Math.max(...hits.map((c) => c.line));
+  return hits.filter((c) => c.line === nearest);
+}
