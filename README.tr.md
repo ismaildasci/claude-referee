@@ -31,7 +31,7 @@ claude-referee, bu tür cümleleri denetleyen, resmî olmayan bir Claude Code ek
 |---|---|---|
 | **Sen ya da Claude bir komut çalıştırınca** | `done`, `decide`, `judge` ya da `claims` (eski adı `verify` hâlâ çalışır) Jev'e sorar ve tek satırlık bir cevap basar | v0.1 |
 | **Oturum başlayınca** | Claude'a komutları nasıl kullanacağını anlatan, en fazla 800 karakterlik kısa bir not gider | v0.1 |
-| **Claude durunca** | Varsayılan olarak kapalı. `shadow` modda yalnızca ne yapacağını kaydeder (`receipts --stops`). Planlanan `active` mod, Jev Claude'un "bitti" iddiasını doğrulanmamış bulursa durmayı engeller ve Claude koşması gereken kontrolü söyleyen bir not alır; oturum başına en fazla üç kez. Jev yavaşsa ya da çalışmıyorsa hook yolu açık bırakır | `shadow` v0.1.3'te; `active` planlandı, [henüz önerilmiyor](docs/measurements.md#the-stop-gate-on-self-generated-sessions-base-rate-study) |
+| **Claude durunca** | Varsayılan olarak kapalı. `shadow` modda yalnızca ne yapacağını kaydeder (`receipts --stops`); `soft` mod hata vermeden bir uyarı ekler (v0.2.0'dan beri). Planlanan `active` mod, Jev Claude'un "bitti" iddiasını doğrulanmamış bulursa durmayı engeller ve Claude koşması gereken kontrolü söyleyen bir not alır; oturum başına en fazla üç kez. Jev yavaşsa ya da çalışmıyorsa hook yolu açık bırakır | `shadow` v0.1.3'ten, `soft` v0.2.0'dan beri; `active` planlandı, [henüz önerilmiyor](docs/measurements.md#the-stop-gate-on-self-generated-sessions-base-rate-study) |
 
 Bir kontrol hiçbir şey bulmazsa Claude hiçbir şey görmez. Bir şey bulursa Claude en fazla 300 karakterlik bir not görür.
 
