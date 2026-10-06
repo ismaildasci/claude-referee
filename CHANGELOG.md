@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-10-06
+
+Fixes and additions that came out of testing on real code. `decide` asks a balanced set of option orders when its two orders tie; `extract` no longer lists already translated Vue mustaches (the cause of every wrong `yes` on the first real-code test of the `i18n` pack) and reads HTML templates inside `<script>`; new `done` parsers for `mix test`, `ctest` and `rubocop`; the dashboard shows stop marks and grouped numbers. The `i18n` pack failed its bar on the first real-code sample and held it on a second one (0 wrong answers on 116 candidates, only 9 of them technical, a definite answer on 18).
+
 ### Added
 
 - `extract` reads HTML templates kept inside `<script>` elements of type `text/html`, `text/x-red`, `text/template`, `text/x-template` or `text/ng-template`, such as Node-RED's editor and help templates; other scripts are still skipped. On the Node-RED repository of the second real-code sample, found removed `data-i18n` keys went from 0 to 39 of 41 (fitted: the rule was written for that repository); the other 12 stripped copies of both samples give exactly the same candidates as before (`docs/decisions/extract-script-templates.md`).
