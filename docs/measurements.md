@@ -253,7 +253,7 @@ Registered in [i18n-pack-eval.md](decisions/i18n-pack-eval.md) before any reques
 
 - **The registered check passed on the hold-out:** 0 wrong `yes` among 46 `no` items and 0 wrong `no` among 49 `yes` items. Verdicts 27 `yes`, 42 `review`, 26 `no`: recall 27 of 49, a definite verdict on 53 of 95. Dev: 0 wrong either way; 12 `yes`, 15 `review`, 13 `no` of 40.
 - As with the other judge questions, the 0.9 band costs coverage, not accuracy: no answer came near the wrong band (lowest on a `yes` item 0.31, highest on a `no` item 0.51). React `no` items (6) and the one Vue `no` item all landed in `review`.
-- Limits: invented items, written and labelled by one model family; no measurement on real repositories (planned in the registration, not started); one model version; 46 and 49 items bound each error rate to about 6% (rule of three).
+- Limits: invented items, written and labelled by one model family; the valid second labelling was the third try (the first two were thrown away because the case category and the id order gave the labels away); no measurement on real repositories (planned in the registration, not started); one model version; 46 and 49 items bound each error rate to about 6% (rule of three).
 
 ### Hook start latency
 

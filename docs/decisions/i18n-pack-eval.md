@@ -53,7 +53,7 @@ Pick several public repositories that use React, Vue and plain HTML and that alr
 
 ## Status
 
-Recorded on 2026-10-06, `jev-1.13.0`, one request per case. (The build session could not run `eval record`: its sandbox refused every command containing the word eval.) Dev first (receipt `rmuwd71k1p62l`), then the amendment above was committed (8fe449d), then the hold-out once with `eval record --suite judge-i18n --split holdout` (95 requests, receipt `rmuwdlnekxqiv`, no `--fresh`). Nothing was reworded or relabelled.
+Recorded on 2026-10-06, `jev-1.13.0`, one request per case. (The build session could not run `eval record`: its sandbox refused every command containing the word eval.) Dev first (receipt `rmuwd71k1p62l`), then the amendment above was committed (8fe449d), then the hold-out once with `eval record --suite judge-i18n --split holdout` (95 requests, receipt `rmuwdlnekxqiv`, no `--fresh`). Order, checkable in the repository: dev `recorded_at` 2026-10-06T07:36:03Z, amendment commit 8fe449d at 07:47:08Z, first hold-out `recorded_at` 07:47:28Z. Nothing was reworded or relabelled.
 
 **Hold-out: the bar passed.** 0 wrong `yes` among 46 `no` items and 0 wrong `no` among 49 `yes` items; verdicts 27 `yes`, 42 `review`, 26 `no`; recall 27 of 49, `no` found 26 of 46, a definite verdict on 53 of 95. The agreed-only subset is the whole hold-out (see the second-label result above), so its numbers are the same. Dev: 0 and 0; 12 `yes`, 15 `review`, 13 `no` of 40.
 
