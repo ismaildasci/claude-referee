@@ -1,0 +1,429 @@
+{
+ "bar": {
+  "wrong_yes": 5,
+  "wrong_no": 0,
+  "held": false
+ },
+ "all": {
+  "n": 157,
+  "expected_yes": 120,
+  "expected_no": 37,
+  "verdicts": {
+   "yes": 32,
+   "review": 125,
+   "no": 0
+  },
+  "wrong_yes": 5,
+  "wrong_yes_upper95": 0.2633661100653958,
+  "wrong_no": 0,
+  "wrong_no_upper95": 0.024655401055656383,
+  "yes_found": 27,
+  "no_found": 0,
+  "coverage": 0.204,
+  "coverage_ci95": {
+   "lo": 0.14378755425680034,
+   "hi": 0.2753765101414424
+  },
+  "wrong_ids": [
+   "openbmc__webui-vue:src/views/SecurityAndAccess/UserManagement/ModalUser.vue:167 (no, p 0.91)",
+   "openbmc__webui-vue:src/views/Settings/SnmpAlerts/ModalAddDestination.vue:61 (no, p 0.91)",
+   "openbmc__webui-vue:src/components/Global/TableDateFilter.vue:51 (no, p 0.92)",
+   "openbmc__webui-vue:src/views/SecurityAndAccess/UserManagement/ModalUser.vue:94 (no, p 0.92)",
+   "openbmc__webui-vue:src/components/Global/TableDateFilter.vue:23 (no, p 0.91)"
+  ]
+ },
+ "without_flagged_o": {
+  "n": 146,
+  "expected_yes": 114,
+  "expected_no": 32,
+  "verdicts": {
+   "yes": 30,
+   "review": 116,
+   "no": 0
+  },
+  "wrong_yes": 5,
+  "wrong_yes_upper95": 0.30084169426544805,
+  "wrong_no": 0,
+  "wrong_no_upper95": 0.025936082013628445,
+  "yes_found": 25,
+  "no_found": 0,
+  "coverage": 0.205,
+  "coverage_ci95": {
+   "lo": 0.14313755066706557,
+   "hi": 0.2801564030660789
+  },
+  "wrong_ids": [
+   "openbmc__webui-vue:src/views/SecurityAndAccess/UserManagement/ModalUser.vue:167 (no, p 0.91)",
+   "openbmc__webui-vue:src/views/Settings/SnmpAlerts/ModalAddDestination.vue:61 (no, p 0.91)",
+   "openbmc__webui-vue:src/components/Global/TableDateFilter.vue:51 (no, p 0.92)",
+   "openbmc__webui-vue:src/views/SecurityAndAccess/UserManagement/ModalUser.vue:94 (no, p 0.92)",
+   "openbmc__webui-vue:src/components/Global/TableDateFilter.vue:23 (no, p 0.91)"
+  ]
+ },
+ "by_origin": {
+  "O": {
+   "n": 62,
+   "expected_yes": 25,
+   "expected_no": 37,
+   "verdicts": {
+    "yes": 10,
+    "review": 52,
+    "no": 0
+   },
+   "wrong_yes": 5,
+   "wrong_yes_upper95": 0.2633661100653958,
+   "wrong_no": 0,
+   "wrong_no_upper95": 0.11292814500684323,
+   "yes_found": 5,
+   "no_found": 0,
+   "coverage": 0.161,
+   "coverage_ci95": {
+    "lo": 0.08015306491677696,
+    "hi": 0.2766798458349219
+   },
+   "wrong_ids": [
+    "openbmc__webui-vue:src/views/SecurityAndAccess/UserManagement/ModalUser.vue:167 (no, p 0.91)",
+    "openbmc__webui-vue:src/views/Settings/SnmpAlerts/ModalAddDestination.vue:61 (no, p 0.91)",
+    "openbmc__webui-vue:src/components/Global/TableDateFilter.vue:51 (no, p 0.92)",
+    "openbmc__webui-vue:src/views/SecurityAndAccess/UserManagement/ModalUser.vue:94 (no, p 0.92)",
+    "openbmc__webui-vue:src/components/Global/TableDateFilter.vue:23 (no, p 0.91)"
+   ]
+  },
+  "Y": {
+   "n": 95,
+   "expected_yes": 95,
+   "expected_no": 0,
+   "verdicts": {
+    "yes": 22,
+    "review": 73,
+    "no": 0
+   },
+   "wrong_yes": 0,
+   "wrong_yes_upper95": null,
+   "wrong_no": 0,
+   "wrong_no_upper95": 0.031042011867954862,
+   "yes_found": 22,
+   "no_found": 0,
+   "coverage": 0.232,
+   "coverage_ci95": {
+    "lo": 0.1511773655558688,
+    "hi": 0.32935612164935835
+   },
+   "wrong_ids": []
+  }
+ },
+ "by_framework": {
+  "react": {
+   "n": 86,
+   "expected_yes": 70,
+   "expected_no": 16,
+   "verdicts": {
+    "yes": 13,
+    "review": 73,
+    "no": 0
+   },
+   "wrong_yes": 0,
+   "wrong_yes_upper95": 0.17074972298248092,
+   "wrong_no": 0,
+   "wrong_no_upper95": 0.04189334406688858,
+   "yes_found": 13,
+   "no_found": 0,
+   "coverage": 0.151,
+   "coverage_ci95": {
+    "lo": 0.08301693991121095,
+    "hi": 0.24461264177189723
+   },
+   "wrong_ids": []
+  },
+  "vue": {
+   "n": 71,
+   "expected_yes": 50,
+   "expected_no": 21,
+   "verdicts": {
+    "yes": 19,
+    "review": 52,
+    "no": 0
+   },
+   "wrong_yes": 5,
+   "wrong_yes_upper95": 0.43697631603126574,
+   "wrong_no": 0,
+   "wrong_no_upper95": 0.058155079116972264,
+   "yes_found": 14,
+   "no_found": 0,
+   "coverage": 0.268,
+   "coverage_ci95": {
+    "lo": 0.16943499179684723,
+    "hi": 0.38594045760522533
+   },
+   "wrong_ids": [
+    "openbmc__webui-vue:src/views/SecurityAndAccess/UserManagement/ModalUser.vue:167 (no, p 0.91)",
+    "openbmc__webui-vue:src/views/Settings/SnmpAlerts/ModalAddDestination.vue:61 (no, p 0.91)",
+    "openbmc__webui-vue:src/components/Global/TableDateFilter.vue:51 (no, p 0.92)",
+    "openbmc__webui-vue:src/views/SecurityAndAccess/UserManagement/ModalUser.vue:94 (no, p 0.92)",
+    "openbmc__webui-vue:src/components/Global/TableDateFilter.vue:23 (no, p 0.91)"
+   ]
+  }
+ },
+ "by_repo": {
+  "Hanziness/FocusTide": {
+   "n": 23,
+   "expected_yes": 21,
+   "expected_no": 2,
+   "verdicts": {
+    "yes": 5,
+    "review": 18,
+    "no": 0
+   },
+   "wrong_yes": 0,
+   "wrong_yes_upper95": 0.7763932022500211,
+   "wrong_no": 0,
+   "wrong_no_upper95": 0.13294591102652342,
+   "yes_found": 5,
+   "no_found": 0,
+   "coverage": 0.217,
+   "coverage_ci95": {
+    "lo": 0.07460340764880383,
+    "hi": 0.4370307262368146
+   },
+   "wrong_ids": []
+  },
+  "Hccake/skill-deck": {
+   "n": 43,
+   "expected_yes": 35,
+   "expected_no": 8,
+   "verdicts": {
+    "yes": 11,
+    "review": 32,
+    "no": 0
+   },
+   "wrong_yes": 0,
+   "wrong_yes_upper95": 0.3123439780663678,
+   "wrong_no": 0,
+   "wrong_no_upper95": 0.08203163585667045,
+   "yes_found": 11,
+   "no_found": 0,
+   "coverage": 0.256,
+   "coverage_ci95": {
+    "lo": 0.13518595028853037,
+    "hi": 0.41171572108485965
+   },
+   "wrong_ids": []
+  },
+  "hamster1963/nezha-dash-v2": {
+   "n": 43,
+   "expected_yes": 35,
+   "expected_no": 8,
+   "verdicts": {
+    "yes": 2,
+    "review": 41,
+    "no": 0
+   },
+   "wrong_yes": 0,
+   "wrong_yes_upper95": 0.3123439780663678,
+   "wrong_no": 0,
+   "wrong_no_upper95": 0.08203163585667045,
+   "yes_found": 2,
+   "no_found": 0,
+   "coverage": 0.047,
+   "coverage_ci95": {
+    "lo": 0.0056832569787479605,
+    "hi": 0.15811145830869772
+   },
+   "wrong_ids": []
+  },
+  "openbmc/webui-vue": {
+   "n": 48,
+   "expected_yes": 29,
+   "expected_no": 19,
+   "verdicts": {
+    "yes": 14,
+    "review": 34,
+    "no": 0
+   },
+   "wrong_yes": 5,
+   "wrong_yes_upper95": 0.47579711042141015,
+   "wrong_no": 0,
+   "wrong_no_upper95": 0.09814462767729573,
+   "yes_found": 9,
+   "no_found": 0,
+   "coverage": 0.292,
+   "coverage_ci95": {
+    "lo": 0.1695307986280279,
+    "hi": 0.4406347799136908
+   },
+   "wrong_ids": [
+    "openbmc__webui-vue:src/views/SecurityAndAccess/UserManagement/ModalUser.vue:167 (no, p 0.91)",
+    "openbmc__webui-vue:src/views/Settings/SnmpAlerts/ModalAddDestination.vue:61 (no, p 0.91)",
+    "openbmc__webui-vue:src/components/Global/TableDateFilter.vue:51 (no, p 0.92)",
+    "openbmc__webui-vue:src/views/SecurityAndAccess/UserManagement/ModalUser.vue:94 (no, p 0.92)",
+    "openbmc__webui-vue:src/components/Global/TableDateFilter.vue:23 (no, p 0.91)"
+   ]
+  }
+ },
+ "by_kind": {
+  "html-text": {
+   "n": 3,
+   "expected_yes": 1,
+   "expected_no": 2,
+   "verdicts": {
+    "yes": 1,
+    "review": 2,
+    "no": 0
+   },
+   "wrong_yes": 0,
+   "wrong_yes_upper95": 0.7763932022500211,
+   "wrong_no": 0,
+   "wrong_no_upper95": 0.95,
+   "yes_found": 1,
+   "no_found": 0,
+   "coverage": 0.333,
+   "coverage_ci95": {
+    "lo": 0.008403758659612626,
+    "hi": 0.9057006759497539
+   },
+   "wrong_ids": []
+  },
+  "jsx-attr": {
+   "n": 12,
+   "expected_yes": 12,
+   "expected_no": 0,
+   "verdicts": {
+    "yes": 2,
+    "review": 10,
+    "no": 0
+   },
+   "wrong_yes": 0,
+   "wrong_yes_upper95": null,
+   "wrong_no": 0,
+   "wrong_no_upper95": 0.2209221919455559,
+   "yes_found": 2,
+   "no_found": 0,
+   "coverage": 0.167,
+   "coverage_ci95": {
+    "lo": 0.020862525460092332,
+    "hi": 0.48413774868596715
+   },
+   "wrong_ids": []
+  },
+  "jsx-expr-string": {
+   "n": 11,
+   "expected_yes": 7,
+   "expected_no": 4,
+   "verdicts": {
+    "yes": 1,
+    "review": 10,
+    "no": 0
+   },
+   "wrong_yes": 0,
+   "wrong_yes_upper95": 0.5271291954984121,
+   "wrong_no": 0,
+   "wrong_no_upper95": 0.3481636551311609,
+   "yes_found": 1,
+   "no_found": 0,
+   "coverage": 0.091,
+   "coverage_ci95": {
+    "lo": 0.0022989722138142643,
+    "hi": 0.4127799169883827
+   },
+   "wrong_ids": []
+  },
+  "jsx-text": {
+   "n": 50,
+   "expected_yes": 43,
+   "expected_no": 7,
+   "verdicts": {
+    "yes": 10,
+    "review": 40,
+    "no": 0
+   },
+   "wrong_yes": 0,
+   "wrong_yes_upper95": 0.3481636551311609,
+   "wrong_no": 0,
+   "wrong_no_upper95": 0.06729675341386782,
+   "yes_found": 10,
+   "no_found": 0,
+   "coverage": 0.2,
+   "coverage_ci95": {
+    "lo": 0.10030223747257111,
+    "hi": 0.337183108383488
+   },
+   "wrong_ids": []
+  },
+  "ui-prop": {
+   "n": 19,
+   "expected_yes": 15,
+   "expected_no": 4,
+   "verdicts": {
+    "yes": 1,
+    "review": 18,
+    "no": 0
+   },
+   "wrong_yes": 0,
+   "wrong_yes_upper95": 0.5271291954984121,
+   "wrong_no": 0,
+   "wrong_no_upper95": 0.18103627252208465,
+   "yes_found": 1,
+   "no_found": 0,
+   "coverage": 0.053,
+   "coverage_ci95": {
+    "lo": 0.001331628804179421,
+    "hi": 0.2602806541952142
+   },
+   "wrong_ids": []
+  },
+  "vue-attr": {
+   "n": 14,
+   "expected_yes": 14,
+   "expected_no": 0,
+   "verdicts": {
+    "yes": 2,
+    "review": 12,
+    "no": 0
+   },
+   "wrong_yes": 0,
+   "wrong_yes_upper95": null,
+   "wrong_no": 0,
+   "wrong_no_upper95": 0.1926361756501353,
+   "yes_found": 2,
+   "no_found": 0,
+   "coverage": 0.143,
+   "coverage_ci95": {
+    "lo": 0.017794515483191532,
+    "hi": 0.428129160909699
+   },
+   "wrong_ids": []
+  },
+  "vue-text": {
+   "n": 48,
+   "expected_yes": 28,
+   "expected_no": 20,
+   "verdicts": {
+    "yes": 15,
+    "review": 33,
+    "no": 0
+   },
+   "wrong_yes": 5,
+   "wrong_yes_upper95": 0.45558240400174876,
+   "wrong_no": 0,
+   "wrong_no_upper95": 0.1014657355727247,
+   "yes_found": 10,
+   "no_found": 0,
+   "coverage": 0.313,
+   "coverage_ci95": {
+    "lo": 0.1865962830960124,
+    "hi": 0.46251357810543614
+   },
+   "wrong_ids": [
+    "openbmc__webui-vue:src/views/SecurityAndAccess/UserManagement/ModalUser.vue:167 (no, p 0.91)",
+    "openbmc__webui-vue:src/views/Settings/SnmpAlerts/ModalAddDestination.vue:61 (no, p 0.91)",
+    "openbmc__webui-vue:src/components/Global/TableDateFilter.vue:51 (no, p 0.92)",
+    "openbmc__webui-vue:src/views/SecurityAndAccess/UserManagement/ModalUser.vue:94 (no, p 0.92)",
+    "openbmc__webui-vue:src/components/Global/TableDateFilter.vue:23 (no, p 0.91)"
+   ]
+  }
+ },
+ "p_range": {
+  "yes_expected_lowest": 0.33,
+  "no_expected_highest": 0.92
+ }
+}

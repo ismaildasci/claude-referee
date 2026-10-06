@@ -47,9 +47,9 @@ Reported but not part of the bar: coverage (share of hold-out items with a defin
 
 With 46 `no` items, zero wrong `yes` bounds the true rate to about 6% at 95% confidence (rule of three), and with 49 `yes` items zero wrong `no` bounds it to about 6%, both on invented items from a single writer. It says nothing about real repositories.
 
-## Planned, not done: public-repo hold-out
+## Public-repo hold-out (planned first, then run on 2026-10-06)
 
-Pick several public repositories that use React, Vue and plain HTML and that already keep strings in a translation file, chosen before looking at results. Strip the translation calls from a copy, run `extract`, and treat the original `t("...")` sites as the labelled `yes` set; label a random sample of the remaining candidates by hand with two labellers. Report extractor recall against the removed calls, and judge accuracy on the sample. Not started.
+Pick several public repositories that use React, Vue and plain HTML and that already keep strings in a translation file, chosen before looking at results. Strip the translation calls from a copy, run `extract`, and treat the original `t("...")` sites as the labelled `yes` set; label a random sample of the remaining candidates by hand with two labellers. Report extractor recall against the removed calls, and judge accuracy on the sample. Run on 2026-10-06 with the protocol below.
 
 ### Amendment, 2026-10-06: protocol of the public-repo hold-out, fixed before any repository is downloaded
 
@@ -130,6 +130,19 @@ A new suite `jev-evals/judge-i18n-real` (all items in `holdout`; fields id, expe
 
 Two fresh `general-purpose` subagents, each given only its own blind file in an empty directory, labelled all 168 items (identical prompt: the pack's question and both criteria verbatim, plus one sentence not in the pack, that text inside `{...}`, `{{ ... }}` or `${...}` is filled in at run time and the words around it are judged). By script (`agreement.json`): agreement 155 of 168, Cohen's kappa 0.80; on origin O 62 of 73, kappa 0.69; on the 11 flagged O items 11 of 11. Labeller 1 said `yes` to all 95 Y items, labeller 2 to 93; no Y item got two `no`, so none is dropped; the two with one `no` are listed in `agreement.json`. Low confidence was marked on 41 and 40 items. The 11 O disagreements are dropped (`dropped.json`). Scored: **157 items, 120 `yes` and 37 `no`**. Both labellers are sessions of one model family; no person labelled.
 
+#### Result, 2026-10-06: the bar failed
+
+Recorded once (`eval record --suite judge-i18n-real --split holdout`, 157 requests, receipt `rmuwld601rdvc`, `jev-1.13.0`, question hash `2c1c03232c15`, both pack hashes as registered, no `--fresh`) after the cases commit 0ada90a was pushed. Scored by `scripts/i18n-real/score.mjs` (`docs/data/i18n-real/score.json`); `eval score` gives the same totals.
+
+- **Bar: failed.** 5 wrong `yes` among 37 `no` items (exact one-sided 95% upper bound 0.26), 0 wrong `no` among 120 `yes` items (upper bound 0.025).
+- **All five wrong `yes` are one shape**: a Vue text node that is only a mustache holding a translation call spread over several lines, such as `{{ $t('global.form.dateMustBeAfter', { date: fromDate, }) }}`, in `openbmc/webui-vue`. The strip step skipped those calls (multi-line) and `extract` listed them, although its recipe says a mustache other than a string literal is not a candidate and a wrapped string is left out: an extractor defect. Both labellers said `no` (already translated); Jev gave 0.91 to 0.92. Ten sampled items have this shape, all `no`, Jev 0.74 to 0.92. The labels are not changed and nothing is tuned on these items.
+- **Coverage 0.204** (32 of 157 definite, exact 95% 0.144 to 0.275), against 0.56 on the invented hold-out. Verdicts: 32 `yes`, 125 `review`, **0 `no`**. `yes` found 27 of 120; precision of `yes` 27 of 32. Lowest answer on a `yes` item 0.33, highest on a `no` item 0.92; on the 27 `no` items without a translation call the highest is 0.89 and the median of all 37 is 0.77 (`yes` items: 0.845).
+- Not registered, descriptive only: the rank separation (AUC) of Jev's answer between `yes` and `no` items is 0.60, and 0.71 without the ten items that hold a translation call.
+- By origin: Y 22 of 95 `yes`, no wrong verdict; O 62 scored (25 `yes`, 37 `no`), 5 `yes` found, 0 `no` found, the 5 wrong `yes`. Without the 11 flagged O items (all 11 scored): the same 5 wrong `yes`, 0 wrong `no`, coverage 0.205. By framework: React 0 wrong of 86, coverage 0.15; Vue 5 wrong `yes` of 71, coverage 0.27. Per repository and per `kind` in `score.json`.
+- `suite.json` takes 5 as `max_wrong_positive` (a tripwire, as in the done-v2 hold-outs); `max_wrong_negative` stays 0.
+
+What it means: on candidates from four real repositories the bands still made no wrong `no` and no wrong `yes` on strings that are not already translated, but they decided only one item in five, and Jev never answered `no`: on real code it rates technical strings much higher than on the invented items (median 0.77, against 0.845 for UI strings). Technical-string rejection, the reason a `no` band exists, did not happen here. The extractor defect behind the five wrong `yes` is a separate fix, and any claim after it needs a new sample.
+
 ## Status
 
 Recorded on 2026-10-06, `jev-1.13.0`, one request per case. (The build session could not run `eval record`: its sandbox refused every command containing the word eval.) Dev first (receipt `rmuwd71k1p62l`), then the amendment above was committed (8fe449d), then the hold-out once with `eval record --suite judge-i18n --split holdout` (95 requests, receipt `rmuwdlnekxqiv`, no `--fresh`). Order, checkable in the repository: dev `recorded_at` 2026-10-06T07:36:03Z, amendment commit 8fe449d at 07:47:08Z, first hold-out `recorded_at` 07:47:28Z. Nothing was reworded or relabelled.
@@ -138,4 +151,4 @@ Recorded on 2026-10-06, `jev-1.13.0`, one request per case. (The build session c
 
 Reported, not part of the bar (hold-out): React 12 of 19 `yes` items found, 0 of 6 `no` items found; Vue 5 of 8 and 0 of 1; HTML 4 of 9 and 1 of 4; plain JS 1 of 5 and 3 of 3; TypeScript 5 of 8 and 22 of 32. Near-misses: 7 of 9 `yes` and 16 of 25 `no` found; the rest: 20 of 40 and 10 of 21. No answer came near the wrong band: the lowest on a `yes` item was 0.31 (the `no` band ends at 0.10) and the highest on a `no` item 0.51 (the `yes` band starts at 0.90); `review` answers ranged from 0.12 to 0.89. Counts come from a script over `recorded.jsonl` that reproduces the `eval score` totals.
 
-What it means: on these invented items the 0.9 bands made no wrong call, and with 46 and 49 items that bounds each error rate to about 6% (rule of three); the cost is coverage, since 42 of 95 items land in `review`. It says nothing about real repositories, both labellers are one model family and one of them wrote the cases, and only one model version was asked. The public-repo hold-out above is still not started.
+What it means: on these invented items the 0.9 bands made no wrong call, and with 46 and 49 items that bounds each error rate to about 6% (rule of three); the cost is coverage, since 42 of 95 items land in `review`. It says nothing about real repositories, both labellers are one model family and one of them wrote the cases, and only one model version was asked. The public-repo hold-out above was run later the same day and failed its bar (see its result).
