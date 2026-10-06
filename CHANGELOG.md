@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-10-06
+
+The first unseen real-log test of `done` (code frozen at 0.2.1, 126 public repositories, 231 cases sent to the judge) failed its three registered bars: wrong `met` 2 of 85, `met` recall among recognised logs 69 of 79 (0.873, bar 0.9), `missing` recall 0.529. This release fixes the two parser defects behind the two wrong `met` (a maven run that ran no tests counted as a passed test; Swift Testing logs with several summaries and known issues) and rewrites the README, FAQ and skill text about `done` to match the numbers. After the fixes wrong `met` is 0 of 85 on that sample, but those fixes were made on those same cases, so the 0 is fitted and is not an unseen result; `met` recall (0.873) and `missing` recall (0.529) did not change. `done` v2 stays "not measured" on its original bar. The Stop gate is a reminder, not a judge, and `active` is not recommended. The plugin name `claude-referee` is still flagged by the Claude Code validator; CI tolerates only that error.
+
 ### Changed
 
 - `done`: a test criterion backed only by build output (maven without surefire totals, `ninja`, `msbuild`, `docker build`, `make`, `swift build`, `cargo build`, `next build`, `nix build`, `vite`) is capped at `unsure` (`reason: no_tests_run`); a build criterion can still be `met`. The mark is read in code and not sent to Jev. This fixes the wrong `met` of `google/gson` in the second real-log test, a `mvn artifact:check-buildplan` step that ran no tests ([decision](docs/decisions/parser-fixes-real-logs-2.md)).
