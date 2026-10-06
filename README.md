@@ -165,7 +165,7 @@ npx claude-referee receipts --tokens
 
 ## Install
 
-You need Claude Code 2.1.139 or later (tested with 2.1.285), Node 20.3 or later on the `PATH` Claude Code sees, and a [TypeSafe API key](https://docs.typesafe.ai).
+You need Claude Code 2.1.139 or later (tested with 2.1.291), Node 20.3 or later on the `PATH` Claude Code sees, and a [TypeSafe API key](https://docs.typesafe.ai).
 
 **1. Install the plugin**
 
