@@ -1,0 +1,22 @@
+{
+ "decision": "Which of these four work items should claude-referee do next, to most improve what its users can rely on for the work it takes?",
+ "context": "claude-referee is an open-source Claude Code plugin that checks what Claude Code says against evidence (test output, source text) with the Jev judge, keeps a receipt of every decision and publishes its own error rate. Standing rule: a feature ships only with tests, and a check that changes Claude's behaviour only with a measurement. State on 2026-10-06: version 0.2.2 is on npm; done v2 failed its registered bars on unseen real CI logs; claims and judge held on their hold-outs; decide is used for design choices and work order; the local dashboard and the i18n pack are recent. One developer does the work, with Jev API access; each item below needs no money beyond cheap Jev requests (about 0.04 USD per million input tokens). Added fact, usage and near-tie rates: the only usage data is the maintainer's own receipts in this repository over the last 30 days: decide 140 runs, done 57, verify 57, eval 44, judge 0 (the i18n pack has never been run outside its eval suite). Near-ties were 18 of 203 decisions (8.9%) in the order study; on the 39 labelled decide cases, 14 ended as tie and 12 had the two orders disagree.",
+ "options": [
+  {
+   "name": "o1",
+   "text": "What: when the two-order decide result is a near-tie (margin under 0.08), also ask a balanced set of orders (every option in every slot, plus reversals) and take the verdict from mean probabilities. Measured: on 32 near-ties two orders matched the 24-order reference leader in 0.66, the balanced set in 0.94, with no false clear. Cost: 2n-2 extra requests per near-tie only; about a day of code and tests plus a replay. Done when: tests pass and a replay on recorded suites reproduces the study."
+  },
+  {
+   "name": "o2",
+   "text": "What: run the registered real-code check of the i18n pack: take React, Vue and HTML repositories that already use a translation file, strip the translation calls in a copy, run extract and judge the candidates. Measured: nothing on real code yet; on 95 invented strings no wrong verdict and 53 definite ones. Cost: public downloads, two blind labeller agents on a sample, about 300 Jev requests; one to two days. Done when: extractor recall and judge errors on real code are reported with intervals."
+  },
+  {
+   "name": "o3",
+   "text": "What: measure whether neutral option names (o1, o2, ...) or the author's own names give decide leaders closer to labelled best options, before changing what decide sends. Measured: renaming options to neutral names changed the leader in 22 of 183 decisions, and the direction of the effect is unknown. Cost: about 400 Jev requests over the existing labelled decide suites; under a day. Done when: a registered comparison on the labelled decisions says which naming agrees more with the labels, or that neither does."
+  },
+  {
+   "name": "o4",
+   "text": "What: dashboard polish: show the stored stop marks (stale pass, truncated checks, subagent calls and reports) on each labelling card, and add thousands separators to the overview numbers. Measured: nothing is needed; the marks are already in stops.jsonl but never shown, and the page was checked once in a real browser. Cost: a few hours, unit tests and one more browser run. Done when: tests pass and a browser check shows the marks and the separators on synthetic stops."
+  }
+ ]
+}
