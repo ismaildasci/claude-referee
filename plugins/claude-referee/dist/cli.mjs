@@ -5947,7 +5947,7 @@ var evalCommand = {
       "--sweep <from:to:step>": "score: precision, recall and wrong positives per threshold; suggests one only with at least 10 cases per class.",
       "--ablation <context|reversed>": "decide suites only. record: record answers with the context text left out of the request (reversed needs no new recording). score: rescore with that element removed and report the change against the full run; context needs those answers recorded first.",
       "--fresh": "record: record every case again, even ones already recorded for this question text, input and model.",
-      "--max-requests <n>": "record: stop before the first request when more than n cases are still to record.",
+      "--max-requests <n>": "record: stop before the first request when recording could send more than n requests, counting the balanced orders a tied decide case may add.",
       "--max-usd <x>": "record: stop before the first request when the estimated input cost, from a token estimate, is above x USD."
     },
     outputs: {

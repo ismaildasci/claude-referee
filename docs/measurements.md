@@ -414,7 +414,7 @@ Three of six are met (stop count, on synthetic ground truth rather than human la
 
 ### decide against author-labelled best options
 
-`jev-evals/decide-best`, `jev-1.13.0`, 2026-10-02, `eval record` then `eval score` ([metric and record](decisions/decide-eval-metric.md)): the 39 close-call decisions of `decide-close`, each with one best option written by the repo author before any answer was recorded. The leader matched the label in 16 of 39 cases (0.41). The verdicts were 0 clear, 25 weak and 14 tie; the written and reversed orders picked different leaders in 12 cases. Several options are defensible in every case by construction and the labels are one author's judgement, so this is a description of how Jev behaves on close calls, not an accuracy and not a pass or fail result. (Measured)
+`jev-evals/decide-best`, `jev-1.13.0`, 2026-10-02, `eval record` then `eval score` ([metric and record](decisions/decide-eval-metric.md)): the 39 close-call decisions of `decide-close`, each with one best option written by the repo author before any answer was recorded. The leader matched the label in 16 of 39 cases (0.41). The verdicts were 0 clear, 25 weak and 14 tie (with two orders; 0, 28 and 11 after the balanced orders on ties, [below](#decide-with-a-balanced-set-of-orders-on-ties)); the written and reversed orders picked different leaders in 12 cases. Several options are defensible in every case by construction and the labels are one author's judgement, so this is a description of how Jev behaves on close calls, not an accuracy and not a pass or fail result. (Measured)
 
 ### decide with a balanced set of orders on ties
 
