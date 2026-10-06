@@ -1,5 +1,6 @@
 // HTML, CSS and browser script of the local dashboard, served from strings so the bundle needs no asset files.
 // The script builds every node with textContent and never uses HTML parsing APIs; stored excerpts are untrusted text.
+// show() bumps seq, so a reply or label for an earlier view never draws over the current one; R/W while a label saves are refused aloud.
 
 export const INDEX_HTML = `<!doctype html>
 <html lang="en">
@@ -72,8 +73,9 @@ h3{font-size:15px;font-weight:600;color:var(--muted);margin:24px 0 0;padding-bot
 .v-bad{color:var(--bad)}
 .v-mid{color:var(--warn)}
 .flow details{margin:8px 0 0}
-.flow summary{cursor:pointer;color:var(--accent);font-size:14px;width:max-content}
+.flow summary{cursor:pointer;color:var(--accent);font-size:14px;width:max-content;max-width:100%}
 .flow details table{margin-top:4px;font-size:14px}
+.flow details td{overflow-wrap:anywhere}
 meter{width:72px;height:8px;vertical-align:middle;margin-right:6px}
 meter::-webkit-meter-bar{background:var(--line);border:0;border-radius:4px}
 meter::-webkit-meter-optimum-value{background:var(--accent);border-radius:4px}
@@ -98,6 +100,7 @@ var current = "flow";
 var flowQuery = { days: "7", command: "all" };
 var items = [];
 var index = 0;
+var seq = 0;
 
 function el(tag, text, cls) {
   var node = document.createElement(tag);
@@ -167,15 +170,19 @@ function renderTabs() {
 }
 
 function show(name) {
+  var my = ++seq;
+  function live(f) { return function (x) { if (my === seq) f(x); }; }
   current = name;
+  items = [];
+  index = 0;
   renderTabs();
   say("");
   clear(main);
   add(main, el("p", "Loading"));
-  if (name === "flow") return getJson("/api/flow?days=" + encodeURIComponent(flowQuery.days) + "&command=" + encodeURIComponent(flowQuery.command)).then(renderFlow).catch(fail);
-  if (name === "queue") return getJson("/api/queue").then(function (d) { items = d.stops; index = 0; renderQueue(d.total); }).catch(fail);
-  if (name === "overview") return getJson("/api/overview").then(renderOverview).catch(fail);
-  if (name === "privacy") return getJson("/api/privacy").then(renderPrivacy).catch(fail);
+  if (name === "flow") return getJson("/api/flow?days=" + encodeURIComponent(flowQuery.days) + "&command=" + encodeURIComponent(flowQuery.command)).then(live(renderFlow)).catch(live(fail));
+  if (name === "queue") return getJson("/api/queue").then(live(function (d) { items = d.stops; index = 0; renderQueue(d.total); })).catch(live(fail));
+  if (name === "overview") return getJson("/api/overview").then(live(renderOverview)).catch(live(fail));
+  if (name === "privacy") return getJson("/api/privacy").then(live(renderPrivacy)).catch(live(fail));
   renderExport();
 }
 
@@ -226,13 +233,18 @@ function move(step) {
 
 var busy = false;
 function labelCurrent(value) {
-  if (busy || current !== "queue" || items.length === 0) return;
-  var s = items[index];
+  if (current !== "queue" || items.length === 0) return;
+  if (busy) return say("Still saving the previous label; press " + value[0].toUpperCase() + " again when it is saved.");
+  var s = items[index], my = seq;
   busy = true;
   request("/api/label", { method: "POST", body: JSON.stringify({ id: s.id, label: value }) }).then(function () {
-    items.splice(index, 1);
-    say("Stop labelled " + value + ". " + items.length + " left in this view.");
-    renderQueue(items.length);
+    if (my === seq) {
+      var i = items.indexOf(s);
+      items.splice(i, 1);
+      if (i < index) index--;
+      renderQueue(items.length);
+    }
+    say("Stop of " + s.ts + " labelled " + value + "." + (my === seq ? " " + items.length + " left in this view." : ""));
   }).catch(function (e) { say(e.message); }).then(function () { busy = false; });
 }
 
@@ -295,9 +307,12 @@ function stopJevText(e) {
 function answersBlock(e) {
   var count = 0;
   e.answers.forEach(function (a) { count += a.questions.length; });
-  if (count === 0 && !e.answers_missing) return null;
+  var more = e.answers_more, read = e.answers.length + e.answers_missing;
+  if (count === 0 && !e.answers_missing && !more) return null;
   var box = el("details");
-  add(box, el("summary", count ? "Jev's answers: " + plural(count, "question", "questions") : "Jev's answers"));
+  var head = "Jev's answers" + (count ? ": " + plural(count, "question", "questions") : "");
+  if (more) head += (count ? ", " : ": ") + plural(more, "stored answer", "stored answers") + " not read";
+  add(box, el("summary", head));
   e.answers.forEach(function (a) {
     add(box, el("p", a.model + ", answered " + day(a.answered_at) + " " + clock(a.answered_at), "meta"));
     var t = el("table");
@@ -325,7 +340,8 @@ function answersBlock(e) {
     });
     add(box, add(t, body));
   });
-  if (e.answers_missing) add(box, el("p", plural(e.answers_missing, "stored answer is", "stored answers are") + " gone: expired, removed by an overrule, or never written.", "meta"));
+  if (more) add(box, el("p", plural(more, read ? "more stored answer" : "stored answer", read ? "more stored answers" : "stored answers") + " not read. A stored answer holds Jev's reply to one request; the page reads at most 12 per call and 600 per page" + (read < 12 ? ", newest calls first, and the 600 ran out here. Pick this command under Show to leave more for this call." : "."), "meta"));
+  if (e.answers_missing) add(box, el("p", plural(e.answers_missing, "stored answer is", "stored answers are") + " gone: expired after 30 days, removed by an overrule, or never written.", "meta"));
   return box;
 }
 

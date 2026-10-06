@@ -2,20 +2,23 @@
 // The server runs in-process on a random port with a temp data directory; raw http is used so Host and Origin can be forged.
 
 import assert from "node:assert/strict";
-import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { request as httpRequest } from "node:http";
 import { join } from "node:path";
 import { test } from "node:test";
 import { Script } from "node:vm";
 import { commands } from "../src/cli/commands/index.ts";
+import { ui as uiCommand } from "../src/cli/commands/ui.ts";
 import { run } from "../src/cli/run.ts";
-import { writeCache } from "../src/engine/cache.ts";
+import { sha256, writeCache } from "../src/engine/cache.ts";
+import { CACHE_TTL_MS } from "../src/engine/config.ts";
 import { projectId } from "../src/engine/datadir.ts";
 import { appendReceipt, overruleReceipt, type Receipt } from "../src/engine/receipts.ts";
 import { appendStop, labelsFile, readStops } from "../src/engine/stopgate/stops.ts";
 import type { StopRecord } from "../src/engine/stopgate/types.ts";
 import { startUi, type UiServer } from "../src/ui/server.ts";
-import { APP_JS, INDEX_HTML } from "../src/ui/page.ts";
+import { APP_CSS, APP_JS, INDEX_HTML } from "../src/ui/page.ts";
 import { memoryIo, tempDir } from "./helpers.ts";
 
 const XSS = '<img src=x onerror="alert(1)"><script>alert(2)</script>';
@@ -243,10 +246,10 @@ test("export takes a kind from an allow-list and never a path", async () => {
       assert.doesNotMatch(r.body, /root:|add a page/);
     }
     assert.equal((await s.get("/api/export")).status, 400);
-    for (const path of ["/%2e%2e/%2e%2e/etc/passwd", "/../../etc/passwd", "/app.js/../../../etc/passwd", "/api/../etc/passwd", "/stops.jsonl", "/labels.jsonl", "//etc/passwd", "/api/export/../../x"]) {
+    for (const path of ["/%2e%2e/%2e%2e/etc/passwd", "/../../etc/passwd", "/app.js/../../../etc/passwd", "/api/../etc/passwd", "/stops.jsonl", "/labels.jsonl", "//etc/passwd", "/api/export/../../x", "/\\", "/\\\\", "/\\evil/api/flow", `/\\127.0.0.1:${s.ui.port}/api/flow`, "/api\\flow", "/api/flow?command=a\\b", "/x/../api/flow", "/x/%2e%2e/app.js"]) {
       const r = await s.get(path);
       assert.ok([400, 404].includes(r.status), `${path} ${r.status}`);
-      assert.doesNotMatch(r.body, /root:|add a page/);
+      assert.doesNotMatch(r.body, /root:|add a page|"events"/);
     }
   } finally {
     await s.ui.close();
@@ -376,25 +379,51 @@ class FakeNode {
 const FIRST_FLOW = "/api/flow?days=7&command=all";
 const EMPTY_FLOW = { days: 7, command: "all", commands: [], total: 0, shown: 0, events: [] };
 
+type Listener = (event?: unknown) => void;
+
 function fakePage(hash: string, queue: unknown, more: Record<string, unknown> = {}) {
   const routes: Record<string, unknown> = { [FIRST_FLOW]: EMPTY_FLOW, ...more };
   const nodes: Record<string, FakeNode> = { main: new FakeNode("main"), status: new FakeNode("p"), tabs: new FakeNode("nav") };
-  const on: Record<string, (() => void)[]> = {};
+  const on: Record<string, Listener[]> = {};
+  const listen = (type: string, f: Listener) => void (on[type] ??= []).push(f);
   const location = { hash, pathname: "/" };
   const fetched: { path: string; token: string }[] = [];
+  const posts: unknown[] = [];
   new Script(APP_JS).runInNewContext({
     URLSearchParams,
     setTimeout,
     location,
     history: { replaceState: () => void (location.hash = "") },
-    document: { getElementById: (id: string) => nodes[id], createElement: (tag: string) => new FakeNode(tag), addEventListener: () => undefined, body: new FakeNode("body") },
-    window: { addEventListener: (type: string, f: () => void) => void (on[type] ??= []).push(f) },
-    fetch: (path: string, init: { headers: Record<string, string> }) => {
+    document: { getElementById: (id: string) => nodes[id], createElement: (tag: string) => new FakeNode(tag), addEventListener: listen, body: new FakeNode("body") },
+    window: { addEventListener: listen },
+    fetch: (path: string, init: { headers: Record<string, string>; method: string; body?: string }) => {
       fetched.push({ path, token: init.headers["X-Referee-Token"] ?? "" });
-      return Promise.resolve({ status: 200, ok: true, json: () => Promise.resolve(path in routes ? routes[path] : queue) });
+      if (init.method === "POST") posts.push(JSON.parse(init.body ?? "null"));
+      const route = path in routes ? routes[path] : queue;
+      const data = typeof route === "function" ? (route as () => Promise<unknown>)() : Promise.resolve(route);
+      return data.then((d) => ({ status: 200, ok: true, json: () => Promise.resolve(d) }));
     },
   });
-  return { main: nodes["main"] as FakeNode, tabs: nodes["tabs"] as FakeNode, location, fetched, fire: (type: string) => (on[type] ?? []).forEach((f) => f()) };
+  return {
+    main: nodes["main"] as FakeNode,
+    tabs: nodes["tabs"] as FakeNode,
+    status: nodes["status"] as FakeNode,
+    location,
+    fetched,
+    posts,
+    fire: (type: string, event?: unknown) => (on[type] ?? []).forEach((f) => f(event)),
+    key: (key: string) => (on["keydown"] ?? []).forEach((f) => f({ key, preventDefault: () => undefined })),
+  };
+}
+
+function held<T = unknown>() {
+  let release!: (v: T) => void;
+  let reject!: (e: Error) => void;
+  const promise = new Promise<T>((res, rej) => {
+    release = res;
+    reject = rej;
+  });
+  return { promise, release, reject };
 }
 
 const settle = () => new Promise((resolve) => setImmediate(resolve));
@@ -642,10 +671,327 @@ test("a corrupt receipt or cache entry degrades to placeholders instead of faili
     const [ok, bad] = d.events;
     assert.equal(ok?.["answers_missing"], 1);
     const qs = (ok?.["answers"] as { model: string; questions: { id: string; value: string; p: number | null; options: unknown[] }[] }[])[0];
-    assert.equal(qs?.model, "7");
+    assert.equal(qs?.model, "?");
     assert.deepEqual(qs?.questions, [{ id: "d", type: "choice", value: "k", p: null, options: [{ label: "j", p: 0.2 }] }, { id: "e", type: "noul", value: "?", p: null, options: [] }]);
     assert.deepEqual({ command: bad?.["command"], verdict: bad?.["verdict"], error: bad?.["error"], pack: bad?.["pack"], requests: bad?.["requests"], answers: bad?.["answers"], missing: bad?.["answers_missing"] }, { command: "unknown", verdict: null, error: null, pack: null, requests: 0, answers: [], missing: 0 });
   } finally {
     await s.ui.close();
+  }
+});
+
+const queueStop = (id: string) => ({ id, ts: "2026-10-06T06:00:00.000Z", edits: 1, checks: 1, claims_done: 0.9, claims_verified: 0.1, task_excerpt: `task ${id}`, final_excerpt: "f", suggestion: null });
+
+function tabState(page: ReturnType<typeof fakePage>): string {
+  return page.tabs.children.filter((b) => b.attrs["aria-selected"] === "true").map((b) => b.textContent).join();
+}
+
+test("a late reply for an earlier tab never draws over the current tab, and R labels the stop on screen", async () => {
+  const flowReply = held();
+  const page = fakePage("#t=tok", { total: 1, stops: [queueStop("sA")] }, { [FIRST_FLOW]: () => flowReply.promise });
+  await openTab(page, "Labelling queue");
+  assert.match(page.main.textContent, /task sA/);
+  flowReply.release({ ...EMPTY_FLOW });
+  await settle();
+  assert.match(page.main.textContent, /Unlabelled stops/);
+  assert.doesNotMatch(page.main.textContent, /What went to Jev|Nothing in this period/);
+  assert.equal(tabState(page), "Labelling queue");
+  page.key("r");
+  await settle();
+  assert.deepEqual(page.posts, [{ id: "sA", label: "right" }]);
+});
+
+test("a stale failure for an earlier tab does not replace the current tab", async () => {
+  const flowReply = held();
+  const page = fakePage("#t=tok", { total: 1, stops: [queueStop("sA")] }, { [FIRST_FLOW]: () => flowReply.promise });
+  await openTab(page, "Labelling queue");
+  flowReply.reject(new Error("Request failed (500)."));
+  await settle();
+  assert.match(page.main.textContent, /task sA/);
+  assert.doesNotMatch(page.main.textContent, /Request failed/);
+});
+
+test("labelling keys do nothing while the queue is loading, even after an earlier visit showed a stop", async () => {
+  const replies = [Promise.resolve({ total: 1, stops: [queueStop("sA")] })];
+  const second = held();
+  const page = fakePage("#t=tok", null, { "/api/queue": () => replies.shift() ?? second.promise });
+  await openTab(page, "Labelling queue");
+  assert.match(page.main.textContent, /task sA/);
+  await openTab(page, "Flow");
+  await openTab(page, "Labelling queue");
+  assert.match(page.main.textContent, /^Loading/);
+  page.key("r");
+  page.key("w");
+  await settle();
+  assert.deepEqual(page.posts, []);
+  second.release({ total: 1, stops: [queueStop("sB")] });
+  await settle();
+  page.key("w");
+  await settle();
+  assert.deepEqual(page.posts, [{ id: "sB", label: "wrong" }]);
+});
+
+test("a label that lands after a tab switch does not redraw the queue over the new tab", async () => {
+  const post = held();
+  const page = fakePage("#t=tok", { total: 2, stops: [queueStop("sA"), queueStop("sB")] }, { "/api/label": () => post.promise });
+  await openTab(page, "Labelling queue");
+  page.key("r");
+  await settle();
+  await openTab(page, "Export");
+  post.release({ ok: true });
+  await settle();
+  assert.match(page.main.textContent, /Export, this project/);
+  assert.doesNotMatch(page.main.textContent, /Unlabelled stops/);
+  assert.equal(page.status.textContent, "Stop of 2026-10-06T06:00:00.000Z labelled right.");
+  assert.deepEqual(page.posts, [{ id: "sA", label: "right" }]);
+});
+
+test("a label removes the stop it was sent for, even when the card moved on while it was in flight", async () => {
+  const post = held();
+  const page = fakePage("#t=tok", { total: 3, stops: [queueStop("sA"), queueStop("sB"), queueStop("sC")] }, { "/api/label": () => post.promise });
+  await openTab(page, "Labelling queue");
+  page.key("r");
+  page.key("s");
+  await settle();
+  assert.match(page.main.textContent, /task sB/);
+  post.release({ ok: true });
+  await settle();
+  assert.match(page.main.textContent, /Stop 1 of 2 .*task sB/s);
+  assert.equal(page.status.textContent, "Stop of 2026-10-06T06:00:00.000Z labelled right. 2 left in this view.");
+});
+
+test("the flow API reads at most 12 stored answers per call and counts the rest as more", async () => {
+  const keys = (prefix: string, n: number) => Array.from({ length: n }, (_, i) => sha256(`${prefix}-${i}`));
+  const many = keys("many", 50);
+  const s = await flowServer((dataDir, project) => {
+    for (const key of [...many, ...keys("one", 1)]) writeCache(dataDir, key, { ts: Date.parse("2026-09-30T10:00:00Z"), model: "jev-1.13.0", inputTokens: 1, answers: { c1: { type: "noul", noul: 0.9 } } });
+    appendReceipt(dataDir, receipt("rMany", project, "2026-09-30T11:00:00.000Z", { command: "judge", cache_keys: many }));
+    appendReceipt(dataDir, receipt("rOne", project, "2026-09-30T10:00:00.000Z", { cache_keys: keys("one", 1) }));
+    appendReceipt(dataDir, receipt("rNone", project, "2026-09-30T09:00:00.000Z"));
+  });
+  try {
+    const d = await s.get();
+    const pick = (id: string) => {
+      const e = d.events.find((x) => x["id"] === id);
+      return { answers: (e?.["answers"] as unknown[]).length, more: e?.["answers_more"], missing: e?.["answers_missing"] };
+    };
+    assert.deepEqual(pick("rMany"), { answers: 12, more: 38, missing: 0 });
+    assert.deepEqual(pick("rOne"), { answers: 1, more: 0, missing: 0 });
+    assert.deepEqual(pick("rNone"), { answers: 0, more: 0, missing: 0 });
+  } finally {
+    await s.ui.close();
+  }
+});
+
+test("the flow API reads at most 600 stored answers per response, newest calls first", async () => {
+  const s = await flowServer((dataDir, project) => {
+    for (let i = 0; i < 55; i++) {
+      const keys = Array.from({ length: 12 }, (_, k) => sha256(`b-${i}-${k}`));
+      for (const key of keys) writeCache(dataDir, key, { ts: Date.parse("2026-09-30T10:00:00Z"), model: "m", inputTokens: 1, answers: { q: { type: "noul", noul: 0.2 } } });
+      appendReceipt(dataDir, receipt(`r${i}`, project, new Date(Date.parse("2026-09-30T11:00:00Z") - i * 60_000).toISOString(), { cache_keys: keys }));
+    }
+  });
+  try {
+    const d = await s.get();
+    const counts = d.events.map((e) => [(e["answers"] as unknown[]).length, e["answers_more"]]);
+    assert.equal(counts.reduce((n, [a]) => n + Number(a), 0), 600);
+    assert.deepEqual(counts.slice(0, 50).filter(([a, m]) => a !== 12 || m !== 0), []);
+    assert.deepEqual(counts.slice(50), Array.from({ length: 5 }, () => [0, 12]));
+  } finally {
+    await s.ui.close();
+  }
+});
+
+test("the flow tab says how many stored answers it did not read", async () => {
+  const call = (id: string, extra: Record<string, unknown>) => ({ kind: "call", id, ts: "2026-10-06T09:00:00.000Z", command: "judge", pack: null, model: null, verdict: "flagged", error: null, requests: 50, cached: 0, input_tokens: 10, cost_usd: 0, ms: 9, session: null, overruled: false, answers: [], answers_missing: 0, answers_more: 0, ...extra });
+  const one = { model: "jev-1.13.0", answered_at: "2026-10-06T09:00:00.000Z", questions: [{ id: "q", type: "noul", value: "yes", p: 0.9, options: [] }] };
+  const page = fakePage("#t=tok", null, { [FIRST_FLOW]: { ...EMPTY_FLOW, commands: ["judge"], total: 3, shown: 3, events: [call("c1", { answers: Array.from({ length: 12 }, () => one), answers_more: 38 }), call("c2", { answers_more: 1 }), call("c3", {})] } });
+  await settle();
+  const blocks = findAll(page.main, (n) => n.tag === "details");
+  assert.equal(blocks.length, 2);
+  const summaries = blocks.map((b) => b.children.find((c) => c.tag === "summary")?.textContent);
+  assert.deepEqual(summaries, ["Jev's answers: 12 questions, 38 stored answers not read", "Jev's answers: 1 stored answer not read"]);
+  const notes = blocks.map((b) => b.children.at(-1)?.textContent);
+  assert.deepEqual(notes, [
+    "38 more stored answers not read. A stored answer holds Jev's reply to one request; the page reads at most 12 per call and 600 per page.",
+    "1 stored answer not read. A stored answer holds Jev's reply to one request; the page reads at most 12 per call and 600 per page, newest calls first, and the 600 ran out here. Pick this command under Show to leave more for this call.",
+  ]);
+});
+
+test("a cache entry whose model or choice is an object shows placeholders, not a 500 or [object Object]", async () => {
+  const s = await flowServer((dataDir, project) => {
+    mkdirSync(join(dataDir, "cache"), { recursive: true });
+    writeFileSync(join(dataDir, "cache", `${hexKey("3")}.json`), `{"ts":${Date.parse("2026-09-30T10:00:00Z")},"model":{"toString":0},"answers":{"q":{"type":"choice","choice":{"toString":0},"confidence":0.5}}}`);
+    writeFileSync(join(dataDir, "cache", `${hexKey("4")}.json`), `{"ts":${Date.parse("2026-09-30T10:00:00Z")},"model":{},"answers":{"q":{"type":"choice","choice":{},"confidence":0.5}}}`);
+    appendReceipt(dataDir, receipt("rObj", project, "2026-09-30T11:00:00.000Z", { cache_keys: [hexKey("3")] }));
+    appendReceipt(dataDir, receipt("rPlain", project, "2026-09-30T10:30:00.000Z", { cache_keys: [hexKey("4")] }));
+  });
+  try {
+    const d = await s.get();
+    const shown = d.events.map((e) => {
+      const answers = e["answers"] as { model: string; questions: { value: string }[] }[];
+      return { id: e["id"], model: answers[0]?.model, value: answers[0]?.questions[0]?.value };
+    });
+    assert.deepEqual(shown, [{ id: "rObj", model: "?", value: "?" }, { id: "rPlain", model: "?", value: "?" }]);
+  } finally {
+    await s.ui.close();
+  }
+});
+
+test("a backslash in the request target gets 400 before the token check", async () => {
+  const s = await setup();
+  try {
+    for (const path of ["/\\", "/\\evil/api/flow"]) {
+      const r = await raw(s.ui.port, { path, headers: { host: `127.0.0.1:${s.ui.port}` } });
+      assert.deepEqual({ status: r.status, body: r.body }, { status: 400, body: '{"error":"bad_request"}' }, path);
+    }
+  } finally {
+    await s.ui.close();
+  }
+});
+
+test("flow treats a stored answer older than the cache life as gone, and the privacy tab says what happens to old files", async () => {
+  const now = Date.parse("2026-09-30T12:00:00Z");
+  const s = await flowServer((dataDir, project) => {
+    writeCache(dataDir, hexKey("c"), { ts: now - CACHE_TTL_MS - 60_000, model: "m", inputTokens: 1, answers: { old: { type: "noul", noul: 0.9 } } });
+    writeCache(dataDir, hexKey("d"), { ts: now - CACHE_TTL_MS + 60_000, model: "m", inputTokens: 1, answers: { fresh: { type: "noul", noul: 0.9 } } });
+    appendReceipt(dataDir, receipt("rOld", project, "2026-09-30T11:00:00.000Z", { cached: 2, requests: 0, cache_keys: [hexKey("c"), hexKey("d")] }));
+  });
+  try {
+    const d = await s.get();
+    const e = d.events[0];
+    const answers = e?.["answers"] as { questions: { id: string }[] }[];
+    assert.deepEqual({ ids: answers.map((a) => a.questions[0]?.id), missing: e?.["answers_missing"] }, { ids: ["fresh"], missing: 1 });
+    const privacy = JSON.parse((await raw(s.ui.port, { path: "/api/privacy", headers: { host: `127.0.0.1:${s.ui.port}`, "x-referee-token": s.ui.token } })).body) as { stores_text: { name: string; holds: string }[] };
+    const holds = privacy.stores_text.find((x) => x.name === "cache")?.holds ?? "";
+    assert.doesNotMatch(holds, /expires/);
+    assert.match(holds, /not reused after 30 days, kept on disk until an overrule or uninstall/);
+  } finally {
+    await s.ui.close();
+  }
+});
+
+test("the project id is worked out once per server, not on every request", async () => {
+  const outer = tempDir();
+  const cwd = join(outer, "sub");
+  mkdirSync(cwd);
+  const dataDir = tempDir();
+  const home = tempDir();
+  const before = projectId(cwd);
+  appendStop(dataDir, stop("sonce", before));
+  const ui = await startUi({ dataDir, cwd, home, env: { HOME: home }, now: () => 0 });
+  try {
+    const queueIds = async () => (JSON.parse((await raw(ui.port, { path: "/api/queue", headers: { host: `127.0.0.1:${ui.port}`, "x-referee-token": ui.token } })).body) as { stops: { id: string }[] }).stops.map((x) => x.id);
+    assert.deepEqual(await queueIds(), ["sonce"]);
+    execFileSync("git", ["init", "-q", outer], { stdio: "ignore" });
+    assert.notEqual(projectId(cwd), before);
+    assert.deepEqual(await queueIds(), ["sonce"]);
+  } finally {
+    await ui.close();
+  }
+});
+
+test("ui --describe names every dashboard tab and the opened field", async () => {
+  const tabs = JSON.parse(/var TABS = (\[.*?\]);/.exec(APP_JS)?.[1] ?? "[]") as [string, string][];
+  assert.ok(tabs.length >= 5);
+  for (const [, name] of tabs) assert.ok(uiCommand.describe.summary.toLowerCase().includes(name.toLowerCase()), name);
+  const io = memoryIo();
+  assert.equal(await run(["ui", "--describe"], io, commands), 0);
+  const outputs = io.json()["outputs"] as Record<string, string>;
+  assert.match(outputs["opened"] ?? "", /^true when the browser opener .* started; false with --no-open/);
+  assert.match(outputs["url"] ?? "", /receipts, stops and Jev's stored answers, and label stops/);
+});
+
+async function listening(platform: NodeJS.Platform, bin: string) {
+  const saved = { PATH: process.env["PATH"], TMPDIR: process.env["TMPDIR"] };
+  const tmp = tempDir();
+  process.env["PATH"] = bin;
+  process.env["TMPDIR"] = tmp;
+  try {
+    const io = memoryIo({ env: { REFEREE_DATA_DIR: tempDir() }, platform });
+    const running = run(["ui"], io, commands);
+    for (let i = 0; i < 300 && io.out.length === 0; i++) await new Promise((r) => setTimeout(r, 10));
+    const line = JSON.parse(io.out[0] ?? "{}") as { opened?: boolean };
+    const launchers = readdirSync(tmp).filter((n) => n.startsWith("referee-ui-")).length;
+    process.emit("SIGTERM");
+    assert.equal(await running, 0);
+    return { opened: line.opened, launchers, after: readdirSync(tmp).filter((n) => n.startsWith("referee-ui-")).length };
+  } finally {
+    process.env["PATH"] = saved.PATH;
+    if (saved.TMPDIR === undefined) delete process.env["TMPDIR"];
+    else process.env["TMPDIR"] = saved.TMPDIR;
+  }
+}
+
+test("ui prints opened: false and removes the launcher at once when the opener is missing", async () => {
+  assert.deepEqual(await listening("linux", tempDir()), { opened: false, launchers: 0, after: 0 });
+});
+
+test("ui prints opened: true when the opener starts, and removes the launcher on shutdown", async () => {
+  const bin = tempDir();
+  writeFileSync(join(bin, "xdg-open"), "#!/bin/sh\nexit 0\n", { mode: 0o755 });
+  assert.deepEqual(await listening("linux", bin), { opened: true, launchers: 1, after: 0 });
+});
+
+test("a request path that URL parsing would change gets 400 with or without the token; query values are left alone", async () => {
+  const s = await setup();
+  try {
+    const host = `127.0.0.1:${s.ui.port}`;
+    for (const path of ["/x/../api/flow", "/x/%2e%2e/api/flow", "/%2e/api/flow", "/./api/flow", "/api/x/%2E%2E/flow", "/api/x/.%2e/flow", "/%2e%2e/app.js", "/x/../app.js", "/x/..", "/x/%2e%2e/api/export?kind=receipts"]) {
+      for (const headers of [{ host, "x-referee-token": s.ui.token }, { host }]) {
+        const r = await raw(s.ui.port, { path, headers });
+        assert.deepEqual({ status: r.status, body: r.body }, { status: 400, body: '{"error":"bad_request"}' }, path);
+      }
+    }
+    const q = await s.get("/api/flow?command=x/..");
+    assert.deepEqual({ status: q.status, command: (JSON.parse(q.body) as { command: string }).command }, { status: 200, command: "all" });
+  } finally {
+    await s.ui.close();
+  }
+});
+
+test("answer table cells and the answers line wrap, so a 375 px page does not scroll sideways", () => {
+  assert.match(APP_CSS, /\.flow details td\{overflow-wrap:anywhere\}/);
+  assert.match(APP_CSS, /\.flow summary\{[^}]*width:max-content;max-width:100%\}/);
+});
+
+test("R or W pressed while a label is saving says so, and the confirmation names the stop it was for", async () => {
+  const post = held();
+  const page = fakePage("#t=tok", { total: 3, stops: [queueStop("sA"), { ...queueStop("sB"), ts: "2026-10-06T07:00:00.000Z" }, queueStop("sC")] }, { "/api/label": () => post.promise });
+  await openTab(page, "Labelling queue");
+  page.key("r");
+  page.key("s");
+  page.key("w");
+  await settle();
+  assert.deepEqual(page.posts, [{ id: "sA", label: "right" }]);
+  assert.match(page.main.textContent, /task sB/);
+  assert.equal(page.status.textContent, "Still saving the previous label; press W again when it is saved.");
+  post.release({ ok: true });
+  await settle();
+  assert.match(page.main.textContent, /Stop 1 of 2 - 2026-10-06T07:00:00\.000Z .*task sB/s);
+  assert.equal(page.status.textContent, "Stop of 2026-10-06T06:00:00.000Z labelled right. 2 left in this view.");
+  page.key("w");
+  await settle();
+  assert.deepEqual(page.posts, [{ id: "sA", label: "right" }, { id: "sB", label: "wrong" }]);
+});
+
+test("once the first flow and queue requests are served, no API request spawns git", async () => {
+  const bin = tempDir();
+  const log = join(bin, "calls.log");
+  writeFileSync(join(bin, "git"), `#!/bin/sh\necho "$*" >> "${log}"\nexit 128\n`, { mode: 0o755 });
+  const saved = process.env["PATH"];
+  process.env["PATH"] = bin;
+  const spawned = () => (existsSync(log) ? readFileSync(log, "utf8").split("\n").filter(Boolean).length : 0);
+  let s: Awaited<ReturnType<typeof setup>> | undefined;
+  try {
+    s = await setup();
+    for (const path of ["/api/flow", "/api/queue"]) assert.equal((await s.get(path)).status, 200, path);
+    const warm = spawned();
+    assert.ok(warm > 0, "the git spy saw no call");
+    for (const path of ["/api/flow", "/api/flow?days=30", "/api/queue", "/api/queue", "/api/overview", "/api/privacy", "/api/export?kind=receipts"]) assert.equal((await s.get(path)).status, 200, path);
+    assert.equal(spawned(), warm);
+  } finally {
+    if (saved === undefined) delete process.env["PATH"];
+    else process.env["PATH"] = saved;
+    await s?.ui.close();
   }
 });

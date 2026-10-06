@@ -1,11 +1,12 @@
 // Data side of the local dashboard: reads the JSON lines in the data directory and shapes them for the page.
 // Labels go through labelStop (labels.jsonl); nothing here touches the network or rewrites a store. Stored fields are untrusted: flow turns a malformed one into a placeholder.
+// Flow reads at most FLOW_KEYS cache entries per call and FLOW_READS per response; the project id and the transcript dirs (each a git spawn) are computed once per context.
 
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { readCache } from "../engine/cache.ts";
 import type { Answer } from "../engine/client.ts";
-import type { Env } from "../engine/config.ts";
+import { CACHE_TTL_MS, type Env } from "../engine/config.ts";
 import { dirSize, projectId, tildify } from "../engine/datadir.ts";
 import { readOverruled, readReceipts, type Receipt } from "../engine/receipts.ts";
 import { loadPack, packDirs, threshold } from "../engine/pack.ts";
@@ -38,9 +39,22 @@ function visible(text: string): string {
   return text.replace(BIDI_CONTROL, (c) => `[U+${c.charCodeAt(0).toString(16).toUpperCase().padStart(4, "0")}]`);
 }
 
+const projects = new WeakMap<UiContext, string>();
+const transcriptDirs = new WeakMap<UiContext, string[]>();
+
+function once<T>(map: WeakMap<UiContext, T>, ctx: UiContext, make: () => T): T {
+  let value = map.get(ctx);
+  if (value === undefined) map.set(ctx, (value = make()));
+  return value;
+}
+
+function project(ctx: UiContext): string {
+  return once(projects, ctx, () => projectId(ctx.cwd));
+}
+
 function projectStops(ctx: UiContext): StopRecord[] {
-  const project = projectId(ctx.cwd);
-  return readStops(ctx.dataDir).filter((r) => r.project === project);
+  const id = project(ctx);
+  return readStops(ctx.dataDir).filter((r) => r.project === id);
 }
 
 function interval(x: number, n: number): [number, number] | null {
@@ -54,7 +68,7 @@ export function queue(ctx: UiContext) {
     .filter((r) => r.decision?.would_block === true && r.label === undefined)
     .sort((a, b) => (a.ts < b.ts ? 1 : a.ts > b.ts ? -1 : 0));
   const picked = unlabelled.slice(0, QUEUE_LIMIT);
-  const hints = suggestForStops(projectTranscriptDirs(ctx.env, ctx.home, ctx.cwd), picked);
+  const hints = suggestForStops(once(transcriptDirs, ctx, () => projectTranscriptDirs(ctx.env, ctx.home, ctx.cwd)), picked);
   return {
     total: unlabelled.length,
     stops: picked.map((r) => ({
@@ -85,8 +99,7 @@ function sum(receipts: readonly Receipt[], key: "requests" | "cached" | "input_t
 
 export function overview(ctx: UiContext) {
   const since = new Date(ctx.now() - WINDOW_DAYS * DAY_MS).toISOString();
-  const project = projectId(ctx.cwd);
-  const receipts = readReceipts(ctx.dataDir, project).filter((r) => r.ts >= since);
+  const receipts = readReceipts(ctx.dataDir, project(ctx)).filter((r) => r.ts >= since);
   const byCommand: Record<string, number> = {};
   for (const r of receipts) byCommand[r.command] = (byCommand[r.command] ?? 0) + 1;
   const stops = projectStops(ctx).filter((r) => r.ts >= since);
@@ -116,6 +129,8 @@ export function overview(ctx: UiContext) {
 export const FLOW_DAYS = [1, 7, 30] as const;
 const FLOW_LIMIT = 200;
 const FLOW_ANSWERS = 40;
+const FLOW_KEYS = 12;
+const FLOW_READS = 600;
 const FLOW_OPTIONS = 6;
 const CACHE_KEY = /^[0-9a-f]{64}$/;
 
@@ -140,16 +155,19 @@ function answerView(id: string, a: Answer) {
       .flatMap(([label, p]) => (num(p) === null ? [] : [{ label: visible(label), p: p as number }]))
       .sort((x, y) => y.p - x.p)
       .slice(0, FLOW_OPTIONS);
-    return { ...base, value: visible(String(a.choice)), p: num(a.confidence), options };
+    return { ...base, value: text(a.choice) ?? "?", p: num(a.confidence), options };
   }
   return null;
 }
 
-function jevAnswers(ctx: UiContext, keys: unknown) {
+function jevAnswers(ctx: UiContext, keys: unknown, budget: { reads: number }) {
   const found: { model: string; answered_at: string; questions: NonNullable<ReturnType<typeof answerView>>[] }[] = [];
+  const list: unknown[] = Array.isArray(keys) ? keys : [];
+  const read = list.slice(0, Math.min(FLOW_KEYS, budget.reads));
+  budget.reads -= read.length;
   let missing = 0;
-  for (const key of Array.isArray(keys) ? keys : []) {
-    const entry = typeof key === "string" && CACHE_KEY.test(key) ? readCache(ctx.dataDir, key, ctx.now(), Number.POSITIVE_INFINITY) : null;
+  for (const key of read) {
+    const entry = typeof key === "string" && CACHE_KEY.test(key) ? readCache(ctx.dataDir, key, ctx.now(), CACHE_TTL_MS) : null;
     const at = entry && num(entry.ts) !== null ? new Date(entry.ts) : null;
     if (!entry || !at || Number.isNaN(at.getTime()) || typeof entry.answers !== "object" || entry.answers === null) {
       missing++;
@@ -158,9 +176,9 @@ function jevAnswers(ctx: UiContext, keys: unknown) {
     const questions = Object.entries(entry.answers)
       .slice(0, FLOW_ANSWERS)
       .flatMap(([id, a]) => (a && typeof a === "object" ? (answerView(id, a) ?? []) : []));
-    found.push({ model: visible(String(entry.model)), answered_at: at.toISOString(), questions });
+    found.push({ model: text(entry.model) ?? "?", answered_at: at.toISOString(), questions });
   }
-  return { answers: found, answers_missing: missing };
+  return { answers: found, answers_missing: missing, answers_more: list.length - read.length };
 }
 
 function shortSession(id: unknown): string | null {
@@ -170,7 +188,7 @@ function shortSession(id: unknown): string | null {
 export function flow(ctx: UiContext, query: { days?: unknown; command?: unknown } = {}) {
   const days = (FLOW_DAYS as readonly number[]).includes(Number(query.days)) ? Number(query.days) : 7;
   const since = new Date(ctx.now() - days * DAY_MS).toISOString();
-  const receipts = readReceipts(ctx.dataDir, projectId(ctx.cwd)).filter((r) => r.ts >= since);
+  const receipts = readReceipts(ctx.dataDir, project(ctx)).filter((r) => r.ts >= since);
   const stops = projectStops(ctx).filter((r) => r.ts >= since);
   const commands = [...new Set(receipts.flatMap((r) => (typeof r.command === "string" ? [r.command] : [])))].sort();
   if (stops.length) commands.push("stop");
@@ -178,6 +196,7 @@ export function flow(ctx: UiContext, query: { days?: unknown; command?: unknown 
   const voided = readOverruled(ctx.dataDir);
   const calls = command === "stop" ? [] : receipts.filter((r) => command === "all" || r.command === command);
   const stopRows = command === "all" || command === "stop" ? stops : [];
+  const budget = { reads: FLOW_READS };
   const rows = [...calls.map((r) => ({ ts: r.ts, r })), ...stopRows.map((s) => ({ ts: s.ts, s }))].sort((a, b) => (a.ts < b.ts ? 1 : a.ts > b.ts ? -1 : 0));
   const events = rows.slice(0, FLOW_LIMIT).map((row) => {
     if ("r" in row) {
@@ -198,7 +217,7 @@ export function flow(ctx: UiContext, query: { days?: unknown; command?: unknown 
         ms: num(r.ms),
         session: shortSession(r.session_id),
         overruled: voided.has(r.id),
-        ...jevAnswers(ctx, r.cache_keys),
+        ...jevAnswers(ctx, r.cache_keys, budget),
       };
     }
     const s = row.s;
@@ -242,7 +261,7 @@ function fileInfo(dataDir: string, name: string): { name: string; bytes: number 
 }
 
 export function privacy(ctx: UiContext) {
-  const project = projectId(ctx.cwd);
+  const id = project(ctx);
   const stops = readStops(ctx.dataDir);
   const stored = ["receipts", "cache", "results", "stops.jsonl", "labels.jsonl", "overruled.jsonl"].flatMap((n) => fileInfo(ctx.dataDir, n) ?? []);
   return {
@@ -250,16 +269,16 @@ export function privacy(ctx: UiContext) {
     total_bytes: dirSize(ctx.dataDir),
     stored,
     counts: {
-      receipts_this_project: readReceipts(ctx.dataDir, project).length,
+      receipts_this_project: readReceipts(ctx.dataDir, id).length,
       receipts_all_projects: readReceipts(ctx.dataDir).length,
-      stops_this_project: stops.filter((r) => r.project === project).length,
+      stops_this_project: stops.filter((r) => r.project === id).length,
       stops_all_projects: stops.length,
-      labelled_this_project: stops.filter((r) => r.project === project && r.label !== undefined).length,
+      labelled_this_project: stops.filter((r) => r.project === id && r.label !== undefined).length,
     },
     stores_text: [
       { name: "stops.jsonl", holds: "Prompt and final-message excerpts of done-gate stops, scores, your labels" },
       { name: "receipts", holds: "Counts, tokens, cost, latency and hashes per run; no request text" },
-      { name: "cache", holds: "Jev's answers keyed by hashes; expires after 30 days" },
+      { name: "cache", holds: "Jev's answers keyed by hashes; not reused after 30 days, kept on disk until an overrule or uninstall" },
     ],
     would_be_sent: SENT,
   };
@@ -267,10 +286,9 @@ export function privacy(ctx: UiContext) {
 
 export function exportKind(ctx: UiContext, kind: unknown): { filename: string; body: string } | null {
   if (typeof kind !== "string" || !(EXPORT_KINDS as readonly string[]).includes(kind)) return null;
-  const project = projectId(ctx.cwd);
   const rows: unknown[] =
     kind === "receipts"
-      ? readReceipts(ctx.dataDir, project)
+      ? readReceipts(ctx.dataDir, project(ctx))
       : kind === "stops"
         ? projectStops(ctx)
         : projectStops(ctx).flatMap((r) => (r.label !== undefined ? [{ id: r.id, label: r.label, labelled_at: r.labelled_at }] : []));

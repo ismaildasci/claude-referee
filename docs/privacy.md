@@ -60,7 +60,7 @@ Redaction is pattern-based. It can miss a secret in an unusual format, and it ca
 
 claude-referee's data directory holds:
 - **Receipts:** one line per command run: the command, pack, model, verdict, request IDs, request and cache-hit counts, input tokens, estimated cost, latency, redaction counts and a hash of the questions. Hook receipts add the Claude Code session ID. Planned: done-gate receipts will also note assertions removed from test files and new skip markers, as counts and file paths only. Receipts hold no request text.
-- **The answer cache:** Jev's answers, keyed by the pack version, the model and hashes of the question and the redacted input. Entries expire after 30 days by default. `--fresh` skips the cache.
+- **The answer cache:** Jev's answers, keyed by the pack version, the model and hashes of the question and the redacted input, one file per request in `cache/`. An entry older than 30 days is no longer used: the same question goes to Jev again, and the new answer overwrites the file. Old files are not deleted on a schedule; one stays on disk until `receipts overrule` voids a run that used it, you delete the `cache/` directory yourself, or uninstalling removes the data directory. `--fresh` skips reading the cache; the new answer is still written.
 - **Done-gate stops and labels:** `stops.jsonl` and `labels.jsonl` (excerpts, scores, your labels). `receipts --stops` also reads your own Claude Code transcript on your machine to hint at a label from your next prompt; it keeps and prints only a fixed reason (`reported_broken` or `repeated_request`), never the prompt text, and sends nothing anywhere.
 - **Results files:** the details of verdicts longer than 1,500 characters, such as per-item scores from `judge`.
 
@@ -70,7 +70,7 @@ claude-referee never writes your API key anywhere: not to `CLAUDE_ENV_FILE`, rec
 
 ## The dashboard
 
-`npx claude-referee ui` serves a page from your own machine on 127.0.0.1 behind a random token. It makes no network call out, loads nothing from other hosts and sends no telemetry. Its first tab, Flow, lists this project's calls and done-gate stops, newest first: the command, how many requests went to Jev or which answers came from the cache, the verdict, and on demand Jev's stored answer to each question. It reads the receipts, the answer cache and `stops.jsonl` and stores nothing new; the text that was sent to Jev is not shown, because it is never stored. It shows stop excerpts, so keep the URL it prints to yourself; the threats and defences are in [docs/decisions/ui-security.md](decisions/ui-security.md).
+`npx claude-referee ui` serves a page from your own machine on 127.0.0.1 behind a random token. It makes no network call out, loads nothing from other hosts and sends no telemetry. Its first tab, Flow, lists this project's calls and done-gate stops, newest first: the command, how many requests went to Jev or which answers came from the cache, the verdict, and on demand Jev's stored answer to each question (at most 12 stored answers per call and 600 per page; an answer older than 30 days counts as gone, as it does for the cache). It reads the receipts, the answer cache and `stops.jsonl` and stores nothing new; the text that was sent to Jev is not shown, because it is never stored. It shows stop excerpts, so keep the URL it prints to yourself; the threats and defences are in [docs/decisions/ui-security.md](decisions/ui-security.md).
 
 ## Retention
 

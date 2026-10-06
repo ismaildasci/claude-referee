@@ -1,5 +1,7 @@
 // Loopback-only HTTP server of the local dashboard. Design and threats: docs/decisions/ui-security.md.
 // Every request passes the Host check, API requests also Origin, Fetch-Metadata and a 128-bit token header; no CORS, no logging.
+// A path with "//" or any backslash is refused before URL parsing, which would read "\" as "/"; a path that parsing
+// changes (dot segments such as ".." or "%2e", characters it percent-encodes) is refused after it: only exact routes are served.
 
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
@@ -80,9 +82,10 @@ export async function startUi(ctx: UiContext, requestedPort = 0): Promise<UiServ
   const handle = async (req: IncomingMessage, res: ServerResponse): Promise<void> => {
     if (req.headers.host !== allowedHost) return json(res, 403, { error: "bad_host" });
     if (req.method !== "GET" && req.method !== "POST") return json(res, 405, { error: "method_not_allowed" });
-    if (!req.url || !req.url.startsWith("/") || req.url.startsWith("//")) return json(res, 400, { error: "bad_request" });
+    if (!req.url || !req.url.startsWith("/") || req.url.startsWith("//") || req.url.includes("\\")) return json(res, 400, { error: "bad_request" });
     const url = new URL(req.url, allowedOrigin);
     const route = url.pathname;
+    if (route !== req.url.split(/[?#]/, 1)[0]) return json(res, 400, { error: "bad_request" });
 
     if (req.method === "GET" && route === "/") return send(res, 200, "text/html; charset=utf-8", INDEX_HTML);
     if (req.method === "GET" && route === "/app.js") return send(res, 200, "text/javascript; charset=utf-8", APP_JS);
