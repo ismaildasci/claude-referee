@@ -247,6 +247,14 @@ How it works: output from a recognised runner is parsed in code into counts, an 
 - So the 0.9 band costs coverage, not accuracy: everything the bands let through was right, and the misses sit in `review`. On routine lines the question rarely reaches `no` (imports, logging and comments often land between 0.13 and 0.38).
 - Limits: the cases are invented and one session wrote them, so real diffs (long hunks, minified code) and real CI logs are untested; with 31 cases per label, no wrong `yes` bounds the rate only to about 10% (rule of three); one model version; the near-misses were textbook ones and may not be hard enough to find the error rate. The stress cases were not blind to the dev results.
 
+### judge with the i18n pack on invented strings
+
+Registered in [i18n-pack-eval.md](decisions/i18n-pack-eval.md) before any request, amended before the hold-out (8fe449d). `eval record --suite judge-i18n`, `string.translatable`, `jev-1.13.0`, 2026-10-06: 135 invented candidate strings in the format `extract` emits (React, Vue, HTML, JS and TypeScript; 40 dev, 95 hold-out), dev recorded first, the hold-out once. A blind second model session, given only each string and its context in random order, agreed with every label. Cases: [cases.jsonl](../jev-evals/judge-i18n/cases.jsonl). Answers: [recorded.jsonl](../jev-evals/judge-i18n/recorded.jsonl). Second labels: [labels-second.jsonl](../jev-evals/judge-i18n/labels-second.jsonl).
+
+- **The registered check passed on the hold-out:** 0 wrong `yes` among 46 `no` items and 0 wrong `no` among 49 `yes` items. Verdicts 27 `yes`, 42 `review`, 26 `no`: recall 27 of 49, a definite verdict on 53 of 95. Dev: 0 wrong either way; 12 `yes`, 15 `review`, 13 `no` of 40.
+- As with the other judge questions, the 0.9 band costs coverage, not accuracy: no answer came near the wrong band (lowest on a `yes` item 0.31, highest on a `no` item 0.51). React `no` items (6) and the one Vue `no` item all landed in `review`.
+- Limits: invented items, written and labelled by one model family; no measurement on real repositories (planned in the registration, not started); one model version; 46 and 49 items bound each error rate to about 6% (rule of three).
+
 ### Hook start latency
 
 `node scripts/hook-latency.mjs`, 2026-10-01, macOS arm64, Node 25.5, 40 runs each after one warm-up, empty event on stdin, no key and no network. p95: a bare `node -e ""` 66.3 ms; `hook.mjs session-start` 93.7 ms (+27.5 ms); `hook.mjs stop` 90.8 ms (+24.5 ms). The budget (registered in the roadmap) is at most 40 ms over a bare node at p95; CI runs the same script on Linux with Node 20.3. Limits: one machine, a hook that exits early (the Stop hook with no project file, the briefing without a project), not a hook that asks Jev; the latency of a Jev call is in [Latency](#latency).

@@ -53,4 +53,10 @@ Pick several public repositories that use React, Vue and plain HTML and that alr
 
 ## Status
 
-Not recorded yet. The build session could not run `eval record`: the sandbox refused every command containing the word eval, from the worktree and from the main checkout, and the refusal was not worked around. Record dev first, then the hold-out once, as described above, then fill the results in here and in docs/measurements.md. Until then no accuracy number exists for this pack.
+Recorded on 2026-10-06, `jev-1.13.0`, one request per case. (The build session could not run `eval record`: its sandbox refused every command containing the word eval.) Dev first (receipt `rmuwd71k1p62l`), then the amendment above was committed (8fe449d), then the hold-out once with `eval record --suite judge-i18n --split holdout` (95 requests, receipt `rmuwdlnekxqiv`, no `--fresh`). Nothing was reworded or relabelled.
+
+**Hold-out: the bar passed.** 0 wrong `yes` among 46 `no` items and 0 wrong `no` among 49 `yes` items; verdicts 27 `yes`, 42 `review`, 26 `no`; recall 27 of 49, `no` found 26 of 46, a definite verdict on 53 of 95. The agreed-only subset is the whole hold-out (see the second-label result above), so its numbers are the same. Dev: 0 and 0; 12 `yes`, 15 `review`, 13 `no` of 40.
+
+Reported, not part of the bar (hold-out): React 12 of 19 `yes` items found, 0 of 6 `no` items found; Vue 5 of 8 and 0 of 1; HTML 4 of 9 and 1 of 4; plain JS 1 of 5 and 3 of 3; TypeScript 5 of 8 and 22 of 32. Near-misses: 7 of 9 `yes` and 16 of 25 `no` found; the rest: 20 of 40 and 10 of 21. No answer came near the wrong band: the lowest on a `yes` item was 0.31 (the `no` band ends at 0.10) and the highest on a `no` item 0.51 (the `yes` band starts at 0.90); `review` answers ranged from 0.12 to 0.89. Counts come from a script over `recorded.jsonl` that reproduces the `eval score` totals.
+
+What it means: on these invented items the 0.9 bands made no wrong call, and with 46 and 49 items that bounds each error rate to about 6% (rule of three); the cost is coverage, since 42 of 95 items land in `review`. It says nothing about real repositories, both labellers are one model family and one of them wrote the cases, and only one model version was asked. The public-repo hold-out above is still not started.

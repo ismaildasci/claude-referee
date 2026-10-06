@@ -23,6 +23,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Measured
 
+- `judge` with the `i18n` pack, on the pre-registered synthetic suite `judge-i18n` (`docs/decisions/i18n-pack-eval.md`, `docs/measurements.md`): dev recorded first, the wording frozen and a blind second label set committed (8fe449d), then the hold-out once. Hold-out: 0 wrong `yes` among 46 `no` items, 0 wrong `no` among 49 `yes` items, so the registered bar passed; 27 `yes`, 42 `review`, 26 `no` (a definite answer on 53 of 95). A second model session, given only the strings and contexts in random order, agreed with all 135 labels; two earlier tries of that labeller were thrown away because the case category and the id order gave the label away. Invented items and one model family only; nothing is measured on real repositories.
 - Second look at the second real-log sample (`docs/measurements-real-logs-3.md`): on the frozen hold-out half, wrong `met` went from 0 of 52 to 1 of 52, `met` recall among parsed from 23 of 29 to 26 of 35 (0.743), parsed coverage from 41.7% to 49.6%. Its aggregate bars were already seen, so this is not an unseen test; `done` v2 stays not measured on its original bar.
 
 ## [0.2.2] - 2026-10-06
