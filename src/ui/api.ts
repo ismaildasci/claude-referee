@@ -1,6 +1,6 @@
 // Data side of the local dashboard: reads the JSON lines in the data directory and shapes them for the page.
 // Labels go through labelStop (labels.jsonl); nothing here touches the network or rewrites a store. Stored fields are untrusted: flow turns a malformed one into a placeholder.
-// Flow reads at most FLOW_KEYS cache entries per call and FLOW_READS per response; the project id and the transcript dirs (each a git spawn) are computed once per context.
+// Flow reads at most FLOW_KEYS cache entries per call and FLOW_READS per response; the project id and the transcript dirs (each a git spawn) are computed once per context, the transcript locator once per queue call.
 // verify receipts (the old name) are shown and counted as claims; a receipt's outcome is shown as text built only from numbers and fixed codes.
 
 import { existsSync, statSync } from "node:fs";
@@ -15,8 +15,8 @@ import { loadProject } from "../engine/project.ts";
 import { clopperPearson, suggestThreshold } from "../engine/stopgate/interval.ts";
 import { labelStop, readStops, stopStats } from "../engine/stopgate/stops.ts";
 import type { StopRecord } from "../engine/stopgate/types.ts";
-import { suggestForStops } from "../engine/stopgate/weak.ts";
-import { projectTranscriptDirs } from "../engine/usage.ts";
+import { suggestForStops, transcriptLocator } from "../engine/stopgate/weak.ts";
+import { claudeProjectsDir, projectTranscriptDirs } from "../engine/usage.ts";
 
 export interface UiContext {
   readonly dataDir: string;
@@ -69,7 +69,8 @@ export function queue(ctx: UiContext) {
     .filter((r) => r.decision?.would_block === true && r.label === undefined)
     .sort((a, b) => (a.ts < b.ts ? 1 : a.ts > b.ts ? -1 : 0));
   const picked = unlabelled.slice(0, QUEUE_LIMIT);
-  const hints = suggestForStops(once(transcriptDirs, ctx, () => projectTranscriptDirs(ctx.env, ctx.home, ctx.cwd)), picked);
+  const dirs = once(transcriptDirs, ctx, () => projectTranscriptDirs(ctx.env, ctx.home, ctx.cwd));
+  const hints = suggestForStops(transcriptLocator(dirs, claudeProjectsDir(ctx.env, ctx.home)), picked);
   return {
     total: unlabelled.length,
     stops: picked.map((r) => ({

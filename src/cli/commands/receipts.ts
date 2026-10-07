@@ -1,71 +1,177 @@
 // receipts: totals of the local receipts for this project (or all with --all), per day and command with --tokens,
 // Claude-side CLI calls from session transcripts with --usage, "receipts export --out <file>" to copy every receipt,
-// and --stops / --label to list and mark the Stop done-gate's shadow stops.
+// --stops / --label to list and mark the Stop done-gate's shadow stops, and --session to join one Claude Code session across projects.
 
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { projectId, resolveDataDir, tildify } from "../../engine/datadir.ts";
 import { RefereeError } from "../../engine/errors.ts";
-import { canonicalCommand, overruleReceipt, readReceipts, verifyChain, type Receipt } from "../../engine/receipts.ts";
+import { REASON_CODE, SESSION_ID, canonicalCommand, overruleReceipt, readReceipts, verifyChain, type Receipt } from "../../engine/receipts.ts";
 import { loadPack, packDirs, threshold } from "../../engine/pack.ts";
 import { loadProject } from "../../engine/project.ts";
 import { suggestThreshold } from "../../engine/stopgate/interval.ts";
 import { labelStop, readStops, stopStats } from "../../engine/stopgate/stops.ts";
-import { suggestForStops } from "../../engine/stopgate/weak.ts";
-import { projectTranscriptDirs, scanUsage } from "../../engine/usage.ts";
-import type { Command } from "../types.ts";
+import type { StopRecord } from "../../engine/stopgate/types.ts";
+import { suggestForStops, transcriptLocator, type TranscriptLocator } from "../../engine/stopgate/weak.ts";
+import { claudeProjectsDir, projectTranscriptDirs, scanUsage } from "../../engine/usage.ts";
+import type { Command, Context } from "../types.ts";
 import { str } from "../shared.ts";
+
+const STOPS_SHOWN = 20;
 
 function sum(receipts: readonly Receipt[], key: "requests" | "cached" | "input_tokens" | "cost_usd"): number {
   return receipts.reduce((total, r) => total + (r[key] ?? 0), 0);
 }
 
+function newestFirst<T extends { readonly ts: string }>(rows: readonly T[]): T[] {
+  return [...rows].sort((a, b) => (a.ts < b.ts ? 1 : a.ts > b.ts ? -1 : 0));
+}
+
+function stopRows(picked: readonly StopRecord[], locator: TranscriptLocator, withProject = false) {
+  const weak = suggestForStops(locator, picked.filter((r) => r.decision?.would_block === true && !r.label));
+  return picked.map((r) => ({
+    id: r.id,
+    ts: r.ts,
+    ...(withProject ? { project: r.project } : {}),
+    skipped: r.skipped,
+    error: r.error,
+    configured: r.configured,
+    edits: r.edits,
+    checks: r.checks,
+    turn: r.turn,
+    bg_pending: r.bg_pending,
+    would_ask: r.would_ask,
+    would_block: r.decision?.would_block,
+    claims_done: r.decision?.claims_done,
+    claims_verified: r.decision?.claims_verified,
+    task_excerpt: r.task_excerpt?.slice(0, 300),
+    final_excerpt: r.final_excerpt?.slice(0, 300),
+    label: r.label,
+    ...(r.label === undefined && weak.has(r.id) ? { suggestion: weak.get(r.id) } : {}),
+  }));
+}
+
+function tally<T>(): Record<string, T> {
+  return Object.create(null) as Record<string, T>;
+}
+
+function lineCount(path: string): number | null {
+  try {
+    const bytes = readFileSync(path);
+    let lines = 0;
+    for (const byte of bytes) if (byte === 10) lines++;
+    return bytes.length > 0 && bytes[bytes.length - 1] !== 10 ? lines + 1 : lines;
+  } catch {
+    return null;
+  }
+}
+
+function sessionJoin(context: Context, dataDir: string, since: string | null) {
+  const { io } = context;
+  const raw = str(context, "session") ?? "";
+  const id = raw === "current" ? io.env["CLAUDE_CODE_SESSION_ID"] : raw;
+  if (raw === "current" && !id) {
+    throw new RefereeError("bad_input", "--session current reads CLAUDE_CODE_SESSION_ID, which is not set here; Claude Code sets it only for the commands it runs.", {
+      next_step: "Run receipts --session current from Claude Code's Bash tool, or pass the id: receipts --session <id>.",
+    });
+  }
+  if (id === undefined || !SESSION_ID.test(id)) {
+    throw new RefereeError("bad_input", "--session takes current or a session id of 1 to 64 letters, digits, '.', '_' or '-'.", { next_step: "Run receipts --session current from Claude Code's Bash tool." });
+  }
+  for (const flag of ["stops", "unlabelled", "tokens", "usage", "all"]) {
+    if (context.values[flag] === true) throw new RefereeError("bad_input", `--session cannot be combined with --${flag}.`, { next_step: "Run receipts --session <id> on its own." });
+  }
+  const inWindow = (ts: unknown) => typeof ts === "string" && (since === null || ts >= since);
+  const receipts = readReceipts(dataDir).filter((r) => r.session_id === id && inWindow(r.ts));
+  const stops = readStops(dataDir).filter((r) => r.session_id === id && inWindow(r.ts));
+  const byCommand = tally<number>();
+  const byVerdict = tally<Record<string, number>>();
+  const byProject = tally<{ receipts: number; stops: number }>();
+  const project = (p: unknown) => (byProject[typeof p === "string" ? p : "unknown"] ??= { receipts: 0, stops: 0 });
+  for (const r of receipts) {
+    const command = typeof r.command === "string" ? canonicalCommand(r.command) : "unknown";
+    byCommand[command] = (byCommand[command] ?? 0) + 1;
+    const outcome = [r.verdict, r.error].find((v): v is string => typeof v === "string" && REASON_CODE.test(v)) ?? "other";
+    const verdicts = (byVerdict[command] ??= tally<number>());
+    verdicts[outcome] = (verdicts[outcome] ?? 0) + 1;
+    project(r.project).receipts += 1;
+  }
+  for (const s of stops) project(s.project).stops += 1;
+  const locator = transcriptLocator(projectTranscriptDirs(io.env, io.home, io.cwd), claudeProjectsDir(io.env, io.home));
+  const transcript = locator.find(id);
+  return {
+    ok: true,
+    verdict: "session",
+    session_id: id,
+    ...(since === null ? {} : { days: Number(str(context, "days")) }),
+    runs: receipts.length,
+    requests: sum(receipts, "requests"),
+    cached: sum(receipts, "cached"),
+    input_tokens: sum(receipts, "input_tokens"),
+    cost_usd: sum(receipts, "cost_usd"),
+    by_command: byCommand,
+    by_verdict: byVerdict,
+    by_project: byProject,
+    transcript_found: transcript !== null,
+    transcript_lines: transcript === null ? null : lineCount(transcript),
+    stats: stopStats(stops),
+    stops: stopRows(newestFirst(stops).slice(0, STOPS_SHOWN), locator, true),
+    receipt: `session-${io.now().toString(36)}`,
+  };
+}
+
 export const receipts: Command = {
   name: "receipts",
   describe: {
-    summary: "Show totals from the local receipts, per day with --tokens, Claude-side calls with --usage, or export them.",
+    summary: "Show totals from the local receipts, per day with --tokens, Claude-side calls with --usage, one Claude Code session with --session, or export them.",
     inputs: {
-      export: "Positional: write every receipt, all projects, to --out as JSON lines. A receipt holds id, ts, command, project (a hash of the repository path), pack, model, verdict, reason (a fixed code), outcome, error (the code), requests, cached, input_tokens, cost_usd, request_ids, qhash, cache_keys, prev, fresh, stopped, replaced, chars, ms, run_id and session_id, each only when it applies; never request text, criteria, claim text or ids, option names, items, file paths or user names.",
+      export: "Positional: write every receipt, all projects, to --out as JSON lines. A receipt holds id, ts, command, project (a hash of the repository path), pack, model, verdict, reason (a fixed code), outcome, error (the code), requests, cached, input_tokens, cost_usd, request_ids, qhash, cache_keys, prev, fresh, stopped, replaced, chars, ms, run_id and session_id (the hook's session, or for the CLI Claude Code's CLAUDE_CODE_SESSION_ID when it is 1 to 64 letters, digits, '.', '_' or '-'), each only when it applies; never request text, criteria, claim text or ids, option names, items, file paths or user names.",
       verify: "Positional: check the hash chain of every project's receipts (add --project-only for the current one). Receipts written before chaining existed are counted as unchained.",
       overrule: "Positional: \"overrule <id>\" voids one decision: it is recorded in overruled.jsonl and the cached answers it used are deleted, so the next run asks again. The receipt itself is not rewritten.",
       "--out <file>": "Target file for export.",
       "--tokens": "Rows per day and command: runs, requests, cache hits, input tokens and the share of --fresh runs. verify (the old name of claims) counts as claims.",
       "--usage": "Claude-side: claude-referee CLI calls per day and command (verify counted as claims), counted from this project's Claude Code transcripts (subagents included, each tool call once, also behind env, timeout, nohup or xargs), with the size of what each call returned. Nothing from the transcripts is printed.",
       "--stops": "List the Stop done-gate's shadow stops of this project, newest first, at most 20, with stats (precision and false block rate over labelled would_block stops, p95 ms, skips per reason). Excerpts only; nothing else from the store is printed.",
+      "--session <id|current>": "One Claude Code session across every project id it wrote under: its receipts, its done-gate stops and whether its transcript was found. current reads CLAUDE_CODE_SESSION_ID, which Claude Code sets for the commands it runs. A CLI receipt carries the session only when the command ran inside Claude Code; CLI receipts written before they carried it have none and are not backfilled. Claude Code's env-vars reference says Bash commands get the same id as the hooks, also after /clear and --resume <id>; it says an MCP server subprocess may keep its startup id after --continue or --resume without an id, and claude-referee runs as a command, not as an MCP server. Every record of the session unless --days is given. Cannot be combined with --stops, --unlabelled, --tokens, --usage or --all.",
       "--unlabelled": "With --stops: only would_block stops without a label.",
       "--label <id>": "Mark one stop with --right (the block would have been correct) or --wrong (a false block).",
       "--right": "With --label: the would-be block was correct.",
       "--wrong": "With --label: the would-be block was a false block.",
       "--project-only": "With verify: only this project's chain.",
       "--all": "Every project instead of the current one.",
-      "--days <n>": "How many days back to include; default 30, or 14 with --tokens or --usage. With --stops it limits the listed stops and their stats.",
+      "--days <n>": "How many days back to include; default 30, or 14 with --tokens or --usage. With --stops it limits the listed stops and their stats. With --session it applies only when given.",
     },
     outputs: {
-      verdict: "summary, tokens, usage, exported, stops, labelled, chain_ok, chain_broken or overruled",
+      verdict: "summary, tokens, usage, exported, stops, session, labelled, chain_ok, chain_broken or overruled",
       chain: "With verify: receipts, chained, unchained and breaks (project, id, kind mismatch, fork or unreadable)",
       dropped: "With overrule: how many cached answers were deleted",
       id: "With overrule or --label: the receipt or stop id",
       receipts: "With export: receipts written. outcome holds numbers and fixed codes only: done's trust, p, exit_code and runner names; decide's lean_p, margin (to the second option) and orders, never the option name; claims' claims, supported, unsupported, contradicted, says_nothing, unsure and unanswered counts and reasons (claims per reason code); judge's items, yes, no and review. A Jev command that failed before its session started (a bad input, a pack or project that does not load, an input that is too large) has no pack, model or outcome; it carries its error code, requests 0 and ms (and fresh with --fresh); a failure after that (a missing or invalid key, a Jev error) has pack and model too",
       out: "With export: the file written, with ~ for home",
-      days: "The window in days",
+      days: "The window in days; with --session only when --days was given",
       project: "With --usage: this project's id",
       calls: "With --usage: CLI calls in the window",
-      runs: "Command runs in the window, including runs that failed with an error receipt",
+      runs: "Command runs in the window, including runs that failed with an error receipt. With --session: that session's receipts, from every project",
       requests: "Jev requests made",
       cached: "Answers served from the cache or merged with an identical request",
       input_tokens: "Input tokens billed",
       cost_usd: "Estimated cost at list price; a run on a model with no known price records null and adds nothing here",
       by_command: "Runs per command; verify runs (the old name) count as claims",
+      by_verdict: "With --session: runs per command and verdict; a run that failed counts under its error code, anything else under other",
+      by_project: "With --session: receipts and stops per project id; a session that changed directory, or ran commands in a worktree or scratch folder, writes under several",
+      session_id: "With --session: the session id that was read",
+      transcript_found: "With --session: whether the session's transcript was found, by its id, in this project's transcript folders or in any other folder of Claude Code's projects directory (the 1,000 most recently changed). Its path is never printed",
+      transcript_lines: "With --session: the transcript's line count, or null when it was not found; nothing else from it is printed",
       rows: "With --tokens: one row per day and command. With --usage: day, command, calls, subagent_calls and result_chars",
       transcripts: "With --usage: how many transcript files were read",
-      stats: "With --stops: stops, skipped_by_reason, asked, would_block, labelled, right, wrong, precision, false_block_rate, p95_ms (answered calls only), errors, error_rate (Jev errors and breaker skips over asked plus errors), p95_all_ms (answered and failed calls), unlabelled_would_block",
-      stops: "With --stops: id, ts, skipped, error (the error code when the stop got no answer: a Jev error, a redaction stop, a missing or bad key, a pack that does not load, or internal), configured (active when the project sets a mode that is not built and the stop ran as shadow), edits, checks, turn (a short key shared by the stops of one turn, absent on older records), bg_pending (on every background_tasks skip: how many background tasks were running), would_ask (on such a skip: whether the code-side rule would have asked Jev; absent when the transcript could not be read or the turn was too long to analyse), would_block, claims_done, claims_verified, task_excerpt, final_excerpt, label, and for an unlabelled would_block stop whose next prompt in the session transcript reports breakage or repeats the request, suggestion: {label: \"right\", reason: reported_broken or repeated_request, source: next_message}. It is a hint only: computed on read, never stored, never counted in stats or in the threshold suggestion, and the message text is never printed or kept",
+      stats: "With --stops or --session: stops, skipped_by_reason, asked, would_block, labelled, right, wrong, precision, false_block_rate, p95_ms (answered calls only), errors, error_rate (Jev errors and breaker skips over asked plus errors), p95_all_ms (answered and failed calls), unlabelled_would_block",
+      stops: "With --stops, and with --session for the session's 20 newest stops plus their project: id, ts, skipped, error (the error code when the stop got no answer: a Jev error, a redaction stop, a missing or bad key, a pack that does not load, or internal), configured (active when the project sets a mode that is not built and the stop ran as shadow), edits, checks, turn (a short key shared by the stops of one turn, absent on older records), bg_pending (on every background_tasks skip: how many background tasks were running), would_ask (on such a skip: whether the code-side rule would have asked Jev; absent when the transcript could not be read or the turn was too long to analyse), would_block, claims_done, claims_verified, task_excerpt, final_excerpt, label, and for an unlabelled would_block stop whose next prompt in the session transcript (found by the session id, also in another project's transcript folder) reports breakage or repeats the request, suggestion: {label: \"right\", reason: reported_broken or repeated_request, source: next_message}. It is a hint only: computed on read, never stored, never counted in stats or in the threshold suggestion, and the message text is never printed or kept",
       threshold_suggestion: "With --stops: only available (true) with at least 10 human labels of each class on would_block stops (have and need are always shown). Then claims_done is checked with exact Clopper-Pearson 95% intervals: suggested is the smallest value at or above the current one at which the kept labelled stops (at least 10) have a precision lower bound of 0.8 or more, or null if none does; it never suggests lowering the threshold. overall holds the precision and false block rate intervals. Nothing is written; set it in .claude/referee.json yourself",
       label: "With --label: the id and the label that was stored",
-      receipt: "With --stops: always a stops-<time> name, used as the details file name when the line passes 1,500 characters; no receipt is written",
+      receipt: "With --stops or --session: always a stops-<time> or session-<time> name, used as the details file name when the line passes 1,500 characters; no receipt is written",
     },
     errors: ["bad_input"],
-    effects: "Reads the data directory, and with --usage this project's Claude Code transcripts; export writes one file; --label appends to labels.jsonl.",
+    effects: "Reads the data directory, with --usage this project's Claude Code transcripts, and with --stops or --session the listed sessions' transcripts, looked up by session id (one listing of Claude Code's projects directory per call); export writes one file; --label appends to labels.jsonl.",
     cost: "Free.",
   },
   options: {
@@ -76,6 +182,7 @@ export const receipts: Command = {
     "project-only": { type: "boolean" },
     days: { type: "string" },
     stops: { type: "boolean" },
+    session: { type: "string" },
     unlabelled: { type: "boolean" },
     label: { type: "string" },
     right: { type: "boolean" },
@@ -121,32 +228,12 @@ export const receipts: Command = {
     const days = Number(str(context, "days") ?? (tokens || usage ? 14 : 30));
     if (!Number.isInteger(days) || days < 1 || days > 366) throw new RefereeError("bad_input", "--days must be a whole number from 1 to 366.");
     const since = new Date(io.now() - days * 86_400_000).toISOString();
+    if (str(context, "session") !== undefined) return sessionJoin(context, dataDir, str(context, "days") === undefined ? null : since);
     if (values["stops"] === true) {
       const project = projectId(io.cwd);
       const scopedStops = readStops(dataDir).filter((r) => r.project === project && r.ts >= since);
-      const picked = (values["unlabelled"] === true ? scopedStops.filter((r) => r.decision?.would_block === true && !r.label) : scopedStops)
-        .sort((a, b) => (a.ts < b.ts ? 1 : a.ts > b.ts ? -1 : 0))
-        .slice(0, 20);
-      const weak = suggestForStops(projectTranscriptDirs(io.env, io.home, io.cwd), picked.filter((r) => r.decision?.would_block === true && !r.label));
-      const shown = picked.map((r) => ({
-          id: r.id,
-          ts: r.ts,
-          skipped: r.skipped,
-          error: r.error,
-          configured: r.configured,
-          edits: r.edits,
-          checks: r.checks,
-          turn: r.turn,
-          bg_pending: r.bg_pending,
-          would_ask: r.would_ask,
-          would_block: r.decision?.would_block,
-          claims_done: r.decision?.claims_done,
-          claims_verified: r.decision?.claims_verified,
-          task_excerpt: r.task_excerpt?.slice(0, 300),
-          final_excerpt: r.final_excerpt?.slice(0, 300),
-          label: r.label,
-          ...(r.label === undefined && weak.has(r.id) ? { suggestion: weak.get(r.id) } : {}),
-        }));
+      const picked = newestFirst(values["unlabelled"] === true ? scopedStops.filter((r) => r.decision?.would_block === true && !r.label) : scopedStops).slice(0, STOPS_SHOWN);
+      const shown = stopRows(picked, transcriptLocator(projectTranscriptDirs(io.env, io.home, io.cwd), claudeProjectsDir(io.env, io.home)));
       let current = 0.7;
       try {
         const project = loadProject(io.cwd);

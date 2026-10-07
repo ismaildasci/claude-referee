@@ -9,7 +9,7 @@ import { KIT, VERSION } from "../engine/config.ts";
 import { projectId, resolveDataDir } from "../engine/datadir.ts";
 import { RefereeError, isRefereeError } from "../engine/errors.ts";
 import { render, renderError, type Result } from "../engine/output.ts";
-import { appendReceipt, errorReceipt } from "../engine/receipts.ts";
+import { appendReceipt, envSessionId, errorReceipt } from "../engine/receipts.ts";
 import { isReceipted } from "../engine/session.ts";
 import type { Command, Context, GlobalFlags, Io } from "./types.ts";
 
@@ -147,7 +147,7 @@ function asksJev(command: Command, context: Context): boolean {
 function receiptError(io: Io, flags: GlobalFlags, command: string, error: unknown, started: number): void {
   try {
     const code = isRefereeError(error) ? error.code : "internal";
-    const receipt = errorReceipt({ command, project: projectId(io.cwd), error: code, started, now: io.now(), fresh: flags.fresh, runId: io.env["EVAL_RUN_ID"] });
+    const receipt = errorReceipt({ command, project: projectId(io.cwd), error: code, started, now: io.now(), fresh: flags.fresh, runId: io.env["EVAL_RUN_ID"], sessionId: envSessionId(io.env) });
     appendReceipt(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), receipt);
   } catch {
     void 0;

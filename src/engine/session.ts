@@ -11,7 +11,7 @@ import { BATCH_DEADLINE_MS, CACHE_TTL_MS, PROFILES, costUsd, estimateTokens, res
 import { resolveDataDir, projectId } from "./datadir.ts";
 import { RefereeError, isRefereeError, type ErrorCode } from "./errors.ts";
 import { endpointOf, resolveEndpointKey, type ResolvedKey } from "./key.ts";
-import { appendReceipt, newReceiptId, type Receipt, type ReceiptOutcome } from "./receipts.ts";
+import { appendReceipt, envSessionId, newReceiptId, type Receipt, type ReceiptOutcome } from "./receipts.ts";
 import { redact, stopError, type PackPatterns, type Stop } from "./redact.ts";
 
 export interface Planned {
@@ -243,6 +243,7 @@ export class Session {
 
   record(fields: { verdict?: string; reason?: string; outcome?: ReceiptOutcome | undefined; error?: RefereeError; chars?: number } = {}): Receipt {
     const env = this.options.env;
+    const sessionId = this.options.sessionId ?? envSessionId(env);
     const receipt: Receipt = {
       id: this.receiptId,
       ts: new Date(this.options.now()).toISOString(),
@@ -267,7 +268,7 @@ export class Session {
       ...(fields.chars !== undefined ? { chars: fields.chars } : {}),
       ms: Math.max(0, this.options.now() - this.started),
       ...(env["EVAL_RUN_ID"] ? { run_id: env["EVAL_RUN_ID"] } : {}),
-      ...(this.options.sessionId ? { session_id: this.options.sessionId } : {}),
+      ...(sessionId ? { session_id: sessionId } : {}),
     };
     if (!appendReceipt(this.dataDir, receipt)) this.unsaved = true;
     if (fields.error !== undefined) markReceipted(fields.error);

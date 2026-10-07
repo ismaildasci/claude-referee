@@ -1,9 +1,10 @@
 // Weak label hint for a stop from the user's NEXT prompt in the session transcript: a fixed enum reason only, never the message text.
-// It can only suggest "right" (the block would have been correct), is computed on read, stored nowhere and never replaces a human label.
-// A prompt that is only a pasted image has no text to read, so it is neither the turn's prompt nor the next one here.
+// It can only suggest "right" (the block would have been correct), is computed on read, stored nowhere and never replaces a human label; an image-only prompt is skipped.
+// The transcript is <session_id>.jsonl in the reader's dirs, else in any Claude Code project folder: one readdir per locator, one stat per folder and session, capped.
 
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { SESSION_ID } from "../receipts.ts";
 import { userPrompts } from "./transcript.ts";
 
 export type WeakReason = "reported_broken" | "repeated_request";
@@ -90,20 +91,84 @@ export function suggestFromTranscript(transcript: string, stopTs: string): WeakS
   }
 }
 
-export function suggestForStops(dirs: readonly string[], stops: readonly { readonly id: string; readonly session_id: string; readonly ts: string }[]): Map<string, WeakSuggestion> {
+export const LOCATOR_FOLDERS_MAX = 1000;
+export const LOCATOR_SCANS_MAX = 50;
+
+export interface TranscriptLocator {
+  find(session: string): string | null;
+  readonly readdirs: number;
+}
+
+function isFile(path: string): boolean {
+  try {
+    return statSync(path, { throwIfNoEntry: false })?.isFile() === true;
+  } catch {
+    return false;
+  }
+}
+
+function mtime(path: string): number {
+  try {
+    return statSync(path, { throwIfNoEntry: false })?.mtimeMs ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
+export function transcriptLocator(dirs: readonly string[], projectsDir?: string): TranscriptLocator {
+  const found = new Map<string, string | null>();
+  let folders: string[] | undefined;
+  let readdirs = 0;
+  let scans = 0;
+  const all = (root: string): string[] => {
+    if (folders) return folders;
+    readdirs += 1;
+    try {
+      const own = new Set(dirs);
+      folders = readdirSync(root, { withFileTypes: true })
+        .filter((e) => e.isDirectory())
+        .map((e) => join(root, e.name))
+        .filter((d) => !own.has(d))
+        .map((d) => ({ d, t: mtime(d) }))
+        .sort((a, b) => b.t - a.t || (a.d < b.d ? -1 : 1))
+        .slice(0, LOCATOR_FOLDERS_MAX)
+        .map((f) => f.d);
+    } catch {
+      folders = [];
+    }
+    return folders;
+  };
+  return {
+    find(session: string): string | null {
+      if (!SESSION_ID.test(session)) return null;
+      const known = found.get(session);
+      if (known !== undefined) return known;
+      const name = `${session}.jsonl`;
+      let path = dirs.map((d) => join(d, name)).find(isFile) ?? null;
+      if (path === null && projectsDir !== undefined && scans < LOCATOR_SCANS_MAX) {
+        scans += 1;
+        path = all(projectsDir).map((d) => join(d, name)).find(isFile) ?? null;
+      }
+      found.set(session, path);
+      return path;
+    },
+    get readdirs() {
+      return readdirs;
+    },
+  };
+}
+
+export function suggestForStops(locator: TranscriptLocator, stops: readonly { readonly id: string; readonly session_id: string; readonly ts: string }[]): Map<string, WeakSuggestion> {
   const out = new Map<string, WeakSuggestion>();
   const cache = new Map<string, string | null>();
   const load = (session: string): string | null => {
-    if (!/^[A-Za-z0-9._-]+$/.test(session)) return null;
     if (cache.has(session)) return cache.get(session) ?? null;
+    const path = locator.find(session);
     let text: string | null = null;
-    for (const dir of dirs) {
-      try {
-        text = readFileSync(join(dir, `${session}.jsonl`), "utf8");
-        break;
-      } catch {
-        continue;
-      }
+    try {
+      text = path === null ? null : readFileSync(path, "utf8");
+    } catch {
+      text = null;
     }
     cache.set(session, text);
     return text;

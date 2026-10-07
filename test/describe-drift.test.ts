@@ -131,10 +131,15 @@ test("every key a command prints is named in its --describe contract", async () 
     appendStop(dataDir, { ...stop, id: "s1", skipped: "jev_error", error: "service_unavailable" });
     appendStop(dataDir, { ...stop, id: "s2", configured: "active", decision: { claims_done: 0.9, claims_verified: 0.1, verification_applies: 1, outcome: {}, would_block: true } });
     const local = { REFEREE_DATA_DIR: dataDir };
+    await call(done, { stdin: "Tests: 12 passed, 12 total\n", env: { ...keyed, CLAUDE_CODE_SESSION_ID: "s" } });
+    mkdirSync(join(home, ".claude", "projects", "-elsewhere"), { recursive: true });
+    writeFileSync(join(home, ".claude", "projects", "-elsewhere", "s.jsonl"), "{}\n");
     await call(["receipts"], { env: local });
     await call(["receipts", "--tokens"], { env: local });
     await call(["receipts", "--usage"], { env: local });
     await call(["receipts", "--stops"], { env: local });
+    await call(["receipts", "--session", "s"], { env: local });
+    await call(["receipts", "--session", "current"], { env: local });
     await call(["receipts", "--label", "s2", "--right"], { env: local });
     await call(["receipts", "export", "--out", join(cwd, "r.jsonl")], { env: local });
     await call(["receipts", "verify"], { env: local });

@@ -147,9 +147,13 @@ function resultChars(content: unknown): number {
   return content.reduce((total: number, item) => total + (typeof (item as { text?: unknown })?.text === "string" ? ((item as { text: string }).text.length) : 0), 0);
 }
 
+export function claudeProjectsDir(env: Env, home: string): string {
+  return join(env["CLAUDE_CONFIG_DIR"]?.trim() || join(home, ".claude"), "projects");
+}
+
 export function projectTranscriptDirs(env: Env, home: string, cwd: string): string[] {
-  const configDir = env["CLAUDE_CONFIG_DIR"]?.trim() || join(home, ".claude");
-  return [...new Set([cwd, projectRoot(cwd)])].map((p) => join(configDir, "projects", p.replace(/[^A-Za-z0-9]/g, "-")));
+  const projects = claudeProjectsDir(env, home);
+  return [...new Set([cwd, projectRoot(cwd)])].map((p) => join(projects, p.replace(/[^A-Za-z0-9]/g, "-")));
 }
 
 export function scanUsage(dirs: readonly string[], since: string): { transcripts: number; rows: UsageRow[] } {

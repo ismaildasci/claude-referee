@@ -5,6 +5,7 @@
 import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { sha256 } from "./cache.ts";
+import type { Env } from "./config.ts";
 
 export interface Receipt {
   readonly id: string;
@@ -57,6 +58,7 @@ export interface ReceiptOutcome {
 }
 
 export const REASON_CODE = /^[a-z][a-z0-9_]{0,39}$/;
+export const SESSION_ID = /^[A-Za-z0-9._-]{1,64}$/;
 export const RUNNER_NAME = /^[A-Za-z0-9][A-Za-z0-9:._ +-]{0,29}$/;
 const TRUST = new Set(["parsed", "exit_code", "unparsed"]);
 const RUNNERS_MAX = 8;
@@ -109,6 +111,11 @@ export function outcomeOf(result: Readonly<Record<string, unknown>>): ReceiptOut
   return Object.keys(out).length ? (out as ReceiptOutcome) : undefined;
 }
 
+export function envSessionId(env: Env): string | undefined {
+  const id = env["CLAUDE_CODE_SESSION_ID"];
+  return id !== undefined && SESSION_ID.test(id) ? id : undefined;
+}
+
 export function canonicalCommand(command: string): string {
   return command === "verify" ? "claims" : command;
 }
@@ -147,7 +154,7 @@ export function appendReceipt(dataDir: string, receipt: Receipt): boolean {
   }
 }
 
-export function errorReceipt(fields: { command: string; project: string; error: string; started: number; now: number; fresh?: boolean; runId?: string | undefined }): Receipt {
+export function errorReceipt(fields: { command: string; project: string; error: string; started: number; now: number; fresh?: boolean; runId?: string | undefined; sessionId?: string | undefined }): Receipt {
   return {
     id: newReceiptId(fields.started),
     ts: new Date(fields.now).toISOString(),
@@ -161,6 +168,7 @@ export function errorReceipt(fields: { command: string; project: string; error: 
     ...(fields.fresh ? { fresh: true } : {}),
     ms: Math.max(0, fields.now - fields.started),
     ...(fields.runId ? { run_id: fields.runId } : {}),
+    ...(fields.sessionId ? { session_id: fields.sessionId } : {}),
   };
 }
 
