@@ -1,14 +1,14 @@
 // done: does the check output show each criterion holds? One request; every criterion is a Noul on the same evidence.
 // Recognised runner output is parsed in code and only those facts reach Jev; unrecognised output can never become met.
 // A non-zero exit code in the evidence is missing without a request (a zero-request receipt; --dry-run prints that verdict); skipped, risky or incomplete tests, or a skip marker anywhere in the log, cap met at unsure.
-// Exit-code-only evidence for a lint or clean criterion (lint, clean, no warnings, or a linter's name such as oxlint) that shows a warning, notice, failure or skip message, or a swallowed exit code, is capped at unsure.
+// A lint or clean criterion (lint, clean, no warnings, or a linter's name such as oxlint) is capped at unsure when only an exit code backs it and the log shows a warning, notice, failure or skip message or a swallowed exit code, or when a test or build runner is parsed but no linter is and the log has a linter's warning or error line or a linter summary with a count above 0.
 // A parsed run that is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion with parsed warnings, is capped the same way.
 // Expected failures (known issues) cap met like skips; a test criterion backed only by build runners or oxlint (no test results) is capped as no tests run; a lint, build or typecheck criterion with no parsed runner of its kind gets a reason, never another verdict.
 
 import type { EntryType, Questions } from "@typesafe-ai/sdk";
 import { RefereeError } from "../../engine/errors.ts";
 import { parseEvidence, type ParsedEvidence } from "../../engine/runners/index.ts";
-import { LINTERS, uncoveredKinds } from "../../engine/runners/kinds.ts";
+import { LINTERS, RUNNER_KINDS, uncoveredKinds } from "../../engine/runners/kinds.ts";
 import { skipMarkers } from "../../engine/runners/skips.ts";
 import type { Result } from "../../engine/output.ts";
 import { threshold, type Pack, type Thresholds } from "../../engine/pack.ts";
@@ -61,6 +61,7 @@ const PROBLEM_WORDS = /\b(?:fail\w*|skipp\w*|partial\w*|errors?|violations?|find
 const PROBLEM_NEGATED = /\b(?:0|no|zero|without) (?:errors?|findings?|violations?|failures?)\b/gi;
 const SWALLOWED = /\|\|\s*true\b|--no-fail\b|--exit-zero\b/i;
 const WARNING_NEXT = "The log shows a warning, notice, failure or skip wording, or a swallowed exit code, and only an exit code backs the lint criterion, so done won't say met. Pipe the linter's full summary, or say yourself that the warning is acceptable.";
+const DIAGNOSTIC_NEXT = "The log has a linter's warning or error line, or a linter summary with a count above 0, and no linter's summary was recognised, so done won't say met. Run the linter as its own done call and pipe its full output, or say yourself that the warning is acceptable.";
 
 const KIND_LABEL: Readonly<Record<string, [string, string]>> = { lint: ["lint", "the lint check"], build: ["build", "the build"], typecheck: ["type check", "the type check"] };
 
@@ -78,6 +79,26 @@ export function hasWarningMessage(evidence: string): boolean {
 export function hasProblemMessage(evidence: string): boolean {
   const log = evidence.replace(/(?:^|\n)[ \t]*\$[^\n]*/g, " ").replace(PROBLEM_NEGATED, " ");
   return PROBLEM_WORDS.test(log) || SWALLOWED.test(evidence);
+}
+
+const DIAG_AT = String.raw`^[ \t]*(?=[^\s:]*[./])[^\s:]+:\d+:\d+:[ \t]+`;
+const SEVERITY_DIAGNOSTIC = new RegExp(`${DIAG_AT}(?:warning|error)\\b`);
+const CODE_DIAGNOSTIC = new RegExp(`${DIAG_AT}[A-Z]{1,3}\\d{3}\\b`);
+const FILE_HEADER = /^\S.*\.\w+$/;
+const STYLISH_ROW = /^[ \t]+\d+:\d+[ \t]+(?:warning|error)[ \t]+\S/;
+const PROBLEMS_SUMMARY = /^[ \t]*(?:[✖⚠][ \t]+)?(\d+) problems?(?: \([^)]*\))?[ \t]*$/;
+const FOUND_SUMMARY = /^[ \t]*Found (\d+) (?:warnings?|errors?)(?: and (\d+) (?:warnings?|errors?))?\b/;
+const COUNT_SUMMARY = /^[ \t]*(\d+) (?:warnings?|errors?)(?: and (\d+) (?:warnings?|errors?))?(?: found)?\.?[ \t]*$/;
+
+export function hasLinterDiagnostic(evidence: string): boolean {
+  let underFile = false;
+  for (const line of evidence.split(/\r?\n/)) {
+    if (SEVERITY_DIAGNOSTIC.test(line) || CODE_DIAGNOSTIC.test(line) || (underFile && STYLISH_ROW.test(line))) return true;
+    const summary = PROBLEMS_SUMMARY.exec(line) ?? FOUND_SUMMARY.exec(line) ?? COUNT_SUMMARY.exec(line);
+    if (summary?.slice(1).some((n) => Number(n) > 0)) return true;
+    underFile = FILE_HEADER.test(line);
+  }
+  return false;
 }
 
 function factsOf(parsed: ParsedEvidence): Record<string, unknown> {
@@ -106,8 +127,11 @@ export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, crit
   const met = threshold(pack, thresholds, "done.met", "met", 0.7);
   const missing = threshold(pack, thresholds, "done.met", "missing", 0.5);
   const finish = ([outcome]: Outcome[]): Result => {
-    const warnCap = (parsed.trust === "exit_code" && (hasWarningMessage(evidence) || hasProblemMessage(evidence))) || hasParsedWarnings(parsed);
     const runnerNames = [...new Set(parsed.runners.map((r) => r.runner))];
+    const lintCovered = runnerNames.some((r) => RUNNER_KINDS[r]?.includes("lint") === true);
+    const wordingCap = (parsed.trust === "exit_code" && (hasWarningMessage(evidence) || hasProblemMessage(evidence))) || hasParsedWarnings(parsed);
+    const diagnosticCap = !wordingCap && parsed.trust === "parsed" && !lintCovered && hasLinterDiagnostic(evidence);
+    const warnCap = wordingCap || diagnosticCap;
     const per = criteria.map((criterion, i) => {
       const answer = outcome?.answers?.[`c${i + 1}`];
       const p = answer?.type === "noul" ? answer.noul : 0;
@@ -140,7 +164,7 @@ export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, crit
       ...(parsed.runners.length > 0 ? { runners: parsed.runners.map((r) => ({ runner: r.runner, passed: r.passed, failed: r.failed, errors: r.errors, skipped: r.skipped })) } : {}),
       ...(reason !== undefined ? { reason } : {}),
       ...(per.length > 1 ? { criteria: per.map(({ i, verdict: v, p: pp, uncovered }) => ({ i, verdict: v, p: pp, ...(uncovered.length > 0 ? { reason: "criterion_not_covered" } : {}) })) } : {}),
-      next_step: verdict === "met" ? undefined : noTestsCapped && verdict === "unsure" ? (per.some((c) => c.noTestsCap && !c.buildCap) ? NO_TESTS_NEXT : BUILD_ONLY_NEXT) : skipCapped && verdict === "unsure" ? SKIPPED_NEXT : incompleteCapped && verdict === "unsure" ? INCOMPLETE_NEXT : warningCapped && verdict === "unsure" ? WARNING_NEXT : notCovered.length > 0 ? notCoveredNext(runnerNames, notCovered, per.length > 1) : parsed.trust === "unparsed" && per.every((c) => c.verdict !== "missing") ? UNPARSED_NEXT : NEXT[verdict],
+      next_step: verdict === "met" ? undefined : noTestsCapped && verdict === "unsure" ? (per.some((c) => c.noTestsCap && !c.buildCap) ? NO_TESTS_NEXT : BUILD_ONLY_NEXT) : skipCapped && verdict === "unsure" ? SKIPPED_NEXT : incompleteCapped && verdict === "unsure" ? INCOMPLETE_NEXT : warningCapped && verdict === "unsure" ? (diagnosticCap ? DIAGNOSTIC_NEXT : WARNING_NEXT) : notCovered.length > 0 ? notCoveredNext(runnerNames, notCovered, per.length > 1) : parsed.trust === "unparsed" && per.every((c) => c.verdict !== "missing") ? UNPARSED_NEXT : NEXT[verdict],
     };
   };
   const state = (parsed.trust === "unparsed" ? { evidence } : { evidence: factsOf(parsed) }) as EntryType;
@@ -160,7 +184,7 @@ export const done: Command = {
       trust: "parsed (a runner summary was recognised), exit_code (only an exit code line) or unparsed (met is not possible)",
       exit_code: "The exit code read from the evidence, when it has one",
       runners: "Parsed counts per recognised runner",
-      reason: "exit_code_nonzero when the evidence has a non-zero exit code (missing, Jev not asked, requests 0; the receipt is still written, and --dry-run gives the same verdict); skipped_tests, no_tests_run, incomplete_run or warning_in_log when met was capped at unsure because tests were skipped, risky, incomplete or ended in an expected failure (a known issue), the log says no tests ran or shows only a build (or an oxlint run) for a test criterion, the parsed run is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion (one that says lint, clean or no warnings, or names a linter such as oxlint, eslint, ruff or phpstan) has a warning behind it (parsed, or in a log with only an exit code); criterion_not_covered when the verdict is not met, no cap applies, and a lint, build or typecheck criterion has no parsed runner of that kind (only a test runner's summary was recognised, for example), so that check's output never reached Jev; it never changes the verdict",
+      reason: "exit_code_nonzero when the evidence has a non-zero exit code (missing, Jev not asked, requests 0; the receipt is still written, and --dry-run gives the same verdict); skipped_tests, no_tests_run, incomplete_run or warning_in_log when met was capped at unsure because tests were skipped, risky, incomplete or ended in an expected failure (a known issue), the log says no tests ran or shows only a build (or an oxlint run) for a test criterion, the parsed run is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion (one that says lint, clean or no warnings, or names a linter such as oxlint, eslint, ruff or phpstan) has a warning behind it (a parsed linter's warnings; warning or problem wording, or a swallowed exit code, in a log with only an exit code; or, when a test or build runner is parsed and no linter is, a linter's warning or error line, such as file:line:col: warning, or a linter summary with a count above 0); criterion_not_covered when the verdict is not met, no cap applies, and a lint, build or typecheck criterion has no parsed runner of that kind (only a test runner's summary was recognised, for example), so that check's output never reached Jev; it never changes the verdict",
       p: "Lowest probability that a criterion holds",
       criteria: "Per criterion, by position, when more than one; reason criterion_not_covered on a criterion that is not met and has no parsed runner of its kind",
       next_step: "Only when not met",
