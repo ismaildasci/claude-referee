@@ -19,6 +19,7 @@ await build({
   platform: "node",
   target: "node20",
   keepNames: true,
+  minifyWhitespace: true,
   banner: { js: "#!/usr/bin/env node" },
   legalComments: "none",
   charset: "utf8",

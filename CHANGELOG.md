@@ -11,6 +11,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Changed
 
 - CI and `npm run ci:local` also run the tests on Node 26.
+- The bundles are built with whitespace-only minification (names kept): `dist/cli.mjs` goes from 392,827 to 318,049 bytes and `dist/hook.mjs` from 184,329 to 142,960, under the unchanged 400,000 and 200,000 byte tripwires. Start latency showed no difference beyond noise. Chosen with `decide` after measuring (p 1.0, both orders); [record](docs/decisions/bundle-minify.md).
 
 ### Fixed
 
