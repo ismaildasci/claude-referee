@@ -1,4 +1,4 @@
-// Runner-parser helpers (ANSI, clipping, facts; formats in docs/decisions/runner-parsers-met-recall.md). stripTransport drops one GitHub line prefix, as scripts/real-ci/lib.mjs.
+// Runner-parser helpers (ANSI, clipping, facts; formats in docs/decisions/runner-parsers-met-recall.md). stripTransport drops one GitHub line prefix, as scripts/real-ci/lib.mjs; stripAnsi (CSI) is the colour strip done and the Stop gate share.
 // wrapperExits reads only non-zero codes from turbo, nx, bun run/--filter, concurrently and npm 10+ exit reports; a zero never adds an exit line.
 // exitMatches is the one exit-line rule (source frames, test titles, open quotes and assertion messages rejected; hex read as its value), see docs/decisions/parser-defects-2026-10-06.md.
 
@@ -12,6 +12,7 @@ export const MAX_SUMMARY = 200;
 const TRANSPORT = /^\uFEFF?(?:[^\t\r\n]+\t[^\t\r\n]+\t)?\uFEFF?\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d+)?Z(?: |(?=\r?$))/gm;
 
 export const stripTransport = (text: string): string => text.replace(TRANSPORT, "");
+export const stripAnsi = (text: string): string => text.replace(/\u001b\[[0-9;?]*[ -/]*[@-~]/g, "");
 
 export const prepare = (text: string): string[] => text.replace(ANSI, "").split(/\r?\n/);
 export const clip = (value: string, max: number): string => value.trim().slice(0, max);

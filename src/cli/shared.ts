@@ -61,9 +61,7 @@ export async function readSource(context: Context, source: string | undefined, w
   }
 }
 
-export function stripAnsi(text: string): string {
-  return text.replace(/\u001b\[[0-9;?]*[ -/]*[@-~]/g, "");
-}
+export { stripAnsi } from "../engine/runners/util.ts";
 
 export function clip(text: string, head: number, tail: number): string {
   if (text.length <= head + tail) return text;

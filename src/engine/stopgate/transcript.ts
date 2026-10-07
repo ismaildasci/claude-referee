@@ -1,8 +1,9 @@
 // Reads a Claude Code transcript (JSON lines) and reports the current turn: edits and checks since the last real user prompt.
 // Scans backwards for that prompt and forwards from it; only content-free facts are kept, never throws. Marks: truncated checks, subagent reports, a pass from the previous turn.
-// An edit Claude Code refused before applying it (a <tool_use_error> or a denial) is not an edit; other errors still count. An image-only prompt starts a turn.
+// An edit Claude Code refused before applying it (a <tool_use_error> or a denial) is not an edit; other errors still count. An image-only prompt starts a turn. A check's output is read with ANSI colours stripped, as done reads evidence.
 
 import { parseEvidence } from "../runners/index.ts";
+import { stripAnsi } from "../runners/util.ts";
 import type { CheckRun, CheckStatus, StopFacts } from "./types.ts";
 
 const TASK_MAX = 1500;
@@ -298,8 +299,9 @@ const editRejected = (full: string, isError: boolean, denialKind: unknown): bool
 
 function statusOf(full: string, isError: boolean, silent: boolean, denialKind?: unknown): { status: CheckStatus; truncated: boolean } {
   if (isDenied(full, isError, denialKind)) return { status: "denied", truncated: false };
-  const truncated = isTruncated(full);
-  const status = rawStatus(full.length > RESULT_TAIL ? full.slice(-RESULT_TAIL) : full, isError, silent);
+  const plain = stripAnsi(full);
+  const truncated = isTruncated(plain);
+  const status = rawStatus(plain.length > RESULT_TAIL ? plain.slice(-RESULT_TAIL) : plain, isError, silent);
   return { status: truncated && status === "passed" ? "unknown" : status, truncated };
 }
 
