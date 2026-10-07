@@ -12,6 +12,7 @@ import { stopGate } from "../src/hooks/stop.ts";
 import { projectId } from "../src/engine/datadir.ts";
 import { readReceipts } from "../src/engine/receipts.ts";
 import { readStops, stopStats } from "../src/engine/stopgate/stops.ts";
+import { currentTurn } from "../src/engine/stopgate/transcript.ts";
 import { fakeJev, type Answerer, type FakeJev } from "./fake-jev.ts";
 import { FAKE, tempDir } from "./helpers.ts";
 
@@ -282,4 +283,109 @@ test("marks are recorded on skipped stops too, and absent when zero", async () =
   const skipped = await run({ transcript: lines(user("x"), tool("g1", "Agent", { prompt: "r" }), result("g1", "launched"), said("waiting")) });
   assert.equal(skipped.stops[0]?.skipped, "no_edits");
   assert.equal(skipped.stops[0]?.subagent_calls, 1);
+});
+
+const BG = { background_tasks: [{ id: "bg1" }, { id: "bg2" }] };
+
+test("background tasks: nothing is asked or printed, but the turn's counts, marks, bg_pending and would_ask are recorded", async () => {
+  for (const mode of ["shadow", "soft"]) {
+    const r = await run({ stopGate: mode, input: BG });
+    assert.equal(r.requests.length, 0, mode);
+    assert.equal(r.printed, "", mode);
+    assert.equal(r.receipts.length, 0, mode);
+    const stop = r.stops[0]!;
+    assert.equal(stop.skipped, "background_tasks");
+    assert.equal(stop.edits, 1);
+    assert.equal(stop.checks, 0);
+    assert.equal(stop.bg_pending, 2);
+    assert.equal(stop.would_ask, true);
+    assert.match(stop.turn ?? "", /^[0-9a-f]{12}$/);
+    assert.equal(stop.decision, undefined);
+    assert.equal(stop.task_excerpt, undefined);
+    assert.equal(stop.final_excerpt, undefined);
+  }
+  const transcript = lines(user("Fix it"), tool("e1", "Edit", { file_path: "src/a.ts" }), result("e1", "ok"), tool("b1", "Bash", { command: "npx tsc --noEmit" }), result("b1", PERSISTED), tool("g1", "Agent", { prompt: "review", run_in_background: true }), result("g1", "Async agent launched successfully."), said("Started a review."));
+  const marked = (await run({ transcript, input: { background_tasks: [{ id: "g1" }] } })).stops[0]!;
+  assert.deepEqual([marked.edits, marked.checks, marked.truncated_checks, marked.subagent_calls, marked.bg_pending, marked.would_ask], [1, 1, 1, 1, 1, true]);
+});
+
+test("background tasks: would_ask follows the code-side skip rule", async () => {
+  const none = (await run({ transcript: NO_EDITS, input: BG })).stops[0]!;
+  assert.deepEqual([none.skipped, none.edits, none.checks, none.would_ask], ["background_tasks", 0, 0, false]);
+  const passed = (await run({ transcript: EDITED_AND_PASSED, input: BG })).stops[0]!;
+  assert.deepEqual([passed.skipped, passed.edits, passed.checks, passed.would_ask], ["background_tasks", 1, 1, false]);
+  const empty = (await run({ input: { background_tasks: [] } })).stops[0]!;
+  assert.equal(empty.skipped, undefined);
+  assert.equal("would_ask" in empty, false);
+  assert.equal("bg_pending" in empty, false);
+});
+
+test("background tasks: an unreadable or corrupt transcript keeps the old record and never throws", async () => {
+  for (const r of [await run({ transcript: null, input: BG }), await run({ input: { ...BG, transcript_path: tempDir() } }), await run({ input: { ...BG, transcript_path: 42 } })]) {
+    const stop = r.stops[0]!;
+    assert.deepEqual([stop.skipped, stop.edits, stop.checks, stop.bg_pending], ["background_tasks", 0, 0, 2]);
+    assert.equal("would_ask" in stop, false);
+    assert.equal("turn" in stop, false);
+  }
+  const garbage = (await run({ transcript: "{not json\n\u0000\u0001 binary\n[1,2]\n", input: BG })).stops[0]!;
+  assert.deepEqual([garbage.skipped, garbage.edits, garbage.checks, garbage.would_ask], ["background_tasks", 0, 0, false]);
+  assert.equal("turn" in garbage, false);
+});
+
+test("turn: one key for the stops of a turn, a new key for the next turn, on asked and skipped records", async () => {
+  const head = [user("Fix the login bug"), tool("e1", "Edit", { file_path: "src/login.ts" }), result("e1", "ok"), tool("g1", "Agent", { prompt: "review", run_in_background: true }), result("g1", "launched"), said("Waiting for the review.")];
+  const first = (await run({ transcript: lines(...head), input: BG })).stops[0]!;
+  const later = (await run({ transcript: lines(...head, NOTE, said("Review is in, all done.")) })).stops[0]!;
+  const again = (await run({ transcript: lines(...head, NOTE, said("Done.")), input: { stop_hook_active: true } })).stops[0]!;
+  const next = (await run({ transcript: lines(...head, NOTE, said("Done."), user("Now the logout bug"), said("Looking.")) })).stops[0]!;
+  assert.equal(first.skipped, "background_tasks");
+  assert.equal(later.decision !== undefined, true);
+  assert.equal(again.skipped, "stop_hook_active");
+  assert.equal(next.skipped, "no_edits");
+  assert.match(first.turn ?? "", /^[0-9a-f]{12}$/);
+  assert.equal(later.turn, first.turn);
+  assert.equal(again.turn, first.turn);
+  assert.notEqual(next.turn, first.turn);
+  assert.equal((await run({ transcript: null, input: { stop_hook_active: true } })).stops[0]?.turn, undefined);
+  const withUuid = (prompt: string, at: number) => lines(...Array.from({ length: at }, () => said("pad")), { ...user(prompt), uuid: "p-1" }, said("ok"));
+  const a = (await run({ transcript: withUuid("Fix it", 0) })).stops[0]!;
+  const b = (await run({ transcript: withUuid("Something else entirely", 3) })).stops[0]!;
+  assert.equal(a.turn, b.turn);
+});
+
+test("background tasks: past 8 million characters to scan, the record keeps edits 0, checks 0 and no would_ask but has turn and bg_pending", async () => {
+  const big = Array.from({ length: 82 }, () => said("x".repeat(100_000)));
+  const edited = [tool("e1", "Edit", { file_path: "src/a.ts" }), result("e1", "ok")];
+  const cases = {
+    longTurn: lines(user("Fix it"), ...edited, ...big, said("Started a review.")),
+    longPreviousTurn: lines(user("First"), ...big, user("Second"), ...edited, said("Started a review.")),
+  };
+  for (const [name, transcript] of Object.entries(cases)) {
+    assert.ok(transcript.length > 8_000_000, name);
+    const r = await run({ transcript, input: BG });
+    const stop = r.stops[0]!;
+    assert.deepEqual([stop.skipped, stop.edits, stop.checks, stop.bg_pending], ["background_tasks", 0, 0, 2], name);
+    assert.equal("would_ask" in stop, false, name);
+    assert.equal(stop.turn, currentTurn(transcript, "s1"), name);
+    assert.match(stop.turn ?? "", /^[0-9a-f]{12}$/, name);
+    assert.equal(r.requests.length, 0, name);
+  }
+  const olderTurnsLong = lines(user("First"), ...big, user("Second"), said("ok"), user("Third"), ...edited, said("Started a review."));
+  const analysed = (await run({ transcript: olderTurnsLong, input: BG })).stops[0]!;
+  assert.deepEqual([analysed.skipped, analysed.edits, analysed.checks, analysed.would_ask], ["background_tasks", 1, 0, true]);
+});
+
+test("turn: a prompt without a uuid is keyed by its position within the session, a uuid alike in every session", async () => {
+  const s1 = (await run()).stops[0]!;
+  const s2 = (await run({ input: { session_id: "s2" } })).stops[0]!;
+  const s2bg = (await run({ input: { session_id: "s2", ...BG } })).stops[0]!;
+  const s2again = (await run({ input: { session_id: "s2", stop_hook_active: true } })).stops[0]!;
+  assert.notEqual(s1.turn, s2.turn);
+  assert.equal(s2bg.turn, s2.turn);
+  assert.equal(s2again.turn, s2.turn);
+  const transcript = lines({ ...user("Fix it"), uuid: "p-7" }, tool("e1", "Edit", { file_path: "src/a.ts" }), result("e1", "ok"), said("Done."));
+  const u1 = (await run({ transcript })).stops[0]!;
+  const u2 = (await run({ transcript, input: { session_id: "s2" } })).stops[0]!;
+  assert.equal(u1.turn, u2.turn);
+  assert.notEqual(u1.turn, s1.turn);
 });

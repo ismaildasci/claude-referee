@@ -1,7 +1,8 @@
-// Reads a Claude Code transcript (JSON lines) and reports the current turn: edits and checks since the last real user prompt.
+// Reads a Claude Code transcript (JSON lines) and reports the current turn: edits and checks since the last real user prompt, and turn, 12 hex of sha256 over that prompt's uuid (else its line position and the session), never its text.
 // Scans backwards for that prompt and forwards from it; only content-free facts are kept, never throws. Marks: truncated checks, subagent reports, a pass from the previous turn.
 // An edit Claude Code refused before applying it (a <tool_use_error> or a denial) is not an edit; other errors still count. An image-only prompt starts a turn. A check's output is read with ANSI colours stripped, as done reads evidence.
 
+import { createHash } from "node:crypto";
 import { parseEvidence } from "../runners/index.ts";
 import { stripAnsi } from "../runners/util.ts";
 import type { CheckRun, CheckStatus, StopFacts } from "./types.ts";
@@ -35,6 +36,7 @@ interface Block {
 }
 interface Entry {
   type?: unknown;
+  uuid?: unknown;
   isSidechain?: unknown;
   isMeta?: unknown;
   isCompactSummary?: unknown;
@@ -257,18 +259,47 @@ function firstPrompt(text: string): string {
 }
 
 // Offset of the line after the last real prompt (0 when none exists), the offset of that prompt's own line, plus its text.
-function lastPromptEnd(text: string): { start: number; lineStart: number; prompt: string | null } {
+function lastPromptEnd(text: string): { start: number; lineStart: number; prompt: string | null; uuid: string | null } {
   let end = text.length;
   while (end > 0) {
     const nl = text.lastIndexOf("\n", end - 1);
     const line = text.slice(nl + 1, end);
     if (isPromptCandidate(line)) {
-      const found = promptText(parseLine(line));
-      if (found !== null) return { start: end + 1, lineStart: nl + 1, prompt: found };
+      const entry = parseLine(line);
+      const found = promptText(entry);
+      if (found !== null) return { start: end + 1, lineStart: nl + 1, prompt: found, uuid: typeof entry?.uuid === "string" && entry.uuid ? entry.uuid : null };
     }
     end = nl;
   }
-  return { start: 0, lineStart: 0, prompt: null };
+  return { start: 0, lineStart: 0, prompt: null, uuid: null };
+}
+
+function turnKey(uuid: string | null, lineStart: number, session: string): string {
+  return createHash("sha256")
+    .update(uuid === null ? `at:${lineStart}:${session}` : `uuid:${uuid}`)
+    .digest("hex")
+    .slice(0, 12);
+}
+
+export function currentTurn(text: string, session = ""): string | undefined {
+  try {
+    if (typeof text !== "string" || !text) return undefined;
+    const { lineStart, prompt, uuid } = lastPromptEnd(text);
+    return prompt === null ? undefined : turnKey(uuid, lineStart, session);
+  } catch {
+    return undefined;
+  }
+}
+
+export function scanLength(text: string): number {
+  try {
+    if (typeof text !== "string" || !text) return 0;
+    const { start, lineStart } = lastPromptEnd(text);
+    const from = lineStart > 0 ? lastPromptEnd(text.slice(0, lineStart)).start : start;
+    return Math.max(0, text.length - from);
+  } catch {
+    return typeof text === "string" ? text.length : 0;
+  }
 }
 
 function fullResultText(content: unknown): string {
@@ -400,12 +431,12 @@ function scanTurn(text: string, from: number, to: number): Scan {
 
 const passedAfterLastEdit = (scan: Scan): boolean => scan.calls.some((c) => c.seq > scan.lastEdit && c.status === "passed");
 
-export function analyzeTranscript(text: string): StopFacts {
+export function analyzeTranscript(text: string, session = ""): StopFacts {
   const empty: StopFacts = { task: "", finalMessage: "", edits: [], checks: [], passedCheckAfterLastEdit: false, marks: { truncatedChecks: 0, subagentCalls: 0, subagentReports: 0, stalePass: false } };
   try {
     if (typeof text !== "string" || !text) return empty;
     const task = firstPrompt(text).slice(0, TASK_MAX);
-    const { start, lineStart } = lastPromptEnd(text);
+    const { start, lineStart, prompt, uuid } = lastPromptEnd(text);
     const turn = scanTurn(text, start, text.length);
     const passedCheckAfterLastEdit = turn.lastEdit >= 0 && passedAfterLastEdit(turn);
     let stalePass = false;
@@ -416,7 +447,7 @@ export function analyzeTranscript(text: string): StopFacts {
     }
     const checks: CheckRun[] = turn.calls.map((c) => ({ cmd: c.cmd, status: c.status, ...(c.truncated ? { truncated: true } : {}) }));
     const marks = { truncatedChecks: turn.calls.filter((c) => c.truncated).length, subagentCalls: turn.subagentCalls, subagentReports: turn.subagentReports, stalePass };
-    return { task, finalMessage: turn.finalMessage.slice(-FINAL_MAX), edits: turn.edits, checks, passedCheckAfterLastEdit, marks };
+    return { task, finalMessage: turn.finalMessage.slice(-FINAL_MAX), edits: turn.edits, checks, passedCheckAfterLastEdit, marks, ...(prompt === null ? {} : { turn: turnKey(uuid, lineStart, session) }) };
   } catch {
     return empty;
   }

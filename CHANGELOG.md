@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- Stop done-gate: a stop skipped because background tasks were running still asks nothing and prints nothing, but now reads the transcript and records the turn's `edits`, `checks` and marks as an asked stop does, plus `bg_pending` (how many background tasks the event listed) and `would_ask` (whether the code-side rule would have asked Jev with no background task running). Before, such a record said `edits` 0 and `checks` 0 because the transcript was never read: in a replay of real use on my own machine (aggregate counts only), 54 of 75 stops in other projects were such skips, 47 of the 54 would have been asked, and 5 of the 11 turns with edits were never evaluated. A transcript that cannot be read keeps the old record (`edits` 0, `checks` 0, no `would_ask`), and so does a stop whose turn, with the turn before it, spans more than 8 million characters (about 8 MB), though that record still has `turn`: the analysis grows with the checks in the turn, up to about 135 ms per MB in a local measurement, and the hook has 10 seconds. Over the 82 background skips of that replay (this repository's included), the largest span was 5.5 million characters and the median 1.2 million, so none fell back. The time this adds is the transcript analysis an asked stop already runs: in two local runs, 17 to 23 ms more at the median on a 4.7 MB transcript (the median size in that replay) and 26 to 29 ms on 22.5 MB, both with one check in the last turn.
+- Stop done-gate: `turn` on each stop record whose transcript was read, 12 hex characters of a hash of the turn's prompt uuid (or of its line's position and the session id when the entry has none), never the prompt text, so the stops of one turn can be grouped. A `stop_hook_active` stop reads the transcript for it. `receipts --stops` lists `turn`, `bg_pending` and `would_ask` when a record has them; older records read and count as before, and background skips never count as asked or as Jev errors.
+
 ### Fixed
 
 - `decide --describe`: the summary says that the balanced set of orders is asked when the two orders tie (3 to 6 options), as it has since 0.2.3; it said only "two option orders".

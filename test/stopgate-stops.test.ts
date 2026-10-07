@@ -457,3 +457,39 @@ test("stats and readers tolerate skip reasons they do not know, old or new", () 
   assert.equal(s.error_rate, 1 / 2);
   assert.equal(s.p95_all_ms, 2000);
 });
+
+test("background skips with counts never count as asked or as errors; records without turn, bg_pending or would_ask still read", () => {
+  const dir = tempDir();
+  const old = { id: "sold2", ts: "2026-10-01T10:00:00.000Z", session_id: "s", project: "p", mode: "shadow", skipped: "background_tasks", edits: 0, checks: 0, ms: 1 };
+  const asked = rec("sask", { block: true, ms: 300, turn: "aaaaaaaaaaaa" });
+  const bg = rec("sbg", { skipped: "background_tasks", edits: 3, checks: 1, bg_pending: 2, would_ask: true, turn: "aaaaaaaaaaaa", ms: 9000 });
+  const bgNo = rec("sbg2", { skipped: "background_tasks", edits: 0, checks: 0, bg_pending: 1, would_ask: false, ms: 5 });
+  writeFileSync(join(dir, "stops.jsonl"), [old, asked, bg, bgNo].map((r) => JSON.stringify(r)).join("\n") + "\n");
+  const stops = readStops(dir);
+  assert.equal(stops.length, 4);
+  assert.equal(stops[0]?.turn, undefined);
+  assert.equal(stops[2]?.would_ask, true);
+  const s = stopStats(stops);
+  assert.equal(s.asked, 1);
+  assert.equal(s.errors, 0);
+  assert.equal(s.error_rate, 0);
+  assert.equal(s.p95_ms, 300);
+  assert.equal(s.p95_all_ms, 300);
+  assert.deepEqual(s.skipped_by_reason, { background_tasks: 3 });
+});
+
+test("receipts --stops shows turn, bg_pending and would_ask when a record has them, and nothing new for older records", async () => {
+  const dataDir = tempDir();
+  const cwd = tempDir();
+  const project = projectId(cwd);
+  appendStop(dataDir, rec("sbg", { project, ts: "2026-09-29T11:00:00.000Z", skipped: "background_tasks", edits: 2, checks: 0, bg_pending: 1, would_ask: true, turn: "0123456789ab" }));
+  appendStop(dataDir, rec("sold", { project, ts: "2026-09-29T10:00:00.000Z", skipped: "background_tasks", edits: 0, checks: 0 }));
+  const io = memoryIo({ env: { REFEREE_DATA_DIR: dataDir }, cwd });
+  assert.equal(await run(["receipts", "--stops", "--pretty"], io, commands), 0);
+  const out = io.json();
+  const stops = out["stops"] as Record<string, unknown>[];
+  assert.deepEqual(stops[0], { id: "sbg", ts: "2026-09-29T11:00:00.000Z", skipped: "background_tasks", edits: 2, checks: 0, turn: "0123456789ab", bg_pending: 1, would_ask: true });
+  assert.deepEqual(stops[1], { id: "sold", ts: "2026-09-29T10:00:00.000Z", skipped: "background_tasks", edits: 0, checks: 0 });
+  assert.equal((out["stats"] as { asked: number; errors: number }).asked, 0);
+  assert.equal((out["stats"] as { asked: number; errors: number }).errors, 0);
+});

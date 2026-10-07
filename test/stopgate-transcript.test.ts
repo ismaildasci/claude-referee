@@ -2,7 +2,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { analyzeTranscript, userPrompts } from "../src/engine/stopgate/transcript.ts";
+import { analyzeTranscript, currentTurn, scanLength, userPrompts } from "../src/engine/stopgate/transcript.ts";
 
 const JEST_PASS = "Tests:       5 passed, 5 total\nTest Suites: 1 passed, 1 total\n";
 const JEST_FAIL = "Tests:       1 failed, 4 passed, 5 total\nTest Suites: 1 failed, 1 total\n";
@@ -310,4 +310,62 @@ test("a 20 MB transcript is analysed in under 1.5 seconds", () => {
   assert.deepEqual(f.edits, ["/a.ts"]);
   assert.equal(f.passedCheckAfterLastEdit, true);
   assert.ok(ms < 1500, `took ${ms.toFixed(0)} ms`);
+});
+
+test("turn key: a hash of the prompt's uuid or position, never its text; same within a turn, new for the next prompt", () => {
+  const t = new T().user("first").edit("/a.ts").user("second task").edit("/b.ts");
+  const key = analyzeTranscript(t.text()).turn;
+  assert.match(key ?? "", /^[0-9a-f]{12}$/);
+  assert.equal(currentTurn(t.text()), key);
+  t.bash("npm test", JEST_PASS).push({ type: "user", origin: { kind: "task-notification" }, message: { role: "user", content: "<task-notification>done</task-notification>" } }).say("done");
+  assert.equal(analyzeTranscript(t.text()).turn, key);
+  const reworded = new T().user("first").edit("/a.ts").user("other words!").edit("/b.ts");
+  assert.equal(analyzeTranscript(reworded.text()).turn, key);
+  assert.notEqual(analyzeTranscript(t.user("third").text()).turn, key);
+  const viaUuid = (pad: number, text: string) => {
+    const u = new T();
+    for (let i = 0; i < pad; i++) u.say("pad");
+    return analyzeTranscript(u.user(text, { uuid: "4f0c-uuid" }).edit("/c.ts").text()).turn;
+  };
+  assert.equal(viaUuid(0, "a"), viaUuid(5, "b"));
+  assert.notEqual(viaUuid(0, "a"), analyzeTranscript(new T().user("a", { uuid: "other-uuid" }).edit("/c.ts").text()).turn);
+  assert.equal(analyzeTranscript(new T().edit("/a.ts").text()).turn, undefined);
+  assert.equal(currentTurn("garbage"), undefined);
+  assert.equal(currentTurn(""), undefined);
+});
+
+test("turn key: a prompt without a uuid is keyed by its position within the session; a uuid keys the same in every session", () => {
+  const plain = new T().user("fix it").edit("/a.ts").text();
+  const other = new T().user("something else entirely").say("ok").text();
+  assert.equal(currentTurn(plain, "s1"), currentTurn(plain, "s1"));
+  assert.equal(analyzeTranscript(plain, "s1").turn, currentTurn(plain, "s1"));
+  assert.notEqual(currentTurn(plain, "s1"), currentTurn(plain, "s2"));
+  assert.notEqual(currentTurn(other, "s1"), currentTurn(plain, "s2"));
+  assert.notEqual(analyzeTranscript(plain, "s1").turn, analyzeTranscript(plain, "s2").turn);
+  const withUuid = new T().user("fix it", { uuid: "9b1d-uuid" }).edit("/a.ts").text();
+  assert.equal(currentTurn(withUuid, "s1"), currentTurn(withUuid, "s2"));
+  assert.equal(analyzeTranscript(withUuid, "s1").turn, analyzeTranscript(withUuid, "s2").turn);
+  assert.notEqual(currentTurn(withUuid, "s1"), currentTurn(plain, "s1"));
+});
+
+test("scanLength: the characters analyzeTranscript may scan, the current turn and the one before it", () => {
+  assert.equal(scanLength(""), 0);
+  const none = new T().edit("/a.ts").say("no prompt").text();
+  assert.equal(scanLength(none), none.length);
+  const one = new T().user("first");
+  const head = one.text().length;
+  const single = one.edit("/a.ts").say("done").text();
+  assert.equal(scanLength(single), single.length - head);
+  const big = "z".repeat(50_000);
+  const first = new T().say("intro").user("first");
+  const firstEnd = first.text().length;
+  const two = first.say(big).user("second").edit("/b.ts").say("done").text();
+  assert.equal(scanLength(two), two.length - firstEnd);
+  assert.ok(scanLength(two) > big.length);
+  const three = new T().user("first").say(big).user("second").say("short").user("third").edit("/c.ts").text();
+  assert.ok(scanLength(three) < 1_000, `scanned ${scanLength(three)}`);
+  assert.equal(scanLength(new T().user("only").text().trimEnd()), 0);
+  const noNewline = new T().say("x").user("last").text().trimEnd();
+  assert.equal(scanLength(noNewline), noNewline.length);
+  assert.equal(scanLength("garbage"), "garbage".length);
 });

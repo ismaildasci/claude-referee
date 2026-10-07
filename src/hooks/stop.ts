@@ -1,7 +1,6 @@
-// Stop done-gate, shadow mode: after a turn with edits and no passing check, asks Jev whether Claude claimed success it didn't verify.
-// It records the decision (stops.jsonl) and never blocks; "soft" also returns a systemMessage JSON line (a user-visible warning), "shadow" prints nothing.
-// Fails open: a failure is recorded with its error code (and a receipt once a Session exists); "active" is not built and runs as shadow, marked configured.
-// Off unless .claude/referee.json sets hooks.stopGate.
+// Stop done-gate, shadow mode (off unless .claude/referee.json sets hooks.stopGate): after a turn with edits and no passing check, asks Jev whether Claude claimed success it didn't verify.
+// It records the decision (stops.jsonl) and never blocks; "soft" also returns a systemMessage JSON line (a user-visible warning), "shadow" prints nothing; "active" is not built and runs as shadow, marked configured.
+// Fails open: a failure is recorded with its error code (and a receipt once a Session exists). While background tasks run it asks nothing but records counts, turn, bg_pending and would_ask; an unreadable transcript or a scan past BG_SCAN_MAX keeps edits 0, checks 0, no would_ask.
 
 import { readFileSync } from "node:fs";
 import { projectId, resolveDataDir } from "../engine/datadir.ts";
@@ -11,8 +10,8 @@ import { loadProject } from "../engine/project.ts";
 import { Session, type Outcome } from "../engine/session.ts";
 import { decideStop, stopQuestions, stopSkipReason, stopState } from "../engine/stopgate/decide.ts";
 import { appendStop, newStopId } from "../engine/stopgate/stops.ts";
-import { analyzeTranscript } from "../engine/stopgate/transcript.ts";
-import type { StopRecord, StopSkip } from "../engine/stopgate/types.ts";
+import { analyzeTranscript, currentTurn, scanLength } from "../engine/stopgate/transcript.ts";
+import type { StopFacts, StopRecord, StopSkip } from "../engine/stopgate/types.ts";
 import type { HookIo } from "./session-start.ts";
 
 interface StopInput {
@@ -25,9 +24,46 @@ interface StopInput {
 }
 
 const EXCERPT = 200;
+const BG_SCAN_MAX = 8_000_000;
 const LOCAL_SKIP: Partial<Record<ErrorCode, StopSkip>> = { credential_in_state: "credential", no_api_key: "no_key", invalid_api_key: "no_key", pack_not_found: "config_error", bad_pack: "config_error" };
 
 export { decideStop };
+
+function readTranscript(path: unknown): string | null {
+  if (typeof path !== "string") return null;
+  try {
+    return readFileSync(path, "utf8");
+  } catch {
+    return null;
+  }
+}
+
+function recordFacts(facts: StopFacts) {
+  const { marks } = facts;
+  return {
+    edits: facts.edits.length,
+    checks: facts.checks.length,
+    ...(marks.truncatedChecks > 0 ? { truncated_checks: marks.truncatedChecks } : {}),
+    ...(marks.subagentCalls > 0 ? { subagent_calls: marks.subagentCalls } : {}),
+    ...(marks.subagentReports > 0 ? { subagent_reports: marks.subagentReports } : {}),
+    ...(marks.stalePass ? { stale_pass: true as const } : {}),
+    ...(facts.turn ? { turn: facts.turn } : {}),
+  };
+}
+
+function backgroundFacts(text: string | null, pending: number, session: string): Partial<StopRecord> {
+  if (text === null) return { bg_pending: pending };
+  try {
+    if (scanLength(text) > BG_SCAN_MAX) {
+      const turn = currentTurn(text, session);
+      return { ...(turn ? { turn } : {}), bg_pending: pending };
+    }
+    const facts = analyzeTranscript(text, session);
+    return { ...recordFacts(facts), bg_pending: pending, would_ask: stopSkipReason(facts) === null };
+  } catch {
+    return { bg_pending: pending };
+  }
+}
 
 export const SOFT_NOTE = "claude-referee: this turn edited files and claimed it was done, but no passing check ran after the last edit. Run the project's tests or build before trusting it.";
 
@@ -53,25 +89,17 @@ export async function stopGate(io: HookIo, _pluginRoot: string): Promise<string 
     return undefined;
   };
 
-  if (input.stop_hook_active === true) return finish("stop_hook_active");
-  if (Array.isArray(input.background_tasks) && input.background_tasks.length > 0) return finish("background_tasks");
-  if (typeof input.transcript_path !== "string") return finish("no_transcript");
-  let text: string;
-  try {
-    text = readFileSync(input.transcript_path, "utf8");
-  } catch {
-    return finish("no_transcript");
+  if (input.stop_hook_active === true) {
+    const text = readTranscript(input.transcript_path);
+    const turn = text === null ? undefined : currentTurn(text, sessionId);
+    return finish("stop_hook_active", turn ? { turn } : {});
   }
-  const facts = analyzeTranscript(text);
-  const { marks } = facts;
-  const counts = {
-    edits: facts.edits.length,
-    checks: facts.checks.length,
-    ...(marks.truncatedChecks > 0 ? { truncated_checks: marks.truncatedChecks } : {}),
-    ...(marks.subagentCalls > 0 ? { subagent_calls: marks.subagentCalls } : {}),
-    ...(marks.subagentReports > 0 ? { subagent_reports: marks.subagentReports } : {}),
-    ...(marks.stalePass ? { stale_pass: true as const } : {}),
-  };
+  const pending = Array.isArray(input.background_tasks) ? input.background_tasks.length : 0;
+  const text = readTranscript(input.transcript_path);
+  if (pending > 0) return finish("background_tasks", backgroundFacts(text, pending, sessionId));
+  if (text === null) return finish("no_transcript");
+  const facts = analyzeTranscript(text, sessionId);
+  const counts = recordFacts(facts);
   const skip = stopSkipReason(facts);
   if (skip) return finish(skip, counts);
   const finalMessage = typeof input.last_assistant_message === "string" && input.last_assistant_message.trim() ? input.last_assistant_message.slice(-2_000) : facts.finalMessage;
