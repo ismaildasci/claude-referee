@@ -190,7 +190,15 @@ secret-tool store --label="TypeSafe API key" service typesafe
 export TYPESAFE_API_KEY_CMD="secret-tool lookup service typesafe"
 ```
 
-Ya da `TYPESAFE_API_KEY` tanımla. `/plugin configure claude-referee` (ya da Claude Code 2.1.285+ ile `claude plugin configure claude-referee --values-stdin`) de anahtarı saklar, ama Claude Code eklenti sırlarını yalnızca hook'lara iletir, kabuğa iletmez. Tam arama sırası [yapılandırma](docs/configuration.md#the-api-key) sayfasında (İngilizce).
+```powershell
+# Windows (henüz test edilmedi), PowerShell 7.1 veya sonrası: anahtarı göstermeden sorar ve kullanıcın için kaydeder.
+# Ardından yeni bir terminal aç ve Claude Code'u yeniden başlat ki ikisi de görsün.
+[Environment]::SetEnvironmentVariable("TYPESAFE_API_KEY", (Read-Host "TypeSafe API key" -MaskInput), "User")
+```
+
+Windows'ta anahtar bir kimlik bilgisi kasasında değil, kullanıcı ortam değişkeninde (`HKCU\Environment`) durur; çalıştırdığın programlar onu okuyabilir.
+
+macOS ya da Linux'ta doğrudan `TYPESAFE_API_KEY` de tanımlayabilirsin. `/plugin configure claude-referee` (ya da Claude Code 2.1.285+ ile `claude plugin configure claude-referee --values-stdin`) de anahtarı saklar, ama Claude Code eklenti sırlarını yalnızca hook'lara iletir, kabuğa iletmez. Tam arama sırası [yapılandırma](docs/configuration.md#the-api-key) sayfasında (İngilizce).
 
 **3. Bir projede aç:** `.claude/referee.json` dosyasını commit'le. Bu dosya yoksa hakem sessiz kalır:
 

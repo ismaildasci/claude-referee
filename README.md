@@ -194,7 +194,15 @@ secret-tool store --label="TypeSafe API key" service typesafe
 export TYPESAFE_API_KEY_CMD="secret-tool lookup service typesafe"
 ```
 
-Or set `TYPESAFE_API_KEY`. `/plugin configure claude-referee` (or `claude plugin configure claude-referee --values-stdin`, Claude Code 2.1.285+) also stores the key, but Claude Code passes plugin secrets to hooks only, not to the shell. The full lookup order is in [configuration](docs/configuration.md#the-api-key).
+```powershell
+# Windows (not yet tested), PowerShell 7.1 or later: asks for the key without showing it and saves it for your user.
+# Open a new terminal and restart Claude Code afterwards so both pick it up.
+[Environment]::SetEnvironmentVariable("TYPESAFE_API_KEY", (Read-Host "TypeSafe API key" -MaskInput), "User")
+```
+
+On Windows the key is a user environment variable (`HKCU\Environment`), not a credential store, so programs you run can read it.
+
+On macOS or Linux you can also just set `TYPESAFE_API_KEY`. `/plugin configure claude-referee` (or `claude plugin configure claude-referee --values-stdin`, Claude Code 2.1.285+) also stores the key, but Claude Code passes plugin secrets to hooks only, not to the shell. The full lookup order is in [configuration](docs/configuration.md#the-api-key).
 
 **3. Turn it on for a project** by committing `.claude/referee.json`. Without this file, the referee stays silent:
 
