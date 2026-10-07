@@ -101,7 +101,7 @@ Opus 5.5 with 50K tokens of cached context. This is the table behind the README 
 | One small judgement whose content is already in context | Loses money | The extra request re-reads the context |
 | Claude writing a long request | Loses money: 500 tokens ≈$0.0155 on Claude vs $0.000021 on Jev | Output, cache write and later reads |
 | Verbose output that echoes its input | 1,000 result tokens ≈$0.011 over 30 turns | Every later request re-reads it |
-| Asking the same question again | A full extra turn for almost no new information | Jev's answers vary by about 0.01 between runs |
+| Asking the same question again | A full extra turn for no new information | An identical request is answered from the local cache; with `--fresh`, Jev's answers vary by about 0.01 between runs |
 | Switching the main model mid-session | At 300K context, switching to Sonnet 5.5 ≈$0.75 vs staying ≈$0.06 | The new model re-reads everything uncached |
 
 Two consequences shape claude-referee:

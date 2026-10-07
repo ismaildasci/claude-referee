@@ -83,7 +83,7 @@ export const judge: Command = {
       items: "Number of items judged",
       yes: "Answers in the yes band",
       no: "Answers in the no band",
-      review: "Answers between the bands",
+      review: "Answers between the bands; when they are more than half of the answers, next_step says the question is not deciding on these items",
       flagged: "Item ids with a yes (first 20; 'id/question' when several questions); with --baseline only the new ones",
       new: "With --baseline: yes answers not in the baseline",
       baselined: "With --baseline: yes answers already in the baseline",
@@ -185,6 +185,11 @@ export const judge: Command = {
           Object.assign(extra, { new: newYes, baselined: yes - newYes, gone });
         }
         const verdict = writing && baselinePath ? "recorded" : newYes > 0 ? "flagged" : review > 0 || unanswered.length > 0 ? "review" : "clear";
+        const answered = yes + no + review;
+        const next = [
+          unanswered.length ? "Some items got no answer; run judge again on those items." : "",
+          review * 2 > answered ? `The question is not deciding on these items (${review} of ${answered} answers in review). Pass --context with what the file or change is, or ask a project-specific question from your own pack.` : "",
+        ].filter(Boolean);
         return {
           ok: true,
           verdict,
@@ -196,7 +201,8 @@ export const judge: Command = {
           ...(shown.length ? { flagged: shown.slice(0, LIST_LIMIT) } : {}),
           ...(reviewIds.length ? { review_ids: reviewIds.slice(0, LIST_LIMIT) } : {}),
           ...(stopped.length ? { stopped } : {}),
-          ...(unanswered.length ? { unanswered: unanswered.slice(0, LIST_LIMIT), next_step: "Some items got no answer; run judge again on those items." } : {}),
+          ...(unanswered.length ? { unanswered: unanswered.slice(0, LIST_LIMIT) } : {}),
+          ...(next.length ? { next_step: next.join(" ") } : {}),
         };
       },
       { batch: true },

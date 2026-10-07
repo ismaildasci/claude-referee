@@ -108,8 +108,12 @@ test("session-start still prints the briefing when it can't write the env file o
 
 test("session-start briefing fits in 600 characters with a long installed plugin path", async () => {
   const installed = "/Users/averageusername/.claude/plugins/cache/claude-referee/claude-referee/0.1.1";
-  const out = await sessionStart(hookIo(event(project())), installed);
-  const text = (JSON.parse(out ?? "{}") as { hookSpecificOutput: { additionalContext: string } }).hookSpecificOutput.additionalContext;
-  assert.ok(text.includes(join(installed, "dist", "cli.mjs")));
-  assert.ok(text.length <= 600, `${text.length} characters`);
+  const fourChecks = ["npm run typecheck", "npm test", "npm run lint", "npm run build"];
+  for (const config of [undefined, { pack: "generic" }, { pack: "generic", areas: [{ prefix: "", checks: fourChecks }] }]) {
+    const out = await sessionStart(hookIo(event(project(config))), installed);
+    const text = (JSON.parse(out ?? "{}") as { hookSpecificOutput: { additionalContext: string } }).hookSpecificOutput.additionalContext;
+    assert.ok(text.includes(join(installed, "dist", "cli.mjs")));
+    assert.ok(text.endsWith("narrow the question."), "the last line of the cheat sheet is kept");
+    assert.ok(text.length <= 600, `${text.length} characters with ${JSON.stringify(config)}`);
+  }
 });

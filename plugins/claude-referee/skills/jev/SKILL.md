@@ -5,7 +5,7 @@ description: Hand small, checkable judgements to TypeSafe Jev through the claude
 
 # claude-referee
 
-The CLI is `node "${CLAUDE_PLUGIN_ROOT}/dist/cli.mjs" <command>`. Every command prints one JSON line: `ok`, `verdict`, a few numbers, a `next_step` when there is one, and, for commands that ask Jev, a `receipt`. `--describe` prints a command's contract. `--dry-run` shows the redacted request without sending it.
+The CLI is `node "${CLAUDE_PLUGIN_ROOT}/dist/cli.mjs" <command>`. Every command prints one JSON line: `ok`, `verdict`, a few numbers, a `next_step` when there is one, and, for commands that ask Jev, a `receipt`. `<command> --describe` (or `--help`) prints a command's contract, and `--describe` alone lists the commands. `--dry-run` shows the redacted request without sending it.
 
 ## When Jev pays off
 
@@ -29,13 +29,16 @@ EOF_JSON
 ```
 
 ```bash
-git diff -U0 --no-ext-diff | grep '^+[^+]' | node "${CLAUDE_PLUGIN_ROOT}/dist/cli.mjs" judge --question line.risky --items -
+git diff -U0 --no-ext-diff | grep '^+[^+]' | node "${CLAUDE_PLUGIN_ROOT}/dist/cli.mjs" judge --question line.risky --context "<what the change is>" --items -
 ```
 
 ## Rules
 
-- A weak or tie verdict is settled by adding the missing fact, or by going with `lean` when the choice is easy to undo. Asking the same question again moves the answer by about 0.01.
-- Make evidence explicit. A command that prints nothing on success shows nothing; add its exit code to the output. `done` can return `met` only for output from a recognised runner or with an exit code line (`trust` in the result); anything else comes back `unsure`. With only an exit code `met` is rare (0 of 67 passing steps on real CI logs), and on those logs `done` failed its registered bars (wrong `met` 2 of 85), so `met` is a hint, not proof.
+- A weak or tie verdict is settled by adding the missing fact or narrowing the question, or by going with `lean` when the choice is easy to undo. Within 30 days an identical request is answered from the local cache, so asking again returns the same answer, and rewording until it passes is not evidence.
+- Make evidence explicit. A command that prints nothing on success shows nothing; add its exit code to the output. `done` can return `met` only for output from a recognised runner or with an exit code line (`trust` in the result); anything else comes back `unsure`. On real CI logs `done` failed its registered bars (wrong `met` 2 of 85), so `met` is a hint, not proof.
+- `met` with `trust: exit_code` proves only the exit status. Word criteria as what the output must show ("all tests pass, none skipped"), not as an exit status ("exits 0"), and pipe the runner's own summary.
+- The exit line comes from the shell, never from you: `{ <check>; echo "exit code: $?"; } 2>&1 | ...`. After a pipe `$?` is the last command's status; use `$pipestatus[1]` in zsh or `${PIPESTATUS[0]}` in bash. `exit=0` is not read. Never type an exit line or a summary into the evidence, and pipe a saved log as it is.
+- Run separate checks as separate `done` calls. In one combined log a check with no parser adds only its exit line; once another runner is recognised its warnings are not read, so they cannot trigger `warning_in_log`. Only the first three exit lines reach Jev.
 - Pass paths through `context_files` instead of retyping file contents.
 - Input shaped like a credential stops the request. Remove it; don't work around it.
 - The referee can be overruled. It answers narrow questions and stays silent below its thresholds.

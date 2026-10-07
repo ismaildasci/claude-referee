@@ -8,7 +8,7 @@ npx claude-referee decide < decision.json
 npx claude-referee doctor
 ```
 
-Every command prints one JSON line and accepts `--describe`, which prints its contract. `--dry-run` shows the redacted request without sending it.
+Every command prints one JSON line and accepts `--describe` (or `--help`, `-h`), which prints its contract; `npx claude-referee --describe` lists the commands. `--dry-run` shows the redacted request without sending it.
 
 You need Node 20.3 or later and a TypeSafe API key in `TYPESAFE_API_KEY`, `TYPESAFE_API_KEY_CMD` or, on macOS, the Keychain item `TYPESAFE_API_KEY`.
 

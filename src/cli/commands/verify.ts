@@ -125,6 +125,22 @@ export function verifyRequest(pack: Pack, thresholds: Thresholds | undefined, cl
     }
     const notSupported = unsupported.length > 0;
     const verdict = notSupported ? "unsupported" : unsure.length || saysNothing.length || unanswered.length ? "unsure" : "supported";
+    const nextByReason: Record<string, string> = {
+      contradicted: "The source says otherwise. Fix the claim or drop it.",
+      quote_not_in_source: "The quoted text is not in the source. Quote the source exactly, or add the source that has the text.",
+      source_has_instruction_for_judge: "The source has a line aimed at the judge. Pass only the section of the source the claims are about.",
+      between_bands: "Jev's answer fell between the bands. Split the claim into single facts, or add the passage that states it.",
+      says_nothing: "The source is silent on the claim. Add the passage that supports it; don't reword the claim.",
+      orders_disagree: "The two option orders disagree. State the claim more narrowly.",
+      identifier_not_in_source: "A backticked name is not in the source. Write it exactly as the source does, or add the source that has it.",
+      number_not_in_source: "A number is not in the source. Write it exactly as the source does, add the source that has it, or check a computed number with a script.",
+      unanswered: "Some claims got no answer (API error or deadline). Run claims again for them.",
+    };
+    const tally = new Map<string, number>();
+    for (const reason of [...reasons.values(), ...unanswered.map(() => "unanswered")]) tally.set(reason, (tally.get(reason) ?? 0) + 1);
+    const top = Object.keys(nextByReason).reduce((best, r) => ((tally.get(r) ?? 0) > (tally.get(best) ?? 0) ? r : best));
+    const listedCount = reasons.size + unanswered.length;
+    const nextStep = verdict === "supported" ? undefined : `${tally.size > 1 ? `${tally.get(top)} of ${listedCount} listed claims: ` : ""}${nextByReason[top]}`;
     return {
       ok: true,
       verdict,
@@ -138,12 +154,7 @@ export function verifyRequest(pack: Pack, thresholds: Thresholds | undefined, cl
       ...(injected ? { source_injection: true } : {}),
       ...(reasons.size ? { reasons: Object.fromEntries(reasons) } : {}),
       ...(listed.size ? { p: Object.fromEntries(listed) } : {}),
-      next_step:
-        verdict === "supported"
-          ? undefined
-          : saysNothing.length && !notSupported && !unsure.length
-            ? "The source is silent on the listed claims: add the passage that supports them, don't reword the claims."
-            : "Fix or drop contradicted claims, add the source passage for silent ones, and check numbers that are not in the source with a script.",
+      next_step: nextStep,
     };
   };
   return { planned, finish };

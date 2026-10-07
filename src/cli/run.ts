@@ -1,6 +1,7 @@
 // CLI runner: parses flags, prints one JSON line, maps verdicts and errors to exit codes.
 // Exit codes: 0 for any verdict, 1 for real errors, 3 when --fail-on matches the verdict.
 // A Jev command given input (its own option or stdin it read; positionals never count) that fails unreceipted gets a zero-request receipt, never with --dry-run.
+// `<command> --help` or `-h` prints the command's contract like --describe; a bare `--describe` prints the command index.
 
 import { join } from "node:path";
 import { parseArgs, type ParseArgsOptionsConfig } from "node:util";
@@ -14,6 +15,7 @@ import type { Command, Context, GlobalFlags, Io } from "./types.ts";
 
 export const GLOBAL_OPTIONS: ParseArgsOptionsConfig = {
   describe: { type: "boolean" },
+  help: { type: "boolean", short: "h" },
   pretty: { type: "boolean" },
   "dry-run": { type: "boolean" },
   fresh: { type: "boolean" },
@@ -25,6 +27,7 @@ export const GLOBAL_OPTIONS: ParseArgsOptionsConfig = {
 
 export const SHARED_CONTRACT = {
   flags: {
+    "--help (-h)": "After a command: print that command's contract, the same as --describe.",
     "--pretty": "Indented JSON for people.",
     "--data-dir <dir>": "Use another data directory for receipts, cache and results.",
     "--pack <name>": "Use this pack instead of the project's.",
@@ -71,7 +74,54 @@ function usage(commands: readonly Command[]): string {
     "",
     "Every command accepts --describe (JSON contract), --pretty, --data-dir, --pack and --fail-on <verdict,...>.",
     "Commands that ask Jev also accept --dry-run, --fresh and --verbose.",
+    `${KIT} <command> --help (or -h) prints that command's contract, the same as --describe.`,
+    `${KIT} --describe prints this command list as JSON (it takes only --pretty); ${KIT} --describe <command> is <command> --describe.`,
   ].join("\n");
+}
+
+const INDEX_ARGS: ReadonlySet<string> = new Set(["--describe", "--pretty", "--help", "-h"]);
+
+function index(commands: readonly Command[]): Record<string, unknown> {
+  return {
+    name: KIT,
+    version: VERSION,
+    usage: `${KIT} <command> [options]`,
+    commands: Object.fromEntries(commands.map((c) => [c.name, c.describe.summary])),
+    contract: `${KIT} <command> --describe (or --help, -h) prints that command's inputs, outputs, errors, effects and cost.`,
+    ...SHARED_CONTRACT,
+  };
+}
+
+function editDistance(a: string, b: string): number {
+  let row = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const next = [i];
+    for (let j = 1; j <= b.length; j++) next[j] = Math.min((row[j] ?? 0) + 1, (next[j - 1] ?? 0) + 1, (row[j - 1] ?? 0) + (a[i - 1] === b[j - 1] ? 0 : 1));
+    row = next;
+  }
+  return row[b.length] ?? 0;
+}
+
+export function closestFlag(token: string, options: ParseArgsOptionsConfig): string | undefined {
+  if (!token.startsWith("--")) return undefined;
+  const name = token.slice(2).toLowerCase();
+  let best: string | undefined;
+  let bestDistance = 3;
+  for (const key of Object.keys(options).sort()) {
+    const d = editDistance(name, key);
+    if (d < bestDistance && d < name.length) {
+      best = `--${key}`;
+      bestDistance = d;
+    }
+  }
+  return best;
+}
+
+function unknownOption(error: unknown, options: ParseArgsOptionsConfig): { token: string; suggestion: string } | null {
+  if ((error as { code?: unknown })?.code !== "ERR_PARSE_ARGS_UNKNOWN_OPTION") return null;
+  const token = /Unknown option '([^']+)'/.exec(error instanceof Error ? error.message : "")?.[1];
+  const suggestion = token === undefined ? undefined : closestFlag(token, options);
+  return token !== undefined && suggestion !== undefined ? { token, suggestion } : null;
 }
 
 function flagsFrom(values: Record<string, unknown>): GlobalFlags {
@@ -114,23 +164,35 @@ export async function run(argv: readonly string[], io: Io, commands: readonly Co
     io.write(`${VERSION}\n`);
     return 0;
   }
+  const indexCall = INDEX_ARGS.has(name) && argv.includes("--describe");
+  const target = indexCall ? argv.findIndex((arg) => !INDEX_ARGS.has(arg)) : -1;
+  if (indexCall && target === -1) {
+    io.write(JSON.stringify(index(commands), null, argv.includes("--pretty") ? 2 : 0) + "\n");
+    return 0;
+  }
+  if (indexCall && commands.some((c) => c.name === argv[target])) {
+    return run([argv[target] ?? "", ...argv.slice(0, target), ...argv.slice(target + 1)], io, commands);
+  }
   let pretty = rest.includes("--pretty");
   try {
     const command = commands.find((c) => c.name === name);
     if (!command) {
-      throw new RefereeError("bad_input", `Unknown command: ${name}`, { next_step: `Run ${KIT} --help for the list.` });
+      const message = indexCall ? `--describe without a command takes only --pretty; '${argv[target]}' is not a command.` : `Unknown command: ${name}`;
+      throw new RefereeError("bad_input", message.slice(0, 300), { next_step: `Run ${KIT} --help for the list.` });
     }
+    const options = { ...GLOBAL_OPTIONS, ...command.options };
     let parsed;
     try {
-      parsed = parseArgs({ args: [...rest], options: { ...GLOBAL_OPTIONS, ...command.options }, allowPositionals: true, strict: true });
+      parsed = parseArgs({ args: [...rest], options, allowPositionals: true, strict: true });
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
+      const unknown = unknownOption(error, options);
+      const message = unknown ? `Unknown option '${unknown.token}'. Did you mean ${unknown.suggestion}?` : error instanceof Error ? error.message : String(error);
       throw new RefereeError("bad_input", message.slice(0, 300), { next_step: `Run ${KIT} ${name} --describe for the inputs.` });
     }
     const values = parsed.values as Record<string, unknown>;
     const flags = flagsFrom(values);
     pretty = flags.pretty;
-    if (values["describe"] === true) {
+    if (values["describe"] === true || values["help"] === true) {
       io.write(JSON.stringify({ command: command.name, ...command.describe, ...SHARED_CONTRACT }, null, pretty ? 2 : 0) + "\n");
       return 0;
     }
