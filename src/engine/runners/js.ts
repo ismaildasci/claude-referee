@@ -1,5 +1,5 @@
 // Parsers for jest, vitest, mocha, eslint, tsc and node:test output. Only structured markers and counts are read; prose in the log is ignored.
-// Worst case wins: a failure marker anywhere beats a passing summary line, and a log cut off before its summary never counts as a pass.
+// Worst case wins: a failure marker anywhere beats a passing summary line, and a log cut off before its summary never counts as a pass; a tsc -b status line ("[t] " or "t - " lead) makes a tsc run, cut off on a dry run, a skipped project, a watch restart after the last Found, or (no Found line after its header) a clip marker, no header, a listed project but the last (a solution root) with no status, or a last status still waiting for its build.
 // node:test details with no summary or failure marker (a tail in one error block) are one failure, cut off, unless a todo's "⚠ name (Xms)" owns them; assertion props any logged error has count only without a jest/vitest/bun/mocha summary; a TAP hookFailed block under "# fail 0" fails.
 
 import type { RunnerFacts, RunnerParser } from "./types.ts";
@@ -220,6 +220,45 @@ const TSC_LEAD = String.raw`^\s*(?:[\w@/.-]+(?:[: ][\w:-]+)?:\s+|\[[^\]]+\]:?\s+
 const TSC_PLAIN = new RegExp(String.raw`${TSC_LEAD}(\S+?)\((\d+),(\d+)\):\s+error\s+((?:TS|NG)\d+):`);
 const TSC_PRETTY = new RegExp(String.raw`${TSC_LEAD}(\S+?):(\d+):(\d+)\s+-\s+error\s+((?:TS|NG)\d+):`);
 const TSC_GLOBAL = new RegExp(String.raw`${TSC_LEAD}error\s+(TS\d+):`);
+const TSC_CLOCK = String.raw`[^\s'"[\]]{0,4}\s?\d{1,2}[:.]\d\d[:.]\d\d(?:\s?[^\s\d'"[\]-]{1,5})?\s-\s+`;
+const TSC_STATUS = String.raw`^\s*(?:\[[^\]]*\]\s*|${TSC_CLOCK})?`;
+const TSC_FOUND = new RegExp(String.raw`^\s*(?:\[[^\]]*\]\s*)?Found (\d+) errors?\b|^\s*${TSC_CLOCK}Found (\d+) errors?\. Watching for file changes\.`);
+const TSC_BUILD = new RegExp(String.raw`${TSC_STATUS}(?:Projects in this build:|Building project '|Project '[^']+' (?:is up to date\b|is out of date because\b|is being forcibly rebuilt\s*$)|Updating (?:unchanged )?output timestamps of project '[^']+'\.\.\.\s*$)`);
+const TSC_HALTED = new RegExp(String.raw`${TSC_STATUS}(?:A non-dry build would (?:build|update|delete)\b|Skipping build of project '[^']+' because its dependency '|Project '[^']+' can't be built because its dependency ')`);
+const TSC_HEADER = new RegExp(String.raw`${TSC_STATUS}Projects in this build:`);
+const TSC_RESTART = new RegExp(String.raw`${TSC_STATUS}(?:Starting compilation in watch mode\b|File change detected\b)`);
+const TSC_NAMED = new RegExp(String.raw`${TSC_STATUS}(?:Project|Building project|Skipping build of project|Updating (?:unchanged )?output timestamps of project|A non-dry build would (?:build|update timestamps for output of) project) '([^']+)'`);
+const TSC_PENDING = new RegExp(String.raw`${TSC_STATUS}Project '[^']+' is (?:out of date because|being forcibly rebuilt|up to date with \.d\.ts files from its dependencies|up to date but needs to update timestamps)`);
+const CLIP_MARK = /^\[… \d+ characters omitted …\]$/;
+
+function tscCut(lines: readonly string[], build: boolean): boolean {
+  let restart = -1;
+  let found = -1;
+  lines.forEach((l, i) => {
+    if (TSC_RESTART.test(l)) restart = i;
+    if (TSC_FOUND.test(l)) found = i;
+  });
+  if (restart > found) return true;
+  const heads = lines.flatMap((l, i) => (TSC_HEADER.test(l) ? [i] : []));
+  if (!build || found > (heads.at(-1) ?? -1)) return false;
+  if (heads.length === 0 || lines.some((l) => CLIP_MARK.test(l))) return true;
+  for (const h of heads) {
+    const listed: string[] = [];
+    let i = h + 1;
+    for (; i < lines.length; i++) {
+      const l = lines[i] ?? "";
+      if (l.trim() === "") continue;
+      const m = /^\s+\* (.+?)\s*$/.exec(l);
+      if (m === null) break;
+      listed.push(m[1] ?? "");
+    }
+    const named = lines.slice(i).flatMap((l) => TSC_NAMED.exec(l)?.[1] ?? []);
+    const due = listed.length === 1 ? listed : listed.slice(0, -1);
+    if (listed.length === 0 || due.some((p) => !named.some((q) => q === p || q.endsWith(`/${p}`)))) return true;
+  }
+  const last = lines.findLast((l) => TSC_NAMED.test(l));
+  return last !== undefined && TSC_PENDING.test(last);
+}
 
 function parseTsc(text: string): RunnerFacts | null {
   const lines = toLines(text);
@@ -227,10 +266,10 @@ function parseTsc(text: string): RunnerFacts | null {
   let errorsMax = 0;
   const entries = new Set<string>();
   for (const l of lines) {
-    const s = /^\s*(?:\[[^\]]*\]\s*)?Found (\d+) errors?\b/.exec(l);
+    const s = TSC_FOUND.exec(l);
     if (s !== null) {
       summary = l;
-      errorsMax = Math.max(errorsMax, Number(s[1]));
+      errorsMax = Math.max(errorsMax, Number(s[1] ?? s[2]));
       continue;
     }
     const a = TSC_PLAIN.exec(l) ?? TSC_PRETTY.exec(l);
@@ -241,10 +280,11 @@ function parseTsc(text: string): RunnerFacts | null {
     const g = TSC_GLOBAL.exec(l);
     if (g !== null) entries.add(g[1] ?? "");
   }
-  const build = lines.some((l) => /^\s*(?:\[[^\]]*\]\s*)?(?:Projects in this build:|Building project ')/.test(l));
-  if (summary === null && entries.size === 0 && !build) return null;
+  const build = lines.some((l) => TSC_BUILD.test(l));
+  const halted = lines.some((l) => TSC_HALTED.test(l));
+  if (summary === null && entries.size === 0 && !build && !halted) return null;
   const errors = Math.max(errorsMax, entries.size);
-  return facts("tsc", { passed: summary !== null && errors === 0 ? 1 : 0, failed: 0, errors, skipped: 0, failing: entries, summary });
+  return facts("tsc", { passed: summary !== null && errors === 0 ? 1 : 0, failed: 0, errors, skipped: 0, incomplete: halted || tscCut(lines, build), failing: entries, summary });
 }
 
 const NODE_WEAK: readonly RegExp[] = [/^\s+code: 'ERR_ASSERTION',$/, /^\s+diff: '(?:simple|full)'$/];
