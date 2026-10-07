@@ -24,3 +24,7 @@ Anything else keeps today's facts. Errors still count as errors, a cut log is st
 - Replay on real-use `done` calls with visible `tsc -b` output (aggregate counts only): verdicts that change.
 
 A fix fitted to the cases named here, not a clean test.
+
+## Addendum after review (2026-10-07)
+
+Added after the rule was built and reviewed; the sections above are unchanged. `Building project` is a completion line only in TypeScript 7, which prints a project's status lines once that project is done. TypeScript 5 and 6 print it before they compile, so a 5 or 6 build killed during its last project, with no trailing text and no exit line, ends exactly like a clean build and gets the marker. The rule as registered cannot tell the two apart. Closing this needs a narrower rule, registered and replayed on its own: a TypeScript 5 or 6 `Building project` line (an absolute path) ends a project only when a later status line follows it. The guards added after the review (no `error TS…:` token, clock-stamped header and status lines, nothing after them but exit lines, `is up to date because`) are read as the registered preconditions (no error line, not incomplete); see [the result](tsc-build-marker-result.md#review-fixes).

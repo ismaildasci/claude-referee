@@ -1,5 +1,5 @@
-// tsc -b status lines behind a "t - " clock (TypeScript 7, and 5/6 when not on a TTY) or "[t]": clean, up to date, errors, dry runs, watch, logs cut by tail, head,
-// a watch kill or the done clip (incomplete), and timestamped logs that are not tsc.
+// tsc -b status lines behind a "t - " clock (TypeScript 7, and 5/6 when not on a TTY) or "[t]": clean, up to date, errors, dry runs, watch, logs cut by tail, head, a watch kill or the done clip (incomplete),
+// timestamped logs that are not tsc, and the clean-build marker (only when every listed project ends built or up to date because, with no error token and only clock-stamped status, blank and exit lines after the list).
 // Every line is invented to mirror the shape of real tsc 6.0 and 7.0 output; real log text is never committed.
 
 import assert from "node:assert/strict";
@@ -42,11 +42,10 @@ const TS7_ERRORS = `${TS7_CLEAN}libs/shared/src/math.ts(4,7): error TS2322: Type
 const TS7_UPSTREAM = "09:14:02 AM - Projects in this build: \r\n    * core/tsconfig.json\r\n    * web/tsconfig.json\n\n09:14:02 AM - Building project 'core/tsconfig.json'...\n\ncore/src/a.ts(1,14): error TS2322: Type 'string' is not assignable to type 'number'.\n09:14:02 AM - Project 'web/tsconfig.json' is up to date with .d.ts files from its dependencies\n\n09:14:02 AM - Updating output timestamps of project 'web/tsconfig.json'...\n\n";
 const TS7_DRY = "09:14:02 AM - Projects in this build: \r\n    * core/tsconfig.json\n\n09:14:02 AM - Project 'core/tsconfig.json' is out of date because buildinfo file 'core/tsconfig.tsbuildinfo' indicates that program needs to report errors.\n\n09:14:02 AM - A non-dry build would build project '/srv/work/demo/core/tsconfig.json'\n\n";
 
-test("tsc -b with a 't - ' clock: a clean TS7 or TS6 build is tsc with 0 errors, no pass count and no summary", () => {
-  for (const log of [TS7_CLEAN, TS6_CLEAN]) {
-    assert.deepEqual(facts(log), { passed: 0, errors: 0, incomplete: false, failing: [], summary: null });
-    assert.deepEqual(parseEvidence(`${log}exit code: 0\n`).runners.map((r) => r.runner), ["tsc"]);
-  }
+test("tsc -b with a 't - ' clock: a clean TS7 or TS6 build is tsc with 0 errors; a solution root with no status line leaves no pass count and no summary", () => {
+  assert.deepEqual(facts(TS7_CLEAN), { passed: 0, errors: 0, incomplete: false, failing: [], summary: null });
+  assert.deepEqual(facts(TS6_CLEAN), { passed: 1, errors: 0, incomplete: false, failing: [], summary: "Building project '/srv/work/demo/pkg/tsconfig.json'..." });
+  for (const log of [TS7_CLEAN, TS6_CLEAN]) assert.deepEqual(parseEvidence(`${log}exit code: 0\n`).runners.map((r) => r.runner), ["tsc"]);
 });
 
 test("tsc -b clocks in other locales and the pretty '[t]' lead read the same", () => {
@@ -195,4 +194,129 @@ test("tsc watch: a log cut before the Found line that follows its last start or 
   assert.deepEqual(verdictOf(`${first}${change}`), { verdict: "unsure", reason: "incomplete_run" });
   assert.equal(facts(`${first}${change}04:49:31 PM - Found 0 errors. Watching for file changes.\n`)?.incomplete, false);
   assert.equal(facts("[3:01:44 PM] Starting compilation in watch mode...\n\n[3:01:45 PM] Found 0 errors. Watching for file changes.\n\n[3:02:10 PM] File change detected. Starting incremental compilation...\n")?.incomplete, true);
+});
+
+const TS5_ONE = "[10:42:07] Projects in this build: \n    * tsconfig.json\n\n[10:42:07] Project 'tsconfig.json' is out of date because output file 'tsconfig.tsbuildinfo' does not exist\n\n[10:42:07] Building project '/srv/work/ledger/tsconfig.json'...\n\n";
+const TS7_ONE = "05:16:25 PM - Projects in this build: \r\n    * tsconfig.json\n\n05:16:25 PM - Project 'tsconfig.json' is being forcibly rebuilt\n\n05:16:25 PM - Building project 'tsconfig.json'...\n\n";
+const TS7_SOME_UP = [
+  "02:11:40 PM - Projects in this build: \r",
+  "    * packages/core/tsconfig.json\r",
+  "    * packages/api/tsconfig.json\r",
+  "    * packages/web/tsconfig.json",
+  "",
+  "02:11:40 PM - Project 'packages/core/tsconfig.json' is up to date because newest input 'packages/core/src/index.ts' is older than output 'packages/core/tsconfig.tsbuildinfo'",
+  "",
+  "02:11:40 PM - Project 'packages/api/tsconfig.json' is out of date because output 'packages/api/tsconfig.tsbuildinfo' is older than input 'packages/api/src/routes.ts'",
+  "",
+  "02:11:40 PM - Building project 'packages/api/tsconfig.json'...",
+  "",
+  "02:11:42 PM - Project 'packages/web/tsconfig.json' is up to date because newest input 'packages/web/src/app.ts' is older than output 'packages/web/tsconfig.tsbuildinfo'",
+  "",
+];
+const TS5_ROOT = [
+  "[9:05:13 AM] Projects in this build: ",
+  "    * libs/util/tsconfig.json",
+  "    * tsconfig.json",
+  "",
+  "[9:05:13 AM] Project 'libs/util/tsconfig.json' is out of date because output file 'libs/util/tsconfig.tsbuildinfo' does not exist",
+  "",
+  "[9:05:13 AM] Building project '/srv/work/demo/libs/util/tsconfig.json'...",
+  "",
+  "[9:05:14 AM] Project 'tsconfig.json' is up to date because newest input 'src/main.ts' is older than output 'tsconfig.tsbuildinfo'",
+  "",
+];
+const UP_WEB = "Project 'packages/web/tsconfig.json' is up to date because newest input 'packages/web/src/app.ts' is older than output 'packages/web/tsconfig.tsbuildinfo'";
+const unchanged = { passed: 0, errors: 0, incomplete: false, failing: [], summary: null };
+
+test("tsc -b marker: a clean single-project build, '[t]' or 't - ', passes 1 with its last status line as summary, clock removed", () => {
+  assert.deepEqual(facts(TS5_ONE), { passed: 1, errors: 0, incomplete: false, failing: [], summary: "Building project '/srv/work/ledger/tsconfig.json'..." });
+  assert.deepEqual(facts(TS7_ONE), { passed: 1, errors: 0, incomplete: false, failing: [], summary: "Building project 'tsconfig.json'..." });
+  assert.equal(facts(TS7_ONE.replace(/05:16:25 PM - /g, "16.05.12 - "))?.summary, "Building project 'tsconfig.json'...");
+  assert.deepEqual(facts(TS7_ONE.replace(/05:16:25 PM - Project 'tsconfig\.json' is being forcibly rebuilt\n\n05:16:25 PM - Building project 'tsconfig\.json'\.\.\./, "05:16:25 PM - Project 'tsconfig.json' is up to date because newest input 'src/a.ts' is older than output 'tsconfig.tsbuildinfo'")), { passed: 1, errors: 0, incomplete: false, failing: [], summary: "Project 'tsconfig.json' is up to date because newest input 'src/a.ts' is older than output 'tsconfig.tsbuildinfo'" });
+});
+
+test("tsc -b marker: a multi-project build where some projects are up to date passes every listed project", () => {
+  assert.deepEqual(facts(cut(TS7_SOME_UP)), { passed: 3, errors: 0, incomplete: false, failing: [], summary: UP_WEB });
+  const bracket = cut(TS7_SOME_UP.map((l) => l.replace(/^(\d\d:\d\d:\d\d PM) - /, "[$1] ")));
+  assert.deepEqual(facts(bracket), { passed: 3, errors: 0, incomplete: false, failing: [], summary: UP_WEB });
+  assert.deepEqual(facts(cut(TS5_ROOT)), { passed: 2, errors: 0, incomplete: false, failing: [], summary: "Project 'tsconfig.json' is up to date because newest input 'src/main.ts' is older than output 'tsconfig.tsbuildinfo'" });
+});
+
+test("tsc -b marker: a listed project with no status line, or one that ends waiting, keeps today's facts", () => {
+  for (const log of [TS7_CLEAN, TS7_UP_TO_DATE, cut(TS5_ROOT.slice(0, -2)), cut(TS7_SOME_UP.slice(0, -2))]) assert.deepEqual(facts(log), unchanged);
+  const waiting = TS7_UPSTREAM.replace(/\ncore\/src\/a\.ts.*\n/, "\n");
+  assert.deepEqual(facts(waiting), unchanged);
+  assert.deepEqual(facts(`${TS7_ONE}05:16:26 PM - Project 'tsconfig.json' is up to date but needs to update timestamps of output files that are older than input files\n\n05:16:26 PM - Updating output timestamps of project 'tsconfig.json'...\n\n`), unchanged);
+});
+
+test("tsc -b marker: errors are counted as before and give no pass count", () => {
+  const error = "src/a.ts(1,14): error TS2322: Type 'string' is not assignable to type 'number'.\n";
+  assert.deepEqual(facts(`${TS7_ONE}${error}`), { passed: 0, errors: 1, incomplete: false, failing: ["src/a.ts:1:14 TS2322"], summary: null });
+  assert.deepEqual(facts(`${TS5_ONE}${error}\nFound 1 error.\n\n`), { passed: 0, errors: 1, incomplete: false, failing: ["src/a.ts:1:14 TS2322"], summary: "Found 1 error." });
+  assert.deepEqual(facts(`${cut(TS7_SOME_UP)}error TS6053: File 'packages/web/src/gone.ts' not found.\n`), { passed: 0, errors: 1, incomplete: false, failing: ["TS6053"], summary: null });
+});
+
+test("tsc -b marker: a cut log stays incomplete with no pass count", () => {
+  const cutOff = { passed: 0, errors: 0, incomplete: true, failing: [], summary: null };
+  assert.deepEqual(facts(TS7_ONE.replace(/05:16:25 PM - Building project.*\n\n$/, "")), cutOff);
+  assert.deepEqual(facts(cut(TS7_SOME_UP.slice(0, 8))), cutOff);
+  assert.deepEqual(facts(cut(TS7_SOME_UP.slice(-6))), cutOff);
+  assert.deepEqual(facts(cut([...TS7_SOME_UP.slice(0, 7), "[… 4210 characters omitted …]", ...TS7_SOME_UP.slice(8)])), cutOff);
+  assert.deepEqual(facts(TS7_ONE.replace(/05:16:25 PM - Building project 'tsconfig\.json'\.\.\./, "05:16:25 PM - A non-dry build would build project '/srv/work/demo/tsconfig.json'")), cutOff);
+});
+
+test("tsc -b marker: watch mode keeps its Found reading", () => {
+  for (const [start, found] of [["05:16:24 PM - ", "05:16:26 PM - "], ["[5:16:24 PM] ", "[5:16:26 PM] "]] as const) {
+    const log = `${start}Starting compilation in watch mode...\n\n${TS7_ONE.replace(/05:16:25 PM - /g, start)}${found}Found 0 errors. Watching for file changes.\n`;
+    assert.deepEqual(facts(log), { passed: 1, errors: 0, incomplete: false, failing: [], summary: `${found}Found 0 errors. Watching for file changes.` });
+  }
+});
+
+test("done: the marker reaches Jev as tsc facts and adds no cap", () => {
+  const ev = `$ npx tsc -b --verbose\n${TS7_ONE}exit code: 0\n`;
+  const { planned } = doneRequest(pack, undefined, ["the typecheck passes"], ev);
+  const sent = (planned[0]?.state as { evidence: { runners: unknown[] } }).evidence.runners;
+  assert.deepEqual(sent, [{ runner: "tsc", passed: 1, failed: 0, errors: 0, skipped: 0, failing: [], summary_line: "Building project 'tsconfig.json'..." }]);
+  assert.deepEqual(verdictOf(ev), { verdict: "met", reason: undefined });
+  assert.deepEqual(verdictOf(`$ npx tsc -b --verbose\n${cut(TS7_SOME_UP)}exit code: 0\n`), { verdict: "met", reason: undefined });
+});
+
+const sentRunners = (evidence: string) => (doneRequest(pack, undefined, ["the typecheck passes"], doneEvidence(evidence)).planned[0]?.state as { evidence: { runners: unknown[] } }).evidence.runners;
+
+test("tsc -b marker: an error line the error parser can't read (a path with a space) still blocks the marker, anywhere in the log", () => {
+  const spaced = "src/my file.ts(1,14): error TS2322: Type 'string' is not assignable to type 'number'.\n";
+  const pretty = "src/my file.ts:1:14 - error TS2322: Type 'string' is not assignable to type 'number'.\n\n1 export const a: number = \"x\";\n               ~\n\n";
+  for (const log of [`${TS7_ONE}${spaced}`, `${TS5_ONE}${spaced}`, `${TS7_ONE}${pretty}`, `${cut(TS7_SOME_UP)}${spaced}`, `${TS7_ONE}${spaced}${TS7_ONE}`, `$ npx tsc -p src\n${spaced}${TS7_ONE}`]) assert.deepEqual(facts(log), unchanged, log);
+  assert.deepEqual(sentRunners(`${TS7_ONE}${spaced}`), [{ runner: "tsc", passed: 0, failed: 0, errors: 0, skipped: 0, failing: [], summary_line: null }]);
+});
+
+test("tsc -b marker: text after the status lines (a crash, another tool, a test run) or between them blocks the marker", () => {
+  const oom = "\n<--- Last few GCs --->\n\n[1234:0x1a2b3c4d5e]      210 ms: Mark-Compact (reduce) 30.1 (32.0) -> 30.0 (31.5) MB\nFATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory\n----- Native stack trace -----\n\n 1: 0x100000001 node::OOMErrorHandler(char const*, v8::OOMDetails const&)\n";
+  const panic = "panic: runtime error: index out of range [3] with length 3\n\ngoroutine 1 [running]:\nmain.main()\n";
+  const debug = "Error: Debug Failure. False expression.\n    at Object.createProgram (/srv/work/demo/node_modules/typescript/lib/typescript.js:1:1)\n";
+  const eslint = "/srv/work/demo/src/x.ts\n  3:7  warning  'y' is assigned a value but never used  no-unused-vars\n\n✖ 1 problem (0 errors, 1 warning)\n";
+  const nodeTest = "✔ build plan prints status lines (3.1ms)\nℹ tests 1\nℹ pass 1\nℹ fail 0\n";
+  for (const tail of [oom, `${oom}exit code: 0\n`, panic, debug, eslint, nodeTest, "Done in 2.41s.\n"]) {
+    assert.deepEqual(facts(`${TS5_ONE}${tail}`), unchanged, tail);
+    assert.deepEqual(facts(`${TS7_ONE}${tail}`), unchanged, tail);
+  }
+  assert.deepEqual(facts(cut([...TS7_SOME_UP.slice(0, 6), "  3:7  warning  'y' is assigned a value but never used  no-unused-vars", ...TS7_SOME_UP.slice(6)])), unchanged);
+  assert.deepEqual(sentRunners(`${TS5_ONE}${oom}exit code: 0\n`), [{ runner: "tsc", passed: 0, failed: 0, errors: 0, skipped: 0, failing: [], summary_line: null }]);
+  for (const exit of ["exit code: 0\n", "Exit status: 0\n", "\nexit code: 0\n\n"]) assert.equal(facts(`${TS7_ONE}${exit}`)?.passed, 1, exit);
+});
+
+test("tsc -b marker: status lines without tsc's clock (printed by a test, say) give no marker", () => {
+  const bare = "Projects in this build:\n    * fixtures/app/tsconfig.json\n\nBuilding project 'fixtures/app/tsconfig.json'...\n\n";
+  assert.deepEqual(facts(bare), unchanged);
+  assert.deepEqual(facts(`\n RUN  v3.2.4 /srv/app\n\nstdout | test/build.test.ts > prints the plan\n${bare} ✓ test/build.test.ts (1 test) 12ms\n\n Test Files  1 passed (1)\n      Tests  1 passed (1)\n`), unchanged);
+  assert.deepEqual(facts(TS7_ONE.replace("05:16:25 PM - Building", "Building")), unchanged);
+  assert.deepEqual(facts(TS7_ONE.replace("05:16:25 PM - Projects", "Projects")), unchanged);
+  assert.deepEqual(facts(TS7_ONE.replace(/05:16:25 PM - /g, "[build] ")), unchanged);
+});
+
+test("tsc -b marker: a dry run's bare 'is up to date' (no 'because') ends nothing, so it keeps today's facts", () => {
+  const dry = "05:16:25 PM - Projects in this build: \r\n    * single/tsconfig.json\n\n05:16:25 PM - Project 'single/tsconfig.json' is up to date because newest input 'single/src/a.ts' is older than output 'single/tsconfig.tsbuildinfo'\n\n05:16:25 PM - Project '/srv/work/demo/single/tsconfig.json' is up to date\n\n";
+  assert.deepEqual(facts(dry), unchanged);
+  assert.deepEqual(facts(dry.replace(/05:16:25 PM - /g, "[8:00:28 PM] ")), unchanged);
+  assert.deepEqual(facts(dry.replace(/05:16:25 PM - Project '\/srv.*\n\n$/, "")), { passed: 1, errors: 0, incomplete: false, failing: [], summary: "Project 'single/tsconfig.json' is up to date because newest input 'single/src/a.ts' is older than output 'single/tsconfig.tsbuildinfo'" });
 });
