@@ -1,5 +1,5 @@
 // Reads a Claude Code transcript (JSON lines) and reports the current turn: edits and checks since the last real user prompt, and turn, 12 hex of sha256 over that prompt's uuid (else its line position and the session), never its text.
-// Scans backwards for that prompt and forwards from it; only content-free facts are kept, never throws. Marks: truncated checks, subagent reports, a pass from the previous turn.
+// Scans backwards for that prompt and forwards from it; only content-free facts are kept, never throws. Marks: truncated checks, subagent reports, a pass from the previous turn. A check keeps only its matched segments (each clipped, joined up to 1,000 characters), never a cd or a heredoc body; node --test on a temp-dir file is Claude's own run, not a check.
 // An edit Claude Code refused before applying it (a <tool_use_error> or a denial) is not an edit; other errors still count. An image-only prompt starts a turn. A check's output is read with ANSI colours stripped, as done reads evidence.
 
 import { createHash } from "node:crypto";
@@ -10,13 +10,19 @@ import type { CheckRun, CheckStatus, StopFacts } from "./types.ts";
 const TASK_MAX = 1500;
 const FINAL_MAX = 2000;
 const CMD_MAX = 200;
+const JOINED_MAX = 1000;
 const RESULT_TAIL = 200_000;
 const EDIT_TOOLS = new Set(["Edit", "Write", "MultiEdit", "NotebookEdit"]);
 const SEPARATORS = new Set(["&&", "||", "|", "|&", ";", "&", "\n", "(", ")"]);
 const ASSIGNMENT = /^[A-Za-z_][A-Za-z0-9_]*=/;
 const WRAPPERS = new Set(["{", "time", "exec", "command", "env"]);
 const SCRIPT = /^(test|lint|typecheck|check|build)(:.+)?$/;
-const DIRECT_TOOLS = new Set(["vitest", "jest", "tsc", "eslint", "playwright", "pytest", "ruff", "mypy", "phpunit", "pest", "rspec"]);
+const PACKAGE_SCRIPT = /^(ci|verify)(:.+)?$/;
+const DIRECT_TOOLS = new Set(["vitest", "jest", "tsc", "eslint", "playwright", "pytest", "ruff", "mypy", "phpunit", "pest", "rspec", "oxlint"]);
+const INFO_FLAGS = new Set(["--version", "-V", "--help", "-h"]);
+const REDIRECT = /^(?:\d*|&)(?:>>?|<)/;
+const REDIRECT_ALONE = /^(?:\d*|&)(?:>>?|<<?<?|>&|<&)$/;
+const TEMP_PATH = /^(?:\/tmp\/|\/private\/tmp\/|\/var\/folders\/|\/private\/var\/folders\/|\$\{?TMPDIR\b)/;
 const FAILURE_MARKER = /\berror\b|\bfail(?:ed|ure|ures|ing)?\b|npm ERR!|✖|✗/i;
 const USER_LINE = /"type"\s*:\s*"user"/;
 const TOOL_RESULT_LINE = /"type"\s*:\s*"tool_result"/;
@@ -56,6 +62,11 @@ interface EditUse {
   seq: number;
   rejected: boolean;
 }
+interface Token {
+  text: string;
+  start: number;
+  end: number;
+}
 
 function withoutHeredocs(command: string): string {
   const out: string[] = [];
@@ -72,13 +83,19 @@ function withoutHeredocs(command: string): string {
   return out.join("\n");
 }
 
-function tokenize(command: string): string[] {
-  const tokens: string[] = [];
+function tokenize(command: string): Token[] {
+  const tokens: Token[] = [];
   let current = "";
+  let begin = -1;
   let quote: string | null = null;
-  const flush = () => {
-    if (current) tokens.push(current);
+  const flush = (end: number) => {
+    if (current) tokens.push({ text: current, start: begin, end });
     current = "";
+    begin = -1;
+  };
+  const word = (i: number, ch: string) => {
+    if (begin < 0) begin = i;
+    current += ch;
   };
   for (let i = 0; i < command.length; i++) {
     const ch = command[i] ?? "";
@@ -89,24 +106,30 @@ function tokenize(command: string): string[] {
       continue;
     }
     if (ch === "'" || ch === '"') {
+      if (begin < 0) begin = i;
       quote = ch;
       continue;
     }
     const two = command.slice(i, i + 2);
     if (two === "&&" || two === "||" || two === "|&") {
-      flush();
-      tokens.push(two);
+      flush(i);
+      tokens.push({ text: two, start: i, end: i + 2 });
       i++;
+    } else if (ch === "&" && (command[i - 1] === ">" || command[i - 1] === "<")) {
+      word(i, ch);
+    } else if (ch === "&" && command[i + 1] === ">") {
+      flush(i);
+      word(i, ch);
     } else if (ch === "|" || ch === ";" || ch === "&" || ch === "\n" || ch === "(" || ch === ")") {
-      flush();
-      tokens.push(ch);
+      flush(i);
+      tokens.push({ text: ch, start: i, end: i + 1 });
     } else if (ch === " " || ch === "\t") {
-      flush();
+      flush(i);
     } else {
-      current += ch;
+      word(i, ch);
     }
   }
-  flush();
+  flush(command.length);
   return tokens;
 }
 
@@ -116,6 +139,16 @@ const skipFlags = (args: readonly string[]): string[] => {
   while ((args[i] ?? "").startsWith("-")) i++;
   return args.slice(i);
 };
+const withoutRedirects = (args: readonly string[]): string[] => {
+  const out: string[] = [];
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i] ?? "";
+    if (REDIRECT_ALONE.test(arg)) i++;
+    else if (!REDIRECT.test(arg)) out.push(arg);
+  }
+  return out;
+};
+const asksInfo = (args: readonly string[], extra: readonly string[] = []): boolean => args.some((a) => INFO_FLAGS.has(a) || extra.includes(a));
 
 // Returns null when the segment is not a check, else whether the check prints nothing on success.
 function checkKind(segment: readonly string[]): { silent: boolean } | null {
@@ -127,7 +160,12 @@ function checkKind(segment: readonly string[]): { silent: boolean } | null {
   const args = segment.slice(i + 1);
   const direct = (tool: string, rest: readonly string[]): { silent: boolean } | null => {
     if (tool === "tsc" || tool === "eslint") return { silent: true };
+    if (tool === "vue-tsc") return asksInfo(rest, ["-v"]) ? null : { silent: true };
     if (tool === "ruff") return ["format", "version", "server", "config", "clean"].includes(rest[0] ?? "") ? null : { silent: true };
+    if (tool === "prettier") return rest.includes("--check") ? { silent: false } : null;
+    if (tool === "pint") return rest.includes("--test") ? { silent: false } : null;
+    if (tool === "phpstan") return !asksInfo(rest) && [undefined, "analyse"].includes(skipFlags(withoutRedirects(rest))[0]) ? { silent: false } : null;
+    if (tool === "oxlint" && asksInfo(rest)) return null;
     return DIRECT_TOOLS.has(tool) ? { silent: false } : null;
   };
   if (name === "npm" || name === "pnpm" || name === "yarn" || name === "bun") {
@@ -138,12 +176,25 @@ function checkKind(segment: readonly string[]): { silent: boolean } | null {
       return tool ? direct(base(tool), skipFlags(rest.slice(1)).slice(1)) : null;
     }
     if (sub === "run" || sub === "run-script") {
-      const script = rest[1] ?? "";
-      return SCRIPT.test(script) ? { silent: /^build(:.+)?$/.test(script) && name === "npm" } : null;
+      const script = skipFlags(rest.slice(1))[0] ?? "";
+      return SCRIPT.test(script) || PACKAGE_SCRIPT.test(script) ? { silent: /^build(:.+)?$/.test(script) && name === "npm" } : null;
     }
     if (sub === "test") return { silent: false };
-    if (name !== "npm" && SCRIPT.test(sub)) return { silent: false };
+    if (name !== "npm" && (SCRIPT.test(sub) || (PACKAGE_SCRIPT.test(sub) && sub !== "ci"))) return { silent: false };
     return null;
+  }
+  if (name === "composer") {
+    const script = skipFlags(args)[0] ?? "";
+    return SCRIPT.test(script) || script === "analyse" ? { silent: false } : null;
+  }
+  if (name === "node") {
+    const at = args.indexOf("--test");
+    if (at < 0 || !args.slice(0, at).every((a) => a.startsWith("-"))) return null;
+    return withoutRedirects(args.slice(at + 1)).some((a) => TEMP_PATH.test(a)) ? null : { silent: false };
+  }
+  if (name === "php") {
+    if (args[0] === "-l") return { silent: false };
+    return args[0] === "artisan" && args[1] === "test" ? { silent: false } : null;
   }
   if (name === "npx" || name === "bunx") {
     const rest = skipFlags(args);
@@ -172,22 +223,33 @@ function checkKind(segment: readonly string[]): { silent: boolean } | null {
   return direct(name, args);
 }
 
-function analyzeCommand(command: string): { silent: boolean } | null {
-  const tokens = tokenize(withoutHeredocs(command));
+function analyzeCommand(command: string): { silent: boolean; cmd: string } | null {
+  const plain = withoutHeredocs(command);
+  const tokens = tokenize(plain);
   let found: { silent: boolean } | null = null;
-  let segment: string[] = [];
-  for (const token of [...tokens, ";"]) {
-    if (!SEPARATORS.has(token)) {
+  let segment: Token[] = [];
+  let before = "";
+  let cmd = "";
+  for (const token of [...tokens, { text: ";", start: plain.length, end: plain.length }]) {
+    if (!SEPARATORS.has(token.text)) {
       segment.push(token);
       continue;
     }
-    const kind = checkKind(segment);
-    if (kind) found = found ? { silent: found.silent && kind.silent } : kind;
+    const kind = checkKind(segment.map((t) => t.text));
+    if (kind) {
+      found = found ? { silent: found.silent && kind.silent } : kind;
+      if (cmd.length < JOINED_MAX) {
+        const first = segment.find((t) => t.text !== "{");
+        const text = plain.slice(first?.start ?? 0, segment.at(-1)?.end ?? 0).slice(0, CMD_MAX);
+        cmd = !cmd ? text : before === ";" || before === "\n" || before === "" ? `${cmd}; ${text}` : `${cmd} ${before} ${text}`;
+      }
+    }
+    if (token.text !== "(" && token.text !== ")") before = token.text;
     segment = [];
   }
   if (!found) return null;
-  const masked = tokens.some((t) => t === "|" || t === "||" || t === "|&" || t === ";");
-  return { silent: found.silent && !masked };
+  const masked = tokens.some((t) => t.text === "|" || t.text === "||" || t.text === "|&" || t.text === ";");
+  return { silent: found.silent && !masked, cmd: cmd.slice(0, JOINED_MAX) };
 }
 
 function textOf(content: unknown): string {
@@ -415,7 +477,7 @@ function scanTurn(text: string, from: number, to: number): Scan {
       } else if (block.name === "Bash" && typeof block.input?.command === "string") {
         const kind = analyzeCommand(block.input.command);
         if (!kind) continue;
-        const call: Pending = { cmd: block.input.command.slice(0, CMD_MAX), silent: kind.silent, seq: seq++, status: "unknown", truncated: false };
+        const call: Pending = { cmd: kind.cmd, silent: kind.silent, seq: seq++, status: "unknown", truncated: false };
         out.calls.push(call);
         if (id) byId.set(id, call);
       }
