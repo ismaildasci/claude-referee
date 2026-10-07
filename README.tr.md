@@ -27,6 +27,8 @@ claude-referee, bu tür cümleleri denetleyen, resmî olmayan bir Claude Code ek
 
 ## Ne yapar
 
+<!-- Sürüm sütununu dürüst tut: v0.1'in getirmediği hiçbir şey v0.1 diye işaretlenmez. Etiketlemeden önce kontrol et. -->
+
 | Ne zaman | Ne olur | Sürüm |
 |---|---|---|
 | **Sen ya da Claude bir komut çalıştırınca** | `done`, `decide`, `judge` ya da `claims` (eski adı `verify` hâlâ çalışır) Jev'e sorar ve tek satırlık bir cevap basar | v0.1 |
@@ -35,7 +37,7 @@ claude-referee, bu tür cümleleri denetleyen, resmî olmayan bir Claude Code ek
 
 Bir kontrol hiçbir şey bulmazsa Claude hiçbir şey görmez. Bir şey bulursa Claude en fazla 300 karakterlik bir not görür.
 
-Neden yalnızca bir komut değil? claude-referee'den önceki kitte Claude `done` kontrolünü istediği zaman çalıştırabiliyordu ve 14 günde bir kez çalıştırdı. Kendiliğinden çalışmayan bir kontrol neredeyse yok hükmündedir. Bu yüzden Claude her durduğunda çalışan bir kontrol var; bugün yalnızca ne yapacağını kaydediyor. Stop kapısı, sayılan hiçbir kontrolün çalışmadığını hatırlatan bir uyarıdır; yanlış işi ölçülmüş biçimde ayıran bir hakem değildir ve `active` modu önerilmiyor ([ölçümler](#şimdiye-kadar-ne-ölçüldü)).
+Neden yalnızca bir komut değil? claude-referee'den önceki kitte Claude `done` kontrolünü istediği zaman çalıştırabiliyordu ve 14 günde bir kez çalıştırdı. Kendiliğinden çalışmayan bir kontrol neredeyse yok hükmündedir. Bu yüzden Claude her durduğunda çalışan bir kontrol var; bugün ne yapacağını kaydediyor, `soft` modda ise engelleyecek olduğunda sana bir uyarı da gösteriyor. Stop kapısı, sayılan hiçbir kontrolün çalışmadığını hatırlatan bir uyarıdır; yanlış işi ölçülmüş biçimde ayıran bir hakem değildir ve `active` modu önerilmiyor ([ölçümler](#şimdiye-kadar-ne-ölçüldü)).
 
 ## Nasıl çalışır
 
@@ -49,7 +51,7 @@ Neden yalnızca bir komut değil? claude-referee'den önceki kitte Claude `done`
 3. Jev olasılıklarla cevap verir.
 4. claude-referee bunları sabit eşiklerle karşılaştırır. Ya sessiz kalır, ya kısa bir not ekler ya da tek satırlık bir JSON sonuç basar.
 
-Düz kod bir soruyu cevaplayabiliyorsa hiçbir modele sorulmaz. Diyagram tasarımın tamamını gösteriyor: bugün oturum notu, dört komut, test çıktısının kodda okunması ve `shadow` modda durunca yapılan kontrol çalışıyor; durmayı engelleyen `active` mod planlandı ([yol haritası](ROADMAP.md)); model değişimi uyarısı, Claude Code zaten sorduğu için bırakıldı.
+Düz kod bir soruyu cevaplayabiliyorsa hiçbir modele sorulmaz. Diyagram tasarımın tamamını gösteriyor: bugün oturum notu, dört komut, test çıktısının kodda okunması ve `shadow` ile `soft` modda durunca yapılan kontrol çalışıyor; durmayı engelleyen `active` mod planlandı ([yol haritası](ROADMAP.md)); model değişimi uyarısı, Claude Code zaten sorduğu için bırakıldı.
 
 ## Şimdiye kadar ne ölçüldü
 
@@ -60,7 +62,7 @@ Kısacası: seçeneklerin sırası Jev'in cevabını, soruyu yeniden sormaktan �
   <img alt="Durum panosu. Ölçülen: seçenek sırası Jev'in seçimini oynatıyor (0,52'ye kadar); yeniden sormak neredeyse oynatmıyor (0,01); iki sıra 24 sıranın tamamıyla eşleşiyor (20/20); brifing 600 karaktere sığıyor. Modellenen: tek küçük bir yargı genellikle para kaybettirir; toplu sorular 80K bağlamda yaklaşık 23 öğede başa baş gelir. Henüz gösterilmeyen: görev başına daha düşük toplam maliyet; 50 etiketli durdurmada done-gate kesinliği; done kontrolünün hold-out doğruluğu." src="assets/charts/status-board-light.png" width="100%">
 </picture>
 
-Buradaki sayıların çoğu tek bir özel kod tabanından, tek ekipten ve tek yazardan geliyor: claude-referee'den önceki kit, Eylül 2026. Onları genel sonuç değil, erken işaret olarak okuyun. 2026-09-30 ve 2026-10-01 tarihli satırlar ise claude-referee'nin kendisiyle, ham sonuçları bu depoda olan açık girdilerle ölçüldü. Her birinin nasıl ölçüldüğü [docs/measurements.md](docs/measurements.md) sayfasında (İngilizce).
+Buradaki sayıların çoğu tek bir özel kod tabanından, tek ekipten ve tek yazardan geliyor: claude-referee'den önceki kit, Eylül 2026. Onları genel sonuç değil, erken işaret olarak okuyun. 2026-09-30 ve sonrası tarihli satırlar ise claude-referee'nin kendisiyle, açık ya da yapay girdilerle ölçüldü. Betikler bu depoda, satırların çoğunda puanlanmış sonuçlar da; gerçek CI loglarının metni ve oturumların ham dökümleri ise depoda yok. Her birinin nasıl ölçüldüğü [docs/measurements.md](docs/measurements.md) sayfasında; sonraki dört çalışmanın kendi sayfası var: [seçenek sıraları](docs/measurements-decide-order-scale.md), [düzenlemelerin içeriğini gören Stop kapısı](docs/measurements-stop-state.md) ve [içeriği görmeyeni](docs/measurements-stop-requirements.md), bir de [ayrı tutulan gerçek loglar](docs/measurements-real-logs-3.md) (hepsi İngilizce).
 
 ### Seçenek sırası cevabı oynatıyor. Yeniden sormak oynatmıyor.
 
@@ -69,7 +71,7 @@ Buradaki sayıların çoğu tek bir özel kod tabanından, tek ekipten ve tek ya
   <img alt="0 ile 0,6 arası yatay çubuklar. Aynı istek yeniden: en fazla 0,01. Önbellek atlanarak taze koşu: en fazla 0,02. Seçeneklerin sırası değişince: ortalama 0,20, en fazla 0,52. Tek bir özel kod tabanından 20 gerçek, 4 seçenekli karar; her biri 24 sırayla." src="assets/charts/order-vs-retry-light.png" width="100%">
 </picture>
 
-Önceki kitte aynı seçenekler farklı sırayla yazılınca Jev'in bir seçeneğe verdiği olasılık 0,52'ye kadar değişti. Aynı soruyu birebir yeniden sormak ise en fazla 0,01 değiştirdi. Bu yüzden `decide` her seçimi iki kez sorar, bir kez senin sıranla, bir kez ters sırayla, ve ikisinin ortalamasını alır; bu ikisi berabere kalırsa ve 3 ile 6 arası seçenek varsa dengeli kalan sıraları da sorar (aşağıda). Claude'a asla "yeniden sor" demez: beraberlik, eksik olgu eklenerek çözülür. claude-referee'nin 19'unda liderin 0,9 ya da üstünde olduğu 20 kararlık kendi açık setinde sıra en fazla 0,13, yeniden sormak en fazla 0,04 değiştirdi. Önceden kayda geçirilmiş 39 yakın kararlık sette ise sıra olasılığı ortalama 0,26, en fazla 0,42 değiştirdi; ters sıra, yazılan sırayı iki kez sormaktan daha çok 24 sıranın ortalamasına yaklaştırdı.
+Önceki kitte aynı seçenekler farklı sırayla yazılınca Jev'in bir seçeneğe verdiği olasılık 0,52'ye kadar değişti. Aynı soruyu birebir yeniden sormak ise en fazla 0,01 değiştirdi. Bu yüzden `decide` her seçimi iki kez sorar, bir kez senin sıranla, bir kez ters sırayla, ve ikisinin ortalamasını alır; bu ikisi berabere kalırsa ve 3 ile 6 arası seçenek varsa dengeli kalan sıraları da sorar (aşağıda). Claude'a asla "yeniden sor" demez: beraberlik, eksik olgu eklenerek çözülür. claude-referee'nin 19'unda liderin 0,9 ya da üstünde olduğu 20 kararlık kendi açık setinde sıra en fazla 0,13, yeniden sormak en fazla 0,04 değiştirdi. Önceden kayda geçirilmiş 39 yakın kararlık sette ise sıra, bir seçeneğin olasılığını ortalama 0,26, en fazla 0,42 oynattı; ters sıra, yazılan sırayı iki kez sormaktan daha çok 24 sıranın ortalamasına yaklaştırdı.
 
 ### İki sıra yeterli
 
@@ -78,7 +80,7 @@ Buradaki sayıların çoğu tek bir özel kod tabanından, tek ekipten ve tek ya
   <img alt="Beş sıralama politikası, karar başına Jev isteği ve 20 kararın kaçında tüm sıraların lideriyle eşleştiğine göre. Yalnızca yazıldığı sıra: 1 istek, 20'de 18. Yazıldığı sıra ve tersi: 2 istek, 20'de 20. Dört dönüş: 4 istek, 20'de 19. İki sıra, emin değilse 24'ü: ortalama 10,8 istek, 20'de 20. 24 sıranın tamamı: 24 istek, referans." src="assets/charts/policies-compare-light.png" width="100%">
 </picture>
 
-Senin sıran ve tersiyle sormak, 24 sıranın hepsini denemekle aynı kazananı 20 kararın 20'sinde buldu; 24 yerine 2 istekle. İstisna neredeyse berabere kararlar: 252 kararlık sonraki bir çalışmada iki sıra, 32 neredeyse beraberliğin 21'inde tüm sıraların lideriyle eşleşti; dengeli 2n sıralık bir set (her seçenek her konumda, artı tersleri) ise 30'unda. Bu yüzden iki sıra berabere kalınca `decide` artık setin kalanını da sorar ve verdict'i 2n sıranın ortalamasından alır; o çalışmaya yeniden uygulandığında bu, 4 ve daha fazla seçenekli kararların %21'inde devreye girdi ve başka hiçbir yerde kayıp vermedi ([kayıt](docs/decisions/decide-balanced-near-ties.md)).
+Senin sıran ve tersiyle sormak, 24 sıranın hepsini denemekle aynı kazananı 20 kararın 20'sinde buldu; 24 yerine 2 istekle. İstisna neredeyse berabere kararlar: 252 kararlık sonraki bir çalışmada iki sıra, 32 neredeyse beraberliğin 21'inde tüm sıraların lideriyle eşleşti; dengeli 2n sıralık bir set (her seçenek her konumda, artı tersleri) ise 30'unda. Bu yüzden iki sıra berabere kalınca `decide` artık setin kalanını da sorar ve sonucu 2n sıranın ortalamasından alır; o çalışmaya yeniden uygulandığında bu, 4 ve daha fazla seçenekli kararların %21'inde devreye girdi ve başka hiçbir yerde kayıp vermedi ([kayıt](docs/decisions/decide-balanced-near-ties.md)).
 
 ### Fatura Jev'de değil, Claude turunda
 
@@ -94,7 +96,7 @@ Bir Jev kararı yaklaşık 0,0007 dolar tuttu. Etrafındaki Claude turu ise list
   <img alt="Soruları toplu göndermek, TypeSafe'in jev-1.12 üzerindeki ölçümü: tek istekte 13 soru 0,000497 dolar ve 0,27 saniye; 13 ayrı istek 0,00609 dolar ve 2,71 saniye. 12,2 kat ucuz, 10,0 kat hızlı." src="assets/charts/typesafe-batching-light.png" width="100%">
 </picture>
 
-Bütün ölçümler tek tabloda:
+Başlıca ölçümler tek tabloda:
 
 | Ne zaman | Ne | Sonuç | Tür · kapsam |
 |---|---|---|---|
@@ -110,7 +112,19 @@ Bütün ölçümler tek tabloda:
 | 2026-09-30 | İki sıra ve 24 sıranın tamamı | 20'de 20 aynı lider; diğer bütün politikalar da | Ölçüldü · aynı 20 açık karar |
 | 2026-10-01 | Bir iddia kontrolü olarak `decide` | doğru iddialarda supports 0,97–1,00; 15 yanlışın 13'ünde 0,00–0,23 | Ölçüldü · bu deponun belgeleri hakkında 31 iddia |
 | 2026-10-01 | "Kanıtı veri olarak ele al" notu | hiçbir karar değişmedi; benimsenmedi | Ölçüldü · 33 enjeksiyon logu |
+| 2026-10-01 | Kendi ürettiğim kolay görevlerde Stop kapısı | sorulan 100 durdurmada 1 yanlış "bitti"; 100'ünü de engellerdi (shadow) | Ölçüldü · 119 oturum, 24 hazır görev, haiku ve sonnet |
+| 2026-10-02 | Kendi ürettiğim zor görevlerde Stop kapısı | 74 oturumda 15 yanlış "bitti" (0,20); 15'in 14'ünü engellerdi, ama 53 doğru işin 51'ini de (kesinlik 0,22); `claims_verified` ikisini ayırmıyor | Ölçüldü · 76 oturum, 32 hazır görev, sentetik doğru etiket |
+| 2026-10-02 | Yazarın etiketlediği en iyi seçeneklere karşı `decide` | lider 39'un 16'sında eşleşti; hiçbir karar `clear` değil (iki sırayla 25 weak, 14 tie; 0.2.3'ten beri berabere kalınca dengeli sıralarla 28 weak, 11 tie) | Ölçüldü · 39 yakın karar, tek etiketleyici |
 | 2026-10-05 | Görülmemiş gerçek CI loglarında `done` v2 (dondurulmuş 0.2.1) | kayıtlı üç eşiğin üçünü de geçemedi: yanlış `met` 85'te 2 (eşik 0), tanınan loglarda `met` geri çağırma 79'da 69 = 0,873 (eşik 0,9), `missing` geri çağırma 85'te 45 = 0,53 (eşik 0,9); yalnızca çıkış kodu: 0 yanlış, ama geçen 67 adımın hiçbirinde `met` yok | Ölçüldü · 126 açık depodan 272 vaka, 231'i Jev'e gönderildi, model etiketleri, insan etiketi yok |
+| 2026-10-05 | `decide` kaç seçenek sırasına ihtiyaç duyuyor | yazılan sıra ve tersi, liderin en az 0,08 önde olduğu 179 kararın 0,99'unda tüm sıraların lideriyle eşleşti, ama 32 neredeyse beraberliğin 21'inde; dengeli 2n sıralık set 32'de 30 | Ölçüldü · 252 yapay karar, 3 ile 6 arası seçenek, 16.044 istek |
+| 2026-10-05 | Düzenlemelerin içeriğini görüp görevin gereksinimlerini soran Stop kapısı | ayırıyor ama işe yarar ölçüde değil: hold-out AUC 0,867, kullanılan kapı 0,553; farkın bir kısmı görev türünden (yalnızca zor görevlerde 0,643); dondurulmuş eşik değerinde geri çağırma 9'da 6 (gereken 0,8); benimsenmedi | Ölçüldü · 95 hold-out oturumu, sentetik doğru etiket |
+| 2026-10-05 | Aynı soru, düzenlemelerin içeriği olmadan | ayırmıyor: AUC 0,626, kullanılan kapı 0,543, aradaki fark kanıtlanmış değil; yanlış engelleme 38'de 29; benimsenmedi | Ölçüldü · 49 yeni oturum, 11 yanlış "bitti", sentetik doğru etiket |
+| 2026-10-06 | `decide` berabere kalınca dengeli sıraları da soruyor | neredeyse beraberliklerde 32'de 30, iki sırayla 32'de 21; 4 ve daha fazla seçenekli kararların %21'inde devreye girdi; canlı komutla çalışmanın düzeneği arasındaki fark ortalama 0,008 | Ölçüldü, tasarımın çıktığı veride · kaydedilmiş 252 kararın yeniden oynatılması, 8 canlı karar |
+| 2026-10-06 | Yazarın seçenek adlarıyla ve nötr adlarla `decide` | hiçbiri etiketlerle daha çok uyuşmuyor (39'da 16,5'e karşı 17,5, işaret testi p 1,0); adlar 39'un 15'inde lideri değiştiriyor | Ölçüldü · 39 yakın karar, tek etiketleyici |
+| 2026-10-06 | Yapay metinlerde `i18n` pack'iyle `judge` | hold-out eşiği geçildi: 46 `no` öğesinde 0 yanlış `yes`, 49 `yes` öğesinde 0 yanlış `no`; 95'in 53'ünde kesin cevap | Ölçüldü · 135 yapay metin, model etiketleri |
+| 2026-10-06 | Gerçek depolarda `extract` ve `i18n` pack'i | `extract` 2.463 metnin 1.725'ini buldu (0,700); judge eşiği geçemedi: 37 `no` öğesinde 5 yanlış `yes`, hiç `no` yok | Ölçüldü · 4 açık React ve Vue deposu, model etiketleri |
+| 2026-10-06 | Aynısı, ikinci örnek | `extract` 2.790 metnin 2.124'ünü buldu (0,761); hold-out'taki 116 adayda 0 yanlış cevap (yalnızca 9'u teknik), 18'inde kesin cevap | Ölçüldü · 9 açık depo, model etiketleri |
+| 2026-10-06 | Üç ayrıştırıcı daha eklenmiş `done` (0.2.3), ikinci gerçek log örneğinin ayrı tutulan yarısı | yanlış `met` 52'de 0'dan 1'e; tanınan loglarda `met` geri çağırma 35'te 26 = 0,743 | Ölçüldü, ikinci bakış, görülmemiş bir test değil · 62 depodan 115 vaka |
 
 Diğer grafikler (kalibrasyon, seçenek başına sorular, sır kuralının ayarı, brifing boyutu) [docs/measurements.md](docs/measurements.md) sayfasında.
 
@@ -156,7 +170,7 @@ npx claude-referee receipts --tokens
 
 ## Kurulum
 
-Gerekenler: Claude Code 2.1.139 ya da sonrası (2.1.285 ile test edildi), Claude Code'un gördüğü `PATH` üzerinde Node 20.3 ya da sonrası ve bir [TypeSafe API anahtarı](https://docs.typesafe.ai).
+Gerekenler: Claude Code 2.1.139 ya da sonrası (2.1.292 ile test edildi), Claude Code'un gördüğü `PATH` üzerinde Node 20.3 ya da sonrası ve bir [TypeSafe API anahtarı](https://docs.typesafe.ai).
 
 **1. Eklentiyi kur**
 
@@ -176,7 +190,7 @@ secret-tool store --label="TypeSafe API key" service typesafe
 export TYPESAFE_API_KEY_CMD="secret-tool lookup service typesafe"
 ```
 
-Ya da `TYPESAFE_API_KEY` tanımla. `/plugin configure claude-referee` de anahtarı saklar, ama Claude Code eklenti sırlarını yalnızca hook'lara iletir, kabuğa iletmez. Tam arama sırası [yapılandırma](docs/configuration.md#the-api-key) sayfasında (İngilizce).
+Ya da `TYPESAFE_API_KEY` tanımla. `/plugin configure claude-referee` (ya da Claude Code 2.1.285+ ile `claude plugin configure claude-referee --values-stdin`) de anahtarı saklar, ama Claude Code eklenti sırlarını yalnızca hook'lara iletir, kabuğa iletmez. Tam arama sırası [yapılandırma](docs/configuration.md#the-api-key) sayfasında (İngilizce).
 
 **3. Bir projede aç:** `.claude/referee.json` dosyasını commit'le. Bu dosya yoksa hakem sessiz kalır:
 
@@ -199,7 +213,10 @@ npx claude-referee doctor            # anahtarı tek bir ücretsiz çağrıyla d
 npm test 2>&1 | npx claude-referee done --criteria "all tests pass" --evidence -
 
 # Tek bir evet/hayır kuralını birçok öğeye uygula: burada bir diff'in eklenen her satırı.
-git diff -U0 --no-ext-diff | grep '^+[^+]' | npx claude-referee judge --question line.risky --items -
+# Gerçek diff'lerde bu genel soru cevapların çoğunu `review`'da bıraktı; bu yüzden değişikliğin ne olduğunu söyle.
+git diff -U0 --no-ext-diff | grep '^+[^+]' | npx claude-referee judge --question line.risky --context "<değişikliğin ne olduğu>" --items -
+# Kuralı eski kodda benimserken: bugünkü bulguları bir kez kaydet, sonra yalnızca yenilerini raporla.
+# --baseline <dosya> ve --baseline-write için docs/judge-baseline.md'ye bak.
 
 # Seçenekler arasında seç. Bağlam dosyalarını hakem kendisi okur.
 npx claude-referee decide <<'EOF'
@@ -211,6 +228,9 @@ EOF
 
 # Jev'i çağırmadan neyin gönderileceğini gör
 npm test 2>&1 | npx claude-referee done --criteria "all tests pass" --evidence - --dry-run
+
+# Bu projenin çağrılarını, durdurmalarını ve Jev'in saklanan cevaplarını yerel bir panoda gör (127.0.0.1, ilk sekme Flow)
+npx claude-referee ui
 ```
 
 Her komut tek satır JSON basar: `ok`, karar, birkaç sayı, varsa bir `next_step` ve Jev'e soran komutlarda bir makbuz kimliği. "Bitmedi" dahil her karar 0 ile çıkar; CI'da `--fail-on missing,unsure` bu kararlarda 3 ile çıkar. Bir komuttan sonra `--describe` (ya da `--help`, `-h`) o komutun tam sözleşmesini basar; `claude-referee --describe` komutları JSON olarak listeler. Bilinmeyen bir seçenekten en fazla iki düzenleme uzakta geçerli bir seçenek varsa ve yazılan seçenekte düzenleme sayısından çok karakter varsa hata onu söyler.
@@ -221,9 +241,9 @@ Her komut tek satır JSON basar: `ok`, karar, birkaç sayı, varsa bir `next_ste
 > { npx tsc --noEmit; echo "tsc exit code: $?"; } 2>&1 | npx claude-referee done --criteria "typecheck passes" --evidence -
 > ```
 
-`done`, yalnızca bir çalıştırıcı özetini tanırsa ya da bir çıkış kodu satırı görürse `met` döndürebilir. Başka her şey `trust: unparsed` ile `unsure` olarak gelir. Kanıtta sıfırdan farklı bir çıkış kodu varsa sonuç `missing` olur (`reason: exit_code_nonzero`) ve Jev'e sorulmaz; çalıştırma yine 0 istekli bir makbuz yazar, `--dry-run` da aynı kararı verir. Atlanan, riskli ya da tamamlanmamış testler `met`'i `unsure` ile sınırlar (`reason: skipped_tests`); Swift Testing'in bilinen sorunları (known issues) gibi beklenen başarısızlıklar da öyle; tanınan ama yarıda kesilmiş, boş, iptal edilmiş ya da kararsız (flaky) bir çalıştırma `reason: incomplete_run` verir; yalnızca derleme logu gösteren bir test ölçütü `reason: no_tests_run` verir.
+`done`, yalnızca bir çalıştırıcı özetini tanırsa ya da bir çıkış kodu satırı görürse `met` döndürebilir. Başka her şey `trust: unparsed` ile `unsure` olarak gelir. Kanıtta sıfırdan farklı bir çıkış kodu varsa sonuç `missing` olur (`reason: exit_code_nonzero`) ve Jev'e sorulmaz; çalıştırma yine 0 istekli bir makbuz yazar, `--dry-run` da aynı kararı verir. Atlanan, riskli ya da tamamlanmamış testler `met`'i `unsure` ile sınırlar (`reason: skipped_tests`); Swift Testing'in bilinen sorunları (known issues) ya da vitest'in `expected fail`'i gibi beklenen başarısızlıklar da öyle; tanınan ama yarıda kesilmiş, boş, iptal edilmiş ya da kararsız (flaky) bir çalıştırma `reason: incomplete_run` verir; yalnızca derleme ya da oxlint çıktısı gösteren bir test ölçütü `reason: no_tests_run` verir; ardında bir uyarı olan, lint ya da temiz çıktı isteyen bir ölçüt, yalnızca linter'ın adını (`oxlint`, `eslint`) ansa bile `reason: warning_in_log` verir. Tanınan bir logda bir lint, derleme ya da tip denetimi ölçütü için çalıştırıcı yoksa (örneğin birleşik bir logda yalnızca test çalıştırıcısının özeti okunduysa), `met` olmayan ve yukarıdaki gerekçelerden hiçbirini almayan bir karar `reason: criterion_not_covered` alır: o kontrolü tek başına çalıştırıp çıktısını boruyla ver. Bu gerekçe kararı hiç değiştirmez.
 
-**`done`'a ne kadar güvenilir.** `done` v2, özgün eşiğinde ölçülmüş değil. Kod için kimsenin ayar yapmadığı gerçek CI logları örneğinde kayıtlı eşikleri geçemedi: yanlış `met` 85'te 2 (eşik 0), tanınan loglarda `met` geri çağırma 0,873 (eşik 0,9). O loglarda yalnızca çıkış kodu kanıtıyla neredeyse hiç `met` demedi; bir insanın `missing` diyeceği yerde `unsure` dedi. Çıkış durumu olarak yazılmış ölçütler ise çoğu zaman yalnızca çıkış kodundan `met` alır (yukarıdaki ipucuna bak). Bu iki yanlış `met`'in ardındaki iki ayrıştırıcı hatası sonradan, aynı vakalar üzerinde düzeltildi; bu yüzden ardından gelen 0 yanlış `met` o vakalara uydurulmuş bir sayıdır, görülmemiş bir test değildir. Ayrıntılar [measurements-real-logs-2](docs/measurements-real-logs-2.md) sayfasında (İngilizce). `met`'i çıktının kontrolün geçtiğini gösterdiğine dair bir ipucu say, kanıt sayma; önemli olduğunda çıktıyı kendin de oku.
+**`done`'a ne kadar güvenilir.** `done` v2, özgün eşiğinde ölçülmüş değil. Kod için kimsenin ayar yapmadığı gerçek CI logları örneğinde kayıtlı eşikleri geçemedi: yanlış `met` 85'te 2 (eşik 0), tanınan loglarda `met` geri çağırma 0,873 (eşik 0,9). O loglarda yalnızca çıkış kodu kanıtıyla neredeyse hiç `met` demedi; bir insanın `missing` diyeceği yerde `unsure` dedi. Çıkış durumu olarak yazılmış ölçütler ise çoğu zaman yalnızca çıkış kodundan `met` alır (yukarıdaki ipucuna bak). Bu iki yanlış `met`'in ardındaki iki ayrıştırıcı hatası sonradan, aynı vakalar üzerinde düzeltildi; bu yüzden ardından gelen 0 yanlış `met` o vakalara uydurulmuş bir sayıdır, görülmemiş bir test değildir. Ayrıntılar [measurements-real-logs-2](docs/measurements-real-logs-2.md) sayfasında (İngilizce). 0.2.3'te eklenen üç ayrıştırıcı (`mix test`, `ctest`, `rubocop`) ardından bu örneğin ayrı tuttuğum yarısında bir kez puanlandı. Yanlış `met` 52'de 0'dan 1'e çıktı: bazı analizlerin atlanacağını düz cümleyle söyleyen bir rubocop logu. O yarıda tanınan loglarda `met` geri çağırma 35'te 26 oldu (0,743). O yarı, toplamlarını daha önce gördüğüm bir örnekten geliyor; bu yüzden bu görülmemiş bir test değil, ikinci bir bakış ([measurements-real-logs-3](docs/measurements-real-logs-3.md), İngilizce). rubocop vakası henüz düzeltilmedi. `met`'i çıktının kontrolün geçtiğini gösterdiğine dair bir ipucu say, kanıt sayma; önemli olduğunda çıktıyı kendin de oku.
 
 ## Makinenden ne çıkar
 
@@ -231,7 +251,7 @@ Her komut tek satır JSON basar: `ok`, karar, birkaç sayı, varsa bir `next_ste
 - Girdide parola, anahtar ya da token'a benzeyen bir şey varsa hiçbir şey gönderilmez.
 - E-postalar, IP adresleri ve ev klasörünün yolu gönderilmeden önce değiştirilir.
 - `--dry-run`, neyin gönderileceğini göndermeden birebir gösterir.
-- Kayıt makinende kalır: model, token, maliyet ve süre; gönderdiğin metin asla.
+- Makbuzlar makinende kalır: model, token, maliyet, süre, karar ve sayıları; gönderdiğin metin asla. Done-gate açıksa `stops.jsonl` ayrıca isteminden ve Claude'un son mesajından alıntılar tutar.
 - Kendiliğinden serbest metin gönderecek her şey sen açana kadar kapalı kalır.
 
 <picture>
@@ -259,8 +279,10 @@ Her birinin gerekçesi [MANIFESTO.tr.md](MANIFESTO.tr.md) dosyasında.
 Belgeler İngilizce:
 - [Yapılandırma](docs/configuration.md): ayarlar, proje dosyası, pack'ler ve anahtar arama sırası
 - [Makinenden ne çıkar](docs/privacy.md) ve [ekonomi](docs/economics.md)
-- [Ölçümler](docs/measurements.md): yukarıdaki her sayı, yöntemi ve sınırlarıyla
-- [Proje `verify` skill'i için tarif](docs/verify-skill.md) (İngilizce): her commit öncesi test çıktısında `done` çalıştır
+- [Ölçümler](docs/measurements.md): yukarıdaki sayıların çoğu, yöntemleri ve sınırlarıyla; sonraki dört çalışma kendi sayfalarında, bağlantıları [Şimdiye kadar ne ölçüldü](#şimdiye-kadar-ne-ölçüldü) bölümünde
+- [Proje `verify` skill'i için tarif](docs/verify-skill.md): her commit öncesi test çıktısında `done` çalıştır
+- [GitHub Action](docs/recipes/github-action.md): bir pull request'in test logunda `done`, eklediği belge satırlarında `claims` çalıştırır ([Marketplace](https://github.com/marketplace/actions/claude-referee))
+- [i18n tarifi](docs/recipes/i18n.md): `extract`, `i18n` pack'inin `judge` sorusu için aday arayüz metinlerini bulur
 - [SSS](docs/faq.md), [yol haritası](ROADMAP.md) ve [değişiklik günlüğü](CHANGELOG.md)
 - [Katkı](CONTRIBUTING.md): API anahtarı gerekmez, testler çevrimdışı çalışır. Güvenlik bildirimleri: [SECURITY.md](SECURITY.md)
 - Kendi TypeSafe kodunu mu yazıyorsun? TypeSafe'in resmî eklentisi Claude'a API'nin tüm bağlamını verir: `claude plugin marketplace add typesafe-ai/skills`, ardından `claude plugin install typesafe@typesafe-ai`. claude-referee'nin buna ihtiyacı yok.

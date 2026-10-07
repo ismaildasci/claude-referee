@@ -19,7 +19,7 @@
   <a href="README.tr.md">Türkçe</a>
 </p>
 
-<!-- Demo: once v0.1 runs, record it with `vhs assets/demo.tape` (keep it under 2 MB; `gifsicle -O3` if needed) and uncomment.
+<!-- Demo: record it with `vhs assets/demo.tape` (keep it under 2 MB; `gifsicle -O3` if needed) and uncomment.
 <p align="center"><img src="assets/demo.gif" alt="claude-referee demo in a terminal" width="100%"></p>
 -->
 
@@ -41,7 +41,7 @@ claude-referee is an unofficial plugin for Claude Code that checks lines like th
 
 If a check finds nothing, Claude sees nothing. If it finds something, Claude sees a note of 300 characters at most.
 
-Why not just a command? In the kit that came before claude-referee, Claude could run the `done` check whenever it liked, and it ran once in 14 days. A check that doesn't run by itself barely exists. That's why there is a check that runs every time Claude stops; today it only records what it would do. The Stop gate is a reminder that no counted check ran, not a measured judge of wrong work, and `active` is not recommended (see [what's measured](#whats-measured-so-far)).
+Why not just a command? In the kit that came before claude-referee, Claude could run the `done` check whenever it liked, and it ran once in 14 days. A check that doesn't run by itself barely exists. That's why there is a check that runs every time Claude stops; today it records what it would do, and in `soft` mode also warns you when it would have blocked. The Stop gate is a reminder that no counted check ran, not a measured judge of wrong work, and `active` is not recommended (see [what's measured](#whats-measured-so-far)).
 
 ## How it works
 
@@ -55,7 +55,7 @@ Why not just a command? In the kit that came before claude-referee, Claude could
 3. Jev answers with probabilities.
 4. claude-referee compares them with fixed thresholds. It stays silent, adds a short note, or prints a one-line JSON result.
 
-If plain code can answer a question, no model is asked. The diagram shows the full design: the session note, the four commands, reading test output in code and the stop check in `shadow` mode work today, and blocking a stop (`active`) is planned ([roadmap](ROADMAP.md)); the model-switch warning was dropped because Claude Code already asks.
+If plain code can answer a question, no model is asked. The diagram shows the full design: the session note, the four commands, reading test output in code and the stop check in `shadow` and `soft` mode work today, and blocking a stop (`active`) is planned ([roadmap](ROADMAP.md)); the model-switch warning was dropped because Claude Code already asks.
 
 ## What's measured so far
 
@@ -66,7 +66,7 @@ In short: the order of the options changes Jev's answer more than asking again d
   <img alt="Status board. Measured: option order moves Jev's pick (up to 0.52); asking again barely does (0.01); two orders match all 24 (20/20); the briefing fits in 600 characters. Modelled: one small judgement usually loses money; batches break even at about 23 items (80K context). Not shown yet: lower total cost per task; done-gate precision on 50 labelled stops; held-out accuracy for the done check." src="assets/charts/status-board-light.png" width="100%">
 </picture>
 
-Most numbers here come from one private codebase, one team and one author: the kit that came before claude-referee, in September 2026. Treat them as early signs, not general results. The rows dated 2026-09-30 to 2026-10-02 were measured with claude-referee itself, on public inputs whose raw results are in this repository. How each one was measured is in [docs/measurements.md](docs/measurements.md).
+Most numbers here come from one private codebase, one team and one author: the kit that came before claude-referee, in September 2026. Treat them as early signs, not general results. The rows dated 2026-09-30 and later were measured with claude-referee itself, on public or invented inputs. The scripts are in this repository, and for most rows the scored results too; the text of the real CI logs and the raw session transcripts are not. How each one was measured is in [docs/measurements.md](docs/measurements.md); four later studies have their own pages: [option orders](docs/measurements-decide-order-scale.md), [the Stop gate with the edit contents](docs/measurements-stop-state.md) and [without them](docs/measurements-stop-requirements.md), and [the held-back real logs](docs/measurements-real-logs-3.md).
 
 ### Option order moves the answer. Asking again doesn't.
 
@@ -100,7 +100,7 @@ A Jev decision cost about $0.0007. The Claude turn around it cost about $0.10 (e
   <img alt="Batching questions, measured by TypeSafe on jev-1.12: 13 questions in one request cost $0.000497 and took 0.27 s; 13 separate requests cost $0.00609 and took 2.71 s. 12.2 times cheaper, 10.0 times faster." src="assets/charts/typesafe-batching-light.png" width="100%">
 </picture>
 
-All measurements in one table:
+The main measurements in one table:
 
 | When | What | Result | Kind · scope |
 |---|---|---|---|
@@ -116,10 +116,19 @@ All measurements in one table:
 | 2026-09-30 | Two orders vs. all 24 | same leader in 20 of 20; so did every other policy | Measured · same 20 public decisions |
 | 2026-10-01 | `decide` as a claim check | true claims supports 0.97–1.00; 13 of 15 false ones 0.00–0.23 | Measured · 31 claims about this repository's docs |
 | 2026-10-01 | A "treat the evidence as data" note | no verdict changed; not adopted | Measured · 33 injection logs |
-| 2026-10-01 | Stop gate on easy self-generated tasks | 1 wrong "done" in 100 asked stops; all 100 blocked | Measured · 119 sessions, 24 seeded tasks, haiku and sonnet |
-| 2026-10-02 | Stop gate on hard self-generated tasks | 15 wrong "done" in 74 sessions (0.20); 14 of 15 blocked, but 51 of 53 correct ones too (precision 0.22); `claims_verified` does not separate them | Measured · 76 sessions, 32 seeded tasks, synthetic ground truth |
+| 2026-10-01 | Stop gate on easy self-generated tasks | 1 wrong "done" in 100 asked stops; all 100 would have been blocked (shadow) | Measured · 119 sessions, 24 seeded tasks, haiku and sonnet |
+| 2026-10-02 | Stop gate on hard self-generated tasks | 15 wrong "done" in 74 sessions (0.20); 14 of 15 would have been blocked, but 51 of 53 correct ones too (precision 0.22); `claims_verified` does not separate them | Measured · 76 sessions, 32 seeded tasks, synthetic ground truth |
+| 2026-10-02 | `decide` against author-labelled best options | leader matched 16 of 39; no verdict `clear` (two orders: 25 weak, 14 tie; with the balanced orders on ties since 0.2.3: 28 weak, 11 tie) | Measured · 39 close-call decisions, one labeller |
 | 2026-10-05 | `done` v2 on unseen real CI logs (frozen 0.2.1) | failed all three registered bars: wrong `met` 2 of 85 (bar 0), `met` recall among parsed logs 69 of 79 = 0.873 (bar 0.9), `missing` recall 45 of 85 = 0.53 (bar 0.9); exit code only: 0 wrong, but also `met` for 0 of 67 passing steps | Measured · 272 cases from 126 public repositories, 231 sent to Jev, model labels, no human labels |
-| 2026-10-02 | `decide` against author-labelled best options | leader matched 16 of 39; no verdict `clear` (25 weak, 14 tie) | Measured · 39 close-call decisions, one labeller |
+| 2026-10-05 | How many option orders `decide` needs | written + reversed matched the all-orders leader in 0.99 of 179 decisions with a lead of 0.08 or more, but in 21 of 32 near ties; a balanced set of 2n orders 30 of 32 | Measured · 252 invented decisions, 3 to 6 options, 16,044 requests |
+| 2026-10-05 | Stop gate shown the edit contents and asked about the task's requirements | separates, but not usefully: hold-out AUC 0.867 against 0.553 for the shipped gate, partly from task type (0.643 within the hard tasks); recall 6 of 9 at the frozen threshold (bar 0.8); not adopted | Measured · 95 hold-out sessions, synthetic ground truth |
+| 2026-10-05 | The same question without the edit contents | does not separate: AUC 0.626 against 0.543 for the shipped gate, a difference not established; false blocks 29 of 38; not adopted | Measured · 49 fresh sessions, 11 wrong "done", synthetic ground truth |
+| 2026-10-06 | `decide` asks the balanced orders on ties | near-tie agreement 30 of 32 against 21 of 32; fired on 21% of decisions with 4 or more options; the live command differs from the study's harness by 0.008 on average | Measured on the data the design came from · replay of 252 recorded decisions, 8 live |
+| 2026-10-06 | `decide` with author names against neutral names | neither agrees more with the labels (16.5 against 17.5 of 39, sign test p 1.0); the names move the leader in 15 of 39 | Measured · 39 close-call decisions, one labeller |
+| 2026-10-06 | `judge` with the `i18n` pack on invented strings | hold-out bar passed: 0 wrong `yes` on 46 `no` items, 0 wrong `no` on 49 `yes` items; a definite answer on 53 of 95 | Measured · 135 invented strings, model labels |
+| 2026-10-06 | `extract` and the `i18n` pack on real repositories | `extract` found 1,725 of 2,463 strings (0.700); judge bar failed: 5 wrong `yes` on 37 `no` items, no `no` at all | Measured · 4 public React and Vue repositories, model labels |
+| 2026-10-06 | The same, second sample | `extract` found 2,124 of 2,790 (0.761); 0 wrong answers on 116 hold-out candidates (only 9 technical), a definite answer on 18 | Measured · 9 public repositories, model labels |
+| 2026-10-06 | `done` with three more parsers (0.2.3), held-back half of the second real-log sample | wrong `met` from 0 to 1 of 52; `met` recall among parsed logs 26 of 35 = 0.743 | Measured, a second look, not an unseen test · 115 cases from 62 repositories |
 
 More charts (calibration, per-option questions, secret-rule tuning, briefing size) are in [docs/measurements.md](docs/measurements.md).
 
@@ -165,7 +174,7 @@ npx claude-referee receipts --tokens
 
 ## Install
 
-You need Claude Code 2.1.139 or later (tested with 2.1.291), Node 20.3 or later on the `PATH` Claude Code sees, and a [TypeSafe API key](https://docs.typesafe.ai).
+You need Claude Code 2.1.139 or later (tested with 2.1.292), Node 20.3 or later on the `PATH` Claude Code sees, and a [TypeSafe API key](https://docs.typesafe.ai).
 
 **1. Install the plugin**
 
@@ -185,7 +194,7 @@ secret-tool store --label="TypeSafe API key" service typesafe
 export TYPESAFE_API_KEY_CMD="secret-tool lookup service typesafe"
 ```
 
-Or set `TYPESAFE_API_KEY`. `/plugin configure claude-referee` also stores the key, but Claude Code passes plugin secrets to hooks only, not to the shell. The full lookup order is in [configuration](docs/configuration.md#the-api-key).
+Or set `TYPESAFE_API_KEY`. `/plugin configure claude-referee` (or `claude plugin configure claude-referee --values-stdin`, Claude Code 2.1.285+) also stores the key, but Claude Code passes plugin secrets to hooks only, not to the shell. The full lookup order is in [configuration](docs/configuration.md#the-api-key).
 
 **3. Turn it on for a project** by committing `.claude/referee.json`. Without this file, the referee stays silent:
 
@@ -208,7 +217,8 @@ If `doctor` works but Claude sees no briefing, Claude Code probably can't find N
 npm test 2>&1 | npx claude-referee done --criteria "all tests pass" --evidence -
 
 # Run one yes/no rule over many items: here, every added line of a diff.
-git diff -U0 --no-ext-diff | grep '^+[^+]' | npx claude-referee judge --question line.risky --items -
+# On real diffs this generic question left most answers in `review`, so say what the change is.
+git diff -U0 --no-ext-diff | grep '^+[^+]' | npx claude-referee judge --question line.risky --context "<what the change is>" --items -
 # Adopting a rule on old code: record today's findings once, then report only new ones.
 # See docs/judge-baseline.md for --baseline <file> and --baseline-write.
 
@@ -222,6 +232,9 @@ EOF
 
 # See what would be sent, without calling Jev
 npm test 2>&1 | npx claude-referee done --criteria "all tests pass" --evidence - --dry-run
+
+# See this project's calls, stops and Jev's stored answers in a local dashboard (127.0.0.1, Flow tab first)
+npx claude-referee ui
 ```
 
 Each command prints one line of JSON: `ok`, the verdict, a few numbers, a `next_step` when there is one, and, for the commands that ask Jev, a receipt ID. Every verdict exits 0, including "not done"; in CI, `--fail-on missing,unsure` exits 3 on those verdicts. `--describe` (or `--help`, `-h`) after a command prints its full contract, and `claude-referee --describe` lists the commands as JSON. An unknown option names the closest valid one when that is at most two edits away and the typed option has more characters than edits.
@@ -232,9 +245,9 @@ Each command prints one line of JSON: `ok`, the verdict, a few numbers, a `next_
 > { npx tsc --noEmit; echo "tsc exit code: $?"; } 2>&1 | npx claude-referee done --criteria "typecheck passes" --evidence -
 > ```
 
-`done` can return `met` only when it recognises a runner summary, or sees an exit code line. Anything else comes back `unsure` with `trust: unparsed`. A non-zero exit code in the evidence is `missing` (`reason: exit_code_nonzero`) and Jev isn't asked; the run still writes a receipt with 0 requests, and `--dry-run` gives the same verdict. Skipped, risky or incomplete tests cap `met` at `unsure` (`reason: skipped_tests`), and so do expected failures such as Swift Testing known issues; a recognised run that is cut off, empty, cancelled or flaky gives `reason: incomplete_run`; a test criterion backed only by a build log gives `reason: no_tests_run`.
+`done` can return `met` only when it recognises a runner summary, or sees an exit code line. Anything else comes back `unsure` with `trust: unparsed`. A non-zero exit code in the evidence is `missing` (`reason: exit_code_nonzero`) and Jev isn't asked; the run still writes a receipt with 0 requests, and `--dry-run` gives the same verdict. Skipped, risky or incomplete tests cap `met` at `unsure` (`reason: skipped_tests`), and so do expected failures such as Swift Testing known issues or vitest's `expected fail`; a recognised run that is cut off, empty, cancelled or flaky gives `reason: incomplete_run`; a test criterion backed only by a build or an oxlint run gives `reason: no_tests_run`; a lint or clean criterion with a warning behind it gives `reason: warning_in_log`, also when it only names the linter (`oxlint`, `eslint`). If a recognised log has no runner for a lint, build or typecheck criterion (in a combined log, say, only the test runner's summary was read), a verdict that is not `met` and has none of the reasons above gets `reason: criterion_not_covered`: run that check on its own and pipe its output. That reason never changes the verdict.
 
-**How far to trust `done`.** `done` v2 is not measured on its original bar. On a sample of real CI logs that nobody tuned the code for, it failed its registered bars: wrong `met` 2 of 85 (the bar is 0), `met` recall among recognised logs 0.873 (bar 0.9). On those logs, with exit-code-only evidence it almost never said `met` and answered `unsure` where a person would say `missing`; criteria worded as exit statuses often get `met` from the exit code alone (see the tip above). Two parser defects behind the two wrong `met` were fixed afterwards, on those same cases, so the 0 wrong `met` that follows is fitted and not an unseen test. The details are in [measurements-real-logs-2](docs/measurements-real-logs-2.md). Read `met` as a hint that the output shows the check passing, not as proof, and keep reading the output yourself when it matters.
+**How far to trust `done`.** `done` v2 is not measured on its original bar. On a sample of real CI logs that nobody tuned the code for, it failed its registered bars: wrong `met` 2 of 85 (the bar is 0), `met` recall among recognised logs 0.873 (bar 0.9). On those logs, with exit-code-only evidence it almost never said `met` and answered `unsure` where a person would say `missing`; criteria worded as exit statuses often get `met` from the exit code alone (see the tip above). Two parser defects behind the two wrong `met` were fixed afterwards, on those same cases, so the 0 wrong `met` that follows is fitted and not an unseen test. The details are in [measurements-real-logs-2](docs/measurements-real-logs-2.md). Three parsers added in 0.2.3 (`mix test`, `ctest`, `rubocop`) were then scored once on the half of that sample I had held back. Wrong `met` went from 0 to 1 of 52: a rubocop log that said in plain words that some analyses would be skipped. `met` recall among recognised logs on that half was 26 of 35 (0.743). That half comes from a sample whose totals I had already seen, so this is a second look, not an unseen test ([measurements-real-logs-3](docs/measurements-real-logs-3.md)). The rubocop case is not fixed yet. Read `met` as a hint that the output shows the check passing, not as proof, and keep reading the output yourself when it matters.
 
 ## What leaves your machine
 
@@ -242,7 +255,7 @@ Each command prints one line of JSON: `ok`, the verdict, a few numbers, a `next_
 - If the input contains something that looks like a password, key or token, nothing is sent.
 - Emails, IP addresses and your home folder path are replaced before sending.
 - `--dry-run` shows exactly what would be sent, without sending it.
-- The log stays on your machine: model, tokens, cost and time, never the text you sent.
+- The receipts stay on your machine: model, tokens, cost, time, the verdict and its numbers, never the text you sent. With the done-gate on, `stops.jsonl` also keeps excerpts of your prompt and Claude's last message.
 - Anything that would send free text on its own stays off until you turn it on.
 
 <picture>
@@ -269,8 +282,10 @@ The reasoning behind each one is in [MANIFESTO.md](MANIFESTO.md) ([Türkçe](MAN
 
 - [Configuration](docs/configuration.md): settings, the project file, packs and the key lookup order
 - [What leaves your machine](docs/privacy.md) and [Economics](docs/economics.md)
-- [Measurements](docs/measurements.md): every number above, with its method and limits
+- [Measurements](docs/measurements.md): most numbers above, with their method and limits; four later studies have their own pages, linked under [What's measured so far](#whats-measured-so-far)
 - [A recipe for the project `verify` skill](docs/verify-skill.md): run `done` on your test output before every commit
+- [GitHub Action](docs/recipes/github-action.md): runs `done` on a pull request's test log and `claims` on the doc lines it adds ([Marketplace](https://github.com/marketplace/actions/claude-referee))
+- [The i18n recipe](docs/recipes/i18n.md): `extract` finds candidate UI strings for the `i18n` pack's `judge` question
 - [FAQ](docs/faq.md), [Roadmap](ROADMAP.md) and [Changelog](CHANGELOG.md)
 - [Contributing](CONTRIBUTING.md): no API key needed, tests run offline. Security reports: [SECURITY.md](SECURITY.md)
 - Writing your own TypeSafe code? TypeSafe's official plugin gives Claude the full API context: `claude plugin marketplace add typesafe-ai/skills`, then `claude plugin install typesafe@typesafe-ai`. claude-referee doesn't need it.
