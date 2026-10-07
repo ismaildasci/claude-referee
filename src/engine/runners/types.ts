@@ -1,6 +1,6 @@
 // Facts parsed in code from check output; only these (never the raw log) go to Jev when a runner is recognised.
 // Parsers take the worst case: any failure marker or conflicting summary wins over a passing one.
-// expected_failures (known issues, xfail) is a fact for Jev and caps met; build_only marks a build runner (no test results) and is read in code only, never sent.
+// expected_failures (known issues, xfail) is a fact for Jev and caps met; build_only marks a runner with no test results (a build, or oxlint) and is read in code only, never sent.
 
 export interface RunnerFacts {
   readonly runner: string;

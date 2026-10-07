@@ -1,13 +1,14 @@
 // done: does the check output show each criterion holds? One request; every criterion is a Noul on the same evidence.
 // Recognised runner output is parsed in code and only those facts reach Jev; unrecognised output can never become met.
 // A non-zero exit code in the evidence is missing without a request (a zero-request receipt; --dry-run prints that verdict); skipped, risky or incomplete tests, or a skip marker anywhere in the log, cap met at unsure.
-// Exit-code-only evidence for a lint or clean criterion that shows a warning, notice, failure or skip message, or a swallowed exit code, is capped at unsure.
+// Exit-code-only evidence for a lint or clean criterion (lint, clean, no warnings, or a linter's name such as oxlint) that shows a warning, notice, failure or skip message, or a swallowed exit code, is capped at unsure.
 // A parsed run that is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion with parsed warnings, is capped the same way.
-// Expected failures (known issues) cap met like skips; a test criterion backed only by build runners (no test results) is capped as no tests run.
+// Expected failures (known issues) cap met like skips; a test criterion backed only by build runners or oxlint (no test results) is capped as no tests run; a lint, build or typecheck criterion with no parsed runner of its kind gets a reason, never another verdict.
 
 import type { EntryType, Questions } from "@typesafe-ai/sdk";
 import { RefereeError } from "../../engine/errors.ts";
 import { parseEvidence, type ParsedEvidence } from "../../engine/runners/index.ts";
+import { LINTERS, uncoveredKinds } from "../../engine/runners/kinds.ts";
 import { skipMarkers } from "../../engine/runners/skips.ts";
 import type { Result } from "../../engine/output.ts";
 import { threshold, type Pack, type Thresholds } from "../../engine/pack.ts";
@@ -30,7 +31,7 @@ const SKIPPED_NEXT = "Some tests were skipped, risky, incomplete or ended in an 
 const NO_TESTS = /\b(?:no tests? (?:to run|found|were found|executed|ran|collected|matched)|0 tests? (?:run|ran|executed|collected|found|completed)|tests? run: 0(?!\d)|nothing to run)/i;
 const INCOMPLETE_NEXT = "The run is cut off, empty, cancelled, flaky or changed files, so done won't say met. Run the full check again and pipe all of its output in.";
 const NO_TESTS_NEXT = "The log itself says no tests ran, so done won't say met. Run the tests that were meant to run and pipe their output in.";
-const BUILD_ONLY_NEXT = "The log shows only a build (no test results), and the criterion is about tests, so done won't say met. Run the tests and pipe their output in.";
+const BUILD_ONLY_NEXT = "The log shows only a build or a lint run (no test results), and the criterion is about tests, so done won't say met. Run the tests and pipe their output in.";
 const TEST_CRITERION = /\b(?:tests?|testing|test suites?|specs?)\b/i;
 const SKIP_WORDS = /^OK, but .*\b(?:incomplete|skipped|risky)\b/i;
 
@@ -52,7 +53,7 @@ function hasParsedWarnings(parsed: ParsedEvidence): boolean {
 
 const UNPARSED_NEXT = 'No recognised runner summary or exit code in the evidence, so it cannot count as met. Pipe the runner\'s full output, or add an exit code line: { your-command; echo "exit code: $?"; } 2>&1 | claude-referee done --criteria "..."';
 
-const CLEAN_CRITERION = /\b(?:lint\w*|clean|warning[- ]?free|no warnings?)\b/i;
+const CLEAN_CRITERION = new RegExp(String.raw`\b(?:lint\w*|clean|warning[- ]?free|no warnings?|${LINTERS.join("|")})\b`, "i");
 const WARN_WORDS = /\b(?:warnings?|notices?|deprecat\w*)\b/i;
 const WARN_NEGATED = /\b(?:0|no|zero|without) (?:warnings?|notices?)\b/gi;
 const WARN_FLAG = /--?[\w-]*warn[\w-]*(?:[ =]\S+)?/gi;
@@ -60,6 +61,15 @@ const PROBLEM_WORDS = /\b(?:fail\w*|skipp\w*|partial\w*|errors?|violations?|find
 const PROBLEM_NEGATED = /\b(?:0|no|zero|without) (?:errors?|findings?|violations?|failures?)\b/gi;
 const SWALLOWED = /\|\|\s*true\b|--no-fail\b|--exit-zero\b/i;
 const WARNING_NEXT = "The log shows a warning, notice, failure or skip wording, or a swallowed exit code, and only an exit code backs the lint criterion, so done won't say met. Pipe the linter's full summary, or say yourself that the warning is acceptable.";
+
+const KIND_LABEL: Readonly<Record<string, [string, string]>> = { lint: ["lint", "the lint check"], build: ["build", "the build"], typecheck: ["type check", "the type check"] };
+
+function notCoveredNext(runners: readonly string[], notCovered: readonly { i: number; uncovered: readonly string[] }[], many: boolean): string {
+  const kinds = [...new Set(notCovered.flatMap((c) => c.uncovered))].map((k) => KIND_LABEL[k] ?? [k, `the ${k} check`]);
+  const which = !many ? "the criterion" : `${notCovered.length > 1 ? "criteria" : "criterion"} ${notCovered.map((c) => c.i).join(", ")}`;
+  const one = kinds.length === 1;
+  return `Only ${runners.join(", ")} output was recognised, and only that reaches Jev, so Jev saw no ${kinds.map(([name]) => name).join(" or ")} output for ${which}. Run ${kinds.map(([, check]) => check).join(" and ")} on ${one ? "its" : "their"} own and pipe ${one ? "its" : "each one's"} output in: { your-command; echo "exit code: $?"; } 2>&1 | claude-referee done --criteria "..."`;
+}
 
 export function hasWarningMessage(evidence: string): boolean {
   return WARN_WORDS.test(evidence.replace(WARN_FLAG, " ").replace(WARN_NEGATED, " "));
@@ -97,6 +107,7 @@ export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, crit
   const missing = threshold(pack, thresholds, "done.met", "missing", 0.5);
   const finish = ([outcome]: Outcome[]): Result => {
     const warnCap = (parsed.trust === "exit_code" && (hasWarningMessage(evidence) || hasProblemMessage(evidence))) || hasParsedWarnings(parsed);
+    const runnerNames = [...new Set(parsed.runners.map((r) => r.runner))];
     const per = criteria.map((criterion, i) => {
       const answer = outcome?.answers?.[`c${i + 1}`];
       const p = answer?.type === "noul" ? answer.noul : 0;
@@ -108,7 +119,8 @@ export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, crit
       const incompleteCap = raw === "met" && hasIncomplete(parsed);
       const warningCap = raw === "met" && warnCap && CLEAN_CRITERION.test(criterion);
       const verdict: Verdict = raw === "met" && (parsed.trust === "unparsed" || parsed.conflict || skipCap || noTestsCap || incompleteCap || warningCap) ? "unsure" : raw;
-      return { i: i + 1, verdict, p, skipCap, noTestsCap, buildCap, incompleteCap, warningCap };
+      const uncovered = verdict !== "met" && parsed.trust === "parsed" ? uncoveredKinds(criterion, runnerNames) : [];
+      return { i: i + 1, verdict, p, skipCap, noTestsCap, buildCap, incompleteCap, warningCap, uncovered };
     });
     const settled = per.every((c) => c.verdict !== "missing") && parsed.trust !== "unparsed" && !parsed.conflict;
     const noTestsCapped = settled && per.some((c) => c.noTestsCap);
@@ -116,6 +128,9 @@ export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, crit
     const incompleteCapped = settled && !noTestsCapped && !skipCapped && per.some((c) => c.incompleteCap);
     const warningCapped = settled && !noTestsCapped && !skipCapped && !incompleteCapped && per.some((c) => c.warningCap);
     const verdict: Verdict = per.some((c) => c.verdict === "missing") ? "missing" : per.some((c) => c.verdict === "unsure") ? "unsure" : "met";
+    const capReason = noTestsCapped && verdict === "unsure" ? "no_tests_run" : skipCapped && verdict === "unsure" ? "skipped_tests" : incompleteCapped && verdict === "unsure" ? "incomplete_run" : warningCapped && verdict === "unsure" ? "warning_in_log" : undefined;
+    const notCovered = per.filter((c) => c.uncovered.length > 0);
+    const reason = capReason ?? (notCovered.length > 0 ? "criterion_not_covered" : undefined);
     return {
       ok: true,
       verdict,
@@ -123,9 +138,9 @@ export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, crit
       trust: parsed.trust,
       ...(parsed.exit_code !== null ? { exit_code: parsed.exit_code } : {}),
       ...(parsed.runners.length > 0 ? { runners: parsed.runners.map((r) => ({ runner: r.runner, passed: r.passed, failed: r.failed, errors: r.errors, skipped: r.skipped })) } : {}),
-      ...(noTestsCapped && verdict === "unsure" ? { reason: "no_tests_run" } : skipCapped && verdict === "unsure" ? { reason: "skipped_tests" } : incompleteCapped && verdict === "unsure" ? { reason: "incomplete_run" } : warningCapped && verdict === "unsure" ? { reason: "warning_in_log" } : {}),
-      ...(per.length > 1 ? { criteria: per.map(({ i, verdict: v, p: pp }) => ({ i, verdict: v, p: pp })) } : {}),
-      next_step: verdict === "met" ? undefined : noTestsCapped && verdict === "unsure" ? (per.some((c) => c.noTestsCap && !c.buildCap) ? NO_TESTS_NEXT : BUILD_ONLY_NEXT) : skipCapped && verdict === "unsure" ? SKIPPED_NEXT : incompleteCapped && verdict === "unsure" ? INCOMPLETE_NEXT : warningCapped && verdict === "unsure" ? WARNING_NEXT : parsed.trust === "unparsed" && per.every((c) => c.verdict !== "missing") ? UNPARSED_NEXT : NEXT[verdict],
+      ...(reason !== undefined ? { reason } : {}),
+      ...(per.length > 1 ? { criteria: per.map(({ i, verdict: v, p: pp, uncovered }) => ({ i, verdict: v, p: pp, ...(uncovered.length > 0 ? { reason: "criterion_not_covered" } : {}) })) } : {}),
+      next_step: verdict === "met" ? undefined : noTestsCapped && verdict === "unsure" ? (per.some((c) => c.noTestsCap && !c.buildCap) ? NO_TESTS_NEXT : BUILD_ONLY_NEXT) : skipCapped && verdict === "unsure" ? SKIPPED_NEXT : incompleteCapped && verdict === "unsure" ? INCOMPLETE_NEXT : warningCapped && verdict === "unsure" ? WARNING_NEXT : notCovered.length > 0 ? notCoveredNext(runnerNames, notCovered, per.length > 1) : parsed.trust === "unparsed" && per.every((c) => c.verdict !== "missing") ? UNPARSED_NEXT : NEXT[verdict],
     };
   };
   const state = (parsed.trust === "unparsed" ? { evidence } : { evidence: factsOf(parsed) }) as EntryType;
@@ -145,9 +160,9 @@ export const done: Command = {
       trust: "parsed (a runner summary was recognised), exit_code (only an exit code line) or unparsed (met is not possible)",
       exit_code: "The exit code read from the evidence, when it has one",
       runners: "Parsed counts per recognised runner",
-      reason: "exit_code_nonzero when the evidence has a non-zero exit code (missing, Jev not asked, requests 0; the receipt is still written, and --dry-run gives the same verdict); skipped_tests, no_tests_run, incomplete_run or warning_in_log when met was capped at unsure because tests were skipped, risky, incomplete or ended in an expected failure (a known issue), the log says no tests ran or shows only a build for a test criterion, the parsed run is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion has a warning behind it (parsed, or in a log with only an exit code)",
+      reason: "exit_code_nonzero when the evidence has a non-zero exit code (missing, Jev not asked, requests 0; the receipt is still written, and --dry-run gives the same verdict); skipped_tests, no_tests_run, incomplete_run or warning_in_log when met was capped at unsure because tests were skipped, risky, incomplete or ended in an expected failure (a known issue), the log says no tests ran or shows only a build (or an oxlint run) for a test criterion, the parsed run is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion (one that says lint, clean or no warnings, or names a linter such as oxlint, eslint, ruff or phpstan) has a warning behind it (parsed, or in a log with only an exit code); criterion_not_covered when the verdict is not met, no cap applies, and a lint, build or typecheck criterion has no parsed runner of that kind (only a test runner's summary was recognised, for example), so that check's output never reached Jev; it never changes the verdict",
       p: "Lowest probability that a criterion holds",
-      criteria: "Per criterion, by position, when more than one",
+      criteria: "Per criterion, by position, when more than one; reason criterion_not_covered on a criterion that is not met and has no parsed runner of its kind",
       next_step: "Only when not met",
     },
     errors: [...JEV_ERRORS],
