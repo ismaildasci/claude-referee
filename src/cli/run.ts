@@ -9,7 +9,7 @@ import { RefereeError, isRefereeError } from "../engine/errors.ts";
 import { render, renderError, type Result } from "../engine/output.ts";
 import type { Command, GlobalFlags, Io } from "./types.ts";
 
-const GLOBAL_OPTIONS: ParseArgsOptionsConfig = {
+export const GLOBAL_OPTIONS: ParseArgsOptionsConfig = {
   describe: { type: "boolean" },
   pretty: { type: "boolean" },
   "dry-run": { type: "boolean" },
@@ -20,14 +20,33 @@ const GLOBAL_OPTIONS: ParseArgsOptionsConfig = {
   "fail-on": { type: "string" },
 };
 
-const SHARED_CONTRACT = {
+export const SHARED_CONTRACT = {
   flags: {
     "--pretty": "Indented JSON for people.",
     "--data-dir <dir>": "Use another data directory for receipts, cache and results.",
     "--pack <name>": "Use this pack instead of the project's.",
-    "--dry-run": "Commands that ask Jev: print the redacted request and a token estimate; send, cache and log nothing. Long requests are shortened; --pretty shows them in full.",
+    "--dry-run": "Commands that ask Jev: print the redacted request and a token estimate; send, cache and log nothing. Long requests are shortened; --pretty shows them in full. A verdict decided in code (done on a non-zero exit code) is printed as is, with dry_run.",
     "--fresh": "Commands that ask Jev: skip the answer cache.",
+    "--verbose": "Commands that ask Jev: also print requests, cached, input_tokens, cost_usd, model and ms as one JSON line on stderr; nothing with --dry-run.",
     "--fail-on <verdict,...>": "Exit with code 3 when the verdict is one of these, e.g. --fail-on missing,unsure.",
+  },
+  outputs_common: {
+    ok: "true with a verdict; false on an error line",
+    verdict: "The command's verdict; see outputs",
+    next_step: "What to do next, when there is something to do",
+    receipt: "Id of the receipt this run wrote",
+    requests: "Requests sent to Jev (with --dry-run: planned)",
+    cached: "Answers from the cache or merged with an identical request",
+    details: "Only when the line would pass 1,500 characters: the file with the full result; the line keeps short scalar fields",
+    dry_run: "--dry-run: true; nothing was sent, cached or logged",
+    est_tokens: "--dry-run: estimated input tokens",
+    replaced: "--dry-run: values redaction replaced",
+    sent: "--dry-run: the redacted requests",
+    sent_shown: "--dry-run: how many requests fit on the line",
+    error: "Error line: the error code",
+    message: "Error line: what went wrong",
+    status: "Error line: the API's HTTP status, when there was one",
+    retry_after_ms: "Error line: when to retry, if the API said",
   },
   exit_codes: {
     "0": "A verdict, including a negative one such as missing.",
@@ -47,8 +66,8 @@ function usage(commands: readonly Command[]): string {
     "Commands:",
     ...lines,
     "",
-    "Every command accepts --describe (JSON contract), --pretty and --data-dir.",
-    "Commands that ask Jev also accept --dry-run, --fresh and --fail-on <verdict,...>.",
+    "Every command accepts --describe (JSON contract), --pretty, --data-dir, --pack and --fail-on <verdict,...>.",
+    "Commands that ask Jev also accept --dry-run, --fresh and --verbose.",
   ].join("\n");
 }
 

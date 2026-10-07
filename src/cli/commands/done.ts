@@ -1,6 +1,6 @@
 // done: does the check output show each criterion holds? One request; every criterion is a Noul on the same evidence.
 // Recognised runner output is parsed in code and only those facts reach Jev; unrecognised output can never become met.
-// A non-zero exit code in the evidence is missing without a request; skipped, risky or incomplete tests, or a skip marker anywhere in the log, cap met at unsure.
+// A non-zero exit code in the evidence is missing without a request (a zero-request receipt; --dry-run prints that verdict); skipped, risky or incomplete tests, or a skip marker anywhere in the log, cap met at unsure.
 // Exit-code-only evidence for a lint or clean criterion that shows a warning, notice, failure or skip message, or a swallowed exit code, is capped at unsure.
 // A parsed run that is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion with parsed warnings, is capped the same way.
 // Expected failures (known issues) cap met like skips; a test criterion backed only by build runners (no test results) is capped as no tests run.
@@ -13,7 +13,7 @@ import type { Result } from "../../engine/output.ts";
 import { threshold, type Pack, type Thresholds } from "../../engine/pack.ts";
 import type { Outcome, Planned } from "../../engine/session.ts";
 import type { Command } from "../types.ts";
-import { JEV_COST, JEV_EFFECTS, JEV_ERRORS, clip, jevCommand, list, openPack, question, readSource, str, stripAnsi, withData } from "../shared.ts";
+import { JEV_COST, JEV_EFFECTS, JEV_ERRORS, clip, jevCommand, list, openPack, question, readSource, reorder, str, stripAnsi, withData } from "../shared.ts";
 
 type Verdict = "met" | "unsure" | "missing";
 
@@ -143,8 +143,9 @@ export const done: Command = {
     outputs: {
       verdict: "met, unsure or missing; the lowest across criteria",
       trust: "parsed (a runner summary was recognised), exit_code (only an exit code line) or unparsed (met is not possible)",
+      exit_code: "The exit code read from the evidence, when it has one",
       runners: "Parsed counts per recognised runner",
-      reason: "exit_code_nonzero when the evidence has a non-zero exit code (missing, Jev not asked); skipped_tests, no_tests_run, incomplete_run or warning_in_log when met was capped at unsure because tests were skipped, risky, incomplete or ended in an expected failure (a known issue), the log says no tests ran or shows only a build for a test criterion, the parsed run is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion has a warning behind it (parsed, or in a log with only an exit code)",
+      reason: "exit_code_nonzero when the evidence has a non-zero exit code (missing, Jev not asked, requests 0; the receipt is still written, and --dry-run gives the same verdict); skipped_tests, no_tests_run, incomplete_run or warning_in_log when met was capped at unsure because tests were skipped, risky, incomplete or ended in an expected failure (a known issue), the log says no tests ran or shows only a build for a test criterion, the parsed run is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion has a warning behind it (parsed, or in a log with only an exit code)",
       p: "Lowest probability that a criterion holds",
       criteria: "Per criterion, by position, when more than one",
       next_step: "Only when not met",
@@ -162,7 +163,7 @@ export const done: Command = {
     if (!evidence.trim()) throw new RefereeError("bad_input", "The evidence is empty.");
     const { pack, project } = openPack(context);
     const { planned, finish } = doneRequest(pack, project?.thresholds, criteria, evidence);
-    if (planned.length === 0 && !context.flags.dryRun) return { ...finish([]), requests: 0, cached: 0 };
+    if (planned.length === 0 && context.flags.dryRun) return reorder({ ...finish([]), dry_run: true, requests: 0 });
     return jevCommand(context, "done", pack, planned, finish);
   },
 };

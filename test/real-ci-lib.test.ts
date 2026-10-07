@@ -3,10 +3,10 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildEvidence, classify, clopperPearson, kappa, negativeKind, refineTool, silentOutput, splitSegments, stripTransport, upperOneSided } from "../scripts/real-ci/lib.mjs";
+import { buildEvidence, classify, clopperPearson, kappa, negativeKind, passTotals, refineTool, silentOutput, splitSegments, stripTransport, upperOneSided } from "../scripts/real-ci/lib.mjs";
 
 const LOG = [
   "2026-09-14T01:24:01.2027120Z Current runner version: '2.337.0'",
@@ -127,6 +127,68 @@ test("fetch aggregation keeps only repositories the registered selection accepts
   const ids = readFileSync(join(out, "cases-raw.jsonl"), "utf8").split("\n").filter(Boolean).map((l) => (JSON.parse(l) as { repo: string }).repo);
   assert.equal(ids.length, 8);
   assert.ok(!ids.includes("o/js8") && !ids.includes("o/cached-but-not-listed"));
+});
+
+test("fetch pass totals add gh calls over every pass and take per-language counts from the latest pass", () => {
+  const totals = passTotals([
+    { at: "2026-10-05T10:00:00.000Z", calls: 900, langs: { Rust: { excluded_candidates: 2, repos_without_cases: 3 } } },
+    { at: "2026-10-05T09:00:00.000Z", calls: 1200, langs: { Rust: { excluded_candidates: 9, repos_without_cases: 9 }, Go: { excluded_candidates: 1, repos_without_cases: 4 } } },
+    { at: "2026-10-05T11:00:00.000Z", mode: "topup", calls: 300, langs: {} },
+  ]);
+  assert.deepEqual(totals, { passes: 3, calls: 2400, excluded_candidates: 3, repos_without_cases: 7 });
+  assert.deepEqual(passTotals([]), { passes: 0, calls: 0, excluded_candidates: 0, repos_without_cases: 0 });
+  const zeroed = passTotals([
+    { at: "2026-10-05T09:00:00.000Z", calls: 5, langs: { Rust: { excluded_candidates: 1, repos_without_cases: 0 } } },
+    { at: "2026-10-05T10:00:00.000Z", calls: 0, langs: { Rust: { excluded_candidates: 0, repos_without_cases: 0 } } },
+  ]);
+  assert.deepEqual(zeroed, { passes: 2, calls: 5, excluded_candidates: 0, repos_without_cases: 0 });
+});
+
+test("a fetch2 --langs pass that bumps nothing still records its languages, so an older pass's count does not survive", () => {
+  const out = mkdtempSync(join(tmpdir(), "real-ci-fetch2-langs-"));
+  for (const dir of ["repos", "lists"]) mkdirSync(join(out, dir));
+  writeFileSync(join(out, "lists", "Rust.json"), JSON.stringify([{ fullName: "o/seen" }]));
+  writeFileSync(join(out, "repos", "o__seen.json"), JSON.stringify({ repo: "o/seen", cases: [{ id: "rl-1", repo: "o/seen", failed: false }], dropped: {} }));
+  const excludeSeen = join(out, "exclude-seen.json");
+  const excludeNone = join(out, "exclude-none.json");
+  writeFileSync(excludeSeen, JSON.stringify({ repos: { "o/seen": "dev" } }));
+  writeFileSync(excludeNone, JSON.stringify({ repos: {} }));
+  run("fetch2.mjs", "--out", out, "--exclude", excludeSeen, "--langs", "Rust");
+  run("fetch2.mjs", "--out", out, "--exclude", excludeNone, "--langs", "Rust");
+  const passes = readdirSync(join(out, "passes")).map((f) => JSON.parse(readFileSync(join(out, "passes", f), "utf8")) as { at: string; langs: object });
+  passes.sort((a, b) => (a.at < b.at ? -1 : 1));
+  assert.deepEqual(passes.map((p) => p.langs), [{ Rust: { excluded_candidates: 1, repos_without_cases: 0 } }, { Rust: { excluded_candidates: 0, repos_without_cases: 0 } }]);
+  run("fetch2.mjs", "--out", out, "--exclude", excludeNone, "--aggregate");
+  const stats = JSON.parse(readFileSync(join(out, "stats.json"), "utf8")) as Record<string, unknown>;
+  assert.deepEqual({ accepted: (stats["accepted"] as Record<string, number>)["Rust"], excluded: stats["excluded_candidates"], calls: stats["calls"], passes: stats["passes"] }, { accepted: 1, excluded: 0, calls: 0, passes: 2 });
+});
+
+test("fetch2 --aggregate keeps the gh calls of earlier passes instead of writing its own 0", () => {
+  const out = mkdtempSync(join(tmpdir(), "real-ci-fetch2-"));
+  for (const dir of ["repos", "picks", "passes"]) mkdirSync(join(out, dir));
+  const exclude = join(out, "exclude.json");
+  writeFileSync(exclude, JSON.stringify({ repos: {} }));
+  writeFileSync(join(out, "stats.json"), JSON.stringify({ calls: 0, note: "kept" }));
+  writeFileSync(join(out, "picks", "Rust.json"), JSON.stringify(["o/a"]));
+  writeFileSync(join(out, "repos", "o__a.json"), JSON.stringify({ repo: "o/a", cases: [{ id: "rl-1", repo: "o/a", failed: true }], dropped: { log_expired: 1 } }));
+  writeFileSync(join(out, "passes", "1-1.json"), JSON.stringify({ at: "2026-10-05T09:00:00.000Z", mode: "langs:Rust", calls: 1500, langs: { Rust: { excluded_candidates: 1, repos_without_cases: 2 } } }));
+  writeFileSync(join(out, "passes", "2-2.json"), JSON.stringify({ at: "2026-10-05T10:00:00.000Z", mode: "langs:Go", calls: 900, langs: { Go: { excluded_candidates: 0, repos_without_cases: 5 } } }));
+  run("fetch2.mjs", "--out", out, "--exclude", exclude, "--aggregate");
+  const stats = JSON.parse(readFileSync(join(out, "stats.json"), "utf8")) as Record<string, unknown>;
+  assert.deepEqual({ calls: stats["calls"], passes: stats["passes"], excluded: stats["excluded_candidates"], empty: stats["repos_without_cases"], cases: stats["cases"], note: stats["note"] }, { calls: 2400, passes: 2, excluded: 1, empty: 7, cases: 1, note: "kept" });
+  assert.equal(readdirSync(join(out, "passes")).length, 2);
+});
+
+test("a fetch2 --langs pass leaves its own record before it exits", () => {
+  const out = mkdtempSync(join(tmpdir(), "real-ci-fetch2-"));
+  const exclude = join(out, "exclude.json");
+  writeFileSync(exclude, JSON.stringify({ repos: { "o/seen": "dev" } }));
+  mkdirSync(join(out, "lists"));
+  writeFileSync(join(out, "lists", "Rust.json"), JSON.stringify([{ fullName: "o/seen", stargazersCount: 1 }]));
+  run("fetch2.mjs", "--out", out, "--exclude", exclude, "--langs", "Rust");
+  const [file] = readdirSync(join(out, "passes"));
+  const pass = JSON.parse(readFileSync(join(out, "passes", file ?? ""), "utf8")) as Record<string, unknown>;
+  assert.deepEqual({ mode: pass["mode"], calls: pass["calls"], langs: pass["langs"] }, { mode: "langs:Rust", calls: 0, langs: { Rust: { excluded_candidates: 1, repos_without_cases: 0 } } });
 });
 
 test("assemble drops a met label on silent output as ambiguous and keeps a silent missing label", () => {

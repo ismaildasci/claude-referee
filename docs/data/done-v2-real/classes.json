@@ -1,6 +1,6 @@
 {
- "note": "Code-level counts only: no Jev answers exist for this sample. met_reachable = the caps would allow met if the judge answered p=1.",
- "jev_scored": false,
+ "note": "Jev's recorded verdicts are in the table: wrong_met, met_found and missing_found count sent cases (clusters are cases in this sample). met_reachable = the caps would allow met if the judge answered p=1.",
+ "jev_scored": true,
  "all": {
   "total": {
    "cases": 229,
@@ -9,7 +9,10 @@
    "expected_met": 123,
    "expected_missing": 76,
    "met_reachable_expected_met": 116,
-   "met_reachable_expected_missing": 50
+   "met_reachable_expected_missing": 50,
+   "wrong_met": 2,
+   "met_found": 34,
+   "missing_found": 44
   },
   "R": {
    "cases": 82,
@@ -18,7 +21,10 @@
    "expected_met": 44,
    "expected_missing": 24,
    "met_reachable_expected_met": 42,
-   "met_reachable_expected_missing": 7
+   "met_reachable_expected_missing": 7,
+   "wrong_met": 2,
+   "met_found": 33,
+   "missing_found": 8
   },
   "E": {
    "cases": 147,
@@ -27,7 +33,10 @@
    "expected_met": 79,
    "expected_missing": 52,
    "met_reachable_expected_met": 74,
-   "met_reachable_expected_missing": 43
+   "met_reachable_expected_missing": 43,
+   "wrong_met": 0,
+   "met_found": 1,
+   "missing_found": 36
   },
   "U": {
    "cases": 0,
@@ -36,7 +45,10 @@
    "expected_met": 0,
    "expected_missing": 0,
    "met_reachable_expected_met": 0,
-   "met_reachable_expected_missing": 0
+   "met_reachable_expected_missing": 0,
+   "wrong_met": 0,
+   "met_found": 0,
+   "missing_found": 0
   }
  },
  "dev": {
@@ -47,7 +59,10 @@
    "expected_met": 59,
    "expected_missing": 43,
    "met_reachable_expected_met": 59,
-   "met_reachable_expected_missing": 29
+   "met_reachable_expected_missing": 29,
+   "wrong_met": 2,
+   "met_found": 13,
+   "missing_found": 25
   },
   "R": {
    "cases": 40,
@@ -56,7 +71,10 @@
    "expected_met": 16,
    "expected_missing": 13,
    "met_reachable_expected_met": 16,
-   "met_reachable_expected_missing": 4
+   "met_reachable_expected_missing": 4,
+   "wrong_met": 2,
+   "met_found": 13,
+   "missing_found": 3
   },
   "E": {
    "cases": 84,
@@ -65,7 +83,10 @@
    "expected_met": 43,
    "expected_missing": 30,
    "met_reachable_expected_met": 43,
-   "met_reachable_expected_missing": 25
+   "met_reachable_expected_missing": 25,
+   "wrong_met": 0,
+   "met_found": 0,
+   "missing_found": 22
   },
   "U": {
    "cases": 0,
@@ -74,7 +95,10 @@
    "expected_met": 0,
    "expected_missing": 0,
    "met_reachable_expected_met": 0,
-   "met_reachable_expected_missing": 0
+   "met_reachable_expected_missing": 0,
+   "wrong_met": 0,
+   "met_found": 0,
+   "missing_found": 0
   }
  },
  "holdout": {
@@ -85,7 +109,10 @@
    "expected_met": 64,
    "expected_missing": 33,
    "met_reachable_expected_met": 57,
-   "met_reachable_expected_missing": 21
+   "met_reachable_expected_missing": 21,
+   "wrong_met": 0,
+   "met_found": 21,
+   "missing_found": 19
   },
   "R": {
    "cases": 42,
@@ -94,7 +121,10 @@
    "expected_met": 28,
    "expected_missing": 11,
    "met_reachable_expected_met": 26,
-   "met_reachable_expected_missing": 3
+   "met_reachable_expected_missing": 3,
+   "wrong_met": 0,
+   "met_found": 20,
+   "missing_found": 5
   },
   "E": {
    "cases": 63,
@@ -103,7 +133,10 @@
    "expected_met": 36,
    "expected_missing": 22,
    "met_reachable_expected_met": 31,
-   "met_reachable_expected_missing": 18
+   "met_reachable_expected_missing": 18,
+   "wrong_met": 0,
+   "met_found": 1,
+   "missing_found": 14
   },
   "U": {
    "cases": 0,
@@ -112,7 +145,10 @@
    "expected_met": 0,
    "expected_missing": 0,
    "met_reachable_expected_met": 0,
-   "met_reachable_expected_missing": 0
+   "met_reachable_expected_missing": 0,
+   "wrong_met": 0,
+   "met_found": 0,
+   "missing_found": 0
   }
  }
 }

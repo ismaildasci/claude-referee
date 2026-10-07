@@ -78,6 +78,7 @@ export function queue(ctx: UiContext) {
       checks: r.checks,
       claims_done: r.decision?.claims_done ?? null,
       claims_verified: r.decision?.claims_verified ?? null,
+      configured: text(r.configured),
       task_excerpt: visible(r.task_excerpt?.slice(0, EXCERPT_CHARS) ?? ""),
       final_excerpt: visible(r.final_excerpt?.slice(0, EXCERPT_CHARS) ?? ""),
       suggestion: hints.get(r.id) ?? null,
@@ -228,6 +229,8 @@ export function flow(ctx: UiContext, query: { days?: unknown; command?: unknown 
       mode: text(s.mode) ?? "unknown",
       session: shortSession(s.session_id),
       skipped: text(s.skipped),
+      error: text(s.error),
+      configured: text(s.configured),
       edits: num(s.edits) ?? 0,
       checks: num(s.checks) ?? 0,
       ms: num(s.ms),
@@ -242,7 +245,7 @@ export function flow(ctx: UiContext, query: { days?: unknown; command?: unknown 
 
 const SENT = [
   { when: "Every call that asks Jev", what: "The pack's question text and the input it asks about, redacted first" },
-  { when: "done", what: "Your criterion and the output you pipe in; recognised runner output is parsed in code and only counts, exit code and failing test names go out" },
+  { when: "done", what: "Your criterion and the output you pipe in; recognised runner output is parsed in code and only counts, exit code, failing test names and the matched summary and exit-code lines go out" },
   { when: "decide", what: "The decision, inline context, option texts and context_files contents, asked in two option orders" },
   { when: "judge, claims and verify", what: "The items, claims and source text you pass in" },
   { when: "Done-gate in shadow or soft mode", what: "Prompt start (1,500 chars), final message end (2,000 chars), check commands with pass/fail and edited file paths" },

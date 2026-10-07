@@ -199,7 +199,7 @@ function renderQueue(total) {
   var card = el("section", null, "card");
   card.tabIndex = -1;
   card.setAttribute("aria-label", "Stop " + (index + 1) + " of " + items.length);
-  add(card, el("p", "Stop " + (index + 1) + " of " + items.length + " - " + s.ts + " - " + s.edits + (s.edits === 1 ? " edit, " : " edits, ") + s.checks + (s.checks === 1 ? " check" : " checks") + " - done score " + (s.claims_done === null ? "n/a" : s.claims_done.toFixed(2)), "meta"));
+  add(card, el("p", "Stop " + (index + 1) + " of " + items.length + " - " + s.ts + " - " + s.edits + (s.edits === 1 ? " edit, " : " edits, ") + s.checks + (s.checks === 1 ? " check" : " checks") + " - done score " + (s.claims_done === null ? "n/a" : s.claims_done.toFixed(2)) + (s.configured ? " - set to " + s.configured + ", not built, ran as shadow" : ""), "meta"));
   var marks = marksText(s.marks);
   if (marks) add(card, el("p", marks, "meta"));
   add(card, el("p", "Task (start of the prompt)", "label"), el("pre", s.task_excerpt || "(none stored)"));
@@ -299,7 +299,8 @@ function jevText(e) {
 }
 
 function stopJevText(e) {
-  if (e.skipped) return "Not asked: " + e.skipped.replace(/_/g, " ");
+  if (e.skipped) return "Not asked: " + e.skipped.replace(/_/g, " ") + (e.error ? ", error " + e.error : "");
+  if (e.error) return "Failed: " + e.error;
   if (e.claims_done === null) return "No answer stored";
   return "Jev: done " + p2(e.claims_done) + ", verified " + p2(e.claims_verified) + ", " + msText(e.ms);
 }
@@ -353,7 +354,7 @@ function flowItem(e) {
   var out;
   if (e.kind === "stop") {
     item.setAttribute("aria-label", "Done-gate stop at " + clock(e.ts));
-    add(first, el("span", "Done-gate stop", "cmd"), el("span", e.mode + " mode, " + plural(e.edits, "edit", "edits") + ", " + plural(e.checks, "check", "checks") + (e.session ? ", session " + e.session : ""), "sub"));
+    add(first, el("span", "Done-gate stop", "cmd"), el("span", e.mode + " mode" + (e.configured ? " (set to " + e.configured + ", not built)" : "") + ", " + plural(e.edits, "edit", "edits") + ", " + plural(e.checks, "check", "checks") + (e.session ? ", session " + e.session : ""), "sub"));
     var outText = e.would_block === null ? "skipped" : e.would_block ? "would block" : "would pass";
     if (e.label) outText += ", labelled " + e.label;
     out = el("li", outText, "out " + (e.would_block === null ? "v-mid" : e.would_block ? "v-bad" : "v-ok"));

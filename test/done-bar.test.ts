@@ -3,6 +3,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -159,4 +160,53 @@ test("measurements doc states removal counts and the hash format", () => {
   assert.match(doc, /0 of 39/);
   assert.match(doc, /28 cases were removed/);
   assert.match(doc, /no trailing newline/);
+});
+
+test("split.mjs counts Jev's verdicts per part and class when the table has them, and says so only then", () => {
+  const dir = mkdtempSync(join(tmpdir(), "done-bar-split-"));
+  const row = (id: string, repo: string, extra: object) => ({ id, repo, language: "Go", tool: "go test", purpose: "test", parsed: true, trust: "parsed", code_decided: false, met_reachable: true, ...extra });
+  const rows = [
+    row("a", "o/one", { expected: "met", verdict: "met" }),
+    row("b", "o/one", { expected: "missing", verdict: "met" }),
+    row("c", "o/two", { expected: "missing", verdict: "missing" }),
+    row("d", "o/two", { expected: "missing", code_decided: true, verdict: "missing" }),
+  ];
+  const script = new URL("../scripts/done-bar/split.mjs", import.meta.url).pathname;
+  const classes = (table: object[]) => {
+    writeFileSync(join(dir, "table.jsonl"), `${table.map((r) => JSON.stringify(r)).join("\n")}\n`);
+    execFileSync(process.execPath, [script, join(dir, "table.jsonl"), dir], { encoding: "utf8" });
+    return JSON.parse(readFileSync(join(dir, "classes.json"), "utf8")) as { jev_scored: boolean; note: string; all: Record<string, Record<string, number>> };
+  };
+  const scored = classes(rows);
+  assert.equal(scored.jev_scored, true);
+  assert.doesNotMatch(scored.note, /no Jev answers/);
+  assert.deepEqual({ wrong: scored.all["R"]?.["wrong_met"], met: scored.all["R"]?.["met_found"], missing: scored.all["R"]?.["missing_found"], sent: scored.all["R"]?.["sent"] }, { wrong: 1, met: 1, missing: 1, sent: 3 });
+  const unscored = classes(rows.map((r) => Object.fromEntries(Object.entries(r).filter(([k]) => k !== "verdict"))));
+  assert.equal(unscored.jev_scored, false);
+  assert.match(unscored.note, /no Jev answers exist/);
+  assert.equal(unscored.all["R"]?.["wrong_met"], undefined);
+});
+
+test("the real-log answers are recorded, and the split-bar doc, its data and the roadmap say so with the script's counts", () => {
+  const table = readFileSync(new URL("../docs/data/done-v2-real/table.jsonl", import.meta.url), "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l) as { code_decided: boolean; verdict?: unknown });
+  const recorded = readFileSync(new URL("../docs/data/done-v2-real/recorded.jsonl", import.meta.url), "utf8").split("\n").filter(Boolean);
+  assert.equal(recorded.length, table.filter((r) => !r.code_decided).length);
+  assert.ok(table.every((r) => r.code_decided || typeof r.verdict === "string"));
+  const classes = JSON.parse(readFileSync(new URL("../docs/data/done-v2-real/classes.json", import.meta.url), "utf8")) as { jev_scored: boolean; note: string } & Record<string, Record<string, Record<string, number>>>;
+  assert.equal(classes.jev_scored, true);
+  assert.doesNotMatch(classes.note, /no Jev answers exist/);
+  const doc = readFileSync(new URL("../docs/measurements-done-bar-split.md", import.meta.url), "utf8");
+  for (const part of ["all", "dev", "holdout"]) {
+    for (const cls of ["R", "E", "total"]) {
+      const x = classes[part]?.[cls] ?? {};
+      assert.ok(doc.includes(`| ${part} | ${cls} | ${x["sent"]} | ${x["wrong_met"]} of ${x["expected_missing"]} | ${x["met_found"]} of ${x["expected_met"]} | ${x["missing_found"]} of ${x["expected_missing"]} |`), `${part} ${cls} row`);
+    }
+  }
+  assert.doesNotMatch(doc, /real-log sample has no judge answers|Next, in order: record the real-log answers/);
+  const roadmap = readFileSync(new URL("../ROADMAP.md", import.meta.url), "utf8").split("\n").find((l) => l.startsWith("| `done` v2 split bar")) ?? "";
+  assert.doesNotMatch(roadmap, /no judge answers yet|record real-log answers/);
+  const h = classes["holdout"] ?? {};
+  assert.ok(roadmap.includes(`hold-out wrong \`met\` ${h["total"]?.["wrong_met"]} of ${h["total"]?.["expected_missing"]}`));
+  assert.ok(roadmap.includes(`R \`met\` recall ${h["R"]?.["met_found"]} of ${h["R"]?.["expected_met"]}`));
+  assert.doesNotMatch(readFileSync(new URL("../docs/data/done-v2-real/suite.json", import.meta.url), "utf8"), /not recorded yet/);
 });

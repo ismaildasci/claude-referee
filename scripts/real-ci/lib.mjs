@@ -1,4 +1,4 @@
-// Pure helpers of the real-log study: GitHub job-log splitting, step classifier, evidence text, intervals.
+// Pure helpers of the real-log study: GitHub job-log splitting, step classifier, evidence text, intervals, fetch pass totals.
 // Registered in docs/decisions/done-v2-real-logs.md; tested in test/real-ci-lib.test.ts.
 
 import { createHash } from "node:crypto";
@@ -229,4 +229,12 @@ export function kappa(pairs) {
   const po = pairs.filter(([a, b]) => a === b).length / n;
   const pe = labels.reduce((s, l) => s + (pairs.filter(([a]) => a === l).length / n) * (pairs.filter(([, b]) => b === l).length / n), 0);
   return pe === 1 ? 1 : (po - pe) / (1 - pe);
+}
+
+export function passTotals(passes) {
+  const ordered = [...passes].sort((a, b) => (a.at < b.at ? -1 : a.at > b.at ? 1 : 0));
+  const langs = {};
+  for (const p of ordered) Object.assign(langs, p.langs ?? {});
+  const sum = (key) => Object.values(langs).reduce((n, c) => n + (c[key] ?? 0), 0);
+  return { passes: ordered.length, calls: ordered.reduce((n, p) => n + (p.calls ?? 0), 0), excluded_candidates: sum("excluded_candidates"), repos_without_cases: sum("repos_without_cases") };
 }

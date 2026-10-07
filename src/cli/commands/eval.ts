@@ -13,7 +13,7 @@ import type { Result } from "../../engine/output.ts";
 import { loadPack, packDirs, type Pack } from "../../engine/pack.ts";
 import { Session, questionHash, redactRequest, stateHash, type Outcome, type Planned } from "../../engine/session.ts";
 import type { Command, Context } from "../types.ts";
-import { JEV_ERRORS, fitLine, openPack, reorder, str } from "../shared.ts";
+import { JEV_ERRORS, fitLine, openPack, printVerbose, reorder, str } from "../shared.ts";
 import { doneEvidence, doneRequest } from "./done.ts";
 import { parseInput as parseDecision, planDecide } from "./decide.ts";
 import { judgeRequest } from "./judge.ts";
@@ -313,6 +313,7 @@ async function record(context: Context, fallback: Pack, list: readonly Suite[]):
     else toppedUp += 1;
   }
   const receipt = session.record({ verdict: failed.length ? "partial" : "recorded" });
+  printVerbose(context, receipt);
   return reorder({
     ok: true,
     verdict: failed.length ? "partial" : "recorded",
@@ -425,18 +426,36 @@ export const evalCommand: Command = {
       "--max-usd <x>": "record: stop before the first request when the estimated input cost, from a token estimate, is above x USD, or when the model has no known price.",
     },
     outputs: {
-      verdict: "record: recorded or partial; score: pass, or violated when wrong positives exceed the suite's max_wrong_positive or, when the suite sets max_wrong_negative, wrong negatives exceed that",
+      verdict: "record: recorded or partial; score: pass, or violated when wrong positives exceed the suite's max_wrong_positive or, when the suite sets max_wrong_negative, wrong negatives exceed that; scored for one decide suite",
+      suites: "record: the suites recorded; score --suite all: per suite its verdict, cases and wrong_positive or agreement",
       recorded: "record: cases recorded now",
+      topped_up: "record: older recordings given the decide orders they lacked",
       skipped: "record: cases already recorded",
+      failed: "record: suite/case ids with no complete answer (first 20)",
+      may_add: "record --dry-run: requests the balanced orders of tied decide cases could add",
+      suite: "score of one suite: its name",
+      model: "score: the model whose recordings were scored",
+      split: "score --split: the split scored",
+      cases: "score: cases scored",
       verdicts: "score: count per verdict",
       precision: "score: share of positive verdicts that were right",
       recall: "score: share of expected positives found",
       automation: "score: share of cases with a definite verdict",
       wrong_positive: "score: positive verdicts that should not be; the kill criterion",
+      max_wrong_positive: "score: the suite's allowance of wrong positives",
+      max_wrong_negative: "score: the suite's allowance of wrong negatives, when it sets one",
+      sweep: "score --sweep: rows of [threshold, precision, recall, wrong_positive]",
+      suggested: "score --sweep: the suggested threshold, or null",
+      sweep_note: "score --sweep: why nothing was suggested",
+      agree: "score, decide suites: cases whose lean equals the labelled best option",
       agreement: "score, decide suites: share of cases whose lean equals the labelled best option; no precision or recall and no pass or fail threshold",
       by_verdict: "score, decide suites: cases and agreeing cases per verdict (clear, weak, tie), raw counts",
       order_disagrees: "score, decide suites: cases where the written and reversed orders picked different leaders, or either order had an exact tie at the top",
-      leader_changed: "score with --ablation: cases whose lean differs from the full run; agree_delta is the change in agreeing cases and verdict_changed the cases with another verdict",
+      ablation: "score --ablation: the element removed",
+      baseline: "score --ablation: the same metrics for the full run",
+      leader_changed: "score with --ablation: cases whose lean differs from the full run",
+      agree_delta: "score with --ablation: change in agreeing cases against the full run",
+      verdict_changed: "score with --ablation: cases with another verdict than the full run",
       wrong_negative: "score: expected positives that got a definite non-positive verdict (for a stop suite also a skip); enforced only when suite.json sets max_wrong_negative",
     },
     errors: [...JEV_ERRORS],

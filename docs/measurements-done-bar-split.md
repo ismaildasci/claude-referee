@@ -75,9 +75,9 @@ Per-class counts per suite are small (0 to 20 clusters), so no per-suite figure 
 
 8 cases, all R: wrong `met` 0 of 3, `met` found 4 of 5, `missing` found 1 of 3 (the other two are `unsure` from the skipped and warning caps). Eight cases carry no recall verdict; seven of the eight texts are invented from memory of the tools' formats.
 
-## Real-log sample, code-level only (no Jev answers exist)
+## Real-log sample, code-level only (written 2026-10-02, before answers were recorded)
 
-229 cases from 94 repositories: 82 R, 147 E, **0 U**; 30 code-decided (14 R, 16 E, all `missing`), 199 sent. Wrong `met` and `met` recall are **not scored** for this sample. What the caps alone allow if the judge answered p = 1 (`met` reachable):
+229 cases from 94 repositories: 82 R, 147 E, **0 U**; 30 code-decided (14 R, 16 E, all `missing`), 199 sent. Wrong `met` and `met` recall were **not scored** when this was written; Jev's answers were recorded on 2026-10-05 and are scored in [Real-log sample with Jev's answers](#real-log-sample-with-jevs-answers-added-2026-10-07). What the caps alone allow if the judge answered p = 1 (`met` reachable):
 
 | Part | Class | Cases | Code-decided | Sent | Expected met | Expected missing | Met reachable among expected met | Met reachable among expected missing |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -129,11 +129,33 @@ Hold-out SHA-256 of the case-id list (ids sorted with the default string sort, j
 
 No parser was added.
 
+## Real-log sample with Jev's answers (added 2026-10-07)
+
+Jev's answers for the 199 sent cases were recorded on 2026-10-05 (`jev-1.13.0`, receipt `rmuv1s6mngwo4`; [measurements-real-logs.md](measurements-real-logs.md)), after the section above was written. `docs/data/done-v2-real/recorded.jsonl` holds the 199 answers and `table.jsonl` the verdicts; `node scripts/done-bar/split.mjs` counts them per part and class into `classes.json` (`jev_scored: true`) and `node scripts/done-bar/report.mjs` prints this table. Classes and verdicts are those of the code registered for the real-log study; clusters are cases in this sample (rule 5); U is empty.
+
+| Part | Class | Sent | Wrong met | Met found | Missing found |
+| --- | --- | --- | --- | --- | --- |
+| all | R | 68 | 2 of 24 | 33 of 44 | 8 of 24 |
+| all | E | 131 | 0 of 52 | 1 of 79 | 36 of 52 |
+| all | total | 199 | 2 of 76 | 34 of 123 | 44 of 76 |
+| dev | R | 29 | 2 of 13 | 13 of 16 | 3 of 13 |
+| dev | E | 73 | 0 of 30 | 0 of 43 | 22 of 30 |
+| dev | total | 102 | 2 of 43 | 13 of 59 | 25 of 43 |
+| holdout | R | 39 | 0 of 11 | 20 of 28 | 5 of 11 |
+| holdout | E | 58 | 0 of 22 | 1 of 36 | 14 of 22 |
+| holdout | total | 97 | 0 of 33 | 21 of 64 | 19 of 33 |
+
+Against the split bar, at that code, descriptively (this hold-out is not clean, see above, so nothing here is a pass):
+
+- **Hold-out:** wrong `met` 0 of 33 (R 0 of 11, E 0 of 22; one-sided 95% upper bounds 8.7%, 23.8% and 12.7%). `missing` recall 19 of 33 (0.576), below 0.9: bar 2 fails. R `met` recall 20 of 28 (0.714): **not evaluable** (n = 28, below 30). E `met` found 1 of 36.
+- **Dev:** wrong `met` 2 of 43, both R, so bar 1 fails on the whole sample (2 of 76); R `met` recall 13 of 16.
+- **Later code, from the dev half only:** with the dev parsers (`after-parsers/table.jsonl`) hold-out R `met` recall is 28 of 38 (0.737), and with the `cargo build` marker (`after-parsers/cargo-build/table.jsonl`) 29 of 38 (0.763); n = 38 makes bar 3 evaluable there, and it fails. Wrong `met` stays 0 of 33. Both are second looks at a hold-out already scored, not unseen tests (`node scripts/done-bar/halves.mjs <table> docs/data/done-v2-real/split.json holdout`).
+
 ## What this shows and does not
 
 - The split makes the structure visible: R is where recall can be asked for (0.77 on 30 post hoc clusters), E is where the lint caps trade recall for wrong `met` (0.53 `met` found, 0 wrong after caps, 6 wrong before), U carries only a coverage number.
-- It does **not** show that `done` v2 meets the bar: wrong `met` 0 is the caps' result on their own training data, the pooled `missing` recall (0.754) fails, R recall fails, nothing was scored on unseen output, and the real-log sample has no judge answers.
-- Next, in order: record the real-log answers (`eval record --suite done-v2-real`), score the dev and hold-out parts with the class tables (`scripts/real-ci/score.mjs` plus the class split), and run the registered check on a fresh sample split in advance.
+- It does **not** show that `done` v2 meets the bar: wrong `met` 0 is the caps' result on their own training data, the pooled `missing` recall (0.754) fails, R recall fails, nothing was scored on unseen output, and on the real-log hold-out (scored after the answers were recorded) `missing` recall is 0.576 and R `met` recall is not evaluable at the registered code.
+- Next: run the registered check on a fresh sample split in advance. The two steps listed before it on 2026-10-02, recording the real-log answers and scoring the dev and hold-out parts by class, are done (answers 2026-10-05, class counts in the section above).
 
 ## Limits
 

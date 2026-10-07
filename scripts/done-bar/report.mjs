@@ -33,11 +33,20 @@ for (const c of old.capped_by_code) out.push(`| ${c.id} | ${c.cls} | ${c.expecte
 out.push("");
 out.push(`Bar over the pooled main sets: ${JSON.stringify(old.pooled_main.bar)}`, "");
 
-out.push("**Real-log sample, code-level only (no Jev answers)**", "", "| Part | Class | Cases | Code-decided | Sent | Expected met | Expected missing | Met reachable among expected met | Met reachable among expected missing |", "| --- | --- | --- | --- | --- | --- | --- | --- | --- |");
+out.push(`**Real-log sample, ${real.jev_scored ? "code-level counts and Jev's recorded verdicts" : "code-level only (no Jev answers)"}**`, "", "| Part | Class | Cases | Code-decided | Sent | Expected met | Expected missing | Met reachable among expected met | Met reachable among expected missing |", "| --- | --- | --- | --- | --- | --- | --- | --- | --- |");
 for (const p of ["all", "dev", "holdout"]) {
   for (const c of ["R", "E", "U", "total"]) {
     const x = real[p][c];
     out.push(`| ${p} | ${c} | ${x.cases} | ${x.code_decided} | ${x.sent} | ${x.expected_met} | ${x.expected_missing} | ${x.met_reachable_expected_met} | ${x.met_reachable_expected_missing} |`);
+  }
+}
+if (real.jev_scored) {
+  out.push("", "| Part | Class | Sent | Wrong met | Met found | Missing found |", "| --- | --- | --- | --- | --- | --- |");
+  for (const p of ["all", "dev", "holdout"]) {
+    for (const c of ["R", "E", "U", "total"]) {
+      const x = real[p][c];
+      out.push(`| ${p} | ${c} | ${x.sent} | ${x.wrong_met} of ${x.expected_missing} | ${x.met_found} of ${x.expected_met} | ${x.missing_found} of ${x.expected_missing} |`);
+    }
   }
 }
 console.log(out.join("\n"));

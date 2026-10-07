@@ -598,6 +598,52 @@ test("the flow API shows the newest 200 events and reports the total", async () 
   }
 });
 
+test("flow and queue carry a stop's error code and configured mode, and the page shows them as text", async () => {
+  const s = await flowServer((dataDir, project) => {
+    const { decision: _none, ...failed } = stop("sfail", project, { ts: "2026-09-30T11:00:00.000Z", skipped: "jev_error", error: "rate_limited" });
+    appendStop(dataDir, failed);
+    appendStop(dataDir, stop("sactive", project, { ts: "2026-09-30T10:00:00.000Z", configured: "active" }));
+    appendStop(dataDir, stop("splain", project, { ts: "2026-09-30T09:00:00.000Z" }));
+  });
+  try {
+    const events = Object.fromEntries((await s.get()).events.map((e) => [e["id"], e]));
+    assert.deepEqual({ error: events["sfail"]?.["error"], configured: events["sfail"]?.["configured"] }, { error: "rate_limited", configured: null });
+    assert.deepEqual({ error: events["sactive"]?.["error"], configured: events["sactive"]?.["configured"] }, { error: null, configured: "active" });
+    assert.deepEqual({ error: events["splain"]?.["error"], configured: events["splain"]?.["configured"] }, { error: null, configured: null });
+    const q = await raw(s.ui.port, { path: "/api/queue", headers: { host: `127.0.0.1:${s.ui.port}`, "x-referee-token": s.ui.token } });
+    const queued = Object.fromEntries((JSON.parse(q.body) as { stops: { id: string; configured: unknown }[] }).stops.map((x) => [x.id, x.configured]));
+    assert.deepEqual(queued, { sactive: "active", splain: null });
+  } finally {
+    await s.ui.close();
+  }
+  const base = { kind: "stop", ts: "2026-10-05T09:00:00.000Z", mode: "shadow", session: null, edits: 2, checks: 0, ms: 3, label: null };
+  const flowData = {
+    days: 7,
+    command: "all",
+    commands: ["stop"],
+    total: 3,
+    shown: 3,
+    events: [
+      { ...base, id: "f1", skipped: "jev_error", error: "rate_limited", configured: null, claims_done: null, claims_verified: null, would_block: null },
+      { ...base, id: "f2", skipped: null, error: null, configured: "active", claims_done: 0.9, claims_verified: 0.1, would_block: true },
+      { ...base, id: "f3", skipped: null, error: null, configured: null, claims_done: 0.2, claims_verified: 0.1, would_block: false },
+    ],
+  };
+  const page = fakePage("#t=tok", { total: 0, stops: [] }, { [FIRST_FLOW]: flowData });
+  await settle();
+  const lanes = findAll(page.main, (n) => n.tag === "article").map((n) => n.textContent);
+  assert.match(lanes[0] ?? "", /Not asked: jev error, error rate_limited/);
+  assert.match(lanes[1] ?? "", /shadow mode \(set to active, not built\)/);
+  assert.doesNotMatch(lanes[2] ?? "", /set to|error/);
+  const card = { id: "s1", ts: "2026-10-06T06:00:00.000Z", edits: 1, checks: 1, claims_done: 0.9, claims_verified: 0.1, task_excerpt: "t", final_excerpt: "f", suggestion: null };
+  const active = fakePage("#t=tok", { total: 1, stops: [{ ...card, configured: "active" }] });
+  await openTab(active, "Labelling queue");
+  assert.match(active.main.textContent, /done score 0\.90 - set to active, not built, ran as shadow/);
+  const plain = fakePage("#t=tok", { total: 1, stops: [{ ...card, configured: null }] });
+  await openTab(plain, "Labelling queue");
+  assert.doesNotMatch(plain.main.textContent, /set to/);
+});
+
 function findAll(node: FakeNode, pred: (n: FakeNode) => boolean, out: FakeNode[] = []): FakeNode[] {
   if (pred(node)) out.push(node);
   node.children.forEach((c) => findAll(c, pred, out));

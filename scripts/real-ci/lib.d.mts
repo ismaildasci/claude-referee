@@ -15,3 +15,5 @@ export function wrapperTool(text: string, tool: string): string;
 export function clopperPearson(k: number, n: number, alpha?: number): { lo: number | null; hi: number | null };
 export function upperOneSided(k: number, n: number, alpha?: number): number | null;
 export function kappa(pairs: [string, string][]): number | null;
+export interface FetchPass { at: string; mode?: string; calls?: number; langs?: Record<string, { excluded_candidates?: number; repos_without_cases?: number }> }
+export function passTotals(passes: FetchPass[]): { passes: number; calls: number; excluded_candidates: number; repos_without_cases: number };

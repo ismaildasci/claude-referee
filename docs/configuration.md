@@ -118,7 +118,7 @@ Questions and thresholds live in packs, not in code. A pack is a directory of da
 my-pack/
 ├── pack.json          name, version, the Jev model it was tuned on, optional "extends"
 ├── questions/*.json   the questions
-├── thresholds.json    a threshold for each question
+├── thresholds.json    thresholds by question ID or group, each with named keys (below)
 ├── cheatsheet/*.md    optional: session.md is the session briefing text
 ├── redact.json        optional: extra redaction patterns
 └── areas.json         optional: default areas, used when the project file has none
@@ -148,6 +148,20 @@ The matching entry in `thresholds.json`:
 { "done.met": { "met": 0.7, "missing": 0.5 } }
 ```
 
+The commands read these groups and keys; the value in brackets is the `generic` pack's, which is also the value used when a pack leaves the key out:
+
+| Group | Keys | Read by |
+|---|---|---|
+| `done.met` | `met` (0.7), `missing` (0.5) | `done` |
+| `decide.best`, `decide.fit` | `clear` (0.85), `margin` (0.1) | `decide`; `decide.fit` when the options don't fit one request |
+| each `judge` question: `line.risky`, `failure.env`, `string.translatable` (i18n pack) | `auto` (0.9) | `judge` |
+| `verify.relation` | `supports` (0.8), `contradicts` (0.5), `says_nothing` (0.5) | `claims` |
+| `verify.injection` | `flag` (0.7) | `claims` |
+| `stop.gate`, one group for the four `stop.*` questions (a key under `stop.claims_done` is not read) | `claims_done` (0.7), `verification_applies` (0.5), `claims_verified` (0.5), `blocked` (0.4) | the done-gate, `receipts --stops` and the dashboard (`claims_done`, for the threshold suggestion) |
+| `decide.micro.<id>` | `bad`: 1 means a yes is bad | `decide`, from the pack's file only |
+
+`thresholds` in `.claude/referee.json` or `.claude/referee.local.json` use the same groups and keys. A value there is used only when it is higher than the pack's (at most 1), except `claims_verified` and `blocked` under `stop.gate`, where it is used only when it is lower (at least 0). The personal file's values merge per group and key over the project file's.
+
 Where the bundled numbers come from: `done.met`'s 0.7 and 0.5 were chosen on 25 cases in the earlier private kit, so they're in-sample. `done` v2 has not been measured on its original bar; on unseen real CI logs it failed its registered bars (wrong `met` 2 of 85, `met` recall among parsed logs 0.873; [result](measurements-real-logs-2.md)), so treat the thresholds as untuned defaults. `verify.relation` (supports 0.8, contradicts and says nothing 0.5) and `verify.injection` (0.7) were set by hand and checked once on 60 held-out claims. A replay of the recorded answers found nothing to tune: see [verify v2](measurements.md#verify-v2-on-held-out-claims). The 0.9 bands for `judge` follow the kit's rule of acting only at 0.90 or above. `line.risky` and `failure.env` were checked once on 62 invented cases each with no wrong `yes` at the 0.9 band, but only 52% and 81% of hold-out cases got a definite answer ([result](measurements.md#judge-on-invented-lines-and-logs)).
 
 `cheatsheet/session.md` may use three placeholders: `{{pack}}`, `{{cli}}` (the absolute path of the bundled CLI) and `{{checks}}` (the area's check commands). The briefing is capped at 800 characters.
@@ -165,7 +179,7 @@ A pattern may carry `flags`, such as `"i"`. The `g` and `y` flags are ignored, s
 
 Packs are data only; claude-referee never runs code from a pack.
 
-The `generic` pack has these questions: `done.met`, `verify.relation`, `verify.injection`, `decide.best`, `decide.fit`, and for `judge`, `line.risky` and `failure.env`.
+The `generic` pack has these 11 questions: `done.met`, `verify.relation`, `verify.injection`, `decide.best`, `decide.fit`, for `judge` `line.risky` and `failure.env`, and for the done-gate `stop.claims_done`, `stop.claims_verified`, `stop.verification_applies` and `stop.outcome`. A pack used with `hooks.stopGate` needs the four `stop.*` questions, its own or through `"extends": "generic"`; without them the gate records `config_error`.
 
 The `i18n` pack extends `generic` and adds `string.translatable` for `judge`: see [the i18n recipe](recipes/i18n.md).
 

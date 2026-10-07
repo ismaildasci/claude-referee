@@ -14,6 +14,7 @@ export interface Receipt {
   readonly pack?: string;
   readonly model?: string;
   readonly verdict?: string;
+  readonly reason?: string;
   readonly error?: string;
   readonly requests: number;
   readonly cached: number;

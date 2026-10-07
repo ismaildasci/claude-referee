@@ -230,7 +230,7 @@ export class Session {
     return !this.unsaved;
   }
 
-  record(fields: { verdict?: string; error?: RefereeError; chars?: number } = {}): Receipt {
+  record(fields: { verdict?: string; reason?: string; error?: RefereeError; chars?: number } = {}): Receipt {
     const env = this.options.env;
     const receipt: Receipt = {
       id: this.receiptId,
@@ -240,6 +240,7 @@ export class Session {
       pack: this.options.pack.name,
       model: this.answeredModel ?? this.model,
       ...(fields.verdict !== undefined ? { verdict: fields.verdict } : {}),
+      ...(fields.reason !== undefined ? { reason: fields.reason } : {}),
       ...(fields.error !== undefined ? { error: fields.error.code } : {}),
       requests: this.requests,
       cached: this.cachedCount,

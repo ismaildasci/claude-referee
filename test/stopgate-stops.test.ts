@@ -102,6 +102,22 @@ function setup() {
   return { dataDir, cwd, env: { REFEREE_DATA_DIR: dataDir } };
 }
 
+test("receipts --stops shows the error code and the configured mode a stop record carries", async () => {
+  const dataDir = tempDir();
+  const cwd = tempDir();
+  const project = projectId(cwd);
+  appendStop(dataDir, rec("sfail", { project, ts: "2026-09-29T11:00:00.000Z", skipped: "jev_error", error: "service_unavailable" }));
+  appendStop(dataDir, rec("sactive", { project, ts: "2026-09-29T10:00:00.000Z", block: true, configured: "active" }));
+  appendStop(dataDir, rec("splain", { project, ts: "2026-09-29T09:00:00.000Z", block: false }));
+  const io = memoryIo({ env: { REFEREE_DATA_DIR: dataDir }, cwd });
+  assert.equal(await run(["receipts", "--stops", "--pretty"], io, commands), 0);
+  const stops = io.json()["stops"] as Record<string, unknown>[];
+  const by = (id: string) => stops.find((s) => s["id"] === id) ?? {};
+  assert.deepEqual({ skipped: by("sfail")["skipped"], error: by("sfail")["error"], configured: by("sfail")["configured"] }, { skipped: "jev_error", error: "service_unavailable", configured: undefined });
+  assert.deepEqual({ error: by("sactive")["error"], configured: by("sactive")["configured"] }, { error: undefined, configured: "active" });
+  assert.ok(!("error" in by("splain")) && !("configured" in by("splain")));
+});
+
 test("receipts --stops lists newest first with stats and only the listed fields", async () => {
   const { cwd, env } = setup();
   const line = memoryIo({ env, cwd });

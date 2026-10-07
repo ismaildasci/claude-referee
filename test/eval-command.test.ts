@@ -69,6 +69,26 @@ test("eval record skips cases already recorded unless --fresh", async () => {
   assert.equal(fresh.requests, 2);
 });
 
+test("eval record --verbose prints the same usage line on stderr as the other commands that ask Jev, and none with --dry-run", async () => {
+  const root = suite(CASES);
+  const server = await fakeJev(byEvidence);
+  try {
+    const env = { TYPESAFE_API_KEY: "ts_test", REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: server.url, REFEREE_DATA_DIR: tempDir() };
+    const planned = memoryIo({ env });
+    assert.equal(await run(["eval", "record", "--suite", "s1", "--evals-dir", root, "--verbose", "--dry-run"], planned, commands), 0);
+    assert.deepEqual(planned.err, []);
+    const live = memoryIo({ env });
+    assert.equal(await run(["eval", "record", "--suite", "s1", "--evals-dir", root, "--verbose"], live, commands), 0);
+    assert.equal(live.out.join("").trim().split("\n").length, 1);
+    assert.equal(live.err.length, 1);
+    const usage = JSON.parse(live.err[0] ?? "") as Record<string, unknown>;
+    assert.deepEqual(Object.keys(usage), ["requests", "cached", "input_tokens", "cost_usd", "model", "ms"]);
+    assert.deepEqual([usage["requests"], usage["cached"], usage["input_tokens"]], [2, 0, 200]);
+  } finally {
+    await server.close();
+  }
+});
+
 test("eval score works offline and reports the kill criterion", async () => {
   const root = suite(CASES);
   await record(root);

@@ -5,7 +5,7 @@ description: Hand small, checkable judgements to TypeSafe Jev through the claude
 
 # claude-referee
 
-The CLI is `node "${CLAUDE_PLUGIN_ROOT}/dist/cli.mjs" <command>`. Every command prints one JSON line: `ok`, `verdict`, a few numbers, a `next_step` when there is one, and a `receipt`. `--describe` prints a command's contract. `--dry-run` shows the redacted request without sending it.
+The CLI is `node "${CLAUDE_PLUGIN_ROOT}/dist/cli.mjs" <command>`. Every command prints one JSON line: `ok`, `verdict`, a few numbers, a `next_step` when there is one, and, for commands that ask Jev, a `receipt`. `--describe` prints a command's contract. `--dry-run` shows the redacted request without sending it.
 
 ## When Jev pays off
 

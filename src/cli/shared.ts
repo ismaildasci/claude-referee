@@ -8,6 +8,7 @@ import { RefereeError, isRefereeError } from "../engine/errors.ts";
 import { roundDeep, type Result } from "../engine/output.ts";
 import { loadPack, packDirs, type Pack } from "../engine/pack.ts";
 import { loadProject, type ProjectConfig } from "../engine/project.ts";
+import type { Receipt } from "../engine/receipts.ts";
 import { Session, type Outcome, type Planned } from "../engine/session.ts";
 import type { Context } from "./types.ts";
 
@@ -85,6 +86,10 @@ export function withData<T extends object>(instructions: unknown, data: Record<s
   return { ...base, ...data } as T;
 }
 
+export function printVerbose(context: Context, receipt: Receipt): void {
+  if (context.flags.verbose) context.io.warn(JSON.stringify({ requests: receipt.requests, cached: receipt.cached, input_tokens: receipt.input_tokens, cost_usd: receipt.cost_usd, model: receipt.model, ms: receipt.ms }) + "\n");
+}
+
 export async function jevCommand(
   context: Context,
   command: string,
@@ -114,9 +119,12 @@ export async function jevCommand(
     const more = options.followUp?.(first) ?? [];
     const outcomes = more.length > 0 ? [...first, ...(await session.run(more, options))] : first;
     const result = finish(outcomes, session);
-    const receipt = session.record(typeof result["verdict"] === "string" ? { verdict: result["verdict"] } : {});
+    const receipt = session.record({
+      ...(typeof result["verdict"] === "string" ? { verdict: result["verdict"] } : {}),
+      ...(typeof result["reason"] === "string" ? { reason: result["reason"] } : {}),
+    });
     if (!session.saved()) io.warn("[claude-referee] Could not write to the data directory; this run was not cached or logged.\n");
-    if (flags.verbose) io.warn(JSON.stringify({ requests: receipt.requests, cached: receipt.cached, input_tokens: receipt.input_tokens, cost_usd: receipt.cost_usd, model: receipt.model, ms: receipt.ms }) + "\n");
+    printVerbose(context, receipt);
     return reorder({ ...result, ...session.stats(), receipt: receipt.id });
   } catch (error) {
     if (isRefereeError(error)) session.record({ error });

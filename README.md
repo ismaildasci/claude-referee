@@ -224,7 +224,7 @@ EOF
 npm test 2>&1 | npx claude-referee done --criteria "all tests pass" --evidence - --dry-run
 ```
 
-Each command prints one line of JSON: `ok`, the verdict, a few numbers, a `next_step` when there is one, and a receipt ID. Every verdict exits 0, including "not done"; in CI, `--fail-on missing,unsure` exits 3 on those verdicts. `--describe` prints any command's full contract.
+Each command prints one line of JSON: `ok`, the verdict, a few numbers, a `next_step` when there is one, and, for the commands that ask Jev, a receipt ID. Every verdict exits 0, including "not done"; in CI, `--fail-on missing,unsure` exits 3 on those verdicts. `--describe` prints any command's full contract.
 
 > [!TIP]
 > **Make the evidence explicit.** A check that prints nothing on success shows nothing. While building claude-referee, the referee answered `missing` (0.46) to "typecheck passes" because `tsc` printed no output; adding the exit code turned it into `met` (0.97). (Measured once, 2026-09-30.) That was one command. On real CI logs where the evidence was only an exit code, `done` answered `met` for none of 67 passing steps: with an exit code alone, a passing step came back `unsure` (34) or `missing` (33), never `met`. Pipe the runner's own summary when you can.
@@ -232,7 +232,7 @@ Each command prints one line of JSON: `ok`, the verdict, a few numbers, a `next_
 > { npx tsc --noEmit; echo "tsc exit code: $?"; } 2>&1 | npx claude-referee done --criteria "typecheck passes" --evidence -
 > ```
 
-`done` can return `met` only when it recognises a runner summary, or sees an exit code line. Anything else comes back `unsure` with `trust: unparsed`. A non-zero exit code in the evidence is `missing` (`reason: exit_code_nonzero`) and Jev isn't asked. Skipped, risky or incomplete tests cap `met` at `unsure` (`reason: skipped_tests`), and so do expected failures such as Swift Testing known issues; a recognised run that is cut off, empty, cancelled or flaky gives `reason: incomplete_run`; a test criterion backed only by a build log gives `reason: no_tests_run`.
+`done` can return `met` only when it recognises a runner summary, or sees an exit code line. Anything else comes back `unsure` with `trust: unparsed`. A non-zero exit code in the evidence is `missing` (`reason: exit_code_nonzero`) and Jev isn't asked; the run still writes a receipt with 0 requests, and `--dry-run` gives the same verdict. Skipped, risky or incomplete tests cap `met` at `unsure` (`reason: skipped_tests`), and so do expected failures such as Swift Testing known issues; a recognised run that is cut off, empty, cancelled or flaky gives `reason: incomplete_run`; a test criterion backed only by a build log gives `reason: no_tests_run`.
 
 **How far to trust `done`.** `done` v2 is not measured on its original bar. On a sample of real CI logs that nobody tuned the code for, it failed its registered bars: wrong `met` 2 of 85 (the bar is 0), `met` recall among recognised logs 0.873 (bar 0.9). With exit-code-only evidence it almost never says `met`, and it answers `unsure` where a person would say `missing`. Two parser defects behind the two wrong `met` were fixed afterwards, on those same cases, so the 0 wrong `met` that follows is fitted and not an unseen test. The details are in [measurements-real-logs-2](docs/measurements-real-logs-2.md). Read `met` as a hint that the output shows the check passing, not as proof, and keep reading the output yourself when it matters.
 

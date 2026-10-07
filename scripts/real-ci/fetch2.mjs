@@ -1,10 +1,11 @@
 // Fetches the second real-log sample (docs/decisions/done-v2-real-logs-2.md): other repositories, runs from 2026-10-04, cap 3 cases per repo.
 // Resumable like fetch.mjs. Usage: node fetch2.mjs --out DIR --exclude SPLIT.json [--per-lang 8] [--extra-per-lang 6] [--langs A,B] [--aggregate] [--topup]
+// Each pass that may call gh writes its own record under DIR/passes; the aggregate step sums them into stats.json (passTotals in lib.mjs).
 
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { buildEvidence, classify, criterionOf, refineTool, sha256, splitSegments, stripTransport, wrapperTool } from "./lib.mjs";
+import { buildEvidence, classify, criterionOf, passTotals, refineTool, sha256, splitSegments, stripTransport, wrapperTool } from "./lib.mjs";
 
 const args = process.argv.slice(2);
 const flag = (name, fallback) => (args.includes(`--${name}`) ? args[args.indexOf(`--${name}`) + 1] : fallback);
@@ -25,7 +26,7 @@ const SINCE = Date.parse("2026-10-04T00:00:00Z");
 const MAX_RUNS = 6;
 const MAX_JOBS = 6;
 const CAP = { total: 3, failed: 2 };
-for (const dir of ["repos", "logs", "lists", "picks"]) mkdirSync(join(OUT, dir), { recursive: true });
+for (const dir of ["repos", "logs", "lists", "picks", "passes"]) mkdirSync(join(OUT, dir), { recursive: true });
 
 let calls = 0;
 const sleep = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
@@ -63,7 +64,19 @@ const slug = (repo) => repo.replace("/", "__");
 const readJson = (file) => JSON.parse(readFileSync(file, "utf8"));
 const byHash = (key) => (a, b) => (sha256(key(a)) < sha256(key(b)) ? -1 : 1);
 const stats = existsSync(join(OUT, "stats.json")) ? readJson(join(OUT, "stats.json")) : {};
-const bump = (name, n = 1) => (stats[name] = (stats[name] ?? 0) + n);
+const counts = {};
+const bump = (lang, name) => {
+  const c = (counts[lang] ??= { excluded_candidates: 0, repos_without_cases: 0 });
+  c[name] += 1;
+};
+let saved = AGGREGATE;
+const savePass = () => {
+  if (saved) return;
+  saved = true;
+  const mode = TOPUP ? "topup" : ONLY ? `langs:${ONLY.join(",")}` : "all";
+  writeFileSync(join(OUT, "passes", `${Date.now()}-${process.pid}.json`), JSON.stringify({ at: new Date().toISOString(), mode, calls, langs: counts }));
+};
+process.on("exit", savePass);
 
 function candidates(lang) {
   const file = join(OUT, "lists", `${lang.replace(/\W/g, "_")}.json`);
@@ -268,11 +281,12 @@ if (TOPUP) {
 if (!AGGREGATE) {
   for (const [lang, quota] of buckets.filter(([l]) => !ONLY || ONLY.includes(l))) {
     accepted[lang] = 0;
+    counts[lang] ??= { excluded_candidates: 0, repos_without_cases: 0 };
     const mine = [];
     for (const meta of candidates(lang)) {
       if (accepted[lang] >= quota) break;
       if (EXCLUDED.has(meta.fullName)) {
-        bump("excluded_candidates");
+        bump(lang, "excluded_candidates");
         continue;
       }
       const record = processRepo(meta, lang);
@@ -280,11 +294,12 @@ if (!AGGREGATE) {
       if (record.cases.length > 0) {
         accepted[lang] += 1;
         mine.push(meta.fullName);
-      } else bump("repos_without_cases");
+      } else bump(lang, "repos_without_cases");
     }
     writeFileSync(join(OUT, "picks", `${lang.replace(/\W/g, "_")}.json`), JSON.stringify(mine));
   }
   if (ONLY) process.exit(0);
+  savePass();
 }
 for (const [lang] of buckets) {
   const f = join(OUT, "picks", `${lang.replace(/\W/g, "_")}.json`);
@@ -297,5 +312,6 @@ const all = pickedFiles.flatMap((f) => readJson(join(OUT, "repos", f)).cases);
 const dropped = {};
 for (const f of pickedFiles) for (const [k, v] of Object.entries(readJson(join(OUT, "repos", f)).dropped)) dropped[k] = (dropped[k] ?? 0) + v;
 writeFileSync(join(OUT, "cases-raw.jsonl"), `${all.map((c) => JSON.stringify(c)).join("\n")}\n`);
-writeFileSync(join(OUT, "stats.json"), JSON.stringify({ ...stats, accepted, dropped, repos: new Set(all.map((c) => c.repo)).size, cases: all.length, failed_cases: all.filter((c) => c.failed).length, calls }, null, 1));
+const passes = readdirSync(join(OUT, "passes")).filter((f) => f.endsWith(".json")).map((f) => readJson(join(OUT, "passes", f)));
+writeFileSync(join(OUT, "stats.json"), JSON.stringify({ ...stats, accepted, dropped, repos: new Set(all.map((c) => c.repo)).size, cases: all.length, failed_cases: all.filter((c) => c.failed).length, ...passTotals(passes) }, null, 1));
 console.error(JSON.stringify({ accepted, repos: new Set(all.map((c) => c.repo)).size, cases: all.length, failed: all.filter((c) => c.failed).length, dropped }));

@@ -79,7 +79,7 @@ Do not switch to `pull_request_target` to get the secret into fork runs: that ru
 
 Exactly what [privacy](../privacy.md) lists for these commands, and nothing when the key is absent:
 
-- `done`: your criteria and the log. A recognised runner's output is parsed in code and only counts, exit code and failing test names are sent; other output is sent as text, its first 2,000 and last 12,000 characters.
+- `done`: your criteria and the log. A recognised runner's output is parsed in code and only counts, exit code, failing test names and the matched summary and exit-code lines are sent; other output is sent as text, its first 2,000 and last 12,000 characters.
 - `claims`: the added doc lines and the text of the changed source files (up to 60,000 characters), after the file-name filter above. Files the filter does not catch are sent in full.
 
 Requests that contain something shaped like a secret are not sent (the step warns with `credential_in_state`), and emails, IP addresses and your home directory are replaced. Do not run this on code you may not send to a US-hosted service.

@@ -232,15 +232,39 @@ test("done reports missing without asking Jev when the exit code is not zero, ev
     assert.equal(result["exit_code"], 1);
     assert.equal(server.requests.length, 0);
     assert.match(String(result["next_step"]), /exit/i);
+    assert.match(String(result["receipt"]), /^r[0-9a-z]+$/);
   } finally {
     await server.close();
   }
 });
 
-test("done --dry-run still shows the request for a non-zero exit code", async () => {
-  const out = io(null, "=== 12 passed in 1.0s ===\nexit code: 1\n");
-  assert.equal(await run(["done", "--criteria", "all tests pass", "--evidence", "-", "--dry-run"], out, commands), 0);
-  assert.equal(out.json()["dry_run"], true);
+test("done on a non-zero exit code writes a zero-request receipt with the verdict and reason, and needs no key", async () => {
+  const dataDir = tempDir();
+  const out = memoryIo({ stdin: "npm test\nexit code: 2\n", env: { REFEREE_DATA_DIR: dataDir } });
+  assert.equal(await run(["done", "--criteria", "all tests pass", "--evidence", "-", "--fail-on", "missing"], out, commands), 3);
+  const result = out.json();
+  assert.deepEqual({ verdict: result["verdict"], reason: result["reason"], requests: result["requests"], cached: result["cached"] }, { verdict: "missing", reason: "exit_code_nonzero", requests: 0, cached: 0 });
+  const id = String(result["receipt"]);
+  assert.match(id, /^r[0-9a-z]+$/);
+  const [dir] = readdirSync(join(dataDir, "receipts"));
+  const [file] = readdirSync(join(dataDir, "receipts", dir ?? ""));
+  const lines = readFileSync(join(dataDir, "receipts", dir ?? "", file ?? ""), "utf8").trim().split("\n").map((l) => JSON.parse(l) as Record<string, unknown>);
+  assert.equal(lines.length, 1);
+  assert.deepEqual({ id: lines[0]?.["id"], command: lines[0]?.["command"], verdict: lines[0]?.["verdict"], reason: lines[0]?.["reason"], requests: lines[0]?.["requests"], cost_usd: lines[0]?.["cost_usd"] }, { id, command: "done", verdict: "missing", reason: "exit_code_nonzero", requests: 0, cost_usd: 0 });
+  const totals = memoryIo({ env: { REFEREE_DATA_DIR: dataDir } });
+  await run(["receipts", "--all"], totals, commands);
+  assert.deepEqual({ runs: totals.json()["runs"], requests: totals.json()["requests"], by_command: totals.json()["by_command"] }, { runs: 1, requests: 0, by_command: { done: 1 } });
+});
+
+test("done --dry-run on a non-zero exit code gives the offline verdict, so --fail-on missing exits 3, and writes nothing", async () => {
+  const dataDir = tempDir();
+  const out = io(null, "=== 12 passed in 1.0s ===\nexit code: 1\n", dataDir);
+  assert.equal(await run(["done", "--criteria", "all tests pass", "--evidence", "-", "--dry-run", "--fail-on", "missing"], out, commands), 3);
+  const result = out.json();
+  assert.deepEqual({ verdict: result["verdict"], reason: result["reason"], dry_run: result["dry_run"], requests: result["requests"], exit_code: result["exit_code"] }, { verdict: "missing", reason: "exit_code_nonzero", dry_run: true, requests: 0, exit_code: 1 });
+  assert.equal(result["sent"], undefined);
+  assert.equal(result["receipt"], undefined);
+  assert.deepEqual(readdirSync(dataDir), []);
 });
 
 test("done never says met when tests were skipped, risky or incomplete, whatever Jev answers", async () => {
