@@ -1,5 +1,7 @@
 // Finds skip, pending, xfail and todo markers anywhere in a log, whatever runner or nested reporter printed them.
-// Only structured shapes count (a count line with a non-zero skip tally, a per-test directive); test names and prose never do.
+// Only structured shapes count (a count line with a non-zero skip tally, a per-test directive); test names and prose never do. CI line prefixes are stripped first.
+
+import { stripTransport } from "./util.ts";
 
 const ANSI = /\u001b(?:\[[0-?]*[ -/]*[@-~]|\][^\u0007\u001b]*(?:\u0007|\u001b\\)?)/g;
 
@@ -51,7 +53,7 @@ function skipTokens(line: string): number {
 
 export function skipMarkers(text: string): string[] {
   const found: string[] = [];
-  for (const raw of text.replace(ANSI, "").split(/\r?\n/)) {
+  for (const raw of stripTransport(text.replace(ANSI, "")).split(/\r?\n/)) {
     const line = raw.trim();
     if (line === "" || ECHO.test(line) || line.startsWith("> Task ")) continue;
     if (DIRECTIVES.some((d) => d.test(line)) || skipTokens(line) > 0) found.push(line.slice(0, 120));

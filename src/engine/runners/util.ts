@@ -1,5 +1,5 @@
-// Shared helpers for the runner parsers added after the first set: ANSI stripping, clipping and fact construction.
-// Formats and sources are recorded in docs/decisions/runner-parsers-met-recall.md, not in code.
+// Runner-parser helpers (ANSI, clipping, facts; formats in docs/decisions/runner-parsers-met-recall.md). stripTransport drops one GitHub line prefix, as scripts/real-ci/lib.mjs.
+// wrapperExits reads only non-zero codes from turbo, nx, bun run/--filter, concurrently and npm 10+ exit reports; a zero never adds an exit line.
 // exitMatches is the one exit-line rule (source frames, test titles, open quotes and assertion messages rejected; hex read as its value), see docs/decisions/parser-defects-2026-10-06.md.
 
 import type { RunnerFacts } from "./types.ts";
@@ -8,6 +8,10 @@ const ANSI = /\u001b(?:\[[0-?]*[ -/]*[@-~]|\][^\u0007\u001b]*(?:\u0007|\u001b\\)
 export const MAX_FAILING = 10;
 export const MAX_NAME = 120;
 export const MAX_SUMMARY = 200;
+
+const TRANSPORT = /^\uFEFF?(?:[^\t\r\n]+\t[^\t\r\n]+\t)?\uFEFF?\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d+)?Z(?: |(?=\r?$))/gm;
+
+export const stripTransport = (text: string): string => text.replace(TRANSPORT, "");
 
 export const prepare = (text: string): string[] => text.replace(ANSI, "").split(/\r?\n/);
 export const clip = (value: string, max: number): string => value.trim().slice(0, max);
@@ -58,6 +62,23 @@ export function exitMatches(text: string): RegExpExecArray[] {
     const prefix = m[1] ?? "";
     if (EXIT_GUTTER.test(m[0]) || EXIT_TITLE.test(m[0]) || insideQuote(prefix) || EXIT_ASSERT.test(prefix) || EXIT_GOT.test(restOfLine(text, m))) return false;
     return !(EXIT_FAIL_LEAD.test(m[0]) && Number(m[2]) === 0);
+  });
+}
+
+const WRAPPER_EXIT: readonly { re: RegExp; code?: number }[] = [
+  { re: /^\[[^\]\s]+\] .+ exited with code (-?\d+)\s*$/ },
+  { re: /^error: script "[^"]*" exited with code (-?\d+)\s*$/ },
+  { re: /^\S+ \S+: Exited with code (-?\d+)\s*$/ },
+  { re: /^(?:\S+:)?\s*ERROR\s+(?:run failed: )?command\b.* exited \((-?\d+)\)\s*$/ },
+  { re: /^(?:\S+:\s+)?npm error code (-?\d+)\s*$/ },
+  { re: /^\s*NX\s+Running targets? \S.* failed\s*$/, code: 1 },
+];
+
+export function wrapperExits(text: string): { line: string; code: number }[] {
+  return prepare(text).flatMap((line) => {
+    const hit = WRAPPER_EXIT.map(({ re, code }) => ({ m: re.exec(line), code })).find((h) => h.m !== null);
+    const code = hit?.code ?? Number(hit?.m?.[1]);
+    return hit === undefined || code === 0 ? [] : [{ line: line.trim(), code }];
   });
 }
 

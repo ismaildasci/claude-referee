@@ -1,5 +1,6 @@
 // Parsers for jest, vitest, mocha, eslint, tsc and node:test output. Only structured markers and counts are read; prose in the log is ignored.
 // Worst case wins: a failure marker anywhere beats a passing summary line, and a log cut off before its summary never counts as a pass.
+// node:test details with no summary or failure marker (a tail in one error block) are one failure, cut off, unless a todo's "⚠ name (Xms)" owns them; assertion props any logged error has count only without a jest/vitest/bun/mocha summary; a TAP hookFailed block under "# fail 0" fails.
 
 import type { RunnerFacts, RunnerParser } from "./types.ts";
 
@@ -246,6 +247,18 @@ function parseTsc(text: string): RunnerFacts | null {
   return facts("tsc", { passed: summary !== null && errors === 0 ? 1 : 0, failed: 0, errors, skipped: 0, failing: entries, summary });
 }
 
+const NODE_WEAK: readonly RegExp[] = [/^\s+code: 'ERR_ASSERTION',$/, /^\s+diff: '(?:simple|full)'$/];
+const FOREIGN_SUMMARY = /^(?:Tests:\s+\d+|\s*Tests\s+\d+ (?:passed|failed)|Ran \d+ tests? across \d+ files?\.|\s*\d+ passing\b)/m;
+const NODE_DETAIL: readonly RegExp[] = [
+  /^\s+code: 'ERR_TEST_FAILURE',$/,
+  /^\s+failureType: '\w+',$/,
+  /^\s+at (?:async )?TestContext\.<anonymous> \(/,
+  /^\s+at (?:async )?\S+ \(node:internal\/test_runner\//,
+  /^\s+'test (?:failed|timed out after \d+ms|did not finish before its parent and was cancelled)'$/,
+];
+const TAP_HOOK: readonly RegExp[] = [/^\s+failureType: 'hookFailed'$/, /^\s+(?:TestHook\.run|Suite\.runHook|Test\.runHook) \(node:internal\/test_runner\/\S+:\d+:\d+\)$/];
+const NODE_MARKED = /^\s*(?:[⚠﹣] (.+?) \(\d+(?:\.\d+)?ms\) # \S.*|✔ (.+?) \(\d+(?:\.\d+)?ms\) # (?!EXPECTED FAILURE\b)\S.*)$/;
+
 function parseNodeTest(text: string): RunnerFacts | null {
   const lines = toLines(text);
   const num = (key: string): number | null => {
@@ -257,15 +270,21 @@ function parseNodeTest(text: string): RunnerFacts | null {
   const fail = num("fail");
   const cancelled = num("cancelled") ?? 0;
   const ids = new Set<string>();
+  const marked = new Set<string>();
   let inFailing = false;
   let empty = false;
   let bare = false;
   let expected = 0;
-  for (const l of lines) {
+  let owner = "";
+  let detail = false;
+  let hook = false;
+  const foreign = FOREIGN_SUMMARY.test(lines.join("\n"));
+  lines.forEach((l, i) => {
     if (/^✖ failing tests:\s*$/.test(l)) {
       bare ||= inFailing && empty;
       inFailing = empty = true;
-      continue;
+      owner = "✖";
+      return;
     }
     if (inFailing && !/^(?:\s|[✖⚠] |test at |$)/.test(l)) {
       bare ||= empty;
@@ -277,12 +296,27 @@ function parseNodeTest(text: string): RunnerFacts | null {
     const tap = /^not ok \d+ - (.+?)\s*$/.exec(l);
     if (tap !== null && !/\s# (?:TODO|SKIP)\b/i.test(tap[1] as string)) ids.add(tap[1] as string);
     if (/^\s*(?:✔ |ok \d+ - ).*\s# EXPECTED FAILURE\b/.test(l)) expected++;
-  }
+    const k = NODE_MARKED.exec(l);
+    if (k !== null) marked.add((k[1] ?? k[2]) as string);
+    const lead = /^\s*([✖⚠]) .+ \(\d+(?:\.\d+)?ms\)(?: # .*)?$/.exec(l);
+    const entry = /^\s*(not )?ok \d+ - (.*)$/.exec(l);
+    if (lead !== null) owner = lead[1] as string;
+    else if (entry !== null) owner = entry[1] !== undefined && /\s# (?:TODO|SKIP)\b/i.test(entry[2] as string) ? "⚠" : "✖";
+    else if (owner !== "⚠" && TAP_HOOK.some((re) => re.test(l))) hook = true;
+    else if (/^test at \S+:\d+:\d+$/.test(l)) {
+      owner = "";
+      detail ||= !/^\s*⚠ /.test(lines[i + 1] ?? "");
+    } else if (owner !== "⚠" && (NODE_DETAIL.some((re) => re.test(l)) || (!foreign && NODE_WEAK.some((re) => re.test(l))))) detail = true;
+  });
   bare ||= inFailing && empty;
   const summary = tests !== null && pass !== null && fail !== null ? lines.filter((l) => /^(?:ℹ|#) (?:tests|pass|fail) \d+\s*$/.test(l)).slice(-3).join(" ") : null;
-  const failed = Math.max((fail ?? 0) + cancelled, ids.size, bare ? 1 : 0);
-  if (summary === null && failed === 0) return null;
-  return facts("node:test", { passed: pass ?? 0, failed, errors: 0, skipped: (num("skipped") ?? 0) + (num("todo") ?? 0), expected_failures: expected, incomplete: cancelled > 0, failing: ids, summary });
+  const listed = Math.max((fail ?? 0) + cancelled, ids.size, bare ? 1 : 0);
+  const cut = summary === null && detail && listed === 0;
+  const hooked = summary !== null && hook && (fail ?? 0) + cancelled === 0;
+  const failed = Math.max(listed, cut || hooked ? 1 : 0);
+  if (summary === null && failed === 0 && marked.size === 0) return null;
+  const skipped = Math.max((num("skipped") ?? 0) + (num("todo") ?? 0), marked.size);
+  return facts("node:test", { passed: pass ?? 0, failed, errors: 0, skipped, expected_failures: expected, incomplete: cancelled > 0 || cut, failing: ids, summary });
 }
 
 export const parsers: readonly RunnerParser[] = [

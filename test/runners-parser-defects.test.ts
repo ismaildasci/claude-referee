@@ -207,8 +207,9 @@ const BUN_MSG = lines(
 );
 
 test("done: an assertion message is not a clean exit, a failure line with a non-zero code is missing, titles stay met", () => {
-  assert.equal(parseEvidence(BUN_MSG).trust, "unparsed");
-  assert.deepEqual(verdictOf(BUN_MSG), { verdict: "unsure", reason: undefined });
+  assert.deepEqual({ exit: parseEvidence(BUN_MSG).exit_code, runners: parseEvidence(BUN_MSG).runners.map((r) => [r.runner, r.failed, ...r.failing]) }, { exit: null, runners: [["bun test", 1, "accepts --quiet"]] });
+  assert.deepEqual(verdictOf(`${BUN_MSG}exit code: 0\n`), { verdict: "unsure", reason: undefined });
+  assert.deepEqual(verdictOf(BUN_MSG, "all tests pass", 0.2), { verdict: "missing", reason: undefined });
   assert.deepEqual(verdictOf(`${NODE_PASS}✖ Command failed with exit code 1: npm run lint\n`), { verdict: "missing", reason: "exit_code_nonzero" });
   const suites = lines("▶ exit code 2 handling", "  ✔ returns exit code 2 on a bad flag (0.3ms)", "✔ exit code 2 handling (1.3ms)") + NODE_SUMMARY(2, 0, 0) + "exit code: 0\n";
   assert.deepEqual(verdictOf(suites), { verdict: "met", reason: undefined });
@@ -248,8 +249,9 @@ const BUN_FRAME = lines(
 );
 
 test("done: an exit code read from a source frame or hex code never gives met; a title no longer gives missing", () => {
-  assert.deepEqual(verdictOf(BUN_FRAME), { verdict: "unsure", reason: undefined });
-  assert.equal(parseEvidence(BUN_FRAME).trust, "unparsed");
+  assert.deepEqual({ exit: parseEvidence(BUN_FRAME).exit_code, runners: parseEvidence(BUN_FRAME).runners.map((r) => [r.runner, r.failed]) }, { exit: null, runners: [["bun test", 1]] });
+  assert.deepEqual(verdictOf(`${BUN_FRAME}exit code: 0\n`), { verdict: "unsure", reason: undefined });
+  assert.deepEqual(verdictOf(BUN_FRAME, "all tests pass", 0.2), { verdict: "missing", reason: undefined });
   assert.deepEqual(verdictOf("running tests\nProcess exited with exit code 0xC0000005\n"), { verdict: "missing", reason: "exit_code_nonzero" });
   const titled = lines("✔ returns exit code 2 on an unknown flag (0.4ms)", "✔ prints usage (0.6ms)") + NODE_SUMMARY(2, 0, 0) + "exit code: 0\n";
   assert.deepEqual(verdictOf(titled), { verdict: "met", reason: undefined });
