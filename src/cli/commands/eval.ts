@@ -1,17 +1,19 @@
 // eval: "record" asks Jev once per case of a suite and appends hashed answers; "score" re-scores them offline.
 // Suites live in jev-evals/<suite>/ as suite.json, cases.jsonl and recorded.jsonl; a changed question text makes scoring fail.
 // decide suites record both option orders per case and score leader agreement; --ablation context|reversed removes the context text or the reversed order.
+// A suite's command claims and its old name verify are the same; only record asks Jev, and a record that fails once its Session exists is receipted there.
 
 import { appendFileSync, existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, resolve, sep } from "node:path";
 import { costUsd, estimateTokens, resolveModel } from "../../engine/config.ts";
 import { decideStop, stopQuestions, stopSkipReason, stopState } from "../../engine/stopgate/decide.ts";
 import { analyzeTranscript } from "../../engine/stopgate/transcript.ts";
-import { RefereeError } from "../../engine/errors.ts";
+import { RefereeError, isRefereeError } from "../../engine/errors.ts";
 import { decideMetrics, decideShift, findRecording, metrics, parseCases, parseRecordings, parseSweep, sweep, type DecideScored, type EvalCase, type Recording } from "../../engine/evals.ts";
 import type { Result } from "../../engine/output.ts";
 import { loadPack, packDirs, type Pack } from "../../engine/pack.ts";
-import { Session, questionHash, redactRequest, stateHash, type Outcome, type Planned } from "../../engine/session.ts";
+import { canonicalCommand } from "../../engine/receipts.ts";
+import { Session, markReceipted, questionHash, redactRequest, stateHash, type Outcome, type Planned } from "../../engine/session.ts";
 import type { Command, Context } from "../types.ts";
 import { JEV_ERRORS, fitLine, openPack, printVerbose, reorder, str } from "../shared.ts";
 import { doneEvidence, doneRequest } from "./done.ts";
@@ -156,8 +158,8 @@ function decideCaseRequest(pack: Pack, suite: Suite, item: EvalCase, ablation: A
 }
 
 function request(context: Context, pack: Pack, suite: Suite, item: EvalCase, ablation?: Ablation): CaseRequest {
-  const command = suite.config.command;
-  if (command !== "done" && command !== "verify" && command !== "judge" && command !== "stop" && command !== "decide") throw new RefereeError("bad_input", `Suite ${suite.name} uses ${command}; eval handles done, verify, judge, stop and decide suites for now.`);
+  const command = canonicalCommand(suite.config.command);
+  if (command !== "done" && command !== "claims" && command !== "judge" && command !== "stop" && command !== "decide") throw new RefereeError("bad_input", `Suite ${suite.name} uses ${suite.config.command}; eval handles done, claims (or verify), judge, stop and decide suites for now.`);
   if (ablation && command !== "decide") throw new RefereeError("bad_input", `--ablation applies to decide suites; suite ${suite.name} uses ${command}.`);
   let planned: Planned[];
   let finish: (outcomes: Outcome[]) => Result;
@@ -179,7 +181,7 @@ function request(context: Context, pack: Pack, suite: Suite, item: EvalCase, abl
   } else {
     const claim = typeof item["claim"] === "string" ? item["claim"] : "";
     const source = typeof item["source"] === "string" ? item["source"] : "";
-    if (!claim.trim() || !source.trim()) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: a verify case needs a claim and a source.`);
+    if (!claim.trim() || !source.trim()) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: a claims case needs a claim and a source.`);
     ({ planned, finish } = verifyRequest(pack, undefined, [{ id: "1", text: claim }], source));
   }
   const first = planned[0];
@@ -237,6 +239,23 @@ async function record(context: Context, fallback: Pack, list: readonly Suite[]):
     dataDir: flags.dataDir,
     fresh: true,
   });
+  try {
+    return await recordCases(context, session, pack, list, { ablation, maxRequests, maxUsd, split });
+  } catch (error) {
+    if (!flags.dryRun) session.record({ error: isRefereeError(error) ? error : new RefereeError("internal", "Unexpected error.") });
+    markReceipted(error);
+    throw error;
+  }
+}
+
+async function recordCases(
+  context: Context,
+  session: Session,
+  pack: Pack,
+  list: readonly Suite[],
+  { ablation, maxRequests, maxUsd, split }: { ablation: Ablation | undefined; maxRequests: number | undefined; maxUsd: number | undefined; split: string | undefined },
+): Promise<Result> {
+  const { io, flags } = context;
   const todo: CaseRequest[] = [];
   const topUps: { req: CaseRequest; answers: Outcome["answers"][]; follow: Planned[] }[] = [];
   let skipped = 0;
@@ -417,7 +436,7 @@ export const evalCommand: Command = {
     inputs: {
       "record | score": "Positional action.",
       "--suite <name|all>": "A directory under the evals dir with suite.json, cases.jsonl and, once recorded, recorded.jsonl. 'all' takes every suite; score then skips suites without recordings.",
-      "--evals-dir <dir>": "Where the suites live; default jev-evals in the current directory. A suite.json names its command (done, verify, judge, stop or decide) and may name a pack, which an explicit --pack overrides (a decide case has decision, context, options and an expected option name; a judge suite also names its question, and its cases have text and an expected yes, no or review).",
+      "--evals-dir <dir>": "Where the suites live; default jev-evals in the current directory. A suite.json names its command (done, claims or its old name verify, judge, stop or decide) and may name a pack, which an explicit --pack overrides (a decide case has decision, context, options and an expected option name; a judge suite also names its question, and its cases have text and an expected yes, no or review).",
       "--split <dev|holdout>": "record and score: only cases from this split, so dev can be recorded before the hold-out.",
       "--sweep <from:to:step>": "score: precision, recall and wrong positives per threshold; suggests one only with at least 10 cases per class.",
       "--ablation <context|reversed>": "decide suites only. record: record answers with the context text left out of the request (reversed needs no new recording). score: rescore with that element removed and report the change against the full run; context needs those answers recorded first.",
@@ -459,10 +478,11 @@ export const evalCommand: Command = {
       wrong_negative: "score: expected positives that got a definite non-positive verdict (for a stop suite also a skip); enforced only when suite.json sets max_wrong_negative",
     },
     errors: [...JEV_ERRORS],
-    effects: "record sends each unrecorded case to the TypeSafe API and appends to recorded.jsonl; score reads files only.",
+    effects: "record sends each unrecorded case to the TypeSafe API, appends to recorded.jsonl and writes a receipt, also when it fails (without --dry-run); score reads files only and writes no receipt.",
     cost: "record: one Jev request per case not yet recorded. score: free and offline.",
   },
   options: { suite: { type: "string" }, split: { type: "string" }, sweep: { type: "string" }, "evals-dir": { type: "string" }, "max-requests": { type: "string" }, "max-usd": { type: "string" }, ablation: { type: "string" } },
+  asksJev: (context) => context.positionals[0] === "record",
   async run(context) {
     const action = context.positionals[0];
     if (action !== "record" && action !== "score") throw new RefereeError("bad_input", "eval needs an action: record or score.", { next_step: "Example: eval score --suite injection" });

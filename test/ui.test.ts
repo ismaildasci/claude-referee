@@ -661,7 +661,7 @@ test("the flow tab draws each call as ask, Jev, verdict, with answers on demand 
     events: [
       call("c1", { answers: [{ model: "jev-1.13.0", answered_at: "2026-10-06T09:00:00.000Z", questions: [{ id: "claim:1:a", type: "choice", value: "supports", p: 0.9, options: [{ label: "supports", p: 0.9 }, { label: "contradicts", p: 0.1 }] }] }], answers_missing: 1 }),
       call("c2", { requests: 0, cached: 1, ms: 22 }),
-      call("c3", { requests: 0, cached: 0, ms: 5, verdict: "missing" }),
+      call("c3", { requests: 0, cached: 0, ms: 5, verdict: "missing", outcome: "reason exit_code_nonzero; trust exit_code; p 0; exit_code 2" }),
       call("c4", { verdict: null, error: "timeout", command: "claims" }),
       call("c5", { overruled: true, verdict: "unsure" }),
       { kind: "stop", id: "s1", ts: "2026-10-05T09:00:00.000Z", mode: "shadow", session: "sess-ui", skipped: null, edits: 2, checks: 1, ms: 800, claims_done: 0.9, claims_verified: 0.1, would_block: true, label: "right" },
@@ -677,6 +677,7 @@ test("the flow tab draws each call as ask, Jev, verdict, with answers on demand 
     "Jev: 1 request, 1,234 tokens, 820 ms",
     "From the cache: 1 stored answer, 22 ms",
     "Decided in code, nothing sent to Jev, 5 ms",
+    "Outcome: reason exit_code_nonzero; trust exit_code; p 0; exit_code 2",
     "Failed: timeout",
     "Overruled: voided",
     "Done-gate stop",
@@ -708,7 +709,7 @@ test("a corrupt receipt or cache entry degrades to placeholders instead of faili
     writeFileSync(join(dir, `${hexKey("2")}.json`), JSON.stringify({ ts: Date.parse("2026-09-30T10:00:00Z"), model: 7, answers: { a: "x", b: null, c: { type: "other" }, d: { type: "choice", choice: "k", confidence: "high", probabilities: { k: "x", j: 0.2 } }, e: { type: "noul", noul: "0.9" } } }));
     appendReceipt(dataDir, receipt("rOk", project, "2026-09-30T11:00:00.000Z", { verdict: "met", cache_keys: [hexKey("1"), hexKey("2")] }));
     appendFileSync(join(dataDir, "receipts", project, "2026-09.jsonl"), 'null\n42\n"s"\n[1]\n');
-    appendReceipt(dataDir, { ...receipt("rBad", project, "2026-09-30T10:00:00.000Z"), command: 5, verdict: 1, error: null, pack: {}, requests: "2", cache_keys: 5 } as unknown as Receipt);
+    appendReceipt(dataDir, { ...receipt("rBad", project, "2026-09-30T10:00:00.000Z"), command: 5, verdict: 1, error: null, pack: {}, requests: "2", cache_keys: 5, reason: "Free text", outcome: { trust: "<b>x</b>", p: "0.9", runners: [5, "../x"], reasons: { "Bad Code": 1, ok_code: "2" } } } as unknown as Receipt);
   });
   try {
     const d = await s.get();
@@ -720,6 +721,7 @@ test("a corrupt receipt or cache entry degrades to placeholders instead of faili
     assert.equal(qs?.model, "?");
     assert.deepEqual(qs?.questions, [{ id: "d", type: "choice", value: "k", p: null, options: [{ label: "j", p: 0.2 }] }, { id: "e", type: "noul", value: "?", p: null, options: [] }]);
     assert.deepEqual({ command: bad?.["command"], verdict: bad?.["verdict"], error: bad?.["error"], pack: bad?.["pack"], requests: bad?.["requests"], answers: bad?.["answers"], missing: bad?.["answers_missing"] }, { command: "unknown", verdict: null, error: null, pack: null, requests: 0, answers: [], missing: 0 });
+    assert.equal(bad?.["outcome"], null);
   } finally {
     await s.ui.close();
   }

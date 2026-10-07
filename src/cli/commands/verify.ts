@@ -1,5 +1,6 @@
-// verify: checks claims against a source text. Quotes and numbers are matched in code first; what is left gets two
+// claims (old name verify): checks claims against a source text. Quotes and numbers are matched in code first; what is left gets two
 // three-way Choice questions per claim (supports, contradicts, says nothing; both option orders) plus one injection check on the source.
+// Both names write receipts as command "claims".
 
 import type { Questions } from "@typesafe-ai/sdk";
 import { checkClaim } from "../../engine/claims.ts";
@@ -174,7 +175,7 @@ export const claims: Command = {
     },
     errors: [...JEV_ERRORS],
     effects: JEV_EFFECTS,
-    cost: `${JEV_COST} verify asks all claims about one source in one request when they fit, two three-way questions per claim and one injection check; claims with a quote or number missing from the source are decided in code.`,
+    cost: `${JEV_COST} claims asks all claims about one source in one request when they fit, two three-way questions per claim and one injection check; claims with a quote or number missing from the source are decided in code.`,
   },
   options: { source: { type: "string" }, claim: { type: "string", multiple: true }, claims: { type: "string" } },
   async run(context) {
@@ -190,7 +191,7 @@ export const claims: Command = {
     const source = stripAnsi(await readSource(context, str(context, "source"), "source"));
     const { pack, project } = openPack(context);
     const { planned, finish } = verifyRequest(pack, project?.thresholds, claims, source);
-    return jevCommand(context, "verify", pack, planned, finish, { partial: true });
+    return jevCommand(context, "claims", pack, planned, finish, { partial: true });
   },
 };
 

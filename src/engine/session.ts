@@ -1,5 +1,6 @@
 // One Session per command run: redacts every request, serves the cache, merges identical in-flight requests,
-// calls Jev within the profile budget and totals the run into a single local receipt.
+// calls Jev within the profile budget and totals the run into a single local receipt. An error it records is remembered
+// (receipted), so the CLI does not write a second receipt for the same failure.
 
 import type { EntryType, Questions } from "@typesafe-ai/sdk";
 import { BREAKER_CODES, breakerOpen, recordBreaker } from "./breaker.ts";
@@ -10,7 +11,7 @@ import { BATCH_DEADLINE_MS, CACHE_TTL_MS, PROFILES, costUsd, estimateTokens, res
 import { resolveDataDir, projectId } from "./datadir.ts";
 import { RefereeError, isRefereeError, type ErrorCode } from "./errors.ts";
 import { endpointOf, resolveEndpointKey, type ResolvedKey } from "./key.ts";
-import { appendReceipt, newReceiptId, type Receipt } from "./receipts.ts";
+import { appendReceipt, newReceiptId, type Receipt, type ReceiptOutcome } from "./receipts.ts";
 import { redact, stopError, type PackPatterns, type Stop } from "./redact.ts";
 
 export interface Planned {
@@ -52,6 +53,16 @@ interface Prepared {
   readonly planned: Planned;
   readonly body: { state: EntryType; questions: Questions };
   readonly stops: readonly Stop[];
+}
+
+const receipted = new WeakSet<object>();
+
+export function markReceipted(error: unknown): void {
+  if (typeof error === "object" && error !== null) receipted.add(error);
+}
+
+export function isReceipted(error: unknown): boolean {
+  return typeof error === "object" && error !== null && receipted.has(error);
 }
 
 export function questionHash(questions: Questions): string {
@@ -230,7 +241,7 @@ export class Session {
     return !this.unsaved;
   }
 
-  record(fields: { verdict?: string; reason?: string; error?: RefereeError; chars?: number } = {}): Receipt {
+  record(fields: { verdict?: string; reason?: string; outcome?: ReceiptOutcome | undefined; error?: RefereeError; chars?: number } = {}): Receipt {
     const env = this.options.env;
     const receipt: Receipt = {
       id: this.receiptId,
@@ -241,6 +252,7 @@ export class Session {
       model: this.answeredModel ?? this.model,
       ...(fields.verdict !== undefined ? { verdict: fields.verdict } : {}),
       ...(fields.reason !== undefined ? { reason: fields.reason } : {}),
+      ...(fields.outcome !== undefined ? { outcome: fields.outcome } : {}),
       ...(fields.error !== undefined ? { error: fields.error.code } : {}),
       requests: this.requests,
       cached: this.cachedCount,
@@ -258,6 +270,7 @@ export class Session {
       ...(this.options.sessionId ? { session_id: this.options.sessionId } : {}),
     };
     if (!appendReceipt(this.dataDir, receipt)) this.unsaved = true;
+    if (fields.error !== undefined) markReceipted(fields.error);
     return receipt;
   }
 }

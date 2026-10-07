@@ -1,13 +1,16 @@
 // CLI runner: parses flags, prints one JSON line, maps verdicts and errors to exit codes.
 // Exit codes: 0 for any verdict, 1 for real errors, 3 when --fail-on matches the verdict.
+// A Jev command given input (its own option or stdin it read; positionals never count) that fails unreceipted gets a zero-request receipt, never with --dry-run.
 
 import { join } from "node:path";
 import { parseArgs, type ParseArgsOptionsConfig } from "node:util";
 import { KIT, VERSION } from "../engine/config.ts";
-import { resolveDataDir } from "../engine/datadir.ts";
+import { projectId, resolveDataDir } from "../engine/datadir.ts";
 import { RefereeError, isRefereeError } from "../engine/errors.ts";
 import { render, renderError, type Result } from "../engine/output.ts";
-import type { Command, GlobalFlags, Io } from "./types.ts";
+import { appendReceipt, errorReceipt } from "../engine/receipts.ts";
+import { isReceipted } from "../engine/session.ts";
+import type { Command, Context, GlobalFlags, Io } from "./types.ts";
 
 export const GLOBAL_OPTIONS: ParseArgsOptionsConfig = {
   describe: { type: "boolean" },
@@ -87,6 +90,20 @@ function flagsFrom(values: Record<string, unknown>): GlobalFlags {
   };
 }
 
+function asksJev(command: Command, context: Context): boolean {
+  return command.asksJev ? command.asksJev(context) : command.describe.errors.includes("no_api_key");
+}
+
+function receiptError(io: Io, flags: GlobalFlags, command: string, error: unknown, started: number): void {
+  try {
+    const code = isRefereeError(error) ? error.code : "internal";
+    const receipt = errorReceipt({ command, project: projectId(io.cwd), error: code, started, now: io.now(), fresh: flags.fresh, runId: io.env["EVAL_RUN_ID"] });
+    appendReceipt(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), receipt);
+  } catch {
+    void 0;
+  }
+}
+
 export async function run(argv: readonly string[], io: Io, commands: readonly Command[]): Promise<number> {
   const [name, ...rest] = argv;
   if (name === undefined || name === "help" || name === "--help" || name === "-h") {
@@ -117,7 +134,24 @@ export async function run(argv: readonly string[], io: Io, commands: readonly Co
       io.write(JSON.stringify({ command: command.name, ...command.describe, ...SHARED_CONTRACT }, null, pretty ? 2 : 0) + "\n");
       return 0;
     }
-    const result: Result = await command.run({ io, flags, values: parsed.values, positionals: parsed.positionals });
+    let payload = Object.keys(values).some((key) => Object.hasOwn(command.options, key));
+    const tracked: Io = {
+      ...io,
+      readStdin: async () => {
+        const text = await io.readStdin();
+        if (text.trim()) payload = true;
+        return text;
+      },
+    };
+    const context: Context = { io: tracked, flags, values: parsed.values, positionals: parsed.positionals };
+    const started = io.now();
+    let result: Result;
+    try {
+      result = await command.run(context);
+    } catch (error) {
+      if (!flags.dryRun && payload && asksJev(command, context) && !isReceipted(error)) receiptError(io, flags, command.name, error, started);
+      throw error;
+    }
     const receipt = typeof result["receipt"] === "string" ? result["receipt"] : null;
     const detailsDir = flags.dryRun ? null : join(resolveDataDir(io.env, io.home, io.cwd, flags.dataDir), "results");
     io.write(render(result, { pretty, detailsDir, receipt }) + "\n");

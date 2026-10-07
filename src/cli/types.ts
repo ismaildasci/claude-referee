@@ -1,4 +1,5 @@
 // Shapes shared by the CLI runner and its commands; Io keeps commands testable without a real process.
+// asksJev: whether this run would ask Jev (for the error receipt); without it, a command that lists no_api_key does.
 
 import type { ParseArgsOptionsConfig } from "node:util";
 import type { Env } from "../engine/config.ts";
@@ -47,5 +48,6 @@ export interface Command {
   readonly name: string;
   readonly describe: Describe;
   readonly options: ParseArgsOptionsConfig;
+  asksJev?(context: Context): boolean;
   run(context: Context): Promise<Result>;
 }

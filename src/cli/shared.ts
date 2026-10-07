@@ -1,5 +1,6 @@
 // Helpers shared by the commands: input reading, pack selection and the Jev command lifecycle.
 // A Jev command plans its requests first, so --dry-run can show them without touching the network or disk.
+// Its receipt takes the verdict, the reason code and outcomeOf(result); any failure once the Session exists is receipted there.
 
 import { readFileSync, statSync } from "node:fs";
 import { resolve } from "node:path";
@@ -8,8 +9,8 @@ import { RefereeError, isRefereeError } from "../engine/errors.ts";
 import { roundDeep, type Result } from "../engine/output.ts";
 import { loadPack, packDirs, type Pack } from "../engine/pack.ts";
 import { loadProject, type ProjectConfig } from "../engine/project.ts";
-import type { Receipt } from "../engine/receipts.ts";
-import { Session, type Outcome, type Planned } from "../engine/session.ts";
+import { outcomeOf, reasonCode, type Receipt } from "../engine/receipts.ts";
+import { Session, markReceipted, type Outcome, type Planned } from "../engine/session.ts";
 import type { Context } from "./types.ts";
 
 export const JEV_COST = "One Jev request per input at $0.042 per million input tokens; output tokens are free. Repeats come from the local cache.";
@@ -31,7 +32,7 @@ export const JEV_ERRORS = [
 ] as const;
 
 export const JEV_EFFECTS =
-  "Sends the redacted input to the TypeSafe API unless --dry-run; writes a receipt and cache entries to the data directory.";
+  "Sends the redacted input to the TypeSafe API unless --dry-run; writes a receipt and cache entries to the data directory. Without --dry-run, an error once the input is read also writes a receipt with its error code.";
 
 export function str(context: Context, key: string): string | undefined {
   const value = context.values[key];
@@ -119,15 +120,18 @@ export async function jevCommand(
     const more = options.followUp?.(first) ?? [];
     const outcomes = more.length > 0 ? [...first, ...(await session.run(more, options))] : first;
     const result = finish(outcomes, session);
+    const reason = reasonCode(result["reason"]);
     const receipt = session.record({
       ...(typeof result["verdict"] === "string" ? { verdict: result["verdict"] } : {}),
-      ...(typeof result["reason"] === "string" ? { reason: result["reason"] } : {}),
+      ...(reason !== undefined ? { reason } : {}),
+      outcome: outcomeOf(result),
     });
     if (!session.saved()) io.warn("[claude-referee] Could not write to the data directory; this run was not cached or logged.\n");
     printVerbose(context, receipt);
     return reorder({ ...result, ...session.stats(), receipt: receipt.id });
   } catch (error) {
-    if (isRefereeError(error)) session.record({ error });
+    session.record({ error: isRefereeError(error) ? error : new RefereeError("internal", "Unexpected error.") });
+    markReceipted(error);
     throw error;
   }
 }

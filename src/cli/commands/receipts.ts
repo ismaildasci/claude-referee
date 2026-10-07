@@ -6,7 +6,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { projectId, resolveDataDir, tildify } from "../../engine/datadir.ts";
 import { RefereeError } from "../../engine/errors.ts";
-import { overruleReceipt, readReceipts, verifyChain, type Receipt } from "../../engine/receipts.ts";
+import { canonicalCommand, overruleReceipt, readReceipts, verifyChain, type Receipt } from "../../engine/receipts.ts";
 import { loadPack, packDirs, threshold } from "../../engine/pack.ts";
 import { loadProject } from "../../engine/project.ts";
 import { suggestThreshold } from "../../engine/stopgate/interval.ts";
@@ -25,12 +25,12 @@ export const receipts: Command = {
   describe: {
     summary: "Show totals from the local receipts, per day with --tokens, Claude-side calls with --usage, or export them.",
     inputs: {
-      export: "Positional: write every receipt, all projects, to --out as JSON lines.",
+      export: "Positional: write every receipt, all projects, to --out as JSON lines. A receipt holds id, ts, command, project (a hash of the repository path), pack, model, verdict, reason (a fixed code), outcome, error (the code), requests, cached, input_tokens, cost_usd, request_ids, qhash, cache_keys, prev, fresh, stopped, replaced, chars, ms, run_id and session_id, each only when it applies; never request text, criteria, claim text or ids, option names, items, file paths or user names.",
       verify: "Positional: check the hash chain of every project's receipts (add --project-only for the current one). Receipts written before chaining existed are counted as unchained.",
       overrule: "Positional: \"overrule <id>\" voids one decision: it is recorded in overruled.jsonl and the cached answers it used are deleted, so the next run asks again. The receipt itself is not rewritten.",
       "--out <file>": "Target file for export.",
-      "--tokens": "Rows per day and command: runs, requests, cache hits, input tokens and the share of --fresh runs.",
-      "--usage": "Claude-side: claude-referee CLI calls per day and command, counted from this project's Claude Code transcripts (subagents included, each tool call once, also behind env, timeout, nohup or xargs), with the size of what each call returned. Nothing from the transcripts is printed.",
+      "--tokens": "Rows per day and command: runs, requests, cache hits, input tokens and the share of --fresh runs. verify (the old name of claims) counts as claims.",
+      "--usage": "Claude-side: claude-referee CLI calls per day and command (verify counted as claims), counted from this project's Claude Code transcripts (subagents included, each tool call once, also behind env, timeout, nohup or xargs), with the size of what each call returned. Nothing from the transcripts is printed.",
       "--stops": "List the Stop done-gate's shadow stops of this project, newest first, at most 20, with stats (precision and false block rate over labelled would_block stops, p95 ms, skips per reason). Excerpts only; nothing else from the store is printed.",
       "--unlabelled": "With --stops: only would_block stops without a label.",
       "--label <id>": "Mark one stop with --right (the block would have been correct) or --wrong (a false block).",
@@ -45,17 +45,17 @@ export const receipts: Command = {
       chain: "With verify: receipts, chained, unchained and breaks (project, id, kind mismatch, fork or unreadable)",
       dropped: "With overrule: how many cached answers were deleted",
       id: "With overrule or --label: the receipt or stop id",
-      receipts: "With export: receipts written",
+      receipts: "With export: receipts written. outcome holds numbers and fixed codes only: done's trust, p, exit_code and runner names; decide's lean_p, margin (to the second option) and orders, never the option name; claims' claims, supported, unsupported, contradicted, says_nothing, unsure and unanswered counts and reasons (claims per reason code); judge's items, yes, no and review. A Jev command that failed before its session started (a bad input, a pack or project that does not load, an input that is too large) has no pack, model or outcome; it carries its error code, requests 0 and ms (and fresh with --fresh); a failure after that (a missing or invalid key, a Jev error) has pack and model too",
       out: "With export: the file written, with ~ for home",
       days: "The window in days",
       project: "With --usage: this project's id",
       calls: "With --usage: CLI calls in the window",
-      runs: "Command runs in the window",
+      runs: "Command runs in the window, including runs that failed with an error receipt",
       requests: "Jev requests made",
       cached: "Answers served from the cache or merged with an identical request",
       input_tokens: "Input tokens billed",
       cost_usd: "Estimated cost at list price; a run on a model with no known price records null and adds nothing here",
-      by_command: "Runs per command",
+      by_command: "Runs per command; verify runs (the old name) count as claims",
       rows: "With --tokens: one row per day and command. With --usage: day, command, calls, subagent_calls and result_chars",
       transcripts: "With --usage: how many transcript files were read",
       stats: "With --stops: stops, skipped_by_reason, asked, would_block, labelled, right, wrong, precision, false_block_rate, p95_ms (answered calls only), errors, error_rate (Jev errors and breaker skips over asked plus errors), p95_all_ms (answered and failed calls), unlabelled_would_block",
@@ -162,7 +162,7 @@ export const receipts: Command = {
     if (tokens) {
       const groups = new Map<string, Receipt[]>();
       for (const r of scoped) {
-        const key = `${r.ts.slice(0, 10)}|${r.command}`;
+        const key = `${r.ts.slice(0, 10)}|${canonicalCommand(r.command)}`;
         groups.set(key, [...(groups.get(key) ?? []), r]);
       }
       const rows = [...groups.entries()].sort().map(([key, rs]) => {
@@ -181,7 +181,10 @@ export const receipts: Command = {
     }
 
     const byCommand: Record<string, number> = {};
-    for (const r of scoped) byCommand[r.command] = (byCommand[r.command] ?? 0) + 1;
+    for (const r of scoped) {
+      const command = canonicalCommand(r.command);
+      byCommand[command] = (byCommand[command] ?? 0) + 1;
+    }
     return {
       ok: true,
       verdict: "summary",

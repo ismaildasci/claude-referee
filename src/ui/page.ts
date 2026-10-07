@@ -371,6 +371,7 @@ function flowItem(e) {
   out = el("li", verdict, "out " + tone(verdict));
   add(lane, first, el("li", jevText(e), "jev"), out);
   add(item, lane);
+  if (e.outcome) add(item, el("p", "Outcome: " + e.outcome, "meta"));
   if (e.overruled) add(item, el("p", "Overruled: voided with receipts overrule; its stored answers were deleted.", "meta"));
   var answers = answersBlock(e);
   if (answers) add(item, answers);

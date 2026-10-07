@@ -1,6 +1,6 @@
-// Local receipts: one JSON line per command run in receipts/<project>/<yyyy-mm>.jsonl.
-// A receipt holds counts, tokens, cost and time; never request text, file paths or user names.
-// Each receipt carries `prev`, the sha256 of the previous line of its project's chain; verifyChain checks it.
+// Local receipts: one JSON line per command run in receipts/<project>/<yyyy-mm>.jsonl, chained by `prev` (sha256 of the previous line).
+// Counts, tokens, cost and time only; never request text, file paths or user names. `outcome` copies allowlisted numbers and fixed codes,
+// never a decide option name or a claim id. Readers group `verify` (the old name) under `claims`; errorReceipt is a failure before any Session.
 
 import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
@@ -15,6 +15,7 @@ export interface Receipt {
   readonly model?: string;
   readonly verdict?: string;
   readonly reason?: string;
+  readonly outcome?: ReceiptOutcome;
   readonly error?: string;
   readonly requests: number;
   readonly cached: number;
@@ -31,6 +32,85 @@ export interface Receipt {
   readonly ms: number;
   readonly run_id?: string;
   readonly session_id?: string;
+}
+
+export interface ReceiptOutcome {
+  readonly trust?: string;
+  readonly p?: number;
+  readonly exit_code?: number;
+  readonly runners?: readonly string[];
+  readonly lean_p?: number;
+  readonly margin?: number;
+  readonly orders?: number;
+  readonly claims?: number;
+  readonly supported?: number;
+  readonly unsupported?: number;
+  readonly contradicted?: number;
+  readonly says_nothing?: number;
+  readonly unsure?: number;
+  readonly unanswered?: number;
+  readonly reasons?: Readonly<Record<string, number>>;
+  readonly items?: number;
+  readonly yes?: number;
+  readonly no?: number;
+  readonly review?: number;
+}
+
+export const REASON_CODE = /^[a-z][a-z0-9_]{0,39}$/;
+export const RUNNER_NAME = /^[A-Za-z0-9][A-Za-z0-9:._ +-]{0,29}$/;
+const TRUST = new Set(["parsed", "exit_code", "unparsed"]);
+const RUNNERS_MAX = 8;
+const REASONS_MAX = 12;
+const CLAIM_LISTS = ["unsupported", "contradicted", "says_nothing", "unsure", "unanswered"] as const;
+
+const isNumber = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v);
+const isCount = (v: unknown): v is number => Number.isInteger(v) && (v as number) >= 0;
+const round = (v: number): number => Number(v.toFixed(4));
+const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
+
+export function reasonCode(value: unknown): string | undefined {
+  return typeof value === "string" && REASON_CODE.test(value) ? value : undefined;
+}
+
+export function outcomeOf(result: Readonly<Record<string, unknown>>): ReceiptOutcome | undefined {
+  const out: Record<string, unknown> = {};
+  const { trust, p, exit_code: exitCode, runners, lean, orders, reasons } = result;
+  if (typeof trust === "string" && TRUST.has(trust)) out["trust"] = trust;
+  if (isNumber(p)) out["p"] = round(p);
+  if (Number.isInteger(exitCode)) out["exit_code"] = exitCode;
+  if (Array.isArray(runners)) {
+    const names = [...new Set(runners.map((r) => (isRecord(r) ? r["runner"] : undefined)).filter((n): n is string => typeof n === "string" && RUNNER_NAME.test(n)))];
+    if (names.length) out["runners"] = names.slice(0, RUNNERS_MAX);
+  }
+  if (typeof lean === "string" && isRecord(p) && isNumber(p[lean])) {
+    const leanP = p[lean] as number;
+    const others = Object.entries(p).flatMap(([k, v]) => (k !== lean && isNumber(v) ? [v] : []));
+    out["lean_p"] = round(leanP);
+    out["margin"] = round(leanP - (others.length ? Math.max(...others) : 0));
+    if (isCount(orders)) out["orders"] = orders;
+  }
+  if (isCount(result["claims"]) && isCount(result["supported"])) {
+    out["claims"] = result["claims"];
+    out["supported"] = result["supported"];
+    for (const key of CLAIM_LISTS) {
+      const list = result[key];
+      out[key] = Array.isArray(list) ? list.length : 0;
+    }
+    if (isRecord(reasons)) {
+      const histogram = new Map<string, number>();
+      for (const code of Object.values(reasons)) if (reasonCode(code)) histogram.set(code as string, (histogram.get(code as string) ?? 0) + 1);
+      const top = [...histogram].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1)).slice(0, REASONS_MAX);
+      if (top.length) out["reasons"] = Object.fromEntries(top.sort((a, b) => (a[0] < b[0] ? -1 : 1)));
+    }
+  }
+  if (isCount(result["items"]) && isCount(result["yes"]) && isCount(result["no"]) && isCount(result["review"])) {
+    for (const key of ["items", "yes", "no", "review"]) out[key] = result[key];
+  }
+  return Object.keys(out).length ? (out as ReceiptOutcome) : undefined;
+}
+
+export function canonicalCommand(command: string): string {
+  return command === "verify" ? "claims" : command;
 }
 
 export function newReceiptId(now: number, random: () => number = Math.random): string {
@@ -65,6 +145,23 @@ export function appendReceipt(dataDir: string, receipt: Receipt): boolean {
   } catch {
     return false;
   }
+}
+
+export function errorReceipt(fields: { command: string; project: string; error: string; started: number; now: number; fresh?: boolean; runId?: string | undefined }): Receipt {
+  return {
+    id: newReceiptId(fields.started),
+    ts: new Date(fields.now).toISOString(),
+    command: canonicalCommand(fields.command),
+    project: fields.project,
+    error: fields.error,
+    requests: 0,
+    cached: 0,
+    input_tokens: 0,
+    cost_usd: 0,
+    ...(fields.fresh ? { fresh: true } : {}),
+    ms: Math.max(0, fields.now - fields.started),
+    ...(fields.runId ? { run_id: fields.runId } : {}),
+  };
 }
 
 export function readReceipts(dataDir: string, project?: string): Receipt[] {

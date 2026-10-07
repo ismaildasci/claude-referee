@@ -1,6 +1,7 @@
 // Data side of the local dashboard: reads the JSON lines in the data directory and shapes them for the page.
 // Labels go through labelStop (labels.jsonl); nothing here touches the network or rewrites a store. Stored fields are untrusted: flow turns a malformed one into a placeholder.
 // Flow reads at most FLOW_KEYS cache entries per call and FLOW_READS per response; the project id and the transcript dirs (each a git spawn) are computed once per context.
+// verify receipts (the old name) are shown and counted as claims; a receipt's outcome is shown as text built only from numbers and fixed codes.
 
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -8,7 +9,7 @@ import { readCache } from "../engine/cache.ts";
 import type { Answer } from "../engine/client.ts";
 import { CACHE_TTL_MS, type Env } from "../engine/config.ts";
 import { dirSize, projectId, tildify } from "../engine/datadir.ts";
-import { readOverruled, readReceipts, type Receipt } from "../engine/receipts.ts";
+import { REASON_CODE, RUNNER_NAME, canonicalCommand, readOverruled, readReceipts, reasonCode, type Receipt } from "../engine/receipts.ts";
 import { loadPack, packDirs, threshold } from "../engine/pack.ts";
 import { loadProject } from "../engine/project.ts";
 import { clopperPearson, suggestThreshold } from "../engine/stopgate/interval.ts";
@@ -102,7 +103,10 @@ export function overview(ctx: UiContext) {
   const since = new Date(ctx.now() - WINDOW_DAYS * DAY_MS).toISOString();
   const receipts = readReceipts(ctx.dataDir, project(ctx)).filter((r) => r.ts >= since);
   const byCommand: Record<string, number> = {};
-  for (const r of receipts) byCommand[r.command] = (byCommand[r.command] ?? 0) + 1;
+  for (const r of receipts) {
+    const command = canonicalCommand(r.command);
+    byCommand[command] = (byCommand[command] ?? 0) + 1;
+  }
   const stops = projectStops(ctx).filter((r) => r.ts >= since);
   const stats = stopStats(stops);
   let current = 0.7;
@@ -182,6 +186,27 @@ function jevAnswers(ctx: UiContext, keys: unknown, budget: { reads: number }) {
   return { answers: found, answers_missing: missing, answers_more: list.length - read.length };
 }
 
+const OUTCOME_NUMBERS = ["p", "exit_code", "lean_p", "margin", "orders", "claims", "supported", "unsupported", "contradicted", "says_nothing", "unsure", "unanswered", "items", "yes", "no", "review"] as const;
+
+function outcomeText(r: Receipt): string | null {
+  const raw: unknown = r.outcome;
+  const o = typeof raw === "object" && raw !== null && !Array.isArray(raw) ? (raw as Record<string, unknown>) : {};
+  const parts: string[] = [];
+  const reason = reasonCode(r.reason);
+  if (reason) parts.push(`reason ${reason}`);
+  if (typeof o["trust"] === "string" && REASON_CODE.test(o["trust"])) parts.push(`trust ${o["trust"]}`);
+  for (const key of OUTCOME_NUMBERS) {
+    const value = num(o[key]);
+    if (value !== null) parts.push(`${key} ${Math.round(value * 10_000) / 10_000}`);
+  }
+  const runners = Array.isArray(o["runners"]) ? o["runners"].filter((n): n is string => typeof n === "string" && RUNNER_NAME.test(n)).slice(0, 8) : [];
+  if (runners.length) parts.push(`runners ${runners.join(", ")}`);
+  const reasons = typeof o["reasons"] === "object" && o["reasons"] !== null && !Array.isArray(o["reasons"]) ? Object.entries(o["reasons"] as Record<string, unknown>) : [];
+  const counted = reasons.flatMap(([code, n]) => (REASON_CODE.test(code) && num(n) !== null ? [`${code} ${n as number}`] : [])).slice(0, 12);
+  if (counted.length) parts.push(`reasons ${counted.join(", ")}`);
+  return parts.length ? parts.join("; ") : null;
+}
+
 function shortSession(id: unknown): string | null {
   return typeof id === "string" && id !== "unknown" && id !== "" ? visible(id.slice(0, 8)) : null;
 }
@@ -191,11 +216,11 @@ export function flow(ctx: UiContext, query: { days?: unknown; command?: unknown 
   const since = new Date(ctx.now() - days * DAY_MS).toISOString();
   const receipts = readReceipts(ctx.dataDir, project(ctx)).filter((r) => r.ts >= since);
   const stops = projectStops(ctx).filter((r) => r.ts >= since);
-  const commands = [...new Set(receipts.flatMap((r) => (typeof r.command === "string" ? [r.command] : [])))].sort();
+  const commands = [...new Set(receipts.flatMap((r) => (typeof r.command === "string" ? [canonicalCommand(r.command)] : [])))].sort();
   if (stops.length) commands.push("stop");
   const command = typeof query.command === "string" && commands.includes(query.command) ? query.command : "all";
   const voided = readOverruled(ctx.dataDir);
-  const calls = command === "stop" ? [] : receipts.filter((r) => command === "all" || r.command === command);
+  const calls = command === "stop" ? [] : receipts.filter((r) => command === "all" || (typeof r.command === "string" && canonicalCommand(r.command) === command));
   const stopRows = command === "all" || command === "stop" ? stops : [];
   const budget = { reads: FLOW_READS };
   const rows = [...calls.map((r) => ({ ts: r.ts, r })), ...stopRows.map((s) => ({ ts: s.ts, s }))].sort((a, b) => (a.ts < b.ts ? 1 : a.ts > b.ts ? -1 : 0));
@@ -206,11 +231,12 @@ export function flow(ctx: UiContext, query: { days?: unknown; command?: unknown 
         kind: "call" as const,
         id: r.id,
         ts: r.ts,
-        command: text(r.command) ?? "unknown",
+        command: typeof r.command === "string" ? visible(canonicalCommand(r.command)) : "unknown",
         pack: text(r.pack),
         model: text(r.model),
         verdict: text(r.verdict),
         error: text(r.error),
+        outcome: outcomeText(r),
         requests: num(r.requests) ?? 0,
         cached: num(r.cached) ?? 0,
         input_tokens: num(r.input_tokens) ?? 0,
@@ -280,7 +306,7 @@ export function privacy(ctx: UiContext) {
     },
     stores_text: [
       { name: "stops.jsonl", holds: "Prompt and final-message excerpts of done-gate stops, scores, your labels" },
-      { name: "receipts", holds: "Counts, tokens, cost, latency and hashes per run; no request text" },
+      { name: "receipts", holds: "Counts, tokens, cost, latency and hashes per run, plus outcome numbers and fixed codes (trust, p, runner names, claim and item counts); no request text, criteria, claim text, option names, items or paths" },
       { name: "cache", holds: "Jev's answers keyed by hashes; not reused after 30 days, kept on disk until an overrule or uninstall" },
     ],
     would_be_sent: SENT,

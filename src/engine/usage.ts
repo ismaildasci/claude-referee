@@ -1,10 +1,12 @@
 // Claude-side usage: claude-referee (and the short-lived name evidence-referee) CLI calls counted from Claude Code's session transcripts, subagents included.
 // A call counts only in command position (also behind env, timeout, nohup and xargs), each tool call once; nothing from the transcripts is echoed back.
+// Rows group verify (the old name) under claims, as the receipts do.
 
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Env } from "./config.ts";
 import { projectRoot } from "./datadir.ts";
+import { canonicalCommand } from "./receipts.ts";
 
 export interface UsageRow {
   readonly day: string;
@@ -180,7 +182,7 @@ export function scanUsage(dirs: readonly string[], since: string): { transcripts
   const rows = new Map<string, { calls: number; subagent_calls: number; result_chars: number }>();
   for (const [id, call] of calls) {
     call.commands.forEach((command, i) => {
-      const key = `${call.day}|${command}`;
+      const key = `${call.day}|${canonicalCommand(command)}`;
       const row = rows.get(key) ?? { calls: 0, subagent_calls: 0, result_chars: 0 };
       row.calls += 1;
       if (call.subagent) row.subagent_calls += 1;
