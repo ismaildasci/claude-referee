@@ -175,7 +175,7 @@ export function planDecide(pack: Pack, thresholds: Thresholds | undefined, state
 export const decide: Command = {
   name: "decide",
   describe: {
-    summary: "Score 2-6 options against your context, asking in two option orders.",
+    summary: "Score 2-6 options against your context, asking in two option orders, and in a balanced set of orders when those two tie (3 to 6 options).",
     inputs: {
       "stdin or --in <file>":
         'JSON: {"decision": string, "options": [{"name", "text"}] or [string], "context"?: string, "context_files"?: [path], "micro"?: [{"id", "question", "bad"?}]}',
