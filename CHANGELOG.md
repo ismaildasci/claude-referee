@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.2.4] - 2026-10-07
+
+Fixes from a review of the whole code base and from real use on my own projects. `done` no longer reaches `met` on several real failing or partial runs (cancelled and todo `node:test` runs, `cargo test --no-fail-fast`, Pest risky or incomplete tests, vitest expected failures, GitHub Actions log prefixes, lint criteria that name the linter), and `claims` can no longer call a claim `supported` because another claim shares its id. New `bun test` and `oxlint` parsers, numbers-only outcome fields in receipts, `--help` on every command, a next step for each `claims` reason, dashboard and Stop hook fixes, and smaller bundles.
+
 ### Added
 
 - Dashboard: a Flow tab, now the first one. For this project it lists each call and done-gate stop of the last 1, 7 or 30 days as what was asked, what went to Jev (requests, cached answers, tokens, time) and the verdict, with Jev's stored answer to each question on demand. It reads the receipts, the answer cache and `stops.jsonl`; nothing new is stored or sent.
