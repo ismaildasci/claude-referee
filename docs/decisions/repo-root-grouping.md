@@ -37,3 +37,15 @@ Shipping is decided with `decide` (ship or hold, both orders) after a replay of 
 ## Decision to implement
 
 `decide` (implement or keep, both orders, this record as context): `implement` 0.97, `keep` 0.03, orders agreeing (receipt `rmuzizyskvg8m`). The implementation follows the bars above in its own commits; this record is registration only, no code has changed.
+
+## Decision to merge (2026-10-08, after the replay)
+
+The implementation is on the branch `option-d-grouping` (one commit, its tests pass there; 1,081 tests with the check). It is not on main.
+
+Bar 2 on the local store: 7 repo groups, 414 receipts and 87 stops join through aliases; 30 receipt dirs (201 receipts) stay on their own ids and are not lost.
+
+Bar 3 cannot be met as written: the store has no `run_id` on any of its 1,441 receipts, and receipts keep no worktree path or class. 84 receipts from `.claude/worktrees` would join the main view with no way to separate them again.
+
+`decide` (merge, class-first, hold; both orders, facts in the session scratchpad): `hold` 0.68 (weak), `class-first` 0.25, `merge` 0.06 (receipt `rmuzjxr9nhh9t`). Per the rule for weak verdicts, the reversible option is taken: `hold`. Main keeps one project id per directory.
+
+Revisit: record a worktree class (main, eval worktree, other linked) on new receipts and stops, without paths, then ask again.
