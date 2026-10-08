@@ -49,3 +49,7 @@ Bar 3 cannot be met as written: the store has no `run_id` on any of its 1,441 re
 `decide` (merge, class-first, hold; both orders, facts in the session scratchpad): `hold` 0.68 (weak), `class-first` 0.25, `merge` 0.06 (receipt `rmuzjxr9nhh9t`). Per the rule for weak verdicts, the reversible option is taken: `hold`. Main keeps one project id per directory.
 
 Revisit: record a worktree class (main, eval worktree, other linked) on new receipts and stops, without paths, then ask again.
+
+## Branch removed (2026-10-08)
+
+On the owner's request the branch `option-d-grouping` was deleted locally and on origin. Its last commit was `1d91f9a` (ci:local green, with the symlink and verify-scope fixes); the commit chain is 47d5806, 9c82cb5, 1d91f9a. The implementation is not on main. Recovering it needs the commits, which stay in git's object store until garbage collection, or a copy of the branch.
