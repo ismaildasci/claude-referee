@@ -142,6 +142,8 @@ const RUBO_INSPECTING = /^Inspecting (\d+) files?\s*$/;
 const RUBO_SUMMARY = /^(\d+) files? inspected, (?:no offenses|(\d+) offenses?) detected(.*)$/;
 const RUBO_OFFENSE = /^(\S[^\s:]*):\d+:\d+: (\[Corrected\] )?[CWEFR]: /;
 const RUBO_WARNING = /^(?:Warning|Notice|Deprecat\w*)\b|\bdeprecated\b/i;
+// An analysis rubocop says it will skip (a missing gem, a project index) makes the run incomplete for lint: see docs/decisions/rubocop-skip-warning.md.
+const RUBO_SKIP = /\bwill be skipped\b/i;
 const RUBO_ERROR = /^Error: |^An error occurred while \S+ cop was inspecting /;
 
 const rubocop: RunnerParser = {
@@ -177,7 +179,7 @@ const rubocop: RunnerParser = {
         offenseLines++;
         files.add(o[1] as string);
         if (o[2] !== undefined) corrected = true;
-      } else if (RUBO_WARNING.test(line)) warnings++;
+      } else if (RUBO_WARNING.test(line) || RUBO_SKIP.test(line)) warnings++;
       else if (RUBO_ERROR.test(line)) errors++;
     }
     if (inspecting === 0 && summaries === 0) return null;
