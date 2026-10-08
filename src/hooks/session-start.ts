@@ -4,7 +4,7 @@
 import { appendFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Env } from "../engine/config.ts";
-import { projectId, resolveDataDir } from "../engine/datadir.ts";
+import { checkoutClass, projectId, resolveDataDir } from "../engine/datadir.ts";
 import { loadPack, packDirs } from "../engine/pack.ts";
 import { areaFor, loadProject } from "../engine/project.ts";
 import { appendReceipt, newReceiptId } from "../engine/receipts.ts";
@@ -76,6 +76,7 @@ export async function sessionStart(io: HookIo, pluginRoot: string): Promise<stri
     ts: new Date(started).toISOString(),
     command: "session-start",
     project: projectId(cwd),
+    worktree: checkoutClass(cwd),
     pack: pack.name,
     requests: 0,
     cached: 0,

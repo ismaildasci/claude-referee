@@ -3,6 +3,7 @@
 // turn: a short hash keying the turn (its prompt's uuid, else that line's position and the session); bg_pending and would_ask appear only on background_tasks skips.
 
 import type { ErrorCode } from "../errors.ts";
+import type { CheckoutClass } from "../datadir.ts";
 
 export type CheckStatus = "passed" | "failed" | "unknown" | "denied";
 // denied: Claude Code refused the command before running it (permission or hook denial); never a pass, never a fail.
@@ -45,6 +46,7 @@ export interface StopRecord {
   readonly ts: string;
   readonly session_id: string;
   readonly project: string;
+  readonly worktree?: CheckoutClass;
   readonly mode: "shadow" | "soft";
   readonly configured?: "active";
   readonly skipped?: StopSkip;

@@ -196,8 +196,8 @@ test("a Jev command that fails after its input is read writes one zero-request r
     [["done", "bad_input", 0], ["done", "bad_input", 0], ["decide", "bad_input", 0], ["done", "pack_not_found", 0], ["claims", "too_large", 0], ["done", "no_api_key", 0], ["done", "invalid_api_key", 0], ["eval", "bad_input", 0], ["eval", "bad_input", 0], ["done", "met", 1]],
   );
   const [first, fresh] = receipts;
-  assert.deepEqual(Object.keys(first ?? {}).sort(), ["command", "cost_usd", "cached", "error", "id", "input_tokens", "ms", "project", "requests", "ts"].sort());
-  assert.deepEqual(Object.keys(fresh ?? {}).sort(), ["command", "cost_usd", "cached", "error", "fresh", "id", "input_tokens", "ms", "prev", "project", "requests", "ts"].sort());
+  assert.deepEqual(Object.keys(first ?? {}).sort(), ["command", "cost_usd", "cached", "error", "id", "input_tokens", "ms", "project", "requests", "ts", "worktree"].sort());
+  assert.deepEqual(Object.keys(fresh ?? {}).sort(), ["command", "cost_usd", "cached", "error", "fresh", "id", "input_tokens", "ms", "prev", "project", "requests", "ts", "worktree"].sort());
   assert.equal(fresh?.fresh, true);
   assert.deepEqual({ cached: first?.cached, input_tokens: first?.input_tokens, cost_usd: first?.cost_usd, project: first?.project }, { cached: 0, input_tokens: 0, cost_usd: 0, project: projectId(cwd) });
   assert.deepEqual(receipts.map((r) => r.pack ?? null), [null, null, null, null, null, "generic", "generic", null, "generic", "generic"], "an error once the Session exists keeps its own receipt, not a second one");

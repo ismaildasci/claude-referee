@@ -6,12 +6,14 @@ import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSyn
 import { join } from "node:path";
 import { sha256 } from "./cache.ts";
 import type { Env } from "./config.ts";
+import type { CheckoutClass } from "./datadir.ts";
 
 export interface Receipt {
   readonly id: string;
   readonly ts: string;
   readonly command: string;
   readonly project: string;
+  readonly worktree?: CheckoutClass;
   readonly pack?: string;
   readonly model?: string;
   readonly verdict?: string;
@@ -154,12 +156,13 @@ export function appendReceipt(dataDir: string, receipt: Receipt): boolean {
   }
 }
 
-export function errorReceipt(fields: { command: string; project: string; error: string; started: number; now: number; fresh?: boolean; runId?: string | undefined; sessionId?: string | undefined }): Receipt {
+export function errorReceipt(fields: { command: string; project: string; worktree?: CheckoutClass; error: string; started: number; now: number; fresh?: boolean; runId?: string | undefined; sessionId?: string | undefined }): Receipt {
   return {
     id: newReceiptId(fields.started),
     ts: new Date(fields.now).toISOString(),
     command: canonicalCommand(fields.command),
     project: fields.project,
+    ...(fields.worktree ? { worktree: fields.worktree } : {}),
     error: fields.error,
     requests: 0,
     cached: 0,

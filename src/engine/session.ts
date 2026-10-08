@@ -8,7 +8,7 @@ import { cacheKey, readCache, sha256, writeCache } from "./cache.ts";
 import { classify } from "./classify.ts";
 import { callJev, type Answer, type JevReply } from "./client.ts";
 import { BATCH_DEADLINE_MS, CACHE_TTL_MS, PROFILES, costUsd, estimateTokens, resolveModel, type Env } from "./config.ts";
-import { resolveDataDir, projectId } from "./datadir.ts";
+import { checkoutClass, resolveDataDir, projectId } from "./datadir.ts";
 import { RefereeError, isRefereeError, type ErrorCode } from "./errors.ts";
 import { endpointOf, resolveEndpointKey, type ResolvedKey } from "./key.ts";
 import { appendReceipt, envSessionId, newReceiptId, type Receipt, type ReceiptOutcome } from "./receipts.ts";
@@ -249,6 +249,7 @@ export class Session {
       ts: new Date(this.options.now()).toISOString(),
       command: this.options.command,
       project: projectId(this.options.cwd),
+      worktree: checkoutClass(this.options.cwd),
       pack: this.options.pack.name,
       model: this.answeredModel ?? this.model,
       ...(fields.verdict !== undefined ? { verdict: fields.verdict } : {}),

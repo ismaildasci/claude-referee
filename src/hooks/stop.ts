@@ -3,7 +3,7 @@
 // Fails open: a failure is recorded with its error code (and a receipt once a Session exists). While background tasks run it asks nothing but records counts, turn, bg_pending and would_ask; an unreadable transcript or a scan past BG_SCAN_MAX keeps edits 0, checks 0, no would_ask.
 
 import { readFileSync } from "node:fs";
-import { projectId, resolveDataDir } from "../engine/datadir.ts";
+import { checkoutClass, projectId, resolveDataDir } from "../engine/datadir.ts";
 import { RefereeError, isRefereeError, type ErrorCode } from "../engine/errors.ts";
 import { loadPack, packDirs } from "../engine/pack.ts";
 import { loadProject } from "../engine/project.ts";
@@ -83,7 +83,7 @@ export async function stopGate(io: HookIo, _pluginRoot: string): Promise<string 
   if (!project || project.hooks.stopGate === "off") return;
   const sessionId = typeof input.session_id === "string" ? input.session_id : "unknown";
   const dataDir = resolveDataDir(env, io.home, cwd);
-  const base = { id: newStopId(started), ts: new Date(started).toISOString(), session_id: sessionId, project: projectId(cwd), mode: project.hooks.stopGate === "soft" ? ("soft" as const) : ("shadow" as const), ...(project.hooks.stopGate === "active" ? { configured: "active" as const } : {}) };
+  const base = { id: newStopId(started), ts: new Date(started).toISOString(), session_id: sessionId, project: projectId(cwd), worktree: checkoutClass(cwd), mode: project.hooks.stopGate === "soft" ? ("soft" as const) : ("shadow" as const), ...(project.hooks.stopGate === "active" ? { configured: "active" as const } : {}) };
   const finish = (skipped: StopSkip | undefined, rest: Partial<StopRecord> = {}): undefined => {
     appendStop(dataDir, { ...base, ...(skipped ? { skipped } : {}), edits: 0, checks: 0, ms: Math.max(0, io.now() - started), ...rest } as StopRecord);
     return undefined;
