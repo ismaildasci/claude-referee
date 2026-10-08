@@ -14,7 +14,7 @@ One pattern in `src/engine/runners/util.ts`, used by `stripAnsi` and `prepare`:
 
 - CSI: ESC `[`, any parameter bytes `0x30`-`0x3F` (digits, `:`, `;`, `<`, `=`, `>`, `?`), intermediate bytes `0x20`-`0x2F`, one final byte `0x40`-`0x7E`;
 - the same CSI as one 8-bit byte `0x9B`;
-- OSC: ESC `]` up to BEL or ESC `\` (or to the end of the text when unterminated), which covers OSC 8 hyperlinks;
+- OSC: ESC `]` up to BEL or ESC `\`, which covers OSC 8 hyperlinks; when unterminated, to the end of its line. (The first draft said "to the end of the text"; a test showed that this would strip every later line of a log, including its failure lines, so it was narrowed before any code or replay. Not a change of the bar.)
 - charset designation: ESC `(` or `)` followed by one byte (`ESC(B`).
 
 Nothing else changes. A check's reading after stripping is the reading of the same text without the escapes.
@@ -31,5 +31,5 @@ Shipping is decided with `decide` (ship or hold, both orders) after the replay. 
 ## Limits
 
 - Parsers keep their own copies of the rule in `php-ruby.ts`, `python.ts`, `more.ts`, `compiled.ts` and `skips.ts`; they are not touched here, since no real or recorded case shows them failing.
-- A lone ESC cut at the end of the text is removed only when the cut includes its next byte; a bare ESC at the very end stays.
+- A lone ESC cut at the end of the text stays, since no form above matches it.
 - Windows drive text is not involved; no Windows log was checked.

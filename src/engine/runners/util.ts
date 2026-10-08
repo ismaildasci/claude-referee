@@ -4,7 +4,8 @@
 
 import type { RunnerFacts } from "./types.ts";
 
-const ANSI = /\u001b(?:\[[0-?]*[ -/]*[@-~]|\][^\u0007\u001b]*(?:\u0007|\u001b\\)?)/g;
+// CSI (also as one 8-bit byte), OSC up to BEL or ST (hyperlinks too) and charset designations; see docs/decisions/ansi-wide.md.
+const ANSI = /\u001b\[[0-?]*[ -/]*[@-~]|\u009b[0-?]*[ -/]*[@-~]|\u001b\][^\u0007\u001b\n]*(?:\u0007|\u001b\\)?|\u001b[()][\s\S]/g;
 export const MAX_FAILING = 10;
 export const MAX_NAME = 120;
 export const MAX_SUMMARY = 200;
@@ -12,9 +13,9 @@ export const MAX_SUMMARY = 200;
 const TRANSPORT = /^\uFEFF?(?:[^\t\r\n]+\t[^\t\r\n]+\t)?\uFEFF?\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d+)?Z(?: |(?=\r?$))/gm;
 
 export const stripTransport = (text: string): string => text.replace(TRANSPORT, "");
-export const stripAnsi = (text: string): string => text.replace(/\u001b\[[0-9;?]*[ -/]*[@-~]/g, "");
+export const stripAnsi = (text: string): string => text.replace(ANSI, "");
 
-export const prepare = (text: string): string[] => text.replace(ANSI, "").split(/\r?\n/);
+export const prepare = (text: string): string[] => stripAnsi(text).split(/\r?\n/);
 export const clip = (value: string, max: number): string => value.trim().slice(0, max);
 
 export function mk(
