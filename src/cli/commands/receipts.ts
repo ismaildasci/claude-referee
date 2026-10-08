@@ -11,6 +11,7 @@ import { loadPack, packDirs, threshold } from "../../engine/pack.ts";
 import { loadProject } from "../../engine/project.ts";
 import { suggestThreshold } from "../../engine/stopgate/interval.ts";
 import { labelStop, readStops, stopStats } from "../../engine/stopgate/stops.ts";
+import { labelReceipt, readEvidence, readReceiptLabels } from "../../engine/evidence.ts";
 import type { StopRecord } from "../../engine/stopgate/types.ts";
 import { suggestForStops, transcriptLocator, type TranscriptLocator } from "../../engine/stopgate/weak.ts";
 import { claudeProjectsDir, projectTranscriptDirs, scanUsage } from "../../engine/usage.ts";
@@ -135,8 +136,11 @@ export const receipts: Command = {
       "--session <id|current>": "One Claude Code session across every project id it wrote under: its receipts, its done-gate stops and whether its transcript was found. current reads CLAUDE_CODE_SESSION_ID, which Claude Code sets for the commands it runs. A CLI receipt carries the session only when the command ran inside Claude Code; CLI receipts written before they carried it have none and are not backfilled. Claude Code's env-vars reference says Bash commands get the same id as the hooks, also after /clear and --resume <id>; it says an MCP server subprocess may keep its startup id after --continue or --resume without an id, and claude-referee runs as a command, not as an MCP server. Every record of the session unless --days is given. Cannot be combined with --stops, --unlabelled, --tokens, --usage or --all.",
       "--unlabelled": "With --stops: only would_block stops without a label.",
       "--label <id>": "Mark one stop with --right (the block would have been correct) or --wrong (a false block).",
-      "--right": "With --label: the would-be block was correct.",
-      "--wrong": "With --label: the would-be block was a false block.",
+      "--right": "With --label: the would-be block was correct. With --label-receipt: the verdict was correct.",
+      "--wrong": "With --label: the would-be block was a false block. With --label-receipt: the verdict was wrong.",
+      "--show-evidence <id>": "Print the stored, redacted criteria and evidence of one done receipt to this terminal only. Only runs made with REFEREE_KEEP_EVIDENCE=1 have it; records older than 14 days are removed.",
+      "--label-receipt <id>": "Label one done receipt with --right or --wrong. Labels are the owner judgment and are kept in receipt-labels.jsonl.",
+      "--evidence-stats": "Counts of labelled done receipts by verdict, with right and wrong.",
       "--project-only": "With verify: only this project's chain.",
       "--all": "Every project instead of the current one.",
       "--days <n>": "How many days back to include; default 30, or 14 with --tokens or --usage. With --stops it limits the listed stops and their stats. With --session it applies only when given.",
@@ -187,10 +191,40 @@ export const receipts: Command = {
     label: { type: "string" },
     right: { type: "boolean" },
     wrong: { type: "boolean" },
+    "show-evidence": { type: "string" },
+    "label-receipt": { type: "string" },
+    "evidence-stats": { type: "boolean" },
   },
   async run(context) {
     const { io, flags, values, positionals } = context;
     const dataDir = resolveDataDir(io.env, io.home, io.cwd, flags.dataDir);
+    const evidenceId = str(context, "show-evidence");
+    if (evidenceId !== undefined) {
+      const record = readEvidence(dataDir, evidenceId);
+      if (!record) throw new RefereeError("bad_input", "No stored evidence for that receipt.", { next_step: "Store it with REFEREE_KEEP_EVIDENCE=1 on the done run; records older than 14 days are removed." });
+      return { ok: true, verdict: "evidence", id: record.id, ts: record.ts, criteria: record.criteria, evidence: record.evidence };
+    }
+    const receiptLabelId = str(context, "label-receipt");
+    if (receiptLabelId !== undefined) {
+      const label = values["right"] === true ? "right" : values["wrong"] === true ? "wrong" : undefined;
+      if (!label) throw new RefereeError("bad_input", "--label-receipt needs --right or --wrong.");
+      const done = readReceipts(dataDir).find((r) => r.id === receiptLabelId && r.command === "done");
+      if (!done) throw new RefereeError("bad_input", "No done receipt with that id in this data directory.", { next_step: "Use the receipt id printed by done (receipt field)." });
+      if (!labelReceipt(dataDir, receiptLabelId, label, new Date(io.now()).toISOString())) throw new RefereeError("internal", "Could not write the label.");
+      return { ok: true, verdict: "labelled", id: receiptLabelId, label };
+    }
+    if (values["evidence-stats"] === true) {
+      const verdicts = new Map(readReceipts(dataDir).filter((r) => r.command === "done").map((r) => [r.id, r.verdict ?? "none"]));
+      const byVerdict: Record<string, { right: number; wrong: number }> = {};
+      for (const l of readReceiptLabels(dataDir)) {
+        const v = verdicts.get(l.id);
+        if (v === undefined) continue;
+        byVerdict[v] ??= { right: 0, wrong: 0 };
+        byVerdict[v][l.label] += 1;
+      }
+      const labelled = Object.values(byVerdict).reduce((n, c) => n + c.right + c.wrong, 0);
+      return { ok: true, verdict: "evidence_stats", labelled, by_verdict: byVerdict };
+    }
     if (positionals[0] === "export") {
       const out = str(context, "out");
       if (!out) throw new RefereeError("bad_input", "export needs --out <file>.");

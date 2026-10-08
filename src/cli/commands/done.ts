@@ -15,6 +15,8 @@ import { threshold, type Pack, type Thresholds } from "../../engine/pack.ts";
 import type { Outcome, Planned } from "../../engine/session.ts";
 import type { Command } from "../types.ts";
 import { JEV_COST, JEV_EFFECTS, JEV_ERRORS, clip, jevCommand, list, openPack, question, readSource, reorder, str, stripAnsi, withData } from "../shared.ts";
+import { keepsEvidence, storeEvidence } from "../../engine/evidence.ts";
+import { resolveDataDir } from "../../engine/datadir.ts";
 
 type Verdict = "met" | "unsure" | "missing";
 
@@ -203,6 +205,11 @@ export const done: Command = {
     const { pack, project } = openPack(context);
     const { planned, finish } = doneRequest(pack, project?.thresholds, criteria, evidence);
     if (planned.length === 0 && context.flags.dryRun) return reorder({ ...finish([]), dry_run: true, requests: 0 });
-    return jevCommand(context, "done", pack, planned, finish);
+    const result = await jevCommand(context, "done", pack, planned, finish);
+    const receipt = result["receipt"];
+    if (planned.length > 0 && keepsEvidence(context.io.env) && typeof receipt === "string") {
+      storeEvidence(resolveDataDir(context.io.env, context.io.home, context.io.cwd, context.flags.dataDir), receipt, { criteria, evidence, home: context.io.home, extra: pack.redact, now: context.io.now() });
+    }
+    return result;
   },
 };
