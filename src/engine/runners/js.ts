@@ -1,5 +1,5 @@
 // Parsers for jest, vitest, mocha, eslint, tsc and node:test output. Only structured markers and counts are read; prose in the log is ignored.
-// Worst case wins: a failure marker anywhere beats a passing summary line, and a log cut off before its summary never counts as a pass; a tsc -b status line ("[t] " or "t - " lead) makes a tsc run, cut off on a dry run, a skipped project, a watch restart after the last Found, or (no Found line after its header) a clip marker, no header, a listed project but the last (a solution root) with no status, or a last status still waiting for its build. A tsc -b with no Found or error line (nor an "error TSn:" token the error parser misses), not cut, whose clock-stamped last header is followed only by clock-stamped status lines, blank lines and exit lines, and where every project of that list ends in "Building project" or "is up to date because", passes that many projects with its last status line, clock removed, as summary.
+// Worst case wins: a failure marker anywhere beats a passing summary line, and a log cut off before its summary never counts as a pass; a tsc -b status line ("[t] " or "t - " lead) makes a tsc run, cut off on a dry run, a skipped project, a watch restart after the last Found, or (no Found line after its header) a clip marker, no header, a listed project but the last (a solution root) with no status, or a last status still waiting for its build. A tsc -b with no Found or error line (nor an "error TSn:" token the error parser misses), not cut, whose clock-stamped last header is followed only by clock-stamped status lines, blank lines and exit lines, and where every project of that list ends in "Building project" or "is up to date because" (an absolute-path "Building project", printed by TS 5/6 before compiling, only when a later status line follows), passes that many projects with its last status line, clock removed, as summary.
 // node:test details with no summary or failure marker (a tail in one error block) are one failure, cut off, unless a todo's "⚠ name (Xms)" owns them; assertion props any logged error has count only without a jest/vitest/bun/mocha summary; a TAP hookFailed block under "# fail 0" fails.
 
 import type { RunnerFacts, RunnerParser } from "./types.ts";
@@ -234,6 +234,7 @@ const TSC_PENDING = new RegExp(String.raw`${TSC_STATUS}Project '[^']+' is (?:out
 const CLIP_MARK = /^\[… \d+ characters omitted …\]$/;
 
 const TSC_DONE = new RegExp(String.raw`${TSC_STATUS}(?:Building project '|Project '[^']+' is up to date because\b)`);
+const TSC_ABS_BUILD = new RegExp(String.raw`${TSC_STATUS}Building project '(?:/|[A-Za-z]:[\\/])`);
 const TSC_STAMP = new RegExp(String.raw`^\s*(?:\[${TSC_TIME}\]\s*|${TSC_CLOCK})`);
 const TSC_DIAG = /\berror\s+(?:TS|NG)\d+:/;
 const TSC_LEAD_STRIP = new RegExp(TSC_STATUS);
@@ -282,14 +283,16 @@ function tscBuilt(lines: readonly string[]): { passed: number; summary: string }
   const { listed, after } = tscList(lines, head);
   if (!after.every((l) => l.trim() === "" || (TSC_STAMP.test(l) && TSC_NAMED.test(l)) || exitMatches(l).length > 0)) return null;
   const owner = (name: string) => listed.reduce<string | undefined>((best, p) => (sameProject(name, p) && p.length > (best?.length ?? -1) ? p : best), undefined);
-  const lastOf = new Map<string, string>();
-  for (const l of after) {
+  const lastOf = new Map<string, number>();
+  after.forEach((l, i) => {
     const p = owner(TSC_NAMED.exec(l)?.[1] ?? "\0");
-    if (p !== undefined) lastOf.set(p, l);
-  }
+    if (p !== undefined) lastOf.set(p, i);
+  });
   const ended = (p: string) => {
-    const last = lastOf.get(p);
-    return last !== undefined && TSC_DONE.test(last) && !TSC_PENDING.test(last);
+    const i = lastOf.get(p) ?? -1;
+    const last = after[i];
+    if (last === undefined || !TSC_DONE.test(last) || TSC_PENDING.test(last)) return false;
+    return !TSC_ABS_BUILD.test(last) || after.slice(i + 1).some((l) => TSC_STAMP.test(l) && TSC_NAMED.test(l));
   };
   const status = after.findLast((l) => TSC_BUILD.test(l));
   if (listed.length === 0 || !listed.every(ended) || status === undefined) return null;

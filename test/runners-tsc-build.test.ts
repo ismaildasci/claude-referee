@@ -1,5 +1,5 @@
 // tsc -b status lines behind a "t - " clock (TypeScript 7, and 5/6 when not on a TTY) or "[t]": clean, up to date, errors, dry runs, watch, logs cut by tail, head, a watch kill or the done clip (incomplete),
-// timestamped logs that are not tsc, and the clean-build marker (only when every listed project ends built or up to date because, with no error token and only clock-stamped status, blank and exit lines after the list).
+// timestamped logs that are not tsc, and the clean-build marker (only when every listed project ends built or up to date because, with no error token and only clock-stamped status, blank and exit lines after the list; a TS 5/6 absolute "Building project" line ends its project only when a later status line follows).
 // Every line is invented to mirror the shape of real tsc 6.0 and 7.0 output; real log text is never committed.
 
 import assert from "node:assert/strict";
@@ -42,9 +42,9 @@ const TS7_ERRORS = `${TS7_CLEAN}libs/shared/src/math.ts(4,7): error TS2322: Type
 const TS7_UPSTREAM = "09:14:02 AM - Projects in this build: \r\n    * core/tsconfig.json\r\n    * web/tsconfig.json\n\n09:14:02 AM - Building project 'core/tsconfig.json'...\n\ncore/src/a.ts(1,14): error TS2322: Type 'string' is not assignable to type 'number'.\n09:14:02 AM - Project 'web/tsconfig.json' is up to date with .d.ts files from its dependencies\n\n09:14:02 AM - Updating output timestamps of project 'web/tsconfig.json'...\n\n";
 const TS7_DRY = "09:14:02 AM - Projects in this build: \r\n    * core/tsconfig.json\n\n09:14:02 AM - Project 'core/tsconfig.json' is out of date because buildinfo file 'core/tsconfig.tsbuildinfo' indicates that program needs to report errors.\n\n09:14:02 AM - A non-dry build would build project '/srv/work/demo/core/tsconfig.json'\n\n";
 
-test("tsc -b with a 't - ' clock: a clean TS7 or TS6 build is tsc with 0 errors; a solution root with no status line leaves no pass count and no summary", () => {
+test("tsc -b with a 't - ' clock: a clean TS7 or TS6 build is tsc with 0 errors; a solution root with no status line, or a TS6 build ending in its absolute build line, leaves no pass count and no summary", () => {
   assert.deepEqual(facts(TS7_CLEAN), { passed: 0, errors: 0, incomplete: false, failing: [], summary: null });
-  assert.deepEqual(facts(TS6_CLEAN), { passed: 1, errors: 0, incomplete: false, failing: [], summary: "Building project '/srv/work/demo/pkg/tsconfig.json'..." });
+  assert.deepEqual(facts(TS6_CLEAN), { passed: 0, errors: 0, incomplete: false, failing: [], summary: null });
   for (const log of [TS7_CLEAN, TS6_CLEAN]) assert.deepEqual(parseEvidence(`${log}exit code: 0\n`).runners.map((r) => r.runner), ["tsc"]);
 });
 
@@ -229,8 +229,8 @@ const UP_WEB = "Project 'packages/web/tsconfig.json' is up to date because newes
 const unchanged = { passed: 0, errors: 0, incomplete: false, failing: [], summary: null };
 
 test("tsc -b marker: a clean single-project build, '[t]' or 't - ', passes 1 with its last status line as summary, clock removed", () => {
-  assert.deepEqual(facts(TS5_ONE), { passed: 1, errors: 0, incomplete: false, failing: [], summary: "Building project '/srv/work/ledger/tsconfig.json'..." });
   assert.deepEqual(facts(TS7_ONE), { passed: 1, errors: 0, incomplete: false, failing: [], summary: "Building project 'tsconfig.json'..." });
+  assert.deepEqual(facts(TS7_ONE.replace(/05:16:25 PM - /g, "[5:16:25 PM] ")), { passed: 1, errors: 0, incomplete: false, failing: [], summary: "Building project 'tsconfig.json'..." });
   assert.equal(facts(TS7_ONE.replace(/05:16:25 PM - /g, "16.05.12 - "))?.summary, "Building project 'tsconfig.json'...");
   assert.deepEqual(facts(TS7_ONE.replace(/05:16:25 PM - Project 'tsconfig\.json' is being forcibly rebuilt\n\n05:16:25 PM - Building project 'tsconfig\.json'\.\.\./, "05:16:25 PM - Project 'tsconfig.json' is up to date because newest input 'src/a.ts' is older than output 'tsconfig.tsbuildinfo'")), { passed: 1, errors: 0, incomplete: false, failing: [], summary: "Project 'tsconfig.json' is up to date because newest input 'src/a.ts' is older than output 'tsconfig.tsbuildinfo'" });
 });
@@ -319,4 +319,56 @@ test("tsc -b marker: a dry run's bare 'is up to date' (no 'because') ends nothin
   assert.deepEqual(facts(dry), unchanged);
   assert.deepEqual(facts(dry.replace(/05:16:25 PM - /g, "[8:00:28 PM] ")), unchanged);
   assert.deepEqual(facts(dry.replace(/05:16:25 PM - Project '\/srv.*\n\n$/, "")), { passed: 1, errors: 0, incomplete: false, failing: [], summary: "Project 'single/tsconfig.json' is up to date because newest input 'single/src/a.ts' is older than output 'single/tsconfig.tsbuildinfo'" });
+});
+
+const TS5_KILLED = [
+  "8:08:44 PM - Projects in this build: ",
+  "    * core/tsconfig.json",
+  "    * app/tsconfig.json",
+  "",
+  "8:08:44 PM - Project 'core/tsconfig.json' is out of date because output file 'core/tsconfig.tsbuildinfo' does not exist",
+  "",
+  "8:08:44 PM - Building project '/srv/work/demo/core/tsconfig.json'...",
+  "",
+  "8:08:44 PM - Project 'app/tsconfig.json' is out of date because output file 'app/tsconfig.tsbuildinfo' does not exist",
+  "",
+  "8:08:44 PM - Building project '/srv/work/demo/app/tsconfig.json'...",
+  "",
+];
+const SOLUTION_UP = [
+  "[10:42:07] Projects in this build: ",
+  "    * packages/core/tsconfig.json",
+  "    * packages/api/tsconfig.json",
+  "    * packages/web/tsconfig.json",
+  "    * tsconfig.json",
+  "",
+  "[10:42:07] Project 'packages/core/tsconfig.json' is up to date because newest input 'packages/core/src/index.ts' is older than output 'packages/core/dist/index.d.ts'",
+  "",
+  "[10:42:07] Project 'packages/api/tsconfig.json' is out of date because output 'packages/api/dist/.tsbuildinfo' is older than input 'packages/api/src/routes.ts'",
+  "",
+  "[10:42:07] Building project '/srv/work/demo/packages/api/tsconfig.json'...",
+  "",
+  "[10:42:11] Project 'packages/web/tsconfig.json' is out of date because output of its dependency 'packages/api' has changed",
+  "",
+  "[10:42:11] Building project '/srv/work/demo/packages/web/tsconfig.json'...",
+  "",
+  "[10:42:16] Project 'tsconfig.json' is up to date because it is a solution file with no files of its own",
+  "",
+];
+
+test("tsc -b marker: a TS 5 or 6 build that ends in an absolute 'Building project' line (killed in its last project, or clean) gets no marker, exit line or not", () => {
+  const drive = (log: string, sep: string) => log.replace(/Building project '\/srv\/work\/demo\/([^']+)'/g, (_, p: string) => `Building project 'C:${sep}srv${sep}work${sep}demo${sep}${p.replaceAll("/", sep)}'`);
+  for (const log of [TS5_ONE, TS6_CLEAN, cut(TS5_KILLED), drive(cut(TS5_KILLED), "/"), drive(cut(TS5_KILLED), "\\")]) {
+    for (const ev of [log, `${log}exit code: 0\n`, `${log}\nexit code: 0\n\n`]) assert.deepEqual(facts(ev), unchanged, ev);
+  }
+  assert.deepEqual(sentRunners(`$ npx tsc -b --verbose | tail -n 40\n${cut(TS5_KILLED)}exit code: 0\n`), [{ runner: "tsc", passed: 0, failed: 0, errors: 0, skipped: 0, failing: [], summary_line: null }]);
+});
+
+test("tsc -b marker: a TS 5 or 6 absolute 'Building project' line followed by a later status line still ends its project", () => {
+  assert.deepEqual(facts(cut(SOLUTION_UP)), { passed: 4, errors: 0, incomplete: false, failing: [], summary: "Project 'tsconfig.json' is up to date because it is a solution file with no files of its own" });
+  assert.deepEqual(facts(`${cut(SOLUTION_UP)}exit code: 0\n`)?.passed, 4);
+  assert.deepEqual(facts(cut(TS5_ROOT))?.passed, 2);
+  assert.deepEqual(facts(cut(SOLUTION_UP.slice(0, -2))), { passed: 0, errors: 0, incomplete: false, failing: [], summary: null });
+  assert.deepEqual(facts(cut([...TS5_KILLED.slice(0, 7), "", "8:08:45 PM - Project 'app/tsconfig.json' is up to date because newest input 'app/src/a.ts' is older than output 'app/tsconfig.tsbuildinfo'", ""]))?.passed, 2);
+  assert.deepEqual(facts(cut(TS7_SOME_UP))?.passed, 3);
 });
