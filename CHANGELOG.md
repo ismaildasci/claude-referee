@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- `scripts/usage-report.mjs` (maintainer tool, not shipped): the four usage measures from the local data directory as one JSON line of counts (edit turns that end with a counted check, re-asks after a non-clear `decide` that became clear, exit-code-only share of `missing` with evidence size, labels by verdict), with `--days`, `--since` and `--data-dir`. Record: [usage-report.md](docs/decisions/usage-report.md).
+
 ### Changed
 
 - `done`: a clean run of `eslint` or `oxlint` that prints nothing is now read as a clean run (facts: errors 0, warnings 0, "printed no diagnostics and exited 0", build-only) when the log is exactly one npm script echo (`> pkg@ver script`, `> eslint ...`), a blank line and exit lines of 0. Flags that hide, redirect or change output (`--quiet`, `-q`, `--silent`, `--format`/`-f`, `--output-file`/`-o`, `--fix`, `no-error` flags), shell operators (`|| true`, `;`, `&&`, `>`, `|`), any other output line, a second script and a non-zero or missing exit stay on the exit-code reading. The 357 recorded `done` cases keep their facts; a new recorded suite `done-silent` (15 invented cases from real shapes) has 0 wrong `met` and `met` on 5 of 5 clean forms; on 38 real lint outputs, 11 more are parsed. Record: [silent-success-reading.md](docs/decisions/silent-success-reading.md).
