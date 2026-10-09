@@ -214,7 +214,7 @@ macOS ya da Linux'ta doğrudan `TYPESAFE_API_KEY` de tanımlayabilirsin. `/plugi
 npx claude-referee doctor            # anahtarı tek bir ücretsiz çağrıyla denetlemek için --online ekle
 ```
 
-`doctor` çalışıyor ama Claude brifingi görmüyorsa Claude Code büyük olasılıkla `PATH` üzerinde Node'u bulamıyordur. Windows henüz test edilmedi.
+`doctor` çalışıyor ama Claude brifingi görmüyorsa Claude Code büyük olasılıkla `PATH` üzerinde Node'u bulamıyordur. Birim testleri CI'da Windows'ta çalışır (Node 24); PowerShell anahtar adımı ve Windows'ta gerçek bir Claude Code oturumu henüz test edilmedi.
 
 ### Dene
 

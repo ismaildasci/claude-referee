@@ -218,7 +218,7 @@ On macOS or Linux you can also just set `TYPESAFE_API_KEY`. `/plugin configure c
 npx claude-referee doctor            # add --online to check the key with one free call
 ```
 
-If `doctor` works but Claude sees no briefing, Claude Code probably can't find Node on its `PATH`. Windows isn't tested yet.
+If `doctor` works but Claude sees no briefing, Claude Code probably can't find Node on its `PATH`. The unit tests run on Windows in CI (Node 24); the PowerShell key step and a real Claude Code session on Windows are not tested yet.
 
 ### Try it
 
