@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Fixed
+
+- Checkout class on Windows: a plain main checkout opened from a subfolder was read as `linked` when the temp or home path has an 8.3 short name (`RUNNER~1`), because the two git paths were compared without expanding short names. They are now resolved with the native real path. Found by the informational Windows CI job; the Windows run still has 16 failing product tests.
+
 ### Added
 
 - CI: an informational `windows` job (Node 24: typecheck and tests, `continue-on-error`), so the first list of what breaks on Windows exists without turning a run red. The README keeps saying Windows is not tested yet. Record: [windows-ci-informational.md](docs/decisions/windows-ci-informational.md).

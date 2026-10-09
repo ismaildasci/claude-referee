@@ -52,7 +52,7 @@ export function checkoutClass(cwd: string): CheckoutClass {
   if (top === "") return "no-checkout";
   const real = (path: string): string => {
     try {
-      return realpathSync(resolve(cwd, path));
+      return realpathSync.native(resolve(cwd, path));
     } catch {
       return resolve(cwd, path);
     }
