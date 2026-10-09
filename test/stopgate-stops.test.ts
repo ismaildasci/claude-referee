@@ -8,7 +8,7 @@ import fs, { appendFileSync, existsSync, readdirSync, readFileSync, statSync, ut
 import { syncBuiltinESMExports } from "node:module";
 import { join } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { commands } from "../src/cli/commands/index.ts";
 import { run } from "../src/cli/run.ts";
 import { projectId } from "../src/engine/datadir.ts";
@@ -438,7 +438,7 @@ test("parallel sessions appending past 2 MB lose no record", async () => {
   writeFileSync(stopsFile(dir), fill("f", 2100, () => isoAgo(DAY)));
   const worker = join(tempDir(), "append.ts");
   const stops = fileURLToPath(new URL("../src/engine/stopgate/stops.ts", import.meta.url));
-  writeFileSync(worker, `import { appendStop } from ${JSON.stringify(stops)};\nconst [dir, tag] = process.argv.slice(2);\nfor (let i = 0; i < 40; i++) appendStop(dir, { id: tag + "-" + i, ts: new Date().toISOString(), session_id: tag, project: "p", mode: "shadow", skipped: "no_edits", edits: 0, checks: 0, ms: 1 });\n`);
+  writeFileSync(worker, `import { appendStop } from ${JSON.stringify(pathToFileURL(stops).href)};\nconst [dir, tag] = process.argv.slice(2);\nfor (let i = 0; i < 40; i++) appendStop(dir, { id: tag + "-" + i, ts: new Date().toISOString(), session_id: tag, project: "p", mode: "shadow", skipped: "no_edits", edits: 0, checks: 0, ms: 1 });\n`);
   const tags = Array.from({ length: 8 }, (_, i) => `w${i}`);
   const codes = await Promise.all(tags.map((tag) => new Promise<number | null>((resolve) => spawn(process.execPath, [worker, dir, tag], { stdio: "ignore" }).on("close", resolve))));
   assert.deepEqual(codes, tags.map(() => 0));

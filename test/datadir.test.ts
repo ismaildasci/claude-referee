@@ -2,7 +2,7 @@
 
 import assert from "node:assert/strict";
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { test } from "node:test";
 import { dirSize, pluginDataId, projectId, resolveDataDir, tildify } from "../src/engine/datadir.ts";
 import { appendReceipt, newReceiptId, readReceipts, type Receipt } from "../src/engine/receipts.ts";
@@ -10,11 +10,11 @@ import { tempDir } from "./helpers.ts";
 
 test("datadir order: flag, CLAUDE_PLUGIN_DATA, REFEREE_DATA_DIR, default", () => {
   const home = "/home/u";
-  assert.equal(resolveDataDir({ CLAUDE_PLUGIN_DATA: "/a", REFEREE_DATA_DIR: "/b" }, home, "/w", "x"), "/w/x");
+  assert.equal(resolveDataDir({ CLAUDE_PLUGIN_DATA: "/a", REFEREE_DATA_DIR: "/b" }, home, "/w", "x"), resolve("/w", "x"));
   assert.equal(resolveDataDir({ CLAUDE_PLUGIN_DATA: "/a", REFEREE_DATA_DIR: "/b" }, home, "/w"), "/a");
   assert.equal(resolveDataDir({ REFEREE_DATA_DIR: "/b" }, home, "/w"), "/b");
-  assert.equal(resolveDataDir({}, home, "/w"), "/home/u/.claude/plugins/data/claude-referee-claude-referee");
-  assert.equal(resolveDataDir({ CLAUDE_CONFIG_DIR: "/cfg" }, home, "/w"), "/cfg/plugins/data/claude-referee-claude-referee");
+  assert.equal(resolveDataDir({}, home, "/w"), join("/home/u", ".claude", "plugins", "data", "claude-referee-claude-referee"));
+  assert.equal(resolveDataDir({ CLAUDE_CONFIG_DIR: "/cfg" }, home, "/w"), join("/cfg", "plugins", "data", "claude-referee-claude-referee"));
   assert.equal(pluginDataId(), "claude-referee-claude-referee");
 });
 

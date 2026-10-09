@@ -113,8 +113,13 @@ function compact(file: string, now: number): void {
     const kept = parseLines(all.subarray(0, end).toString("utf8")).filter((r) => typeof r.ts === "string" && r.ts >= cutoff);
     writeFileSync(tmp, kept.map((r) => JSON.stringify(r) + "\n").join(""), { mode: 0o600 });
     const copied = copyTail(fd, tmp, end);
+    // Windows refuses to replace a file this process still holds open, so there the descriptor is closed first and the post-rename tail copy is skipped.
+    if (process.platform === "win32") {
+      closeSync(fd);
+      fd = undefined;
+    }
     renameSync(tmp, file);
-    copyTail(fd, file, copied);
+    if (fd !== undefined) copyTail(fd, file, copied);
   } finally {
     if (fd !== undefined) closeSync(fd);
     if (existsSync(tmp)) unlinkSync(tmp);

@@ -7,6 +7,7 @@ import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, write
 import { request as httpRequest } from "node:http";
 import { join } from "node:path";
 import { test } from "node:test";
+import { posixTest } from "./posix-test.ts";
 import { Script } from "node:vm";
 import { commands } from "../src/cli/commands/index.ts";
 import { ui as uiCommand } from "../src/cli/commands/ui.ts";
@@ -974,7 +975,7 @@ test("ui prints opened: false and removes the launcher at once when the opener i
   assert.deepEqual(await listening("linux", tempDir()), { opened: false, launchers: 0, after: 0 });
 });
 
-test("ui prints opened: true when the opener starts, and removes the launcher on shutdown", async () => {
+posixTest("ui prints opened: true when the opener starts, and removes the launcher on shutdown", async () => {
   const bin = tempDir();
   writeFileSync(join(bin, "xdg-open"), "#!/bin/sh\nexit 0\n", { mode: 0o755 });
   assert.deepEqual(await listening("linux", bin), { opened: true, launchers: 1, after: 0 });
@@ -1022,7 +1023,7 @@ test("R or W pressed while a label is saving says so, and the confirmation names
   assert.deepEqual(page.posts, [{ id: "sA", label: "right" }, { id: "sB", label: "wrong" }]);
 });
 
-test("once the first flow and queue requests are served, no API request spawns git", async () => {
+posixTest("once the first flow and queue requests are served, no API request spawns git", async () => {
   const bin = tempDir();
   const log = join(bin, "calls.log");
   writeFileSync(join(bin, "git"), `#!/bin/sh\necho "$*" >> "${log}"\nexit 128\n`, { mode: 0o755 });

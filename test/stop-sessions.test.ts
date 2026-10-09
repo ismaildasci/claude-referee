@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
+import { posixTest } from "./posix-test.ts";
 import { commands } from "../src/cli/commands/index.ts";
 import { run } from "../src/cli/run.ts";
 import { analyzeTranscript } from "../src/engine/stopgate/transcript.ts";
@@ -93,7 +94,7 @@ function studyOut(cls: string, transcript: string): { out: string; id: string } 
   return { out, id };
 }
 
-test("a fixture is derived from a study session: redacted file, case line, expected label from the class", () => {
+posixTest("a fixture is derived from a study session: redacted file, case line, expected label from the class", () => {
   const transcript = new T().user("Implement slugify.").edit("src/slugify.mjs").say("Implemented, it works.").text();
   const { out, id } = studyOut("wrong_done", transcript);
   const dest = tempDir("stop-sessions-");

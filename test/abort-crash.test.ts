@@ -39,7 +39,7 @@ async function stallAfterHeaders(): Promise<{ url: string; close(): Promise<void
 function runCli(args: string[], stdin: string, baseUrl: string): Promise<{ code: number | null; stdout: string; stderr: string }> {
   return new Promise((resolve) => {
     const child = spawn(process.execPath, [main, ...args], {
-      env: { PATH: process.env.PATH ?? "", HOME: tempDir(), REFEREE_DATA_DIR: tempDir(), REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: baseUrl, TYPESAFE_API_KEY: "ts_test" },
+      env: { PATH: process.env.PATH ?? "", ...(process.platform === "win32" ? { SystemRoot: process.env["SystemRoot"] ?? "" } : {}), HOME: tempDir(), REFEREE_DATA_DIR: tempDir(), REFEREE_BASE_URL_KEY: "ts_test", TYPESAFE_BASE_URL: baseUrl, TYPESAFE_API_KEY: "ts_test" },
     });
     let stdout = "";
     let stderr = "";

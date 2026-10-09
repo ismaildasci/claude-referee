@@ -4,6 +4,7 @@
 import assert from "node:assert/strict";
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { test } from "node:test";
 import { commands } from "../src/cli/commands/index.ts";
 import { run } from "../src/cli/run.ts";
@@ -15,7 +16,7 @@ import { defaultAnswer, fakeJev, type FakeRequest } from "./fake-jev.ts";
 import { memoryIo, tempDir } from "./helpers.ts";
 
 const MARK = "QZX";
-const REPO = new URL("..", import.meta.url).pathname;
+const REPO = fileURLToPath(new URL("..", import.meta.url));
 
 function receiptLines(dataDir: string): string[] {
   const root = join(dataDir, "receipts");

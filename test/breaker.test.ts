@@ -6,7 +6,7 @@ import { spawn } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { breakerOpen, recordBreaker } from "../src/engine/breaker.ts";
 import { isRefereeError } from "../src/engine/errors.ts";
 import { Session, type Planned } from "../src/engine/session.ts";
@@ -54,7 +54,7 @@ test("parallel sessions keep every failure count: 16 sessions failing three time
   const dir = tempDir();
   const worker = join(tempDir(), "fail.ts");
   const breaker = fileURLToPath(new URL("../src/engine/breaker.ts", import.meta.url));
-  writeFileSync(worker, `import { recordBreaker } from ${JSON.stringify(breaker)};\nconst [dir, id] = process.argv.slice(2);\nfor (let i = 0; i < 3; i++) recordBreaker(dir, id, false, ${NOW});\n`);
+  writeFileSync(worker, `import { recordBreaker } from ${JSON.stringify(pathToFileURL(breaker).href)};\nconst [dir, id] = process.argv.slice(2);\nfor (let i = 0; i < 3; i++) recordBreaker(dir, id, false, ${NOW});\n`);
   const ids = Array.from({ length: 16 }, (_, i) => `s${i}`);
   const codes = await Promise.all(ids.map((id) => new Promise<number | null>((resolve) => spawn(process.execPath, [worker, dir, id], { stdio: "ignore" }).on("close", resolve))));
   assert.deepEqual(codes, ids.map(() => 0));
