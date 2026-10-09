@@ -22,7 +22,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
-- CI: an informational `windows` job (Node 24: typecheck and tests, `continue-on-error`), so the first list of what breaks on Windows exists without turning a run red. The README keeps saying Windows is not tested yet. Record: [windows-ci-informational.md](docs/decisions/windows-ci-informational.md).
+- CI: a `windows` job (Node 24: typecheck and tests). It started as informational (`continue-on-error`) to list what breaks on Windows; after the fixes below it is green and enforced like the macOS and Ubuntu jobs. The README says the unit tests run on Windows and that the key step and a real Windows session are not tested. Record: [windows-ci-informational.md](docs/decisions/windows-ci-informational.md).
 
 ## [0.2.7] - 2026-10-09
 

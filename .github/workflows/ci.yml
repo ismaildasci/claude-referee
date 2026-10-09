@@ -30,7 +30,6 @@ jobs:
 
   windows:
     runs-on: windows-latest
-    continue-on-error: true
     steps:
       - run: git config --global core.autocrlf false
       - uses: actions/checkout@v7
