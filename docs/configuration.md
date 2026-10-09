@@ -50,7 +50,7 @@ Hooks stay off in any project without a project file. `hooks_enabled: false` in 
 | `hooks.stopGate` | `off`, `shadow` or `soft`; `active` is not built yet and runs as `shadow` | `off` |
 | `hooks.preModelSwitch` | Read but not used: the cache guard was dropped, see [decisions](decisions/dropped.md) | `false` |
 
-`areas` tells claude-referee which checks count as proof for which part of the repository. The session briefing shows only the area where the session started. A pack can ship default areas in `areas.json`; they apply only when the project file has no `areas`. Planned: an evidence file will count only if it changed after Claude's last edit, so a stale report is treated as no evidence.
+`areas` tells claude-referee which checks count as proof for which part of the repository. The session briefing shows only the area where the session started. When no area matches, it lists up to 4 checks detected from the nearest `package.json`, `composer.json` (or `artisan`), `Cargo.toml` or `go.mod`, from the working directory up to the project root, and marks them `(detected)`; if there is none, and exactly one immediate subdirectory of the root has them, they are listed as `cd <dir> && <command>`. Only script names are read, never script bodies, and several candidate subdirectories give nothing rather than a guess. A pack can ship default areas in `areas.json`; they apply only when the project file has no `areas`. Planned: an evidence file will count only if it changed after Claude's last edit, so a stale report is treated as no evidence.
 
 ### Done-gate modes
 
@@ -165,7 +165,7 @@ The commands read these groups and keys; the value in brackets is the `generic` 
 
 Where the bundled numbers come from: `done.met`'s 0.7 and 0.5 were chosen on 25 cases in the earlier private kit, so they're in-sample. `done` v2 has not been measured on its original bar; on unseen real CI logs it failed its registered bars (wrong `met` 2 of 85, `met` recall among parsed logs 0.873; [result](measurements-real-logs-2.md)), so treat the thresholds as untuned defaults. `verify.relation` (supports 0.8, contradicts and says nothing 0.5) and `verify.injection` (0.7) were set by hand and checked once on 60 held-out claims. A replay of the recorded answers found nothing to tune: see [verify v2](measurements.md#verify-v2-on-held-out-claims). The 0.9 bands for `judge` follow the kit's rule of acting only at 0.90 or above. `line.risky` and `failure.env` were checked once on 62 invented cases each with no wrong `yes` at the 0.9 band, but only 52% and 81% of hold-out cases got a definite answer ([result](measurements.md#judge-on-invented-lines-and-logs)).
 
-`cheatsheet/session.md` may use three placeholders: `{{pack}}`, `{{cli}}` (the absolute path of the bundled CLI) and `{{checks}}` (the area's check commands). The briefing is capped at 800 characters.
+`cheatsheet/session.md` may use three placeholders: `{{pack}}`, `{{cli}}` (the absolute path of the bundled CLI) and `{{checks}}` (the area's check commands, or the detected ones). The briefing is capped at 800 characters.
 
 `redact.json` adds patterns; it can never remove the built-in ones:
 
