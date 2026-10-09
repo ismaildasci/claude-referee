@@ -4,6 +4,13 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.2.6] - 2026-10-09
+
+### Added
+
+- Receipts and stop records: a `worktree` field on new records with one of four fixed words, `main`, `linked`, `claude-worktree` or `no-checkout`, chosen from the directory the command ran in. The path is inspected and never stored; old records are not backfilled and no verdict depends on the field. It is the prerequisite for any decision on grouping worktrees under one project. Record: [checkout-class.md](docs/decisions/checkout-class.md).
+- Opt-in local evidence labels: with `REFEREE_KEEP_EVIDENCE=1`, `done` keeps its redacted criteria and evidence on this machine for 14 days. `receipts --show-evidence <id>` prints them to the terminal, `receipts --label-receipt <id> --right|--wrong` records your judgment, and `receipts --evidence-stats` counts labels by verdict. Off by default; nothing is sent anywhere. Record: [local-evidence-labels.md](docs/decisions/local-evidence-labels.md).
+
 ### Fixed
 
 - `done`: a rubocop run that prints a line saying an analysis will be skipped (for example a project index that needs a gem) counts as one warning, so a lint criterion is `unsure` (`warning_in_log`) instead of `met`. This closes the one known wrong `met` on hold-out (a real log read as clean, labelled `missing` by both labellers). Recorded eval facts do not change; of ten real rubocop lint rows, only that one moves. Record: [rubocop-skip-warning-result.md](docs/decisions/rubocop-skip-warning-result.md).
