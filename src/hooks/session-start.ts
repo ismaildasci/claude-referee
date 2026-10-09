@@ -5,6 +5,7 @@ import { appendFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Env } from "../engine/config.ts";
 import { checkoutClass, projectId, resolveDataDir } from "../engine/datadir.ts";
+import { detectChecks } from "../engine/detect-checks.ts";
 import { loadPack, packDirs } from "../engine/pack.ts";
 import { areaFor, loadProject } from "../engine/project.ts";
 import { appendReceipt, newReceiptId } from "../engine/receipts.ts";
@@ -50,7 +51,8 @@ export async function sessionStart(io: HookIo, pluginRoot: string): Promise<stri
   const template = pack.cheatsheet["session"];
   if (!template) return null;
 
-  const checks = area?.checks.length ? area.checks.join("; ") : "none listed in .claude/referee.json";
+  const detected = area?.checks.length ? [] : detectChecks(cwd, project.root);
+  const checks = area?.checks.length ? area.checks.join("; ") : detected.length ? `${detected.join("; ")} (detected)` : "none listed in .claude/referee.json";
   const text = fit(
     template
       .replaceAll("{{pack}}", pack.name)

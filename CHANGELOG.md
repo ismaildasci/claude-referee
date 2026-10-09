@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Changed
+
+- SessionStart briefing: when no area lists checks, it names up to 4 checks detected from the nearest `package.json`, `composer.json` (or `artisan`), `Cargo.toml` or `go.mod` and marks them `(detected)`, instead of always saying `none listed in .claude/referee.json`. Only script names are read, never script bodies; a missing or unparsable manifest keeps the old text, and explicit `areas` checks are untouched. On the owner's 14 project roots, 8 yield at least one detected check (aggregate count). Record: [briefing-detected-checks.md](docs/decisions/briefing-detected-checks.md).
+
 ## [0.2.6] - 2026-10-09
 
 ### Added
