@@ -474,6 +474,7 @@ test("done: a missing answer on exit-code-only evidence says only an exit code w
       assert.equal(result["p"], p);
       assert.ok(String(result["next_step"]).startsWith(start), String(result["next_step"]));
       assert.equal(result["evidence_lines"], evidence.split("\n").length);
+      assert.equal(String(result["next_step"]).includes('word the criterion as its exit status, e.g. "eslint exits with code 0"'), start.startsWith("Only an exit code"));
     } finally {
       await server.close();
     }

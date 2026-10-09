@@ -53,7 +53,7 @@ function hasParsedWarnings(parsed: ParsedEvidence): boolean {
   return parsed.runners.some((r) => (r.warnings ?? 0) > 0);
 }
 
-const EXIT_ONLY_NEXT = 'Only an exit code line was recognised, and an exit code alone cannot show a criterion. Pipe the check\'s output in front of it: { your-command; echo "exit code: $?"; } 2>&1 | claude-referee done --criteria "..."';
+const EXIT_ONLY_NEXT = 'Only an exit code line was recognised, and an exit code alone cannot show a criterion. Pipe the check\'s output in front of it: { your-command; echo "exit code: $?"; } 2>&1 | claude-referee done --criteria "...". If the tool prints nothing when it passes (eslint, tsc), word the criterion as its exit status, e.g. "eslint exits with code 0".';
 const UNPARSED_NEXT = 'No recognised runner summary or exit code in the evidence, so it cannot count as met. Pipe the runner\'s full output, or add an exit code line: { your-command; echo "exit code: $?"; } 2>&1 | claude-referee done --criteria "..."';
 
 const CLEAN_CRITERION = new RegExp(String.raw`\b(?:lint\w*|clean|warning[- ]?free|no warnings?|${LINTERS.join("|")})\b`, "i");
