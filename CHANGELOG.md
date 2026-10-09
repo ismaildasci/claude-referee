@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- CI: an informational `windows` job (Node 24: typecheck and tests, `continue-on-error`), so the first list of what breaks on Windows exists without turning a run red. The README keeps saying Windows is not tested yet. Record: [windows-ci-informational.md](docs/decisions/windows-ci-informational.md).
+
 ## [0.2.7] - 2026-10-09
 
 The `done` and `decide` next steps now say what to do instead of repeating that the evidence was not enough, the session briefing lists the checks it finds in the project and asks for them after edits, and wrong `met` verdicts can be labelled from a queue. No verdict, `p`, reason or threshold changed.

@@ -28,6 +28,20 @@ jobs:
       - name: Committed bundle and npm copy match the source
         run: git diff --exit-code plugins/claude-referee/dist npm
 
+  windows:
+    runs-on: windows-latest
+    continue-on-error: true
+    steps:
+      - run: git config --global core.autocrlf false
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+
   bundle:
     runs-on: ubuntu-latest
     steps:
