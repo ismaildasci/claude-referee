@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
+- `done`: a clean run of `eslint` or `oxlint` that prints nothing is now read as a clean run (facts: errors 0, warnings 0, "printed no diagnostics and exited 0", build-only) when the log is exactly one npm script echo (`> pkg@ver script`, `> eslint ...`), a blank line and exit lines of 0. Flags that hide, redirect or change output (`--quiet`, `-q`, `--silent`, `--format`/`-f`, `--output-file`/`-o`, `--fix`, `no-error` flags), shell operators (`|| true`, `;`, `&&`, `>`, `|`), any other output line, a second script and a non-zero or missing exit stay on the exit-code reading. The 357 recorded `done` cases keep their facts; a new recorded suite `done-silent` (15 invented cases from real shapes) has 0 wrong `met` and `met` on 5 of 5 clean forms; on 38 real lint outputs, 11 more are parsed. Record: [silent-success-reading.md](docs/decisions/silent-success-reading.md).
 - `done`: a Vite build log without the `vite v5.x building` banner is read as a Vite build when it has the `✓ built in <time>` line and a Vite output line (path, size, `│ gzip:`); with the banner nothing changes. The parsed facts of the 357 recorded `done` cases are identical; on 38 real build outputs, 2 more are parsed (the other 18 exit-code-only logs are silent `nest build` runs). Record: [vite-built-line.md](docs/decisions/vite-built-line.md).
 
 ### Fixed

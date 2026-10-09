@@ -1,0 +1,1 @@
+{"command": "done", "criteria": "lint is clean", "positive": "met", "max_wrong_positive": 0, "note": "Invented from the shapes of real gate-script outputs (npm echo, blank line, exit code 0) for docs/decisions/silent-success-reading.md. Clean silent eslint and oxlint expect met; hidden, redirected, tolerated or printed output and other criteria expect not met."}
