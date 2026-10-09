@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.2.7] - 2026-10-09
+
+The `done` and `decide` next steps now say what to do instead of repeating that the evidence was not enough, the session briefing lists the checks it finds in the project and asks for them after edits, and wrong `met` verdicts can be labelled from a queue. No verdict, `p`, reason or threshold changed.
+
 ### Fixed
 
 - SessionStart briefing: a broken symlink in the project root no longer hides the one subdirectory whose checks the briefing would list; before, one dangling entry silently turned the detection off.

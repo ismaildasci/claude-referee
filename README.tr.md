@@ -103,7 +103,7 @@ Başlıca ölçümler tek tabloda:
 | 2026-09 | Seçenek sırası ve yeniden sormak | 0,52'ye kadar, en fazla 0,01'e karşı | Ölçüldü · önceki kit, 20 karar, tek kod tabanı |
 | 2026-09 | İki sıra ve 24 sıranın tamamı | 20'de 20 aynı lider | Ölçüldü · aynı 20 karar |
 | 2026-09 | Claude turu ve Jev kararı | yaklaşık 0,10 dolar (tahmin), yaklaşık 0,0007 dolara karşı | Ölçüldü, maliyet tahmin · 321 CLI çağrısı |
-| 2026-09 | SessionStart brifing boyutu | 431–599 karakter (hedef 600); algılanan kontroller ve "kontrolleri çalıştır" satırıyla (yayımlanacak sürümde): gerçek bir projede 660, uzun plugin yollu testte 697 (sınır 800) | Ölçüldü · tek çalışma alanının dört bölgesi; 660 ve 697 bugünkü derlemeden |
+| 2026-09 | SessionStart brifing boyutu | 431–599 karakter (hedef 600); 0.2.7'den beri, algılanan kontroller ve "kontrolleri çalıştır" satırıyla: gerçek bir projede 660, uzun plugin yollu testte 697 (sınır 800) | Ölçüldü · tek çalışma alanının dört bölgesi; 660 ve 697 bugünkü derlemeden |
 | 2026-09 | Aynı denetim, ikinci koşu | 0 Jev isteği (ilk koşu: 10) | Ölçüldü · 10 çiftlik tek denetim |
 | 2026-09 | Gönüllü `done` komutu | 14 günde 1 koşu | Ölçüldü · 14 gün, tek kod tabanı |
 | 2026-09-30 | API sınırları, canlı yoklama | 11 Score seviyesi ve 256 seçenek 400 alıyor; 1 seviyeli Score kabul ediliyor | Ölçüldü · claude-referee, 7 istek |

@@ -107,7 +107,7 @@ The main measurements in one table:
 | 2026-09 | Option order vs. asking again | up to 0.52 vs. at most 0.01 | Measured · earlier kit, 20 decisions, one codebase |
 | 2026-09 | Two orders vs. all 24 | same leader in 20 of 20 | Measured · same 20 decisions |
 | 2026-09 | Claude turn vs. Jev decision | about $0.10 (estimated) vs. about $0.0007 | Measured, cost estimated · 321 CLI calls |
-| 2026-09 | SessionStart briefing size | 431–599 characters (target 600); since 0.2.7-to-be, with detected checks and the run-the-checks line: 660 on a real project, 697 in a test with a long plugin path (the cap is 800) | Measured · four areas of one workspace; the 660 and 697 from today's build |
+| 2026-09 | SessionStart briefing size | 431–599 characters (target 600); since 0.2.7, with detected checks and the run-the-checks line: 660 on a real project, 697 in a test with a long plugin path (the cap is 800) | Measured · four areas of one workspace; the 660 and 697 from today's build |
 | 2026-09 | Same audit, second run | 0 Jev requests (first run: 10) | Measured · one 10-pair audit |
 | 2026-09 | Voluntary `done` command | 1 run in 14 days | Measured · 14 days, one codebase |
 | 2026-09-30 | API limits, live probe | 11 Score levels and 256 options get a 400; a 1-level Score is accepted | Measured · claude-referee, 7 requests |
