@@ -3,6 +3,7 @@
 // A monorepo wrapper's non-zero exit report (turbo, nx, bun, concurrently, npm) counts only when the log's own exit lines show no non-zero code.
 
 import { parsers as compiled } from "./compiled.ts";
+import { commandLines } from "./echo.ts";
 import { parsers as builds } from "./builds.ts";
 import { parsers as bun } from "./bun.ts";
 import { parsers as js } from "./js.ts";
@@ -26,12 +27,14 @@ export interface ParsedEvidence {
   readonly trust: Trust;
   readonly exit_code: number | null;
   readonly exit_lines: readonly string[];
+  readonly command_lines: readonly string[];
   readonly runners: readonly RunnerFacts[];
   readonly conflict: boolean;
   readonly lines: number;
 }
 
 const PARSERS: readonly RunnerParser[] = [...python, ...js, ...compiled, ...phpRuby, ...more, ...suites, ...scenarios, ...builds, ...native, ...moreTools, ...bun, ...oxlint, ...silent];
+
 
 const HALTED = /^##\[error\](?:The operation was canceled\.|The job (?:running on runner .+ )?has exceeded the maximum execution time|The runner has received a shutdown signal)/m;
 
@@ -44,8 +47,9 @@ export function parseEvidence(text: string): ParsedEvidence {
   const read = exitMatches(body).map((m) => ({ line: m[0], code: Number(m[2]) }));
   const exits = read.some((e) => e.code !== 0) ? read : [...wrapperExits(body), ...read];
   const exit_lines = exits.slice(0, 3).map((e) => e.line.trim().slice(0, 80));
+  const command_lines = commandLines(body, new Set(read.map((e) => e.line.trim())));
   const exit_code = exits.length === 0 ? null : (exits.find((e) => e.code !== 0)?.code ?? 0);
   const conflict = runners.some((r) => r.failed + r.errors > 0) && (runners.some((r) => r.failed + r.errors === 0 && r.passed > 0) || exit_code === 0);
   const trust: Trust = runners.length > 0 ? "parsed" : exit_code !== null ? "exit_code" : "unparsed";
-  return { trust, exit_code, exit_lines, runners, conflict, lines: text.split("\n").length };
+  return { trust, exit_code, exit_lines, command_lines, runners, conflict, lines: text.split("\n").length };
 }

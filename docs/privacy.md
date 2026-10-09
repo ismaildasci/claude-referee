@@ -9,7 +9,7 @@ Requests go to `api.typesafe.ai`. TypeSafe's [privacy policy](https://typesafe.a
 | When | What is sent |
 |---|---|
 | Every call | The pack's question text and the input it asks about |
-| `done` | Your criterion and the output you pipe in. Output from a runner claude-referee has a parser for is parsed in code and only the counts, exit code, failing test names and the matched summary and exit-code lines are sent; any other output is sent as text, its first 2,000 and last 12,000 characters |
+| `done` | Your criterion and the output you pipe in. Output from a runner claude-referee has a parser for is parsed in code and only the counts, exit code, failing test names and the matched summary and exit-code lines are sent, and, when the log has only an exit code, up to three echoed command lines (`$ cmd` or `> cmd`, 80 characters each, only when the command's first word is a known check tool such as `tsc`, `eslint`, `npm` or `cargo`, and none when the command hides or tolerates its output); any other output is sent as text, its first 2,000 and last 12,000 characters |
 | `decide` | The decision, any inline `context`, the option texts and the contents of your `context_files`. The choice is asked twice, in two option orders, and in up to 2n orders (n options) when those two tie |
 | `judge` and `verify` | The items, claims and source text you pass in |
 | Done-gate in shadow mode | Each time Claude stops after editing without a passing check: the first 1,500 characters of your prompt, the last 2,000 characters of Claude's final message, the check commands with their pass/fail status, and the paths of the files Claude edited, without their contents |

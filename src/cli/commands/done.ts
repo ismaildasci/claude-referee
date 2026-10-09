@@ -105,7 +105,7 @@ export function hasLinterDiagnostic(evidence: string): boolean {
 }
 
 function factsOf(parsed: ParsedEvidence): Record<string, unknown> {
-  return { trust: parsed.trust, exit_code: parsed.exit_code, exit_lines: parsed.exit_lines, runners: parsed.runners.map(({ build_only: _buildOnly, ...r }) => r), conflict: parsed.conflict, lines: parsed.lines };
+  return { trust: parsed.trust, exit_code: parsed.exit_code, exit_lines: parsed.exit_lines, ...(parsed.trust === "exit_code" && parsed.command_lines.length > 0 ? { command_lines: parsed.command_lines } : {}), runners: parsed.runners.map(({ build_only: _buildOnly, ...r }) => r), conflict: parsed.conflict, lines: parsed.lines };
 }
 
 export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, criteria: readonly string[], evidence: string): { planned: Planned[]; finish: (outcomes: Outcome[]) => Result } {
@@ -186,7 +186,7 @@ export const done: Command = {
     },
     outputs: {
       verdict: "met, unsure or missing; the lowest across criteria",
-      trust: "parsed (a runner summary was recognised), exit_code (only an exit code line) or unparsed (met is not possible)",
+      trust: "parsed (a runner summary was recognised), exit_code (only an exit code line; the echoed command of a known check tool is sent with it) or unparsed (met is not possible)",
       exit_code: "The exit code read from the evidence, when it has one",
       evidence_lines: "How many lines the evidence has (a count; the receipt keeps it too)",
       runners: "Parsed counts per recognised runner",
