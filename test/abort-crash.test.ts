@@ -6,10 +6,11 @@ import { spawn } from "node:child_process";
 import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 import { isSdkAbort } from "../src/engine/abort-guard.ts";
 import { tempDir } from "./helpers.ts";
 
-const main = new URL("../src/cli/main.ts", import.meta.url).pathname;
+const main = fileURLToPath(new URL("../src/cli/main.ts", import.meta.url));
 
 async function stallAfterHeaders(): Promise<{ url: string; close(): Promise<void> }> {
   const sockets = new Set<import("node:net").Socket>();

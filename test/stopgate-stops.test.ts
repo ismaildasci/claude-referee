@@ -8,6 +8,7 @@ import fs, { appendFileSync, existsSync, readdirSync, readFileSync, statSync, ut
 import { syncBuiltinESMExports } from "node:module";
 import { join } from "node:path";
 import { test } from "node:test";
+import { posixTest } from "./posix-test.ts";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { commands } from "../src/cli/commands/index.ts";
 import { run } from "../src/cli/run.ts";
@@ -340,7 +341,7 @@ test("another session holding the lock means no pruning now; a stale lock is cle
   assert.deepEqual(readStops(dir).map((r) => r.id), ["a", "b", "c"]);
 });
 
-test("lines another session appends while the file is rewritten are kept", () => {
+posixTest("lines another session appends while the file is rewritten are kept", () => {
   const dir = tempDir();
   const file = stopsFile(dir);
   writeFileSync(file, fill("old", 2100, () => "2020-01-01T00:00:00.000Z"));
@@ -402,7 +403,7 @@ test("an append that lands on the file another session's pruning renamed away is
   assert.deepEqual(leftovers(dir), []);
 });
 
-test("a stop the pruning copied and the append wrote again is read and counted once", () => {
+posixTest("a stop the pruning copied and the append wrote again is read and counted once", () => {
   const dir = tempDir();
   writeFileSync(stopsFile(dir), fill("old", 2100, () => "2020-01-01T00:00:00.000Z"));
   aroundAppend(

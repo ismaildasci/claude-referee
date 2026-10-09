@@ -16,7 +16,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Fixed
 
-- Stop gate records on Windows: pruning of `stops.jsonl` (records older than 90 days, past 2 MB) never ran there, because Windows refuses to replace a file that this process still holds open. The descriptor is now closed before the replace on Windows, and the post-replace copy of lines another session appended in that instant is skipped there. The tests that build workers by absolute path now import them by file URL, and several tests no longer assume POSIX paths, a POSIX shell for their fixtures or a bare environment without `SystemRoot`.
+- Stop gate records on Windows: pruning of `stops.jsonl` (records older than 90 days, past 2 MB) never ran there, because Windows refuses to replace a file that this process still holds open. The descriptor is now closed before the replace on Windows, and the post-replace copy of lines another session appended in that instant is skipped there. The two tests of an append that lands on a file being renamed away run on POSIX only. The tests that build workers by absolute path now import them by file URL, the CLI path in the abort test comes from a file URL, and several tests no longer assume POSIX paths, a POSIX shell for their fixtures or a bare environment without `SystemRoot`.
 - Checkout class on Windows: a plain main checkout opened from a subfolder was read as `linked` when the temp or home path has an 8.3 short name (`RUNNER~1`), because the two git paths were compared without expanding short names. They are now resolved with the native real path. Found by the informational Windows CI job; the Windows run still has 16 failing product tests.
 
 ### Added
