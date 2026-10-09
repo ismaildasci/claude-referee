@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- `receipts --evidence-queue [--verdict <v>]`: up to 20 newest `done` receipts that have stored evidence (`REFEREE_KEEP_EVIDENCE=1`) and no label, with id, time, verdict, p, trust and runner names only, so labelling a wrong `met` is `--evidence-queue --verdict met`, `--show-evidence <id>`, `--label-receipt <id> --right|--wrong`. No criteria or evidence text is printed by the queue. Record: [evidence-queue.md](docs/decisions/evidence-queue.md).
 - SessionStart briefing (generic pack): one line after the `done` pipe example, "After editing files, run the checks below this way before saying it is done." The detected-checks list is capped at 80 joined characters (was 90) and the briefing stays within 700 characters in tests (was 600); it measures 660 on a real project and 697 in the long-plugin-path test, the hard cap stays 800. It is observational: the report is the share of edit turns that end with a counted check, 28 of 52 before. Record: [briefing-done-nudge.md](docs/decisions/briefing-done-nudge.md).
 - Weekly docs watch: TypeSafe's "Jev 1.13 jaggedness" page (its known weaknesses and "last reviewed" date) joins `models.md`, `api.md` and `llms.txt` as a watched page, and the newest versions of the Python and JavaScript SDK changelogs are recorded and printed as `::notice::` lines when they change; those notices never fail the run. Record: [docs-watch-jaggedness.md](docs/decisions/docs-watch-jaggedness.md).
 

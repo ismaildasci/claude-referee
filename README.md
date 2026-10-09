@@ -265,7 +265,7 @@ Each command prints one line of JSON: `ok`, the verdict, a few numbers, a `next_
 - If the input contains something that looks like a password, key or token, nothing is sent.
 - Emails, IP addresses and your home folder path are replaced before sending.
 - `--dry-run` shows exactly what would be sent, without sending it.
-- The receipts stay on your machine: model, tokens, cost, time, the verdict and its numbers, never the text you sent. With the done-gate on, `stops.jsonl` also keeps excerpts of your prompt and Claude's last message. If you set `REFEREE_KEEP_EVIDENCE=1`, `done` also keeps its redacted criteria and evidence on your machine for 14 days, so you can label verdicts; it is off by default and nothing is sent.
+- The receipts stay on your machine: model, tokens, cost, time, the verdict and its numbers, never the text you sent. With the done-gate on, `stops.jsonl` also keeps excerpts of your prompt and Claude's last message. If you set `REFEREE_KEEP_EVIDENCE=1`, `done` also keeps its redacted criteria and evidence on your machine for 14 days, so you can label verdicts (`receipts --evidence-queue` lists them); it is off by default and nothing is sent.
 - Anything that would send free text on its own stays off until you turn it on.
 
 <picture>

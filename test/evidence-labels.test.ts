@@ -6,6 +6,7 @@ import { test } from "node:test";
 import { commands } from "../src/cli/commands/index.ts";
 import { run } from "../src/cli/run.ts";
 import { EVIDENCE_DAYS, readEvidence, storeEvidence } from "../src/engine/evidence.ts";
+import { appendReceipt } from "../src/engine/receipts.ts";
 import { fakeJev } from "./fake-jev.ts";
 import { memoryIo, tempDir } from "./helpers.ts";
 
@@ -78,4 +79,52 @@ test("retention: a record older than 14 days is removed by the next write, a new
 test("storage refuses ids that are not receipt ids (no path from input)", () => {
   assert.equal(storeEvidence(tempDir(), "../escape", { criteria: ["x"], evidence: "ok", home: HOME, now: Date.now() }), false);
   assert.equal(readEvidence(tempDir(), "../escape"), null);
+});
+
+test("evidence-queue lists stored, unlabelled done receipts newest first, filters by verdict and prints no text", async () => {
+  const server = await fakeJev();
+  try {
+    const dataDir = tempDir();
+    const cwd = tempDir();
+    const ids: string[] = [];
+    for (const keep of [true, true, false, true]) {
+      const done = memoryIo({ env: env(dataDir, server.url, keep), cwd, home: HOME, stdin: EVIDENCE });
+      assert.equal(await run(["done", "--criteria", "all tests pass"], done, commands), 0);
+      if (keep) ids.push(String(done.json()["receipt"]));
+    }
+    const label = memoryIo({ env: env(dataDir, server.url, false), cwd, home: HOME });
+    assert.equal(await run(["receipts", "--label-receipt", ids[0] ?? "", "--right"], label, commands), 0);
+    const queue = memoryIo({ env: env(dataDir, server.url, false), cwd, home: HOME });
+    assert.equal(await run(["receipts", "--evidence-queue"], queue, commands), 0);
+    const result = queue.json() as { count: number; queue: { id: string; verdict: string }[]; next_step: string };
+    assert.deepEqual(result.queue.map((r) => r.id), [ids[2], ids[1]]);
+    assert.equal(result.count, 2);
+    assert.match(result.next_step, /--show-evidence/);
+    assert.doesNotMatch(queue.out.join(""), /owner@example\.test|work\/app|all tests pass/);
+    const verdict = result.queue[0]?.verdict ?? "";
+    const same = memoryIo({ env: env(dataDir, server.url, false), cwd, home: HOME });
+    await run(["receipts", "--evidence-queue", "--verdict", verdict], same, commands);
+    assert.equal((same.json() as { count: number }).count, 2);
+    const none = memoryIo({ env: env(dataDir, server.url, false), cwd, home: HOME });
+    await run(["receipts", "--evidence-queue", "--verdict", "no-such-verdict"], none, commands);
+    assert.equal((none.json() as { count: number }).count, 0);
+    assert.match(String(none.json()["next_step"]), /Nothing waits/);
+  } finally {
+    await server.close();
+  }
+});
+
+test("evidence-queue shows at most 20 rows, the newest", async () => {
+  const dataDir = tempDir();
+  for (let i = 0; i < 25; i++) {
+    const id = `r${String(i).padStart(2, "0")}`;
+    appendReceipt(dataDir, { id, ts: `2026-10-09T10:${String(i).padStart(2, "0")}:00.000Z`, command: "done", project: "p1", verdict: "met", requests: 1, cached: 0, input_tokens: 1, cost_usd: 0, ms: 1 });
+    storeEvidence(dataDir, id, { criteria: ["x"], evidence: "y", home: HOME, now: Date.parse("2026-10-09T10:30:00Z") });
+  }
+  const queue = memoryIo({ env: { REFEREE_DATA_DIR: dataDir }, cwd: tempDir(), home: HOME });
+  assert.equal(await run(["receipts", "--evidence-queue"], queue, commands), 0);
+  const result = queue.json() as { count: number; queue: { id: string }[] };
+  assert.equal(result.count, 20);
+  assert.equal(result.queue[0]?.id, "r24");
+  assert.equal(result.queue[19]?.id, "r05");
 });

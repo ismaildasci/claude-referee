@@ -11,7 +11,7 @@ import { loadPack, packDirs, threshold } from "../../engine/pack.ts";
 import { loadProject } from "../../engine/project.ts";
 import { suggestThreshold } from "../../engine/stopgate/interval.ts";
 import { labelStop, readStops, stopStats } from "../../engine/stopgate/stops.ts";
-import { labelReceipt, readEvidence, readReceiptLabels } from "../../engine/evidence.ts";
+import { labelReceipt, listEvidenceIds, readEvidence, readReceiptLabels } from "../../engine/evidence.ts";
 import type { StopRecord } from "../../engine/stopgate/types.ts";
 import { suggestForStops, transcriptLocator, type TranscriptLocator } from "../../engine/stopgate/weak.ts";
 import { claudeProjectsDir, projectTranscriptDirs, scanUsage } from "../../engine/usage.ts";
@@ -141,12 +141,14 @@ export const receipts: Command = {
       "--show-evidence <id>": "Print the stored, redacted criteria and evidence of one done receipt to this terminal only. Only runs made with REFEREE_KEEP_EVIDENCE=1 have it; records older than 14 days are removed.",
       "--label-receipt <id>": "Label one done receipt with --right or --wrong. Labels are the owner judgment and are kept in receipt-labels.jsonl.",
       "--evidence-stats": "Counts of labelled done receipts by verdict, with right and wrong.",
+      "--evidence-queue": "Up to 20 done receipts that have stored evidence and no label, newest first, with id, time, verdict, p, trust and runner names only; --verdict <v> keeps one verdict. Then --show-evidence and --label-receipt.",
+      "--verdict <v>": "With --evidence-queue: only receipts with this verdict, for example met.",
       "--project-only": "With verify: only this project's chain.",
       "--all": "Every project instead of the current one.",
       "--days <n>": "How many days back to include; default 30, or 14 with --tokens or --usage. With --stops it limits the listed stops and their stats. With --session it applies only when given.",
     },
     outputs: {
-      verdict: "summary, tokens, usage, exported, stops, session, labelled, chain_ok, chain_broken or overruled",
+      verdict: "summary, tokens, usage, exported, stops, session, labelled, evidence_queue, chain_ok, chain_broken or overruled",
       chain: "With verify: receipts, chained, unchained and breaks (project, id, kind mismatch, fork or unreadable)",
       dropped: "With overrule: how many cached answers were deleted",
       id: "With overrule or --label: the receipt or stop id",
@@ -194,6 +196,8 @@ export const receipts: Command = {
     "show-evidence": { type: "string" },
     "label-receipt": { type: "string" },
     "evidence-stats": { type: "boolean" },
+    "evidence-queue": { type: "boolean" },
+    verdict: { type: "string" },
   },
   async run(context) {
     const { io, flags, values, positionals } = context;
@@ -212,6 +216,17 @@ export const receipts: Command = {
       if (!done) throw new RefereeError("bad_input", "No done receipt with that id in this data directory.", { next_step: "Use the receipt id printed by done (receipt field)." });
       if (!labelReceipt(dataDir, receiptLabelId, label, new Date(io.now()).toISOString())) throw new RefereeError("internal", "Could not write the label.");
       return { ok: true, verdict: "labelled", id: receiptLabelId, label };
+    }
+    if (values["evidence-queue"] === true) {
+      const wanted = str(context, "verdict");
+      const labelled = new Set(readReceiptLabels(dataDir).map((l) => l.id));
+      const stored = new Set(listEvidenceIds(dataDir));
+      const queue = readReceipts(dataDir)
+        .filter((r) => r.command === "done" && stored.has(r.id) && !labelled.has(r.id) && (wanted === undefined || r.verdict === wanted))
+        .reverse()
+        .slice(0, 20)
+        .map((r) => ({ id: r.id, ts: r.ts, verdict: r.verdict, ...(r.outcome?.p !== undefined ? { p: r.outcome.p } : {}), ...(r.outcome?.trust !== undefined ? { trust: r.outcome.trust } : {}), ...(r.outcome?.runners ? { runners: r.outcome.runners } : {}) }));
+      return { ok: true, verdict: "evidence_queue", count: queue.length, queue, ...(queue.length === 0 ? { next_step: "Nothing waits for a label. Evidence is stored only for done runs made with REFEREE_KEEP_EVIDENCE=1, for 14 days." } : { next_step: "receipts --show-evidence <id>, then receipts --label-receipt <id> --right or --wrong." }) };
     }
     if (values["evidence-stats"] === true) {
       const verdicts = new Map(readReceipts(dataDir).filter((r) => r.command === "done").map((r) => [r.id, r.verdict ?? "none"]));

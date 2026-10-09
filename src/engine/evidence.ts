@@ -63,6 +63,14 @@ export function readEvidence(dataDir: string, receiptId: string): StoredEvidence
   }
 }
 
+export function listEvidenceIds(dataDir: string): string[] {
+  try {
+    return readdirSync(evidenceDir(dataDir)).flatMap((f) => (f.endsWith(".json") && ID.test(f.slice(0, -5)) ? [f.slice(0, -5)] : []));
+  } catch {
+    return [];
+  }
+}
+
 export function labelReceipt(dataDir: string, receiptId: string, label: "right" | "wrong", nowIso: string): boolean {
   if (!ID.test(receiptId)) return false;
   try {

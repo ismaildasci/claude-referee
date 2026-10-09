@@ -261,7 +261,7 @@ Her komut tek satır JSON basar: `ok`, karar, birkaç sayı, varsa bir `next_ste
 - Girdide parola, anahtar ya da token'a benzeyen bir şey varsa hiçbir şey gönderilmez.
 - E-postalar, IP adresleri ve ev klasörünün yolu gönderilmeden önce değiştirilir.
 - `--dry-run`, neyin gönderileceğini göndermeden birebir gösterir.
-- Makbuzlar makinende kalır: model, token, maliyet, süre, karar ve sayıları; gönderdiğin metin asla. Done-gate açıksa `stops.jsonl` ayrıca isteminden ve Claude'un son mesajından alıntılar tutar. `REFEREE_KEEP_EVIDENCE=1` ayarlarsan `done`, etiketleme için redakte edilmiş ölçütlerini ve kanıtını makinende 14 gün tutar; varsayılan olarak kapalıdır ve hiçbir şey gönderilmez.
+- Makbuzlar makinende kalır: model, token, maliyet, süre, karar ve sayıları; gönderdiğin metin asla. Done-gate açıksa `stops.jsonl` ayrıca isteminden ve Claude'un son mesajından alıntılar tutar. `REFEREE_KEEP_EVIDENCE=1` ayarlarsan `done`, etiketleme için redakte edilmiş ölçütlerini ve kanıtını makinende 14 gün tutar (`receipts --evidence-queue` listeler); varsayılan olarak kapalıdır ve hiçbir şey gönderilmez.
 - Kendiliğinden serbest metin gönderecek her şey sen açana kadar kapalı kalır.
 
 <picture>
