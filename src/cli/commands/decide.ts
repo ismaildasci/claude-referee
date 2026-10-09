@@ -209,7 +209,12 @@ export const decide: Command = {
       ...(read.length ? { context_files: contents } : {}),
     };
     const stateTokens = estimateTokens(JSON.stringify(state));
-    if (stateTokens > STATE_TOKEN_LIMIT) throw new RefereeError("too_large", "The context is too large for one Jev request.", { next_step: "Trim context or context_files." });
+    if (stateTokens > STATE_TOKEN_LIMIT) {
+      const largest = Object.entries(contents).sort((a, b) => b[1].length - a[1].length)[0];
+      throw new RefereeError("too_large", `The context is too large for one Jev request (about ${stateTokens} tokens, limit ${STATE_TOKEN_LIMIT}).`, {
+        next_step: largest ? `Trim context or context_files; the largest file is ${largest[0]} (about ${estimateTokens(largest[1])} tokens).` : "Trim context.",
+      });
+    }
 
     const plan = planDecide(pack, project?.thresholds, state, input.options);
     const { perOption } = plan;

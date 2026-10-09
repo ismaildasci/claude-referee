@@ -22,6 +22,7 @@ export interface PackPatterns {
 export interface Stop {
   readonly kind: string;
   readonly field: string;
+  readonly line?: number;
 }
 
 export interface Redacted<T = unknown> {
@@ -92,18 +93,20 @@ function compile(specs: readonly PatternSpec[] | undefined, global: boolean): Pa
   });
 }
 
-function stopsIn(text: string, extra: readonly Pattern[]): string[] {
-  const kinds: string[] = [];
+function stopsIn(text: string, extra: readonly Pattern[]): { kind: string; line?: number }[] {
+  const found: { kind: string; line?: number }[] = [];
+  const at = (index: number | undefined): { line?: number } => (index === undefined || !text.includes("\n") ? {} : { line: text.slice(0, index).split("\n").length });
   for (const { kind, regex } of [...STOP, ...extra]) {
-    if (regex.test(text)) kinds.push(kind);
+    const match = regex.exec(text);
+    if (match) found.push({ kind, ...at(match.index) });
   }
   for (const match of text.matchAll(ASSIGNMENT)) {
     if (looksSecret(match[1] ?? "", match[2] ?? "")) {
-      kinds.push("secret_assignment");
+      found.push({ kind: "secret_assignment", ...at(match.index) });
       break;
     }
   }
-  return kinds;
+  return found;
 }
 
 function isVersionContext(text: string, start: number, end: number): boolean {
@@ -148,7 +151,7 @@ export function redact<T>(value: T, options: RedactOptions = {}): Redacted<T> {
 
   const walk = (node: unknown, field: string): unknown => {
     if (typeof node === "string") {
-      for (const kind of stopsIn(node, extraStop)) stopped.push({ kind, field });
+      for (const { kind, line } of stopsIn(node, extraStop)) stopped.push({ kind, field, ...(line !== undefined ? { line } : {}) });
       const clipped = node.length > maxField ? `${node.slice(0, maxField)}[TRUNCATED:${node.length - maxField}]` : node;
       return replaceIn(clipped, options.home, extraReplace, replaced);
     }
@@ -156,7 +159,7 @@ export function redact<T>(value: T, options: RedactOptions = {}): Redacted<T> {
     if (node !== null && typeof node === "object") {
       const out: Record<string, unknown> = {};
       for (const [key, child] of Object.entries(node)) {
-        for (const kind of stopsIn(key, extraStop)) stopped.push({ kind, field: `${field}.<key>` });
+        for (const { kind } of stopsIn(key, extraStop)) stopped.push({ kind, field: `${field}.<key>` });
         const base = options.keepKeys ? key : replaceIn(key, options.home, extraReplace, replaced);
         let safeKey = base;
         for (let n = 2; Object.hasOwn(out, safeKey); n++) safeKey = `${base}#${n}`;
@@ -170,10 +173,12 @@ export function redact<T>(value: T, options: RedactOptions = {}): Redacted<T> {
   return { value: walk(value, "") as T, replaced, stopped };
 }
 
+const ASSIGNMENT_NEXT = "The rule matches a name containing key, token, secret or password next to a long mixed-character value. Remove that line or shorten the value, then run again; --dry-run shows what would be sent.";
+
 export function stopError(stopped: readonly Stop[]): RefereeError {
   const first = stopped[0];
-  const where = first ? `${first.kind} in ${first.field || "input"}` : "credential";
+  const where = first ? `${first.kind} in ${first.field || "input"}${first.line !== undefined ? `, line ${first.line}` : ""}` : "credential";
   return new RefereeError("credential_in_state", `Request not sent: found something shaped like a credential (${where}).`, {
-    next_step: "Remove the credential from the input, or run with --dry-run to see what would be sent.",
+    next_step: first?.kind === "secret_assignment" ? ASSIGNMENT_NEXT : "Remove the credential from the input, or run with --dry-run to see what would be sent.",
   });
 }

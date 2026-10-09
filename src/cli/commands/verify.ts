@@ -33,7 +33,7 @@ export function verifyRequest(pack: Pack, thresholds: Thresholds | undefined, cl
   const ordered = (reverse: boolean) => Object.fromEntries(reverse ? Object.entries(baseCriteria).reverse() : Object.entries(baseCriteria));
   const state = { source };
   const stateTokens = estimateTokens(JSON.stringify(state));
-  if (stateTokens > STATE_TOKEN_LIMIT) throw new RefereeError("too_large", "The source is too large for one Jev request.", { next_step: "Pass the relevant section of the source." });
+  if (stateTokens > STATE_TOKEN_LIMIT) throw new RefereeError("too_large", `The source is too large for one Jev request (about ${stateTokens} tokens, limit ${STATE_TOKEN_LIMIT}).`, { next_step: "Pass the relevant section of the source." });
   if (new Set(claims.map((c) => c.id)).size !== claims.length) throw new RefereeError("bad_input", "Claim ids must be unique.", { next_step: "Give every claim its own id, or leave the ids out." });
   const checks = new Map(claims.map((c) => [c.id, checkClaim(c.text, source)]));
   const asked = claims.filter((c) => {
