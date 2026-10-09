@@ -157,12 +157,13 @@ const VITE_MARK = /^vite v\d+\.\d+(?:\.\d+)?\S* building\b/;
 const VITE_BUILT = /^✓ built in \S+\s*$/;
 const VITE_ERROR = /^(?:error during build:|✗ Build failed in\b|\[vite[:\]])/;
 const VITE_WARN = /^\(!\) /;
+const VITE_OUTPUT = /^\S+\/\S+\s+\d[\d.,]*\s*(?:kB|B|MB)\b.*│ gzip:/;
 
 const viteParser: RunnerParser = {
   name: "vite",
   parse(text) {
     const lines = prepare(text);
-    if (!lines.some((l) => VITE_MARK.test(l))) return null;
+    if (!lines.some((l) => VITE_MARK.test(l)) && !(lines.some((l) => VITE_BUILT.test(l)) && lines.some((l) => VITE_OUTPUT.test(l)))) return null;
     let errors = 0;
     let warnings = 0;
     let built: string | null = null;

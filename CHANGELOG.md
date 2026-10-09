@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Changed
+
+- `done`: a Vite build log without the `vite v5.x building` banner is read as a Vite build when it has the `✓ built in <time>` line and a Vite output line (path, size, `│ gzip:`); with the banner nothing changes. The parsed facts of the 357 recorded `done` cases are identical; on 38 real build outputs, 2 more are parsed (the other 18 exit-code-only logs are silent `nest build` runs). Record: [vite-built-line.md](docs/decisions/vite-built-line.md).
+
 ### Fixed
 
 - Checkout class on Windows: a plain main checkout opened from a subfolder was read as `linked` when the temp or home path has an 8.3 short name (`RUNNER~1`), because the two git paths were compared without expanding short names. They are now resolved with the native real path. Found by the informational Windows CI job; the Windows run still has 16 failing product tests.
