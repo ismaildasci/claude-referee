@@ -6,7 +6,7 @@ import { dirname, join } from "node:path";
 
 const FAMILIES = ["test", "typecheck", "lint", "check", "build", "ci", "verify"] as const;
 export const DETECTED_MAX = 4;
-const JOINED_MAX = 90;
+const JOINED_MAX = 80;
 
 function scripts(file: string): string[] {
   try {
