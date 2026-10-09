@@ -7,3 +7,7 @@ export function compare(
   recorded: Record<string, { sha256: string; facts: unknown } | undefined>,
   current: Record<string, { sha256: string; facts: unknown } | undefined>,
 ): { page: string; was: unknown; now: unknown }[];
+export const SDK_CHANGELOGS: Record<string, string>;
+export type Release = { version: string; date: string };
+export function latestRelease(text: string): Release | null;
+export function infoNotes(recorded: Record<string, Release | null> | undefined, current: Record<string, Release | null> | undefined): string[];
