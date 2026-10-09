@@ -20,14 +20,16 @@ function repo(): string {
   return dir;
 }
 
+const probe = (cwd: string): string => `cwd ${cwd}: ` + execFileSync("git", ["rev-parse", "--show-toplevel", "--git-dir", "--git-common-dir"], { cwd, encoding: "utf8" }).replace(/\r?\n/g, " | ");
+
 test("a main checkout, a subfolder of it, and a submodule are main", () => {
   const main = repo();
   mkdirSync(join(main, "src"));
-  assert.equal(checkoutClass(main), "main");
-  assert.equal(checkoutClass(join(main, "src")), "main");
+  assert.equal(checkoutClass(main), "main", probe(main));
+  assert.equal(checkoutClass(join(main, "src")), "main", probe(join(main, "src")));
   const lib = repo();
   git(main, "submodule", "add", "-q", lib, "vendor/lib");
-  assert.equal(checkoutClass(join(main, "vendor", "lib")), "main");
+  assert.equal(checkoutClass(join(main, "vendor", "lib")), "main", probe(join(main, "vendor", "lib")));
 });
 
 test("a linked worktree outside .claude/worktrees is linked; one inside it is claude-worktree", () => {

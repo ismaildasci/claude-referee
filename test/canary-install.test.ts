@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { chmodSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { test } from "node:test";
+import { posixTest as test } from "./posix-test.ts";
 import { assessInstall, runCanary } from "../scripts/canary-install.mjs";
 
 const repo = resolve(import.meta.dirname, "..");

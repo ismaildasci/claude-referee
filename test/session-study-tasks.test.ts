@@ -5,7 +5,7 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { test } from "node:test";
+import { posixTest as test } from "./posix-test.ts";
 import { KINDS, TASKS, manifest, validateTasks, verifierCommand, verifierExt, verifierSource, visibleCommand, type Task } from "../scripts/session-study/tasks.mjs";
 
 const hasPython = spawnSync("python3", ["--version"]).status === 0;

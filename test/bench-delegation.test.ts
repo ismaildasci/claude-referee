@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
-import { test } from "node:test";
+import { posixTest as test } from "./posix-test.ts";
 import { fileURLToPath } from "node:url";
 import { ALONE_SUFFIX, CHUNK_SIZE, DELEGATION_ARMS, TASK_TEXT, chunkFiles, delegateSuffix } from "../bench/arms.mjs";
 import { isTracked, sha256, armItemsJsonl, itemsHash } from "../bench/delegation-items.mjs";

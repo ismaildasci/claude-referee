@@ -5,7 +5,7 @@ import { spawnSync } from "node:child_process";
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
-import { test } from "node:test";
+import { posixTest as test } from "./posix-test.ts";
 import { fileURLToPath } from "node:url";
 import { ambiguousPending, askedCount, findProjectDir, paths, prepare, readGrounds, readLedger, runAll, runSession, setManual, writeLabels } from "../scripts/session-study/runner.mjs";
 import { taskById } from "../scripts/session-study/tasks.mjs";

@@ -2,7 +2,7 @@
 // Offline; the replay test reads the committed jev-evals suites and the hash-only real-log table.
 
 import assert from "node:assert/strict";
-import { test } from "node:test";
+import { posixTest as test } from "./posix-test.ts";
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";

@@ -5,7 +5,7 @@ import { spawnSync } from "node:child_process";
 import { chmodSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
-import { test } from "node:test";
+import { posixTest as test } from "./posix-test.ts";
 import { fileURLToPath } from "node:url";
 import { clopperPearson } from "../src/engine/stopgate/interval.ts";
 import { HARD_ASKED_TARGET, HARD_CAP_USD, HARD_MAX_SESSIONS, HARD_PER_SESSION_USD, PILOT_POSITIONS, auc, bootstrapAuc, hardReport, planHard, permutationP } from "../scripts/session-study/hard.mjs";

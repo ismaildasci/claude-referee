@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
-import { test } from "node:test";
+import { posixTest as test } from "./posix-test.ts";
 import { fileURLToPath } from "node:url";
 import { planDry } from "../bench/plan.mjs";
 import { analyze } from "../bench/report.mjs";

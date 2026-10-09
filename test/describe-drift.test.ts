@@ -4,7 +4,7 @@
 import assert from "node:assert/strict";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { test } from "node:test";
+import { posixTest as test } from "./posix-test.ts";
 import { commands } from "../src/cli/commands/index.ts";
 import { GLOBAL_OPTIONS, run } from "../src/cli/run.ts";
 import { projectId } from "../src/engine/datadir.ts";
