@@ -20,3 +20,12 @@ A separate `windows` job in `.github/workflows/ci.yml` on `windows-latest`, Node
 
 - A job that is always red can be ignored; the plan is to fix the failures and then drop `continue-on-error`.
 - Windows `git` and symlink behaviour in the tests may fail for reasons unrelated to the product.
+
+## Result of the first run (2026-10-09, commit 6b933ed)
+
+B1 held: the run concluded `success` with the `windows` job failed. Typecheck passed on Windows; `npm test` ran 1,109 tests with 63 failing (1,045 passing). By area, aggregate counts:
+
+- **Maintainer-only harness tests, 46:** the GitHub Action recipe (13), the session-study runner and tasks (8, 7, 5, 1), the bench harness (5, 1), the install canary (3), `done-bar` (2), `describe-drift` (1). They drive bash, python or POSIX paths and are not shipped.
+- **Product-facing, 17:** Stop gate record pruning and locking (8: file rename and lock behaviour on Windows), the checkout class reads a plain main checkout as `linked` (1, git prints forward slashes where Windows paths use backslashes), the data directory order test (1, a path-form assertion), decide's home-directory replacement keeps `\` in a path (1), UI launcher and git spy (2), parallel sessions in the breaker (1), the abort/crash timeout line (1), a receipt-outcome eval path (1, `D:\D:\` doubled drive), a session-derived fixture (1).
+
+Typical causes in the log: line endings (`\r\n`, 36 mentions), path separators and drive letters (assertions, `ENOENT` 10), POSIX-only helpers. Fixing is separate work, decided with `decide`. The README keeps "Windows isn't tested yet".
