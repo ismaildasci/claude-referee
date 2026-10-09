@@ -96,8 +96,8 @@ test("each Jev command records its outcome as numbers and fixed codes, never the
   const receipts = lines.map((l) => JSON.parse(l) as Receipt);
   const fields = receipts.map((r) => ({ command: r.command, verdict: r.verdict, reason: r.reason, outcome: r.outcome }));
   assert.deepEqual(fields, [
-    { command: "done", verdict: "met", reason: undefined, outcome: { trust: "parsed", p: 0.9, exit_code: 0, runners: ["jest"] } },
-    { command: "done", verdict: "missing", reason: "exit_code_nonzero", outcome: { trust: "exit_code", p: 0, exit_code: 2 } },
+    { command: "done", verdict: "met", reason: undefined, outcome: { trust: "parsed", p: 0.9, exit_code: 0, evidence_lines: 3, runners: ["jest"] } },
+    { command: "done", verdict: "missing", reason: "exit_code_nonzero", outcome: { trust: "exit_code", p: 0, exit_code: 2, evidence_lines: 3 } },
     { command: "decide", verdict: "weak", reason: undefined, outcome: { lean_p: 0.8, margin: 0.6, orders: 2 } },
     { command: "judge", verdict: "flagged", reason: undefined, outcome: { items: 3, yes: 1, no: 1, review: 1 } },
     {

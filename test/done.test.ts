@@ -458,3 +458,24 @@ test("a lint criterion is capped at unsure when a parsed runner shows warnings, 
     }
   }
 });
+
+test("done: a missing answer on exit-code-only evidence says only an exit code was seen; verdict, p and other next steps stay", async () => {
+  const cases: [string, number, string][] = [
+    ["exit code: 0\n", 0.2, "Only an exit code line was recognised"],
+    ["Tests: 12 passed, 12 total\nexit code: 0\n", 0.2, "The evidence doesn't show the criterion"],
+    ["exit code: 0\n", 0.6, "The evidence is ambiguous"],
+  ];
+  for (const [evidence, p, start] of cases) {
+    const server = await fakeJev(nouls(p));
+    try {
+      const out = io(server, evidence);
+      await run(["done", "--criteria", "the migration applied"], out, commands);
+      const result = out.json();
+      assert.equal(result["p"], p);
+      assert.ok(String(result["next_step"]).startsWith(start), String(result["next_step"]));
+      assert.equal(result["evidence_lines"], evidence.split("\n").length);
+    } finally {
+      await server.close();
+    }
+  }
+});

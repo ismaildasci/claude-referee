@@ -41,6 +41,7 @@ export interface ReceiptOutcome {
   readonly trust?: string;
   readonly p?: number;
   readonly exit_code?: number;
+  readonly evidence_lines?: number;
   readonly runners?: readonly string[];
   readonly lean_p?: number;
   readonly margin?: number;
@@ -82,6 +83,7 @@ export function outcomeOf(result: Readonly<Record<string, unknown>>): ReceiptOut
   if (typeof trust === "string" && TRUST.has(trust)) out["trust"] = trust;
   if (isNumber(p)) out["p"] = round(p);
   if (Number.isInteger(exitCode)) out["exit_code"] = exitCode;
+  if (isCount(result["evidence_lines"])) out["evidence_lines"] = result["evidence_lines"];
   if (Array.isArray(runners)) {
     const names = [...new Set(runners.map((r) => (isRecord(r) ? r["runner"] : undefined)).filter((n): n is string => typeof n === "string" && RUNNER_NAME.test(n)))];
     if (names.length) out["runners"] = names.slice(0, RUNNERS_MAX);
