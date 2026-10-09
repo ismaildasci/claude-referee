@@ -93,6 +93,8 @@ In the kit that preceded claude-referee (version 0.2.6), the briefing text for f
 
 claude-referee v0.1's own briefing from the `generic` pack came to 657 characters on a test project. About a quarter of that is the absolute path of the CLI, which appears twice and differs per machine. (Measured once, 2026-09-30)
 
+Since 0.2.7 the `generic` briefing lists detected checks and asks for them after edits, so the 600-character target no longer holds: 660 characters on a real project with the CLI path of a local install, and 697 in the test with a long plugin path and four long script names; the limit stays 800 and the test budget is 700. (Measured, 2026-10-09, [record](decisions/briefing-done-nudge.md)) The chart below shows the older measurement.
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../assets/charts/briefing-size-dark.png">
   <img alt="The session briefing fits in 600 characters: workspace root 599, web app 484, backend 431, root files 469; target 600, limit 800. Measured on four areas of one private workspace." src="../assets/charts/briefing-size-light.png" width="100%">
