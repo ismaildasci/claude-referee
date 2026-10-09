@@ -73,6 +73,11 @@ test("decide verdicts: weak needs a margin, a tie gives lean and a next step", a
   assert.equal(tie.out["verdict"], "tie");
   assert.equal(tie.out["lean"], "redis");
   assert.match(String(tie.out["next_step"]), /missing fact.*won't change/);
+  assert.match(String(tie.out["next_step"]), /separates redis from memory \(what each costs/);
+  assert.match(String(weak.out["next_step"]), /separates redis from memory/);
+  const clear = await decideWith(favour({ redis: 0.97, memory: 0.03 }), { decision: "d", options: OPTIONS.slice(0, 2) });
+  assert.equal(clear.out["verdict"], "clear");
+  assert.equal("next_step" in clear.out, false);
 });
 
 test("decide can't be clear when the two orders disagree", async () => {

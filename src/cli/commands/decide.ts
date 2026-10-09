@@ -97,6 +97,10 @@ function readContextFiles(context: Context, files: readonly string[]): { content
   return { contents, read };
 }
 
+function runnerUp(p: Readonly<Record<string, number>>, lean: string): string {
+  return Object.entries(p).filter(([name]) => name !== lean).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "the other options";
+}
+
 function leader(p: Readonly<Record<string, number>>): string | null {
   const [first, second] = Object.entries(p).sort((a, b) => b[1] - a[1]);
   return first && second?.[1] === first[1] ? null : (first?.[0] ?? "");
@@ -250,7 +254,9 @@ export const decide: Command = {
         ...(read.length ? { read } : {}),
         ...(flags.length ? { flags } : {}),
         next_step:
-          verdict === "clear" ? undefined : `${why}Add the missing fact to context; if the decision is easy to undo, go with ${lean}. Asking the same question again won't change it.`,
+          verdict === "clear"
+            ? undefined
+            : `${why}Add the missing fact: one that separates ${lean} from ${runnerUp(mean, lean)} (what each costs or breaks, how easily it is undone). If easy to undo, go with ${lean}. Asking again won't change it.`,
       };
     }, { followUp: (outcomes) => plan.followUp(byIdOf(outcomes)) });
   },
