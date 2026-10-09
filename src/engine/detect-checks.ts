@@ -62,9 +62,16 @@ function checksIn(dir: string): string[] {
 
 // Only when exactly one immediate subdirectory of the root has checks; several would mean guessing the subproject.
 function onlySubdir(root: string): { name: string; commands: string[] } | null {
+  const isDir = (d: string): boolean => {
+    try {
+      return statSync(join(root, d)).isDirectory();
+    } catch {
+      return false;
+    }
+  };
   let names: string[];
   try {
-    names = readdirSync(root).filter((d) => !d.startsWith(".") && d !== "node_modules" && d !== "vendor" && statSync(join(root, d)).isDirectory());
+    names = readdirSync(root).filter((d) => !d.startsWith(".") && d !== "node_modules" && d !== "vendor" && isDir(d));
   } catch {
     return null;
   }

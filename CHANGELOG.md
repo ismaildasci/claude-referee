@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Fixed
+
+- SessionStart briefing: a broken symlink in the project root no longer hides the one subdirectory whose checks the briefing would list; before, one dangling entry silently turned the detection off.
+
 ### Added
 
 - `receipts --evidence-queue [--verdict <v>]`: up to 20 newest `done` receipts that have stored evidence (`REFEREE_KEEP_EVIDENCE=1`) and no label, with id, time, verdict, p, trust and runner names only, so labelling a wrong `met` is `--evidence-queue --verdict met`, `--show-evidence <id>`, `--label-receipt <id> --right|--wrong`. No criteria or evidence text is printed by the queue. Record: [evidence-queue.md](docs/decisions/evidence-queue.md).

@@ -1,7 +1,7 @@
 // detectChecks and the briefing: script names only, nearest manifest, at most 4, byte-stable, silent on bad files.
 
 import assert from "node:assert/strict";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -120,4 +120,10 @@ test("the briefing asks for the checks after editing, once, between the pipe exa
     assert.ok(text.indexOf(" done --criteria ") < text.indexOf(nudge) && text.indexOf(nudge) < text.indexOf("Checks here"));
     assert.ok(text.length <= 700 && text.endsWith("narrow the question."), String(text.length));
   }
+});
+
+test("a broken symlink next to the one subdirectory with checks does not hide it", () => {
+  const root = repo({ "server/package.json": { scripts: { test: "x" } } });
+  symlinkSync(join(root, "does-not-exist"), join(root, "dangling"));
+  assert.deepEqual(detectChecks(root, root), ["cd server && npm run test"]);
 });
