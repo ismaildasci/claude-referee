@@ -25,6 +25,23 @@ function read(file: string): { failures: number; ts: number } | null {
   }
 }
 
+// Windows refuses to replace a file another process has open (the stale scan of a parallel session reads every entry), so the replace is retried briefly.
+function replace(tmp: string, file: string): void {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      renameSync(tmp, file);
+      return;
+    } catch (error) {
+      const code = (error as NodeJS.ErrnoException).code;
+      if (attempt >= 5 || (code !== "EPERM" && code !== "EBUSY" && code !== "EACCES")) {
+        rmSync(tmp, { force: true });
+        throw error;
+      }
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 10 * (attempt + 1));
+    }
+  }
+}
+
 export function breakerOpen(dataDir: string, sessionId: string): boolean {
   return (read(sessionFile(dataDir, sessionId))?.failures ?? 0) >= LIMIT;
 }
@@ -45,7 +62,7 @@ export function recordBreaker(dataDir: string, sessionId: string, ok: boolean, n
     mkdirSync(dir, { recursive: true });
     const tmp = `${own}.${process.pid}.tmp`;
     writeFileSync(tmp, `${(read(own)?.failures ?? 0) + 1} ${now}`);
-    renameSync(tmp, own);
+    replace(tmp, own);
   } catch {
     return;
   }
