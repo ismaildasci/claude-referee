@@ -22,6 +22,11 @@ function repo(files: Record<string, string | object>, config: object = { pack: "
   return root;
 }
 
+function detect(files: Record<string, string | object>): string[] {
+  const root = repo(files);
+  return detectChecks(root, root);
+}
+
 async function briefing(cwd: string, plugin = pluginRoot): Promise<string> {
   const io = { env: {}, home: tempDir("referee-home-"), now: () => Date.parse("2026-10-09T12:00:00Z"), readStdin: async () => JSON.stringify({ cwd, session_id: "t" }) };
   const out = await sessionStart({ ...io, env: { REFEREE_DATA_DIR: join(io.home, "data") } }, plugin);
@@ -30,32 +35,32 @@ async function briefing(cwd: string, plugin = pluginRoot): Promise<string> {
 
 test("package.json scripts are listed in family order with the lockfile's runner", () => {
   const scripts = { build: "x", lint: "x", test: "x", dev: "x" };
-  assert.deepEqual(detectChecks(repo({ "package.json": { scripts } }), "/"), ["npm run test", "npm run lint", "npm run build"]);
+  assert.deepEqual(detect({ "package.json": { scripts } }), ["npm run test", "npm run lint", "npm run build"]);
   const pnpm = repo({ "package.json": { scripts }, "pnpm-lock.yaml": "" });
   assert.deepEqual(detectChecks(pnpm, pnpm), ["pnpm run test", "pnpm run lint", "pnpm run build"]);
 });
 
 test("composer scripts and artisan give composer and php artisan test", () => {
-  assert.deepEqual(detectChecks(repo({ "composer.json": { scripts: { test: "x", lint: "x" } } }), "/"), ["composer test", "composer lint"]);
+  assert.deepEqual(detect({ "composer.json": { scripts: { test: "x", lint: "x" } } }), ["composer test", "composer lint"]);
   const laravel = repo({ artisan: "", "composer.json": { require: { "laravel/framework": "^12" } }, "package.json": { scripts: { build: "x" } } });
   assert.deepEqual(detectChecks(laravel, laravel), ["php artisan test", "npm run build"]);
 });
 
 test("cargo and go manifests give their test command", () => {
-  assert.deepEqual(detectChecks(repo({ "Cargo.toml": "" }), "/"), ["cargo test"]);
-  assert.deepEqual(detectChecks(repo({ "go.mod": "" }), "/"), ["go test ./..."]);
+  assert.deepEqual(detect({ "Cargo.toml": "" }), ["cargo test"]);
+  assert.deepEqual(detect({ "go.mod": "" }), ["go test ./..."]);
 });
 
 test("one command per family, at most 4, suffixed scripts only when the plain name is missing", () => {
   const scripts = { "test:unit": "x", "test:e2e": "x", typecheck: "x", lint: "x", check: "x", build: "x", ci: "x" };
-  assert.deepEqual(detectChecks(repo({ "package.json": { scripts } }), "/"), ["npm run test:e2e", "npm run typecheck", "npm run lint", "npm run check"]);
+  assert.deepEqual(detect({ "package.json": { scripts } }), ["npm run test:e2e", "npm run typecheck", "npm run lint", "npm run check"]);
 });
 
 test("no manifest, no matching scripts or an unparsable package.json give nothing and do not throw", () => {
-  assert.deepEqual(detectChecks(repo({}), "/"), []);
-  assert.deepEqual(detectChecks(repo({ "package.json": { scripts: { dev: "x" } } }), "/"), []);
-  assert.deepEqual(detectChecks(repo({ "package.json": "{ not json" }), "/"), []);
-  assert.deepEqual(detectChecks(repo({ "package.json": '{"scripts": ["test"]}' }), "/"), []);
+  assert.deepEqual(detect({}), []);
+  assert.deepEqual(detect({ "package.json": { scripts: { dev: "x" } } }), []);
+  assert.deepEqual(detect({ "package.json": "{ not json" }), []);
+  assert.deepEqual(detect({ "package.json": '{"scripts": ["test"]}' }), []);
 });
 
 test("the nearest manifest from the working directory wins", () => {
@@ -82,4 +87,26 @@ test("the briefing with long detected checks and a long plugin path stays within
   assert.ok(text.length <= BRIEFING_LIMIT, String(text.length));
   assert.ok(text.includes("pnpm run test:integration; pnpm run typecheck; pnpm run lint; pnpm run check (detected)."));
   assert.ok(text.endsWith("narrow the question."));
+});
+
+test("with no manifest from the working directory to the root, exactly one subdirectory with checks is listed with a cd prefix", () => {
+  const one = repo({ "server/composer.json": { scripts: { test: "x", lint: "x" } }, "docs/readme.md": "" });
+  assert.deepEqual(detectChecks(one, one), ["cd server && composer test", "cd server && composer lint"]);
+  const spaced = repo({ "my app/package.json": { scripts: { test: "x" } } });
+  assert.deepEqual(detectChecks(spaced, spaced), ['cd "my app" && npm run test']);
+});
+
+test("several subdirectories with checks, none, skipped directories and a root that has a manifest give the old behaviour", () => {
+  const two = repo({ "a/package.json": { scripts: { test: "x" } }, "b/package.json": { scripts: { test: "x" } } });
+  assert.deepEqual(detectChecks(two, two), []);
+  assert.deepEqual(detect({ "a/readme.md": "" }), []);
+  const skipped = repo({ "node_modules/p/package.json": { scripts: { test: "x" } }, "vendor/v/composer.json": { scripts: { test: "x" } }, ".hidden/package.json": { scripts: { test: "x" } } });
+  assert.deepEqual(detectChecks(skipped, skipped), []);
+  const rooted = repo({ "package.json": { scripts: { build: "x" } }, "web/package.json": { scripts: { test: "x" } } });
+  assert.deepEqual(detectChecks(rooted, rooted), ["npm run build"]);
+});
+
+test("the briefing lists the single subdirectory's checks", async () => {
+  const root = repo({ "server/package.json": { scripts: { test: "x" } } });
+  assert.ok((await briefing(root)).includes("Checks here: cd server && npm run test (detected)."));
 });
