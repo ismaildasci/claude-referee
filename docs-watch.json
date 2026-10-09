@@ -18,5 +18,21 @@
     "facts": {
       "links": 111
     }
+  },
+  "model-jaggedness/jev-1.13.md": {
+    "sha256": "5d471be7c8d2a359a81979b7bcf2c2fab536a198d4e50155c4233380d5c03986",
+    "facts": {
+      "reviewed": "2026-10-02"
+    }
+  },
+  "info": {
+    "python": {
+      "version": "0.7.3",
+      "date": "2026-10-09"
+    },
+    "javascript": {
+      "version": "0.6.0",
+      "date": "2026-09-15"
+    }
   }
 }

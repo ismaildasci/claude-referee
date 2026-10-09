@@ -16,5 +16,5 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 24
-      - name: Compare models.md, api.md and llms.txt with docs-watch.json
+      - name: Compare models.md, api.md, llms.txt and the jaggedness page with docs-watch.json
         run: node scripts/docs-watch.mjs

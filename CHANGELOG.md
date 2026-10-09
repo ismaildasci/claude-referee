@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- Weekly docs watch: TypeSafe's "Jev 1.13 jaggedness" page (its known weaknesses and "last reviewed" date) joins `models.md`, `api.md` and `llms.txt` as a watched page, and the newest versions of the Python and JavaScript SDK changelogs are recorded and printed as `::notice::` lines when they change; those notices never fail the run. Record: [docs-watch-jaggedness.md](docs/decisions/docs-watch-jaggedness.md).
+
 ### Changed
 
 - SessionStart briefing: when no manifest is found from the working directory up to the project root, and exactly one immediate subdirectory of the root has detected checks, they are listed as `cd <dir> && <command>`. With none or several the old text stays, so the briefing never picks between subprojects. On the owner's 14 project roots this moves the count with checks from 8 to 10 (aggregate). Record: [detected-checks-one-subdir.md](docs/decisions/detected-checks-one-subdir.md).
