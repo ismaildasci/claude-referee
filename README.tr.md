@@ -103,7 +103,7 @@ Başlıca ölçümler tek tabloda:
 | 2026-09 | Seçenek sırası ve yeniden sormak | 0,52'ye kadar, en fazla 0,01'e karşı | Ölçüldü · önceki kit, 20 karar, tek kod tabanı |
 | 2026-09 | İki sıra ve 24 sıranın tamamı | 20'de 20 aynı lider | Ölçüldü · aynı 20 karar |
 | 2026-09 | Claude turu ve Jev kararı | yaklaşık 0,10 dolar (tahmin), yaklaşık 0,0007 dolara karşı | Ölçüldü, maliyet tahmin · 321 CLI çağrısı |
-| 2026-09 | SessionStart brifing boyutu | 431–599 karakter (hedef 600) | Ölçüldü · tek çalışma alanının dört bölgesi |
+| 2026-09 | SessionStart brifing boyutu | 431–599 karakter (hedef 600); algılanan kontrollerle uzun plugin yolu ve uzun script adlarıyla bir testte 620 (sınır 800) | Ölçüldü · tek çalışma alanının dört bölgesi; 620 bir testten |
 | 2026-09 | Aynı denetim, ikinci koşu | 0 Jev isteği (ilk koşu: 10) | Ölçüldü · 10 çiftlik tek denetim |
 | 2026-09 | Gönüllü `done` komutu | 14 günde 1 koşu | Ölçüldü · 14 gün, tek kod tabanı |
 | 2026-09-30 | API sınırları, canlı yoklama | 11 Score seviyesi ve 256 seçenek 400 alıyor; 1 seviyeli Score kabul ediliyor | Ölçüldü · claude-referee, 7 istek |
@@ -170,7 +170,7 @@ npx claude-referee receipts --tokens
 
 ## Kurulum
 
-Gerekenler: Claude Code 2.1.139 ya da sonrası (2.1.292 ile test edildi), Claude Code'un gördüğü `PATH` üzerinde Node 20.3 ya da sonrası ve bir [TypeSafe API anahtarı](https://docs.typesafe.ai).
+Gerekenler: Claude Code 2.1.139 ya da sonrası (2.1.295 ile test edildi), Claude Code'un gördüğü `PATH` üzerinde Node 20.3 ya da sonrası ve bir [TypeSafe API anahtarı](https://docs.typesafe.ai).
 
 **1. Eklentiyi kur**
 
@@ -205,6 +205,8 @@ macOS ya da Linux'ta doğrudan `TYPESAFE_API_KEY` de tanımlayabilirsin. `/plugi
 ```json
 { "pack": "generic", "areas": [{ "prefix": "", "checks": ["npm test"] }] }
 ```
+
+`areas` isteğe bağlıdır. Olmazsa oturum brifingi, en yakın `package.json`, `composer.json`, `Cargo.toml` ya da `go.mod` dosyasında bulduğu en fazla dört kontrolü (yalnız script adları) listeler ve `(detected)` ile işaretler.
 
 **4. Kurulumu denetle:**
 
@@ -251,7 +253,7 @@ Her komut tek satır JSON basar: `ok`, karar, birkaç sayı, varsa bir `next_ste
 
 `done`, yalnızca bir çalıştırıcı özetini tanırsa ya da bir çıkış kodu satırı görürse `met` döndürebilir. Başka her şey `trust: unparsed` ile `unsure` olarak gelir. Kanıtta sıfırdan farklı bir çıkış kodu varsa sonuç `missing` olur (`reason: exit_code_nonzero`) ve Jev'e sorulmaz; çalıştırma yine 0 istekli bir makbuz yazar, `--dry-run` da aynı kararı verir. Atlanan, riskli ya da tamamlanmamış testler `met`'i `unsure` ile sınırlar (`reason: skipped_tests`); Swift Testing'in bilinen sorunları (known issues) ya da vitest'in `expected fail`'i gibi beklenen başarısızlıklar da öyle; tanınan ama yarıda kesilmiş, boş, iptal edilmiş ya da kararsız (flaky) bir çalıştırma `reason: incomplete_run` verir; yalnızca derleme ya da oxlint çıktısı gösteren bir test ölçütü `reason: no_tests_run` verir; ardında bir uyarı olan, lint ya da temiz çıktı isteyen bir ölçüt, yalnızca linter'ın adını (`oxlint`, `eslint`) ansa bile `reason: warning_in_log` verir. Tanınan bir logda bir lint, derleme ya da tip denetimi ölçütü için çalıştırıcı yoksa (örneğin birleşik bir logda yalnızca test çalıştırıcısının özeti okunduysa), `met` olmayan ve yukarıdaki gerekçelerden hiçbirini almayan bir karar `reason: criterion_not_covered` alır: o kontrolü tek başına çalıştırıp çıktısını boruyla ver. Bu gerekçe kararı hiç değiştirmez.
 
-**`done`'a ne kadar güvenilir.** `done` v2, özgün eşiğinde ölçülmüş değil. Kod için kimsenin ayar yapmadığı gerçek CI logları örneğinde kayıtlı eşikleri geçemedi: yanlış `met` 85'te 2 (eşik 0), tanınan loglarda `met` geri çağırma 0,873 (eşik 0,9). O loglarda yalnızca çıkış kodu kanıtıyla neredeyse hiç `met` demedi; bir insanın `missing` diyeceği yerde `unsure` dedi. Çıkış durumu olarak yazılmış ölçütler ise çoğu zaman yalnızca çıkış kodundan `met` alır (yukarıdaki ipucuna bak). Bu iki yanlış `met`'in ardındaki iki ayrıştırıcı hatası sonradan, aynı vakalar üzerinde düzeltildi; bu yüzden ardından gelen 0 yanlış `met` o vakalara uydurulmuş bir sayıdır, görülmemiş bir test değildir. Ayrıntılar [measurements-real-logs-2](docs/measurements-real-logs-2.md) sayfasında (İngilizce). 0.2.3'te eklenen üç ayrıştırıcı (`mix test`, `ctest`, `rubocop`) ardından bu örneğin ayrı tuttuğum yarısında bir kez puanlandı. Yanlış `met` 52'de 0'dan 1'e çıktı: bazı analizlerin atlanacağını düz cümleyle söyleyen bir rubocop logu. O yarıda tanınan loglarda `met` geri çağırma 35'te 26 oldu (0,743). O yarı, toplamlarını daha önce gördüğüm bir örnekten geliyor; bu yüzden bu görülmemiş bir test değil, ikinci bir bakış ([measurements-real-logs-3](docs/measurements-real-logs-3.md), İngilizce). rubocop vakası henüz düzeltilmedi. `met`'i çıktının kontrolün geçtiğini gösterdiğine dair bir ipucu say, kanıt sayma; önemli olduğunda çıktıyı kendin de oku.
+**`done`'a ne kadar güvenilir.** `done` v2, özgün eşiğinde ölçülmüş değil. Kod için kimsenin ayar yapmadığı gerçek CI logları örneğinde kayıtlı eşikleri geçemedi: yanlış `met` 85'te 2 (eşik 0), tanınan loglarda `met` geri çağırma 0,873 (eşik 0,9). O loglarda yalnızca çıkış kodu kanıtıyla neredeyse hiç `met` demedi; bir insanın `missing` diyeceği yerde `unsure` dedi. Çıkış durumu olarak yazılmış ölçütler ise çoğu zaman yalnızca çıkış kodundan `met` alır (yukarıdaki ipucuna bak). Bu iki yanlış `met`'in ardındaki iki ayrıştırıcı hatası sonradan, aynı vakalar üzerinde düzeltildi; bu yüzden ardından gelen 0 yanlış `met` o vakalara uydurulmuş bir sayıdır, görülmemiş bir test değildir. Ayrıntılar [measurements-real-logs-2](docs/measurements-real-logs-2.md) sayfasında (İngilizce). 0.2.3'te eklenen üç ayrıştırıcı (`mix test`, `ctest`, `rubocop`) ardından bu örneğin ayrı tuttuğum yarısında bir kez puanlandı. Yanlış `met` 52'de 0'dan 1'e çıktı: bazı analizlerin atlanacağını düz cümleyle söyleyen bir rubocop logu. O yarıda tanınan loglarda `met` geri çağırma 35'te 26 oldu (0,743). O yarı, toplamlarını daha önce gördüğüm bir örnekten geliyor; bu yüzden bu görülmemiş bir test değil, ikinci bir bakış ([measurements-real-logs-3](docs/measurements-real-logs-3.md), İngilizce). rubocop vakası 0.2.6'dan beri sınırlı: atlanan analiz satırı uyarı sayılır, ölçüt `unsure` olur ([kayıt](docs/decisions/rubocop-skip-warning-result.md)). `met`'i çıktının kontrolün geçtiğini gösterdiğine dair bir ipucu say, kanıt sayma; önemli olduğunda çıktıyı kendin de oku.
 
 ## Makinenden ne çıkar
 
@@ -259,7 +261,7 @@ Her komut tek satır JSON basar: `ok`, karar, birkaç sayı, varsa bir `next_ste
 - Girdide parola, anahtar ya da token'a benzeyen bir şey varsa hiçbir şey gönderilmez.
 - E-postalar, IP adresleri ve ev klasörünün yolu gönderilmeden önce değiştirilir.
 - `--dry-run`, neyin gönderileceğini göndermeden birebir gösterir.
-- Makbuzlar makinende kalır: model, token, maliyet, süre, karar ve sayıları; gönderdiğin metin asla. Done-gate açıksa `stops.jsonl` ayrıca isteminden ve Claude'un son mesajından alıntılar tutar.
+- Makbuzlar makinende kalır: model, token, maliyet, süre, karar ve sayıları; gönderdiğin metin asla. Done-gate açıksa `stops.jsonl` ayrıca isteminden ve Claude'un son mesajından alıntılar tutar. `REFEREE_KEEP_EVIDENCE=1` ayarlarsan `done`, etiketleme için redakte edilmiş ölçütlerini ve kanıtını makinende 14 gün tutar; varsayılan olarak kapalıdır ve hiçbir şey gönderilmez.
 - Kendiliğinden serbest metin gönderecek her şey sen açana kadar kapalı kalır.
 
 <picture>

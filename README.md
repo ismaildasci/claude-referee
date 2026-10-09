@@ -107,7 +107,7 @@ The main measurements in one table:
 | 2026-09 | Option order vs. asking again | up to 0.52 vs. at most 0.01 | Measured · earlier kit, 20 decisions, one codebase |
 | 2026-09 | Two orders vs. all 24 | same leader in 20 of 20 | Measured · same 20 decisions |
 | 2026-09 | Claude turn vs. Jev decision | about $0.10 (estimated) vs. about $0.0007 | Measured, cost estimated · 321 CLI calls |
-| 2026-09 | SessionStart briefing size | 431–599 characters (target 600) | Measured · four areas of one workspace |
+| 2026-09 | SessionStart briefing size | 431–599 characters (target 600); with detected checks, 620 in a test with a long plugin path and long script names (the cap is 800) | Measured · four areas of one workspace; the 620 from a test |
 | 2026-09 | Same audit, second run | 0 Jev requests (first run: 10) | Measured · one 10-pair audit |
 | 2026-09 | Voluntary `done` command | 1 run in 14 days | Measured · 14 days, one codebase |
 | 2026-09-30 | API limits, live probe | 11 Score levels and 256 options get a 400; a 1-level Score is accepted | Measured · claude-referee, 7 requests |
@@ -174,7 +174,7 @@ npx claude-referee receipts --tokens
 
 ## Install
 
-You need Claude Code 2.1.139 or later (tested with 2.1.292), Node 20.3 or later on the `PATH` Claude Code sees, and a [TypeSafe API key](https://docs.typesafe.ai).
+You need Claude Code 2.1.139 or later (tested with 2.1.295), Node 20.3 or later on the `PATH` Claude Code sees, and a [TypeSafe API key](https://docs.typesafe.ai).
 
 **1. Install the plugin**
 
@@ -265,7 +265,7 @@ Each command prints one line of JSON: `ok`, the verdict, a few numbers, a `next_
 - If the input contains something that looks like a password, key or token, nothing is sent.
 - Emails, IP addresses and your home folder path are replaced before sending.
 - `--dry-run` shows exactly what would be sent, without sending it.
-- The receipts stay on your machine: model, tokens, cost, time, the verdict and its numbers, never the text you sent. With the done-gate on, `stops.jsonl` also keeps excerpts of your prompt and Claude's last message.
+- The receipts stay on your machine: model, tokens, cost, time, the verdict and its numbers, never the text you sent. With the done-gate on, `stops.jsonl` also keeps excerpts of your prompt and Claude's last message. If you set `REFEREE_KEEP_EVIDENCE=1`, `done` also keeps its redacted criteria and evidence on your machine for 14 days, so you can label verdicts; it is off by default and nothing is sent.
 - Anything that would send free text on its own stays off until you turn it on.
 
 <picture>
