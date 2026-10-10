@@ -1,0 +1,6 @@
+{"suite":"done-vite","case":"dv-01","split":"dev","model":"jev-1.13.0","pack":"generic@0.1.0","qhash":"abd276848fa4","shash":"8ba6fad845ed","answers":{"c1":{"type":"noul","noul":0.94}},"recorded_at":"2026-10-10T09:02:26.809Z"}
+{"suite":"done-vite","case":"dv-02","split":"dev","model":"jev-1.13.0","pack":"generic@0.1.0","qhash":"f9ebe14ea9bc","shash":"8ba6fad845ed","answers":{"c1":{"type":"noul","noul":0.02}},"recorded_at":"2026-10-10T09:02:26.810Z"}
+{"suite":"done-vite","case":"dv-03","split":"dev","model":"jev-1.13.0","pack":"generic@0.1.0","qhash":"3c4a05d05ac2","shash":"8ba6fad845ed","answers":{"c1":{"type":"noul","noul":0.13}},"recorded_at":"2026-10-10T09:02:26.810Z"}
+{"suite":"done-vite","case":"dv-04","split":"dev","model":"jev-1.13.0","pack":"generic@0.1.0","qhash":"8b79006bbf62","shash":"33f75043171b","answers":{"c1":{"type":"noul","noul":0.94}},"recorded_at":"2026-10-10T09:02:26.810Z"}
+{"suite":"done-vite","case":"dv-06","split":"dev","model":"jev-1.13.0","pack":"generic@0.1.0","qhash":"8b79006bbf62","shash":"1511d6599aed","answers":{"c1":{"type":"noul","noul":0.1}},"recorded_at":"2026-10-10T09:02:26.810Z"}
+{"suite":"done-vite","case":"dv-07","split":"dev","model":"jev-1.13.0","pack":"generic@0.1.0","qhash":"b495b9fa9733","shash":"ccc4bf6b8557","answers":{"c1":{"type":"noul","noul":0.67}},"recorded_at":"2026-10-10T09:02:26.811Z"}

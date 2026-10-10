@@ -6,6 +6,8 @@ Registered 2026-10-09, before any code change. Chosen with `decide` among three 
 
 In 114 check outputs written by the owner's gate scripts (lint, test, build; aggregate counts), 20 of 38 build logs have Vite's chunk lines (`dist/assets/index-....js 432.28 kB │ gzip: 117.70 kB`), `✓ built in 3.32s` and an exit code, but not the `vite v5.x building` banner the parser requires, so they read as exit-code-only and a build criterion can only be `met` when it is worded as an exit status. Vite prints `✓ built in` only after a build that finished; a failed build prints `error during build:`. ROADMAP lists `met` recall as an open question; this is one parser "from real output".
 
+> Bar B2 below ("`✓ built in` alone is not claimed") was reversed on 2026-10-10 by [vite-built-line-alone.md](vite-built-line-alone.md): a real Vite 8 log has no size table.
+
 ## The rule
 
 The Vite parser also claims a log with no banner when it has a `✓ built in <time>` line and at least one output line of Vite's shape (a path, a size in kB, B or MB, and `│ gzip:`). Facts are the same as with the banner: build-only, `errors` from `error during build:` / `✗ Build failed` / `[vite...` lines, `warnings` from `(!)` lines, the built line as the summary. A log with the banner is read exactly as before.
