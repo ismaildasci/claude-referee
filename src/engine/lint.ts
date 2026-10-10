@@ -16,6 +16,8 @@ interface Raw {
 
 const OTHER = /^(?:other|none|neither|unknown|unsure|undecided|says_nothing|no_answer)$/i;
 const COUNTING = /\b(?:how many|count (?:the|how)|counting|number of|sum of|total of|average|earlier than|later than|older than|newer than|days between)\b/i;
+const NEGATED_TRUE = /^\s*(?:no|not|never|none)\b/i;
+const COLOR_VALUE = /#[0-9a-f]{6}\b|\brgba?\(|\b0x[0-9a-f]{2,}\b/i;
 const COMPOUND = /\b(?:and|or|ve|veya)\b/i;
 
 export function lintQuestions(questions: Readonly<Record<string, unknown>>, model: unknown): Finding[] {
@@ -34,6 +36,7 @@ export function lintQuestions(questions: Readonly<Record<string, unknown>>, mode
       if (COMPOUND.test(text)) add("compound", "warn", id, "The question contains and/or: split it so each Noul asks one thing.");
       const c = raw.criteria as { true?: unknown; false?: unknown } | undefined;
       if (typeof c?.true !== "string" || typeof c?.false !== "string") add("criteria", "error", id, "A Noul needs true and false criteria.");
+      else if (NEGATED_TRUE.test(c.true)) add("negated_true", "warn", id, "The true criterion starts with a negation, so true means no; phrase the question so true is the yes case.");
       else if (c.true.trim() === c.false.trim() || c.true.includes(c.false) || c.false.includes(c.true)) add("contradiction", "warn", id, "The true and false criteria are the same or one contains the other; state what separates them.");
     }
     if (type === "choice" && raw.criteria && typeof raw.criteria === "object" && !Array.isArray(raw.criteria)) {
@@ -49,6 +52,7 @@ export function lintQuestions(questions: Readonly<Record<string, unknown>>, mode
       if (!Array.isArray(levels) || levels.length < 2 || levels.length > 10) add("levels", "error", id, "A Score needs 2 to 10 levels.");
       else if (levels.some((l) => typeof l !== "string" || !l.trim() || /^[\d.\s]+$/.test(l))) add("levels", "warn", id, "Every Score level needs a description, not only a number.");
     }
+    if (COLOR_VALUE.test(text)) add("numeric_value", "warn", id, "Hex, RGB and similar numeric values read poorly; convert in code and pass a named bucket.");
     if (COUNTING.test(text)) add("counting", "warn", id, "Counting, summing and date comparison belong in code, not in a question to Jev.");
   }
   return out;

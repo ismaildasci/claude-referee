@@ -27,6 +27,8 @@ test("each rule catches its violating fixture", () => {
   assert.deepEqual(rules({ a: { type: "score", instructions: { question: "How good?" }, criteria: ["bad"] } }), ["levels:a"]);
   assert.deepEqual(rules({ a: { type: "score", instructions: { question: "How good?" }, criteria: ["1", "2", "3"] } }), ["levels:a"]);
   assert.deepEqual(rules({ a: noul("How many files changed?") }), ["counting:a"]);
+  assert.deepEqual(rules({ a: noul("Is it red?", "No red is shown.", "Red is shown.") }), ["negated_true:a"]);
+  assert.deepEqual(rules({ a: noul("Is #ff0000 near #fe0101?") }), ["numeric_value:a"]);
   assert.deepEqual(rules({ a: noul("Is it red?", "Red.", "Not red at all.") }), []);
 });
 
