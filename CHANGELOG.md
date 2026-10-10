@@ -6,7 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
-- `scripts/usage-report.mjs` (maintainer tool, not shipped): the four usage measures from the local data directory as one JSON line of counts (edit turns that end with a counted check, re-asks after a non-clear `decide` that became clear, exit-code-only share of `missing` with evidence size, labels by verdict), with `--days`, `--since` and `--data-dir`. Record: [usage-report.md](docs/decisions/usage-report.md).
+- `scripts/usage-report.mjs` (maintainer tool, not shipped): the four usage measures from the local data directory as one JSON line of counts (edit turns that end with a counted check, re-asks after a non-clear `decide` that became clear, exit-code-only share of `missing` with evidence size, labels by verdict), with `--days`, `--since` and `--data-dir` and `--exclude-session <id|current>` (repeatable) to leave out the receipts and stops of your own development session. Record: [usage-report.md](docs/decisions/usage-report.md).
 
 ### Changed
 

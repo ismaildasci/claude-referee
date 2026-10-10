@@ -1,5 +1,6 @@
 // Maintainer report of the four usage measures from the local data directory (docs/decisions/usage-report.md). Counts only, no text.
-// Usage: node scripts/usage-report.mjs [--days 7] [--since 2026-10-09T12:00:00Z] [--data-dir <dir>]
+// Usage: node scripts/usage-report.mjs [--days 7] [--since 2026-10-09T12:00:00Z] [--data-dir <dir>] [--exclude-session <id|current>]...
+// --exclude-session leaves out the receipts and stops of a session (your own development session), `current` reads CLAUDE_CODE_SESSION_ID.
 
 import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
@@ -9,8 +10,9 @@ import { fileURLToPath } from "node:url";
 const REASK_MS = 10 * 60_000;
 const share = (k, n) => ({ k, n, share: n === 0 ? null : Number((k / n).toFixed(3)) });
 
-export function measures({ receipts, stops, labels, since }) {
-  const at = (r) => Date.parse(r.ts) >= since;
+export function measures({ receipts, stops, labels, since, excludeSessions = [] }) {
+  const out = new Set(excludeSessions);
+  const at = (r) => Date.parse(r.ts) >= since && !(r.session_id !== undefined && out.has(r.session_id));
   const turns = new Map();
   for (const s of stops.filter((x) => x.turn && at(x))) {
     const t = turns.get(s.turn) ?? { edits: 0, checks: 0 };
@@ -61,6 +63,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const dir = arg("--data-dir", process.env.REFEREE_DATA_DIR ?? join(homedir(), ".claude/plugins/data/claude-referee-claude-referee"));
   const since = arg("--since") ? Date.parse(arg("--since")) : Date.now() - Number(arg("--days", 7)) * 86_400_000;
   if (!Number.isFinite(since)) throw new Error("--since is not a time");
+  const flags = process.argv.flatMap((a, i, all) => (a === "--exclude-session" ? [all[i + 1]] : []));
+  const excludeSessions = flags.flatMap((id) => (id === "current" ? [process.env.CLAUDE_CODE_SESSION_ID ?? ""] : id ? [id] : [])).filter(Boolean);
   const { readReceipts } = await import("../src/engine/receipts.ts");
-  console.log(JSON.stringify({ data_dir: "(local)", since: new Date(since).toISOString(), ...measures({ receipts: readReceipts(dir), stops: jsonl(join(dir, "stops.jsonl")), labels: jsonl(join(dir, "receipt-labels.jsonl")), since }) }));
+  console.log(JSON.stringify({ data_dir: "(local)", since: new Date(since).toISOString(), ...measures({ receipts: readReceipts(dir), stops: jsonl(join(dir, "stops.jsonl")), labels: jsonl(join(dir, "receipt-labels.jsonl")), since, excludeSessions }), excluded_sessions: excludeSessions.length }));
 }

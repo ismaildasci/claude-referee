@@ -3,9 +3,10 @@
 export interface Share { k: number; n: number; share: number | null }
 export function measures(input: {
   receipts: { id: string; ts: string; command: string; verdict?: string; session_id?: string; outcome?: { trust?: string; evidence_lines?: number } }[];
-  stops: { ts: string; turn?: string; edits?: number; checks?: number }[];
+  stops: { ts: string; session_id?: string; turn?: string; edits?: number; checks?: number }[];
   labels: { id: string; label: "right" | "wrong" }[];
   since: number;
+  excludeSessions?: string[];
 }): {
   edit_turns_with_check: Share;
   reask_cleared: Share;

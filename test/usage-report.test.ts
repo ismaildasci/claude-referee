@@ -47,3 +47,17 @@ test("the output holds counts only: ids, criteria and session ids never appear",
   const text = JSON.stringify(measures({ receipts, stops: [{ ts: T(0), turn: "secret-turn", edits: 1, checks: 0 }], labels: [{ id: "secret-id", label: "right" }], since }));
   assert.doesNotMatch(text, /secret/);
 });
+
+test("excluded sessions drop their receipts and stops from every measure; receipts without a session id stay in the ones that need no session", () => {
+  const d = (id: string, min: number, verdict: string, session?: string) => ({ id, ts: T(min), command: "decide", verdict, ...(session ? { session_id: session } : {}) });
+  const done = (id: string, session?: string) => ({ id, ts: T(2), command: "done", verdict: "missing", outcome: { trust: "exit_code" }, ...(session ? { session_id: session } : {}) });
+  const receipts = [d("1", 0, "weak", "mine"), d("2", 1, "clear", "mine"), d("3", 0, "weak", "other"), d("4", 1, "weak", "other"), done("5", "mine"), done("6", "other"), done("7")];
+  const stops = [
+    { ts: T(0), session_id: "mine", turn: "m1", edits: 1, checks: 1 },
+    { ts: T(1), session_id: "other", turn: "o1", edits: 1, checks: 0 },
+  ];
+  const all = measures({ receipts, stops, labels: [], since });
+  assert.deepEqual([all.reask_cleared, all.edit_turns_with_check, all.exit_only_missing.k], [{ k: 1, n: 2, share: 0.5 }, { k: 1, n: 2, share: 0.5 }, 3]);
+  const clean = measures({ receipts, stops, labels: [], since, excludeSessions: ["mine"] });
+  assert.deepEqual([clean.reask_cleared, clean.edit_turns_with_check, clean.exit_only_missing.k], [{ k: 0, n: 1, share: 0 }, { k: 0, n: 1, share: 0 }, 2]);
+});
