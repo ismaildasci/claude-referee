@@ -1,0 +1,33 @@
+{
+ "accepted": {
+  "JavaScript": 8,
+  "TypeScript": 8,
+  "Python": 8,
+  "Go": 8,
+  "Rust": 8,
+  "Java": 8,
+  "Ruby": 8,
+  "PHP": 8,
+  "C#": 8,
+  "C++": 8,
+  "C": 8,
+  "Swift": 8,
+  "Kotlin": 8,
+  "Dart": 6,
+  "Elixir": 6,
+  "Scala": 6,
+  "Shell": 6
+ },
+ "dropped": {
+  "segment_mismatch": 476,
+  "log_expired": 6,
+  "multi_purpose": 4
+ },
+ "repos": 128,
+ "cases": 270,
+ "failed_cases": 46,
+ "passes": 4,
+ "calls": 11668,
+ "excluded_candidates": 179,
+ "repos_without_cases": 451
+}

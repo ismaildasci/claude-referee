@@ -1,0 +1,10 @@
+{
+ "raw": 270,
+ "redaction_stopped": 1,
+ "stopped_kinds": {
+  "secret_assignment": 1
+ },
+ "kept": 269,
+ "code_checked": 108,
+ "code_check_violations": []
+}

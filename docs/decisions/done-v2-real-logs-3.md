@@ -45,3 +45,7 @@ As before: **no log text for any repository** (the first registration's `decide`
 - **What was seen before the fix.** Counts only: logs per kind, drop reasons, segments per log, and the step names of the first two logs with several steps (checkout and CodeQL actions) while locating the fault. No case, no evidence text, no label and no Jev answer exists, so the 0-case result says nothing about the logs' content and nothing is selected by it.
 - **Fix.** The log request passes `--allow-escape-sequences`; that is the only change to `fetch3.mjs`. The records of the faulty walk (repository records, picks, pass records, gone markers) are moved aside; the saved candidate lists and the 2,050 valid logs stay (same bytes), and the walk restarts from the same lists in the same order. The frozen code, `lib.mjs`, exclusion list, run window start, caps, quotas, labelling, bars and scoring are unchanged.
 - **Consequence.** The walk stops at 8 accepted repositories per bucket (6 for the extra ones) as registered; the first walk visited every candidate only because none could be accepted. Runs created after the first walk can now enter the window; the fetch date and run counts are reported with the results.
+
+## Result
+
+Negative on both models; recorded in [measurements-real-logs-sample-3.md](../measurements-real-logs-sample-3.md). No parser, cap, question text, rule or script that decides a label or verdict was changed after the first answer; the wrong `met` cases are analysed there, not fixed.

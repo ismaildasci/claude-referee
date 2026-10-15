@@ -1,0 +1,22 @@
+{
+ "note": "First walk of 2026-10-15, discarded (docs/decisions/done-v2-real-logs-3.md, Amendment 1): gh 2.102.0 refused log responses with terminal escape sequences",
+ "gh_version": "2.102.0 (2026-09-30)",
+ "repos_walked": 1508,
+ "cases": 0,
+ "job_logs_marked_gone": 17525,
+ "job_logs_downloaded": 2050,
+ "passes": [
+  {
+   "mode": "langs:JavaScript,TypeScript,Python,Go,Rust",
+   "calls": 9189
+  },
+  {
+   "mode": "langs:Java,Ruby,PHP,C#,C++",
+   "calls": 9105
+  },
+  {
+   "mode": "langs:C,Swift,Kotlin,Dart,Elixir,Scala,Shell",
+   "calls": 12772
+  }
+ ]
+}

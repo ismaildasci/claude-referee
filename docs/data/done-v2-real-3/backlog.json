@@ -1,0 +1,275 @@
+[
+ {
+  "tool": "make",
+  "purpose": "build",
+  "cases": 10,
+  "expected_met": 10,
+  "repos": 10
+ },
+ {
+  "tool": "cmake build",
+  "purpose": "build",
+  "cases": 10,
+  "expected_met": 5,
+  "repos": 6
+ },
+ {
+  "tool": "phpstan",
+  "purpose": "lint",
+  "cases": 4,
+  "expected_met": 3,
+  "repos": 4
+ },
+ {
+  "tool": "go build",
+  "purpose": "build",
+  "cases": 3,
+  "expected_met": 3,
+  "repos": 2
+ },
+ {
+  "tool": "clang-tidy",
+  "purpose": "lint",
+  "cases": 9,
+  "expected_met": 2,
+  "repos": 5
+ },
+ {
+  "tool": "docker build",
+  "purpose": "build",
+  "cases": 4,
+  "expected_met": 2,
+  "repos": 2
+ },
+ {
+  "tool": "go vet",
+  "purpose": "lint",
+  "cases": 3,
+  "expected_met": 2,
+  "repos": 2
+ },
+ {
+  "tool": "dart test",
+  "purpose": "test",
+  "cases": 3,
+  "expected_met": 2,
+  "repos": 2
+ },
+ {
+  "tool": "npm build -> build",
+  "purpose": "build",
+  "cases": 2,
+  "expected_met": 2,
+  "repos": 2
+ },
+ {
+  "tool": "ktlint",
+  "purpose": "lint",
+  "cases": 5,
+  "expected_met": 1,
+  "repos": 4
+ },
+ {
+  "tool": "make test",
+  "purpose": "test",
+  "cases": 4,
+  "expected_met": 1,
+  "repos": 4
+ },
+ {
+  "tool": "npm test",
+  "purpose": "test",
+  "cases": 3,
+  "expected_met": 1,
+  "repos": 3
+ },
+ {
+  "tool": "xcodebuild",
+  "purpose": "build",
+  "cases": 2,
+  "expected_met": 1,
+  "repos": 2
+ },
+ {
+  "tool": "npm build",
+  "purpose": "build",
+  "cases": 2,
+  "expected_met": 1,
+  "repos": 2
+ },
+ {
+  "tool": "npm build -> /home/runner/work/OpenSpec/OpenSpec",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "php-cs-fixer",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "rake test",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "npm test -> test:e2e",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "npm lint -> /home/runner/work/svelte/svelte",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "npm build -> /home/runner/work/svelte/svelte",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "swift test",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 1,
+  "repos": 1
+ },
+ {
+  "tool": "shellcheck",
+  "purpose": "lint",
+  "cases": 7,
+  "expected_met": 0,
+  "repos": 6
+ },
+ {
+  "tool": "pre-commit",
+  "purpose": "lint",
+  "cases": 5,
+  "expected_met": 0,
+  "repos": 3
+ },
+ {
+  "tool": "ruff",
+  "purpose": "lint",
+  "cases": 3,
+  "expected_met": 0,
+  "repos": 3
+ },
+ {
+  "tool": "ctest",
+  "purpose": "test",
+  "cases": 2,
+  "expected_met": 0,
+  "repos": 2
+ },
+ {
+  "tool": "pytest",
+  "purpose": "test",
+  "cases": 2,
+  "expected_met": 0,
+  "repos": 2
+ },
+ {
+  "tool": "bazel build",
+  "purpose": "build",
+  "cases": 2,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "pylint",
+  "purpose": "lint",
+  "cases": 2,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "phpunit",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "npm build -> /home/runner/work/SukiSU-Ultra/SukiSU-Ultra/website",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "npm test -> test:launcher",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "flake8",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "prettier",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "npm test -> test:unit",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "npm test -> test:integration",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "maven test",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "jest",
+  "purpose": "test",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "phpcs",
+  "purpose": "lint",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ },
+ {
+  "tool": "vite build",
+  "purpose": "build",
+  "cases": 1,
+  "expected_met": 0,
+  "repos": 1
+ }
+]
