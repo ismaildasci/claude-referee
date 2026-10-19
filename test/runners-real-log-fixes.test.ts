@@ -35,7 +35,7 @@ test("done: a build-only log cannot be met for a test criterion, and still can f
   assert.deepEqual(verdictOf(PLAN, "the unit tests pass and the build succeeds"), { verdict: "unsure", reason: "no_tests_run" });
   assert.deepEqual(verdictOf(PLAN, "the build succeeds"), { verdict: "met", reason: undefined });
   assert.deepEqual(verdictOf(SUREFIRE), { verdict: "met", reason: undefined });
-  assert.deepEqual(verdictOf(PLAN, "all tests pass", 0.2), { verdict: "missing", reason: undefined });
+  assert.deepEqual(verdictOf(PLAN, "all tests pass", 0.2), { verdict: "missing", reason: "no_tests_run" });
 });
 
 test("done: zero tests and 'No tests to run' still cap, for every criterion", () => {
