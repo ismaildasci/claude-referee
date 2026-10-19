@@ -5,7 +5,7 @@ import { mkdirSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { detectChecks } from "../src/engine/detect-checks.ts";
+import { detectChecks, detectFamilies } from "../src/engine/detect-checks.ts";
 import { BRIEFING_LIMIT, sessionStart } from "../src/hooks/session-start.ts";
 import { tempDir } from "./helpers.ts";
 
@@ -111,15 +111,29 @@ test("the briefing lists the single subdirectory's checks", async () => {
   assert.ok((await briefing(root)).includes("Checks here: cd server && npm run test (detected)."));
 });
 
-test("the briefing asks for done --run after edits, once, then the pipe form, then the checks line, and stays within 700 characters", async () => {
+test("the briefing asks for a check after edits, once, then the pipe form, then the checks line, and stays within 700 characters", async () => {
   const installed = "/Users/averageusername/.claude/plugins/cache/claude-referee/claude-referee/0.1.1";
-  const nudge = "After edits, before saying done: node";
+  const nudge = "After edits, before saying done:";
   for (const files of [{}, { "package.json": { scripts: { "test:integration": "x", "typecheck:strict": "x", "lint:all": "x", "check:all": "x" } }, "pnpm-lock.yaml": "" }]) {
     const text = await briefing(repo(files), installed);
     assert.equal(text.split(nudge).length - 1, 1);
-    assert.ok(text.indexOf(nudge) < text.indexOf(" done --criteria ") && text.indexOf(" done --run ") < text.indexOf(" done --criteria ") && text.indexOf(" done --criteria ") < text.indexOf("Checks here"));
+    assert.ok(text.indexOf(nudge) < text.indexOf(" done --criteria ") && text.indexOf(" done --criteria ") < text.indexOf("Checks here"));
+    assert.equal(text.includes(" done --run <"), Object.keys(files).length > 0);
     assert.ok(text.length <= 700 && text.endsWith("narrow the question."), String(text.length));
   }
+});
+
+test("the briefing names only the done --run families detected here, and none when nothing is runnable", async () => {
+  const run = async (files: Record<string, string | object>, config?: object): Promise<string> => (await briefing(repo(files, config))).split("\n").find((l) => l.startsWith("After edits")) ?? "";
+  const some = await run({ "package.json": { scripts: { test: "x", build: "x", dev: "x" } } });
+  assert.match(some, / done --run <test\|build> \(runs the project's check/);
+  assert.match(await run({ "composer.json": { scripts: { ci: "x", verify: "x" } } }), / done --run <ci\|verify> /);
+  assert.match(await run({ "package.json": { scripts: { test: "x" } } }, { pack: "generic", areas: [{ prefix: "", checks: ["make verify"] }] }), / done --run <test> /);
+  for (const none of [await run({}), await run({ "-odd/package.json": { scripts: { test: "x" } } }), await run({}, { pack: "generic", areas: [{ prefix: "", checks: ["make verify"] }] })]) {
+    assert.match(none, /^After edits, before saying done: node ".+" done --run finds no check here; pipe the check's output instead/);
+  }
+  const wide = repo({ "package.json": { scripts: { test: "x", lint: "x", check: "x", build: "x", ci: "x" } } });
+  assert.deepEqual(detectFamilies(wide, wide), ["test", "lint", "check", "build"]);
 });
 
 test("a broken symlink next to the one subdirectory with checks does not hide it", () => {

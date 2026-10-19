@@ -5,12 +5,13 @@ import { appendFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Env } from "../engine/config.ts";
 import { checkoutClass, projectId, resolveDataDir } from "../engine/datadir.ts";
-import { detectChecks } from "../engine/detect-checks.ts";
+import { detectChecks, detectFamilies } from "../engine/detect-checks.ts";
 import { loadPack, packDirs } from "../engine/pack.ts";
 import { areaFor, loadProject } from "../engine/project.ts";
 import { appendReceipt, newReceiptId } from "../engine/receipts.ts";
 
 export const BRIEFING_LIMIT = 800;
+const NO_RUN = 'After edits, before saying done: node "{{cli}}" done --run finds no check here; pipe the check\'s output instead (below).';
 
 export interface HookIo {
   readonly env: Env;
@@ -48,8 +49,10 @@ export async function sessionStart(io: HookIo, pluginRoot: string): Promise<stri
   let pack = loadPack(project.pack, dirs);
   const area = areaFor(project.areas ?? pack.areas, project.root, cwd);
   if (area?.pack && area.pack !== pack.name) pack = loadPack(area.pack, dirs);
-  const template = pack.cheatsheet["session"];
-  if (!template) return null;
+  const sheet = pack.cheatsheet["session"];
+  if (!sheet) return null;
+  const families = detectFamilies(cwd, project.root);
+  const template = families.length > 0 ? sheet.replaceAll("{{families}}", families.join("|")) : sheet.split("\n").map((l) => (l.includes("{{families}}") ? NO_RUN : l)).join("\n");
 
   const detected = area?.checks.length ? [] : detectChecks(cwd, project.root);
   const checks = area?.checks.length ? area.checks.join("; ") : detected.length ? `${detected.join("; ")} (detected)` : "none listed in .claude/referee.json";

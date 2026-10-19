@@ -1,5 +1,5 @@
 // Names up to 4 check commands from the nearest manifest (package.json, composer.json, Cargo.toml, go.mod); reads script names only.
-// Used by the SessionStart briefing when no area lists checks, and by `done --run`, which runs only what is found here: a script name outside SAFE is dropped.
+// Used by the SessionStart briefing (commands when no area lists checks, `--run` families always) and by `done --run`, which runs only what is found here: a script name outside SAFE is dropped.
 // Any read or parse error means "no checks".
 
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
@@ -102,11 +102,16 @@ export function detectCheckSet(cwd: string, root: string, options: { subdir?: bo
   return { dir: root, checks: sub.checks.map((c) => ({ family: c.family, command: `cd ${plain ? sub.name : JSON.stringify(sub.name)} && ${c.command}`, runnable: plain })) };
 }
 
-export function detectChecks(cwd: string, root: string): string[] {
-  const out: string[] = [];
-  for (const { command } of detectCheckSet(cwd, root)?.checks ?? []) {
-    if (out.length === DETECTED_MAX || [...out, command].join("; ").length > JOINED_MAX) break;
-    out.push(command);
+function shown(cwd: string, root: string): Check[] {
+  const out: Check[] = [];
+  for (const check of detectCheckSet(cwd, root)?.checks ?? []) {
+    if (out.length === DETECTED_MAX || [...out, check].map((c) => c.command).join("; ").length > JOINED_MAX) break;
+    out.push(check);
   }
   return out;
 }
+
+export const detectChecks = (cwd: string, root: string): string[] => shown(cwd, root).map((c) => c.command);
+
+// The families `done --run` accepts among the checks the briefing shows (docs/decisions/briefing-run-families.md).
+export const detectFamilies = (cwd: string, root: string): string[] => shown(cwd, root).filter((c) => c.runnable).map((c) => c.family);

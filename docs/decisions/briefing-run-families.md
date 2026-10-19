@@ -34,4 +34,7 @@ Registered 2026-10-19, before any code change. Found in the owner's local transc
 
 ## Result
 
-Filled in after the checks below.
+- **E1:** `test/detect-checks.test.ts` (14 tests, one rewritten): the families follow the manifest (`<test|build>`, `<ci|verify>`, `<test>` with explicit area checks), at most the 4 shown (`test|lint|check|build` from five scripts), and a project with no manifest, only a non-runnable subfolder check, or area checks and no manifest gets `done --run finds no check here; pipe the check's output instead` with the CLI path kept (without it the pipe line had no path). The old test that required the `--run` sentence in a project without checks now requires the nudge once and the `--run <` form only where a check exists; that is the one contract change (briefing-done-nudge B1 said "with and without checks").
+- **E2:** briefing length with a 73-character install path, before and after: no manifest 632 to 595, four long script names 676 to 664, all seven families 668 to 662. It never grows (the family names are shorter than the old fixed list, at most four are shown, and the no-check sentence is shorter).
+- **E3:** the `done --run` describe text and the `jev` skill already list all seven families; nothing else needed a change.
+- **E4:** `npm run check` green; `ci:local`: see the commit.
