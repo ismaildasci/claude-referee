@@ -28,6 +28,7 @@ Registered 2026-10-19, before any code change. Found in the owner's local transc
 
 - The saving is at most one call per session where Claude would have tried an absent family; it is not a verdict change and cannot produce a `met`.
 - The briefing is no longer one fixed sentence per pack: it varies with the manifest. It stays byte-stable for the same input.
+- The families are read from the session's working directory when the briefing is built, while `done --run` reads the shell's directory when it runs, so a session that moves into another folder can see a different set; `done` loads the same project (including the `REFEREE_DEFAULT_PROJECT` default) as the hook.
 - A runnable family beyond the 4 shown (or beyond 80 joined characters) is not named, though `--run` accepts it; the refusal text lists all of them.
 - The owner's global `~/.claude/CLAUDE.md` carries the same fixed list. If Claude follows that file, a refused `--run check` can survive this change, so a later drop cannot be credited to the briefing alone. That file is the owner's to edit.
 - Not measured: the effect on real calls. Live is still on an older commit, so this is one more unshipped change until the owner runs `claude-referee-live-update`.
@@ -35,6 +36,6 @@ Registered 2026-10-19, before any code change. Found in the owner's local transc
 ## Result
 
 - **E1:** `test/detect-checks.test.ts` (14 tests, one rewritten): the families follow the manifest (`<test|build>`, `<ci|verify>`, `<test>` with explicit area checks), at most the 4 shown (`test|lint|check|build` from five scripts), and a project with no manifest, only a non-runnable subfolder check, or area checks and no manifest gets `done --run finds no check here; pipe the check's output instead` with the CLI path kept (without it the pipe line had no path). The old test that required the `--run` sentence in a project without checks now requires the nudge once and the `--run <` form only where a check exists; that is the one contract change (briefing-done-nudge B1 said "with and without checks").
-- **E2:** briefing length with a 73-character install path, before and after: no manifest 632 to 595, four long script names 676 to 664, all seven families 668 to 662. It never grows (the family names are shorter than the old fixed list, at most four are shown, and the no-check sentence is shorter).
+- **E2:** briefing length with a 73-character install path, before and after: no manifest 632 to 595, four long script names 676 to 664, four long script names with a pnpm lockfile 679 to 667, all seven families 668 to 662 (the 695 worst case in the 0.2.8 notes came from a scenario not reproduced here, so it is only an upper bound). It never grows (the family names are shorter than the old fixed list, at most four are shown, and the no-check sentence is shorter).
 - **E3:** the `done --run` describe text and the `jev` skill already list all seven families; nothing else needed a change.
 - **E4:** `npm run check` green; `ci:local`: see the commit.
