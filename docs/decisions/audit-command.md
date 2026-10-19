@@ -97,6 +97,8 @@ Choice of the build, Jev `decide` over three options (an audit tab in the dashbo
 
 Smoke run on the maintainer's machine (2026-10-13, after the bars were written; by C3 it updates nothing): cut `2026-10-09T14:00:00Z`, this repository excluded: 200 edit turns before (41 verified), 25 after (9 verified); `not_evaluable` (C1: 25 is under 30), difference 0.15, p 0.07, paired set 2 folders 0.24 to 0.36. All folders: 259 before (56 verified), 31 after (11 verified), difference 0.13, p 0.07, `no_signal`. One scan took 7.5 seconds.
 
+Registered run (taken 2026-10-19, cut `2026-10-09T14:00:00Z`, this repository excluded): C1 met (183 edit turns before, 56 after), verified share 0.21 to 0.30, difference 0.08, one-sided p 0.13, paired set 0.25 to 0.30; C2 not met, verdict `no_signal`. Details and the matching usage numbers: [usage-report.md](usage-report.md).
+
 ## Not in this decision
 
 A SubagentStop hook, a commit and PR rules guard and the dashboard tab were compared and not chosen first. The audit's per-turn units extend to subagent reports later (659 Agent calls are in the main transcripts).

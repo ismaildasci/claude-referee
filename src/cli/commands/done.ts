@@ -109,8 +109,10 @@ export function hasLinterDiagnostic(evidence: string): boolean {
   return false;
 }
 
+export const bareCommand = (command: string): string => command.replace(/^cd (?:"[^"]*"|\S+) && /, "").slice(0, 80);
+
 function factsOf(parsed: ParsedEvidence, ran?: string): Record<string, unknown> {
-  return { trust: parsed.trust, ...(ran !== undefined && parsed.trust === "parsed" ? { ran: ran.replace(/^cd (?:"[^"]*"|\S+) && /, "").slice(0, 80) } : {}), exit_code: parsed.exit_code, exit_lines: parsed.exit_lines, ...(parsed.trust === "exit_code" && parsed.command_lines.length > 0 ? { command_lines: parsed.command_lines } : {}), runners: parsed.runners.map(({ build_only: _buildOnly, ...r }) => r), conflict: parsed.conflict, lines: parsed.lines };
+  return { trust: parsed.trust, ...(ran !== undefined && parsed.trust === "parsed" ? { ran: bareCommand(ran) } : {}), exit_code: parsed.exit_code, exit_lines: parsed.exit_lines, ...(parsed.trust === "exit_code" && parsed.command_lines.length > 0 ? { command_lines: parsed.command_lines } : {}), runners: parsed.runners.map(({ build_only: _buildOnly, ...r }) => r), conflict: parsed.conflict, lines: parsed.lines };
 }
 
 // `exitCode` is the check's own exit status when the CLI ran it (done --run): a stray "exit code 1" printed by the check itself must not outvote it.
@@ -194,7 +196,7 @@ export const done: Command = {
       "--criteria <text>": "What must hold, e.g. \"all tests pass\". Repeat for several; max 10.",
       "--run <check>": "Instead of piping evidence: run the project's detected check yourself and judge all of its output. Give a family (test, typecheck, lint, build, check, ci, verify) or the exact detected command; anything else is refused and nothing runs. The check runs in the manifest folder with stdout and stderr in order, no stdin and no TypeSafe key variables, and `exit code: N` is appended. Without --criteria the family sets one (all tests pass, lint is clean, the typecheck passes, the build succeeds, all checks pass). Exits 3 unless the verdict is met (an explicit --fail-on wins). With --dry-run the check still runs; nothing is sent. Not on Windows.",
       "--timeout <seconds>": "With --run: kill the check after this many seconds (default 600, at most 3600); the evidence then ends in exit code 124, so nothing is met.",
-      "--evidence <file|->": "The check output. '-' or omitted reads stdin. ANSI colours are stripped; long output keeps its first 2,000 and last 12,000 characters. Output from a recognised test runner, linter or type checker, or with an exit code line, is parsed in code and only those facts are sent; anything else is sent as text and can never count as met.",
+      "--evidence <file|->": "The check output. '-' or omitted reads stdin. ANSI colours are stripped; long output keeps its first 2,000 and last 12,000 characters. Output from a recognised test runner, linter or type checker, or with an exit code line, is parsed in code and only those facts are sent (with --run, also the detected command's name); anything else is sent as text and can never count as met.",
     },
     outputs: {
       verdict: "met, unsure or missing; the lowest across criteria",
@@ -253,7 +255,7 @@ export const done: Command = {
             const result = request.finish(outcomes);
             const asks = typeof result["next_step"] === "string" && result["reason"] === undefined;
             const buildOnly = result["reason"] === "no_tests_run" && result["next_step"] === BUILD_ONLY_NEXT;
-            const next = asks ? RUN_NEXT : buildOnly ? `${ran} ran only build or lint tools, so no test results were shown. If it is the project's check, claim what it does: --criteria "${ran} exits with code 0". Otherwise run the real tests.` : undefined;
+            const next = asks ? RUN_NEXT : buildOnly ? `${ran} ran only build or lint tools, so no test results were shown. If it is the project's check, claim what it does: --criteria "${bareCommand(ran)} exits with code 0". Otherwise run the real tests.` : undefined;
             return { ...result, ...(next ? { next_step: next } : {}), run: true, ran };
           };
     if (planned.length === 0 && context.flags.dryRun) return reorder({ ...finish([]), dry_run: true, requests: 0 });

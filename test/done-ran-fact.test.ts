@@ -72,3 +72,23 @@ posixTest("done --run: Jev gets the command name, and a missing answer on a lint
   assert.deepEqual([defaulted.out["verdict"], defaulted.out["reason"]], ["missing", "no_tests_run"]);
   assert.match(String(defaulted.out["next_step"]), /^npm run test ran only build or lint tools.*--criteria "npm run test exits with code 0"/);
 });
+
+posixTest("done --run in a subfolder: the fact and the hint name the command without the folder", async () => {
+  const root = tempDir();
+  mkdirSync(join(root, ".claude"), { recursive: true });
+  writeFileSync(join(root, ".claude", "referee.json"), JSON.stringify({ pack: "generic" }));
+  mkdirSync(join(root, "web"));
+  writeFileSync(join(root, "web", "package.json"), JSON.stringify({ name: "p", scripts: { test: `node -e "console.log(JSON.stringify({tool:'pint',result:'passed'}))"` } }));
+  const fake = await fakeJev((request) => Object.fromEntries(Object.keys(request.questions).map((id) => [id, { type: "noul", noul: 0.1 }])));
+  try {
+    const home = tempDir();
+    const io = memoryIo({ cwd: root, home, platform: "linux", env: { HOME: home, PATH: process.env["PATH"], TYPESAFE_BASE_URL: fake.url, REFEREE_BASE_URL_KEY: "test-key" } });
+    await run(["done", "--run", "test"], io, commands);
+    const out = JSON.parse(io.out.join("").trim().split("\n").at(-1) ?? "{}") as Record<string, unknown>;
+    assert.equal(out["ran"], "cd web && npm run test");
+    assert.equal((fake.requests[0]?.state as { evidence: { ran?: string } }).evidence.ran, "npm run test");
+    assert.match(String(out["next_step"]), /^cd web && npm run test ran only.*--criteria "npm run test exits with code 0"/);
+  } finally {
+    await fake.close();
+  }
+});
