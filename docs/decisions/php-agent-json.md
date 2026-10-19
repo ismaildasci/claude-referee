@@ -35,6 +35,10 @@ Kinds: `pint` and `phpstan` cover `lint`; `rector` covers nothing (a rector dry 
 - **B5:** the existing suites and the recorded evals score unchanged (`ci:local` green), and `RUNNER_KINDS` lists every runner name.
 - **B6:** a live `done` probe on invented fixtures in a temporary data directory: a `passed` summary with an exit-status or tool criterion gives `met`; a `failed` summary gives `missing` or `unsure`, never `met`.
 
+## Correction (2026-10-19)
+
+The sentence "The warning caps are not changed" in the Kinds paragraph above held for lint-claim logs with a parsed linter summary of its own, but not for a log made of these JSON summaries plus another linter's `path:line:col: warning` lines: `pint` and `phpstan` counted as lint coverage and switched the diagnostic cap off, so "lint is clean" over such a log was `met`. Fixed in [php-agent-diagnostic-cap.md](php-agent-diagnostic-cap.md).
+
 ## Not measured, stated up front
 
 - The effect on real calls. The 13 calls' evidence was never stored, and re-sending their criteria and outputs to the API for a replay was not done. The reference to re-measure after the live install is 1 `met` of 13 for PHP-stack calls; read it with the same transcript count.

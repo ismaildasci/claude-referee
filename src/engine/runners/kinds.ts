@@ -1,7 +1,10 @@
 // The one map from parsed runner names to the kinds of check they cover (test, lint, build, typecheck), and the criterion words for each kind.
 // A runner covers typecheck when its output reports the compiler's type errors (tsc, cargo build/check, clippy, next build); done uses this only for a reason, never a verdict. Every runner name a parser emits must be listed here (the dart parser also emits "flutter test").
+// SUMMARY_ONLY lists the runners that read a one-line JSON summary (php-agent.ts): they say nothing about other diagnostic lines in the log (docs/decisions/php-agent-diagnostic-cap.md).
 
 export type CheckKind = "test" | "lint" | "build" | "typecheck";
+
+export const SUMMARY_ONLY: ReadonlySet<string> = new Set(["pint", "phpstan", "rector"]);
 
 export const RUNNER_KINDS: Readonly<Record<string, readonly CheckKind[]>> = {
   jest: ["test"],

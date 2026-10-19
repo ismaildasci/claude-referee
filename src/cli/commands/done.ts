@@ -8,7 +8,7 @@
 import type { EntryType, Questions } from "@typesafe-ai/sdk";
 import { RefereeError } from "../../engine/errors.ts";
 import { parseEvidence, type ParsedEvidence } from "../../engine/runners/index.ts";
-import { LINTERS, RUNNER_KINDS, uncoveredKinds } from "../../engine/runners/kinds.ts";
+import { LINTERS, RUNNER_KINDS, SUMMARY_ONLY, uncoveredKinds } from "../../engine/runners/kinds.ts";
 import { skipMarkers } from "../../engine/runners/skips.ts";
 import type { Result } from "../../engine/output.ts";
 import { threshold, type Pack, type Thresholds } from "../../engine/pack.ts";
@@ -140,7 +140,7 @@ export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, crit
   const missing = threshold(pack, thresholds, "done.met", "missing", 0.5);
   const finish = ([outcome]: Outcome[]): Result => {
     const runnerNames = [...new Set(parsed.runners.map((r) => r.runner))];
-    const lintCovered = runnerNames.some((r) => RUNNER_KINDS[r]?.includes("lint") === true);
+    const lintCovered = runnerNames.some((r) => RUNNER_KINDS[r]?.includes("lint") === true && !SUMMARY_ONLY.has(r));
     const wordingCap = (parsed.trust === "exit_code" && (hasWarningMessage(evidence) || hasProblemMessage(evidence))) || hasParsedWarnings(parsed);
     const diagnosticCap = !wordingCap && parsed.trust === "parsed" && !lintCovered && hasLinterDiagnostic(evidence);
     const warnCap = wordingCap || diagnosticCap;
