@@ -1,6 +1,11 @@
 // Echoed command lines (`$ cmd`, `> cmd`) of a log that has only an exit code, so Jev knows what ran (docs/decisions/command-echo-facts.md).
 // Only commands whose first word is a known check tool; none for a log in which an echoed command hides, redirects or tolerates its output or failure.
+// silentTypecheckTail: the tsc or vue-tsc echo that ends a log, nothing after it but exit lines; done reads it only for done --run (docs/decisions/run-silent-typecheck-tail.md).
 
+import { exitMatches } from "./util.ts";
+
+export const SILENT_TYPECHECKS: ReadonlySet<string> = new Set(["tsc", "vue-tsc"]);
+const SHELL = /[|&;<>$()`]/;
 const ECHO = /^(?:\$|>) \S/;
 const HIDES = /\|\||;\s*(?:true|exit 0|:)(?:\s|$)|\s(?:--quiet|-q|--silent|--no-error\S*|--format\b|-f\b|--output-file\b|-o\b|--fix\b)|[12&]?>\s*\/dev\/null|\s\d?>\s*\S/;
 const MAX_LINES = 3;
@@ -18,4 +23,11 @@ export function commandLines(body: string, exitLines: ReadonlySet<string>): stri
     .map((l) => l.trim())
     .filter((l) => ECHO.test(l) && !exitLines.has(l) && CHECK_TOOLS.has(l.slice(2).split(/\s+/)[0] ?? ""));
   return echoes.some((l) => HIDES.test(l)) ? [] : [...new Set(echoes.map((l) => l.slice(0, MAX_CHARS)))].slice(0, MAX_LINES);
+}
+
+export function silentTypecheckTail(body: string): string | null {
+  const last = body.split(/\r?\n/).map((l) => l.trim()).filter((l) => l !== "" && exitMatches(l).length === 0).at(-1) ?? "";
+  const command = last.slice(2);
+  const tool = command.split(/\s+/)[0] ?? "";
+  return ECHO.test(last) && SILENT_TYPECHECKS.has(tool) && !SHELL.test(command) && !HIDES.test(last) ? tool : null;
 }

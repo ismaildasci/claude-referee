@@ -42,6 +42,7 @@ export const RUNNER_KINDS: Readonly<Record<string, readonly CheckKind[]>> = {
   phpstan: ["lint"],
   rector: [],
   tsc: ["typecheck", "build"],
+  "vue-tsc": ["typecheck"],
   "next build": ["build", "typecheck"],
   "nix build": ["build"],
   vite: ["build"],

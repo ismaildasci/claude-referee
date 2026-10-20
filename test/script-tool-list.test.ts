@@ -47,6 +47,7 @@ test("S1: claim wording in the list, a linter outside a list and a lint claim st
     "composer test (phpstan no errors) exits with code 0",
     "composer test (phpstan 0 errors) exits with code 0",
     "composer test (lint hatasız) exits with code 0",
+    "composer test (lint succeeds) exits with code 0",
     "phpstan exits with code 0",
     "lint is clean",
     "composer test (pint, phpstan) exits 0; phpstan 0 errors",

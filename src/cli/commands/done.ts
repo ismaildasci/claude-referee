@@ -1,5 +1,5 @@
 // done: does the check output show each criterion holds? One request; every criterion is a Noul on the same evidence.
-// Recognised runner output is parsed in code and only those facts reach Jev; unrecognised output can never become met.
+// Recognised runner output is parsed in code and only those facts reach Jev; unrecognised output can never become met. Under done --run with exit 0, a silent tsc or vue-tsc echo that ends the output is one more runner fact.
 // A non-zero exit code in the evidence is missing without a request (a zero-request receipt; --dry-run prints that verdict); skipped, risky or incomplete tests, or a skip marker anywhere in the log, cap met at unsure.
 // A lint or clean criterion (lint, clean, no warnings, or a linter's name such as oxlint, not counting a plain step list after a script command) is capped at unsure when only an exit code backs it and the log shows a warning, notice, failure or skip message or a swallowed exit code, or when a test or build runner is parsed but no linter is and the log has a linter's warning or error line or a linter summary with a count above 0.
 // A parsed run that is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion with parsed warnings, is capped the same way.
@@ -7,7 +7,9 @@
 
 import type { EntryType, Questions } from "@typesafe-ai/sdk";
 import { RefereeError } from "../../engine/errors.ts";
+import { silentTypecheckTail } from "../../engine/runners/echo.ts";
 import { parseEvidence, type ParsedEvidence } from "../../engine/runners/index.ts";
+import { buildOnly, mk } from "../../engine/runners/util.ts";
 import { LINTERS, RUNNER_KINDS, SUMMARY_ONLY, uncoveredKinds } from "../../engine/runners/kinds.ts";
 import { skipMarkers } from "../../engine/runners/skips.ts";
 import type { Result } from "../../engine/output.ts";
@@ -40,7 +42,7 @@ const TEST_CRITERION = /\b(?:tests?|testing|test suites?|specs?)\b/i;
 // A script runner's own test script (`composer test`, `npm run test:unit`) names a command, not a claim that tests ran; toolchain commands (`cargo test`, `php artisan test`) stay claims.
 const SCRIPT_TEST = /\b(?:(?:composer|npm|pnpm|yarn|make)\s+(?:run\s+)?|bun\s+run\s+)test(?:[:_-][\w:-]+)*(?!\w)/gi;
 const SCRIPT_STEPS = /\b((?:composer|npm|pnpm|yarn|make)\s+(?:run\s+)?|bun\s+run\s+)([\w:.-]+)\s*\(([^()]*)\)/gi;
-const STEP_CLAIM = /\b(?:clean\w*|warn\w*|errors?|pass\w*|fail\w*|success\w*|ok|0|no|zero|none|hata\w*|uyar\w*|temiz\w*|geç\w*|başar\w*|sıfır|yok)\b|(?<![-\w:])(?:tests?|testing)\b/i;
+const STEP_CLAIM = /\b(?:clean\w*|warn\w*|errors?|pass\w*|fail\w*|succe\w*|ok|0|no|zero|none|hata\w*|uyar\w*|temiz\w*|geç\w*|başar\w*|sıfır|yok)\b|(?<![-\w:])(?:tests?|testing)\b/i;
 const withoutStepLists = (criterion: string): string => criterion.replace(SCRIPT_STEPS, (all: string, run: string, script: string, list: string) => (STEP_CLAIM.test(list) ? all : `${run}${script}`));
 export const claimsTests = (criterion: string): boolean => TEST_CRITERION.test(withoutStepLists(criterion).replace(SCRIPT_TEST, " "));
 const SKIP_WORDS = /^OK, but .*\b(?:incomplete|skipped|risky)\b/i;
@@ -120,7 +122,9 @@ function factsOf(parsed: ParsedEvidence, ran?: string): Record<string, unknown> 
 
 // `exitCode` is the check's own exit status when the CLI ran it (done --run): a stray "exit code 1" printed by the check itself must not outvote it.
 export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, criteria: readonly string[], evidence: string, exitCode?: number, ran?: string): { planned: Planned[]; finish: (outcomes: Outcome[]) => Result } {
-  const read = parseEvidence(evidence);
+  const piped = parseEvidence(evidence);
+  const tail = ran !== undefined && exitCode === 0 ? silentTypecheckTail(evidence) : null;
+  const read: ParsedEvidence = tail === null ? piped : { ...piped, trust: "parsed", runners: [...piped.runners, buildOnly(mk(tail, {}, [], `${tail} printed no diagnostics and exited 0`, false))] };
   const failing = read.runners.some((r) => r.failed + r.errors > 0);
   const parsed: ParsedEvidence = exitCode === undefined ? read : { ...read, exit_code: exitCode, exit_lines: [`exit code: ${exitCode}`], conflict: failing && (read.runners.some((r) => r.failed + r.errors === 0 && r.passed > 0) || exitCode === 0) };
   if (parsed.exit_code !== null && parsed.exit_code !== 0) {

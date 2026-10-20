@@ -33,6 +33,7 @@ Written 2026-10-19 after a throwaway prototype and a live before/after probe, no
 - **D4:** `pint` failed with exit code 0 gave `unsure` 0.97 (1.13) and 0.98 (1.14), `phpstan` failed with 3 errors `unsure` 0.97 and 0.99: the conflict cap holds, never `met`. A script that prints nothing: exit-status criterion `met` 0.97 and 0.98 as before (`ran` is not sent for exit-code evidence), `all tests pass` `missing` 0.25 and 0.05. A real runner line (`Tests: 3 passed, 3 total`): `all tests pass` `met` 0.97 and 0.99.
 - **D1:** one existing test asserted the old contract (a Jev `missing` on a build-only log had no reason, `test/runners-real-log-fixes.test.ts`); it now expects `reason: no_tests_run` with the verdict still `missing`. The other tests pass unchanged.
 - D2: see the commit.
+- **Note (2026-10-20):** the command name can also lower Jev's own answer. On an invented fixture of the same shape, three fresh asks per model, `composer test (pint, rector, phpstan, vue-tsc) exits with code 0` under `done --run test` was `missing` (0.27 to 0.42 on 1.14, 0.33 to 0.40 on 1.13), while the build without this change answered `met` (0.80 to 0.90; 0.72 to 0.80): Jev knew `composer test` ran and saw no fact for the silent `vue-tsc` the criterion names. [run-silent-typecheck-tail.md](run-silent-typecheck-tail.md) adds that fact; see [script-tool-list.md](script-tool-list.md) for the measurement.
 
 ## Cost, stated up front
 

@@ -8,6 +8,7 @@ import { loadPack, packDirs } from "../src/engine/pack.ts";
 import { parsers as builds } from "../src/engine/runners/builds.ts";
 import { parsers as bun } from "../src/engine/runners/bun.ts";
 import { parsers as compiled } from "../src/engine/runners/compiled.ts";
+import { SILENT_TYPECHECKS } from "../src/engine/runners/echo.ts";
 import { parseEvidence } from "../src/engine/runners/index.ts";
 import { parsers as js } from "../src/engine/runners/js.ts";
 import { LINTERS, RUNNER_KINDS, uncoveredKinds } from "../src/engine/runners/kinds.ts";
@@ -245,7 +246,7 @@ test("R3 leaves met, covered criteria, exit-code-only logs and earlier reasons a
 test("R3: every runner name a parser emits has a kind, and every kind entry is emitted", () => {
   const emitted = parseEvidence("$ flutter test --no-pub\n00:00 +0: adds one to input values\n00:00 +1: All tests passed!\nexit code: 0\n").runners.map((r) => r.runner);
   assert.deepEqual(emitted, ["flutter test"]);
-  const names = [...[...python, ...js, ...compiled, ...phpRuby, ...more, ...suites, ...scenarios, ...builds, ...native, ...moreTools, ...bun, ...oxlintParsers, ...phpAgent].map((p) => p.name), ...emitted];
+  const names = [...[...python, ...js, ...compiled, ...phpRuby, ...more, ...suites, ...scenarios, ...builds, ...native, ...moreTools, ...bun, ...oxlintParsers, ...phpAgent].map((p) => p.name), ...emitted, ...SILENT_TYPECHECKS];
   assert.deepEqual(names.filter((n) => RUNNER_KINDS[n] === undefined), []);
   assert.deepEqual(Object.keys(RUNNER_KINDS).filter((n) => !names.includes(n)), []);
   assert.deepEqual(uncoveredKinds("cargo check passes the typecheck", ["cargo build"]), []);
