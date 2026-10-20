@@ -43,4 +43,6 @@ Written after the code.
 | `the typecheck passes` | `met` 0.77 to 0.80 | `met` 0.73 to 0.76 | `met` 0.82 (1.14, one ask) |
 | `lint is clean` | `unsure` 0.84 to 0.85, `warning_in_log` | `unsure` 0.78 to 0.81, `warning_in_log` | not asked |
 
-Limits: one invented fixture of one project's shape, a probe and not a test on unseen logs; real `--run` calls on that project will show it after the live update.
+- **R4, second pass (same day, after the push, advisor's request):** the shape that is only a silent type check also changes (trust `exit_code` to `parsed`, the echoed command replaced by the command name and the `tsc` fact). `done --run typecheck` in this repository (`> tsc -p tsconfig.json`, then the exit code), default criterion `the typecheck passes`, three fresh asks each: the bundle before this change `met` 0.88 to 0.90 (1.13) and 0.90 to 0.91 (1.14) at `exit_code` trust; after it `met` 0.93 to 0.96 and 0.97 to 0.98 at `parsed` trust. `the typecheck passes` on the fixture, three more asks on the bundle before: 0.77 to 0.80 (1.13), 0.70 to 0.83 (1.14); after, three more: 0.76 to 0.81 and 0.68 to 0.86 (one `unsure` 0.68). Same spread before and after; on 1.14 that wording sits near the 0.70 bar either way.
+
+Limits: one invented fixture of one project's shape and one silent `tsc` repository, a probe and not a test on unseen logs; real `--run` calls on that project will show it after the live update.
