@@ -27,6 +27,6 @@ test("B1: a script runner's test script in the criterion is not a test claim, ot
 
 test("the other caps ignore the wording: a log that says no tests ran, or another linter's warnings, still cap a script-name criterion", () => {
   assert.deepEqual(verdictOf("npm test exits with code 0", "Error: no tests found\nexit code: 0\n"), { verdict: "unsure", reason: "no_tests_run" });
-  assert.deepEqual(verdictOf("composer test (pint, phpstan) exits with code 0", WITH_WARNINGS), { verdict: "unsure", reason: "warning_in_log" });
+  assert.deepEqual(verdictOf("composer test and phpstan exit with code 0", WITH_WARNINGS), { verdict: "unsure", reason: "warning_in_log" });
   assert.deepEqual(verdictOf("composer test exits with code 0", WITH_WARNINGS), { verdict: "met", reason: undefined });
 });

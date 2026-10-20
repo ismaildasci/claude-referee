@@ -1,7 +1,7 @@
 // done: does the check output show each criterion holds? One request; every criterion is a Noul on the same evidence.
 // Recognised runner output is parsed in code and only those facts reach Jev; unrecognised output can never become met.
 // A non-zero exit code in the evidence is missing without a request (a zero-request receipt; --dry-run prints that verdict); skipped, risky or incomplete tests, or a skip marker anywhere in the log, cap met at unsure.
-// A lint or clean criterion (lint, clean, no warnings, or a linter's name such as oxlint) is capped at unsure when only an exit code backs it and the log shows a warning, notice, failure or skip message or a swallowed exit code, or when a test or build runner is parsed but no linter is and the log has a linter's warning or error line or a linter summary with a count above 0.
+// A lint or clean criterion (lint, clean, no warnings, or a linter's name such as oxlint, not counting a plain step list after a script command) is capped at unsure when only an exit code backs it and the log shows a warning, notice, failure or skip message or a swallowed exit code, or when a test or build runner is parsed but no linter is and the log has a linter's warning or error line or a linter summary with a count above 0.
 // A parsed run that is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion with parsed warnings, is capped the same way.
 // Expected failures (known issues) cap met like skips; a test criterion backed only by build runners or oxlint (no test results) is capped as no tests run; a lint, build or typecheck criterion with no parsed runner of its kind gets a reason, never another verdict.
 
@@ -39,7 +39,10 @@ const BUILD_ONLY_NEXT = "The log shows only a build or a lint run (no test resul
 const TEST_CRITERION = /\b(?:tests?|testing|test suites?|specs?)\b/i;
 // A script runner's own test script (`composer test`, `npm run test:unit`) names a command, not a claim that tests ran; toolchain commands (`cargo test`, `php artisan test`) stay claims.
 const SCRIPT_TEST = /\b(?:(?:composer|npm|pnpm|yarn|make)\s+(?:run\s+)?|bun\s+run\s+)test(?:[:_-][\w:-]+)*(?!\w)/gi;
-export const claimsTests = (criterion: string): boolean => TEST_CRITERION.test(criterion.replace(SCRIPT_TEST, " "));
+const SCRIPT_STEPS = /\b((?:composer|npm|pnpm|yarn|make)\s+(?:run\s+)?|bun\s+run\s+)([\w:.-]+)\s*\(([^()]*)\)/gi;
+const STEP_CLAIM = /\b(?:clean\w*|warn\w*|errors?|pass\w*|fail\w*|success\w*|ok|0|no|zero|none|hata\w*|uyar\w*|temiz\w*|geç\w*|başar\w*|sıfır|yok)\b|(?<![-\w:])(?:tests?|testing)\b/i;
+const withoutStepLists = (criterion: string): string => criterion.replace(SCRIPT_STEPS, (all: string, run: string, script: string, list: string) => (STEP_CLAIM.test(list) ? all : `${run}${script}`));
+export const claimsTests = (criterion: string): boolean => TEST_CRITERION.test(withoutStepLists(criterion).replace(SCRIPT_TEST, " "));
 const SKIP_WORDS = /^OK, but .*\b(?:incomplete|skipped|risky)\b/i;
 
 function hasSkips(parsed: ParsedEvidence, evidence: string): boolean {
@@ -156,7 +159,7 @@ export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, crit
       const buildCap = raw === "met" && buildClaim;
       const noTestsCap = raw === "met" && (logSaysNoTests || buildCap);
       const incompleteCap = raw === "met" && hasIncomplete(parsed);
-      const warningCap = raw === "met" && warnCap && CLEAN_CRITERION.test(criterion);
+      const warningCap = raw === "met" && warnCap && CLEAN_CRITERION.test(withoutStepLists(criterion));
       const verdict: Verdict = raw === "met" && (parsed.trust === "unparsed" || parsed.conflict || skipCap || noTestsCap || incompleteCap || warningCap) ? "unsure" : raw;
       const uncovered = verdict !== "met" && parsed.trust === "parsed" ? uncoveredKinds(criterion, runnerNames) : [];
       return { i: i + 1, verdict, p, skipCap, noTestsCap, buildCap, buildClaim, incompleteCap, warningCap, uncovered };
@@ -206,7 +209,7 @@ export const done: Command = {
       run: "With --run: true (the receipt keeps it, never the command)",
       ran: "With --run: the detected command that ran. When the output was parsed, its name (a leading `cd <folder> && ` removed, 80 characters at most) also goes to Jev as a fact, so a criterion that names the command can be judged",
       runners: "Parsed counts per recognised runner",
-      reason: "exit_code_nonzero when the evidence has a non-zero exit code (missing, Jev not asked, requests 0; the receipt is still written, and --dry-run gives the same verdict); skipped_tests, no_tests_run, incomplete_run or warning_in_log when met was capped at unsure because tests were skipped, risky, incomplete or ended in an expected failure (a known issue), the log says no tests ran or shows only a build (or an oxlint run) for a test criterion, the parsed run is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion (one that says lint, clean or no warnings, or names a linter such as oxlint, eslint, ruff or phpstan) has a warning behind it (a parsed linter's warnings; warning or problem wording, or a swallowed exit code, in a log with only an exit code; or, when a test or build runner is parsed and no linter is, a linter's warning or error line, such as file:line:col: warning, or a linter summary with a count above 0); no_tests_run also, without a cap, when the verdict is already not met, the parsed runners are only build or lint runners and none failed, and a criterion claims tests (the next step then says so); criterion_not_covered when the verdict is not met, no cap applies, and a lint, build or typecheck criterion has no parsed runner of that kind (only a test runner's summary was recognised, for example), so that check's output never reached Jev; it never changes the verdict",
+      reason: "exit_code_nonzero when the evidence has a non-zero exit code (missing, Jev not asked, requests 0; the receipt is still written, and --dry-run gives the same verdict); skipped_tests, no_tests_run, incomplete_run or warning_in_log when met was capped at unsure because tests were skipped, risky, incomplete or ended in an expected failure (a known issue), the log says no tests ran or shows only a build (or an oxlint run) for a test criterion, the parsed run is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion (one that says lint, clean or no warnings, or names a linter such as oxlint, eslint, ruff or phpstan, other than in a plain list of a script's steps such as composer test (pint, phpstan)) has a warning behind it (a parsed linter's warnings; warning or problem wording, or a swallowed exit code, in a log with only an exit code; or, when a test or build runner is parsed and no linter is, a linter's warning or error line, such as file:line:col: warning, or a linter summary with a count above 0); no_tests_run also, without a cap, when the verdict is already not met, the parsed runners are only build or lint runners and none failed, and a criterion claims tests (the next step then says so); criterion_not_covered when the verdict is not met, no cap applies, and a lint, build or typecheck criterion has no parsed runner of that kind (only a test runner's summary was recognised, for example), so that check's output never reached Jev; it never changes the verdict",
       p: "Lowest probability that a criterion holds",
       criteria: "Per criterion, by position, when more than one; reason criterion_not_covered on a criterion that is not met and has no parsed runner of its kind",
       next_step: "Only when not met",
