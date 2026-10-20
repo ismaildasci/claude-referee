@@ -1,4 +1,4 @@
-// Parsers for jest, vitest, mocha, eslint, tsc and node:test output. Only structured markers and counts are read; prose in the log is ignored.
+// Parsers for jest, vitest, mocha, eslint, tsc and node:test output. Only structured markers and counts are read; prose in the log is ignored. Pest and Collision output goes to jest: its "Tests:" line, namespaced FAIL/FAILED headers, "⨯" lines (with such a header) and compact "⨯" marks.
 // Worst case wins: a failure marker anywhere beats a passing summary line, and a log cut off before its summary never counts as a pass; a tsc -b status line ("[t] " or "t - " lead) makes a tsc run, cut off on a dry run, a skipped project, a watch restart after the last Found, or (no Found line after its header) a clip marker, no header, a listed project but the last (a solution root) with no status, or a last status still waiting for its build. A tsc -b with no Found or error line (nor an "error TSn:" token the error parser misses), not cut, whose clock-stamped last header is followed only by clock-stamped status lines, blank lines and exit lines, and where every project of that list ends in "Building project" or "is up to date because" (an absolute-path "Building project", printed by TS 5/6 before compiling, only when a later status line follows), passes that many projects with its last status line, clock removed, as summary.
 // node:test details with no summary or failure marker (a tail in one error block) are one failure, cut off, unless a todo's "⚠ name (Xms)" owns them; assertion props any logged error has count only without a jest/vitest/bun/mocha summary; a TAP hookFailed block under "# fail 0" fails.
 
@@ -70,8 +70,28 @@ function facts(runner: string, f: Omit<RunnerFacts, "runner" | "failing" | "summ
   return { runner, passed: f.passed, failed: f.failed, errors: f.errors, skipped: f.skipped, ...extra, failing: listFailing(f.failing), summary_line: clip(f.summary) };
 }
 
+function pestFailures(lines: readonly string[]): { count: number; names: string[] } {
+  const blocks: string[] = [];
+  const marked: string[] = [];
+  let files = 0;
+  let progress = 0;
+  let header = false;
+  for (const l of lines) {
+    const b = /^\s*FAILED\s+([A-Z]\w*(?:\\\w+)+\b.*?)(?:\s{2,}[\w\\]+)?\s*$/.exec(l);
+    if (b !== null) blocks.push(b[1] ?? "");
+    if (/^\s*FAIL\s+[A-Z]\w*(?:\\\w+)+(?:\s+-\s+\d+ todos?)?\s*$/.test(l)) files += 1;
+    if (/^\s*(?:PASS|WARN|FAIL|FAILED)\s+[A-Z]\w*\\\w/.test(l)) header = true;
+    const t = /^\s*⨯ (.+?)(?:\s+\d+(?:\.\d+)?m?s)?\s*$/.exec(l);
+    if (t !== null) marked.push(t[1] ?? "");
+    else if (/^\s*[.⨯sti!]*⨯[.⨯sti!]*\s*$/.test(l)) progress += l.split("⨯").length - 1;
+  }
+  const marks = header ? marked : [];
+  return { count: Math.max(blocks.length, files, marks.length, progress), names: blocks.length > 0 ? blocks : marks };
+}
+
 function parseJest(text: string): RunnerFacts | null {
   const lines = toLines(text);
+  const pest = pestFailures(lines);
   const tests = tally(lines, /^\s*Tests:\s+(?=.*\b\d+\s+(?:failed|passed|skipped|todos?|risky|incomplete|total)\b)(\d.*)$/);
   const suites = tally(lines, /^\s*Test Suites:\s+(\d.*)$/);
   const noTests = lines.find((l) => /^\s*No tests found\b/.test(l)) ?? null;
@@ -89,15 +109,15 @@ function parseJest(text: string): RunnerFacts | null {
     const f = /^\s*FAIL\s+(\S*[./]\S*)(?:\s+\(.*\))?\s*$/.exec(l);
     if (f !== null) files.add(f[1] ?? "");
   }
-  if (tests.line === null && suites.line === null && noTests === null && ids.size === 0 && files.size === 0 && runErrors === 0) return null;
-  const failed = Math.max(tests.failedMax, ids.size, ids.size === 0 && runErrors === 0 ? files.size : 0);
+  if (tests.line === null && suites.line === null && noTests === null && ids.size === 0 && files.size === 0 && runErrors === 0 && pest.count === 0) return null;
+  const failed = Math.max(tests.failedMax, ids.size, ids.size === 0 && runErrors === 0 ? files.size : 0, pest.count);
   const errors = Math.max(runErrors, failed === 0 ? suites.failedMax : 0);
   return facts("jest", {
     passed: tests.last.passed,
     failed,
     errors,
     skipped: tests.last.skipped,
-    failing: ids.size > 0 ? ids : files,
+    failing: ids.size > 0 ? ids : pest.names.length > 0 ? pest.names : files,
     summary: tests.line ?? suites.line ?? noTests,
   });
 }
