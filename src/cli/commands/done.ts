@@ -1,5 +1,5 @@
 // done: does the check output show each criterion holds? One request; every criterion is a Noul on the same evidence.
-// Recognised runner output is parsed in code and only those facts reach Jev; unrecognised output can never become met. Under done --run with exit 0, a silent tsc or vue-tsc echo that ends the output is one more runner fact.
+// Recognised runner output is parsed in code and only those facts reach Jev (Pint, PHPStan and Rector without zero test counts); unrecognised output can never become met. Under done --run with exit 0, a silent tsc or vue-tsc echo that ends the output is one more runner fact.
 // A non-zero exit code in the evidence is missing without a request (a zero-request receipt; --dry-run prints that verdict); skipped, risky or incomplete tests, or a skip marker anywhere in the log, cap met at unsure.
 // A lint or clean criterion (lint, clean, no warnings, or a linter's name such as oxlint, not counting a plain step list after a script command) is capped at unsure when only an exit code backs it and the log shows a warning, notice, failure or skip message or a swallowed exit code, or when a test or build runner is parsed but no linter is and the log has a linter's warning or error line or a linter summary with a count above 0.
 // A parsed run that is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion with parsed warnings, is capped the same way.
@@ -12,6 +12,7 @@ import { parseEvidence, type ParsedEvidence } from "../../engine/runners/index.t
 import { buildOnly, mk } from "../../engine/runners/util.ts";
 import { LINTERS, RUNNER_KINDS, SUMMARY_ONLY, uncoveredKinds } from "../../engine/runners/kinds.ts";
 import { skipMarkers } from "../../engine/runners/skips.ts";
+import type { RunnerFacts } from "../../engine/runners/types.ts";
 import type { Result } from "../../engine/output.ts";
 import { threshold, type Pack, type Thresholds } from "../../engine/pack.ts";
 import type { Outcome, Planned } from "../../engine/session.ts";
@@ -116,8 +117,11 @@ export function hasLinterDiagnostic(evidence: string): boolean {
 
 export const bareCommand = (command: string): string => command.replace(/^cd (?:"[^"]*"|\S+) && /, "").slice(0, 80);
 
+const TEST_COUNTS: ReadonlySet<string> = new Set(["passed", "failed", "skipped"]);
+const sentRunner = ({ build_only: _buildOnly, ...r }: RunnerFacts): object => (SUMMARY_ONLY.has(r.runner) ? Object.fromEntries(Object.entries(r).filter(([k, v]) => !(TEST_COUNTS.has(k) && v === 0))) : r);
+
 function factsOf(parsed: ParsedEvidence, ran?: string): Record<string, unknown> {
-  return { trust: parsed.trust, ...(ran !== undefined && parsed.trust === "parsed" ? { ran: bareCommand(ran) } : {}), exit_code: parsed.exit_code, exit_lines: parsed.exit_lines, ...(parsed.trust === "exit_code" && parsed.command_lines.length > 0 ? { command_lines: parsed.command_lines } : {}), runners: parsed.runners.map(({ build_only: _buildOnly, ...r }) => r), conflict: parsed.conflict, lines: parsed.lines };
+  return { trust: parsed.trust, ...(ran !== undefined && parsed.trust === "parsed" ? { ran: bareCommand(ran) } : {}), exit_code: parsed.exit_code, exit_lines: parsed.exit_lines, ...(parsed.trust === "exit_code" && parsed.command_lines.length > 0 ? { command_lines: parsed.command_lines } : {}), runners: parsed.runners.map(sentRunner), conflict: parsed.conflict, lines: parsed.lines };
 }
 
 // `exitCode` is the check's own exit status when the CLI ran it (done --run): a stray "exit code 1" printed by the check itself must not outvote it.
