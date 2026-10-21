@@ -2,7 +2,7 @@
 // Recognised runner output is parsed in code and only those facts reach Jev (Pint, PHPStan and Rector without zero test counts); unrecognised output can never become met. Under done --run with exit 0, a silent tsc or vue-tsc echo that ends the output is one more runner fact.
 // A non-zero exit code in the evidence is missing without a request (a zero-request receipt; --dry-run prints that verdict); skipped, risky or incomplete tests, or a skip marker anywhere in the log, cap met at unsure.
 // A lint or clean criterion (lint, clean, no warnings, or a linter's name such as oxlint, not counting a plain step list after a script command) is capped at unsure when only an exit code backs it and the log shows a warning, notice, failure or skip message or a swallowed exit code, or when a test or build runner is parsed but no linter is and the log has a linter's warning or error line or a linter summary with a count above 0.
-// A parsed run that is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion with parsed warnings, is capped the same way.
+// A parsed run that is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion with parsed warnings, is capped the same way; a criterion that names only linters whose own parsed facts are clean, with no lint, clean or no-warnings wording, is not capped for warnings.
 // Expected failures (known issues) cap met like skips; a test criterion backed only by build runners or oxlint (no test results) is capped as no tests run; a lint, build or typecheck criterion with no parsed runner of its kind gets a reason, never another verdict.
 
 import type { EntryType, Questions } from "@typesafe-ai/sdk";
@@ -64,10 +64,18 @@ function hasParsedWarnings(parsed: ParsedEvidence): boolean {
   return parsed.runners.some((r) => (r.warnings ?? 0) > 0);
 }
 
+function namesOnlyCleanLinters(parsed: ParsedEvidence, criterion: string): boolean {
+  const named = NAMED_LINTERS.filter(([, re]) => re.test(criterion)).map(([name]) => parsed.runners.filter((r) => r.runner === name));
+  return parsed.trust === "parsed" && !GENERIC_CRITERION.test(criterion) && named.length > 0 && named.every((own) => own.length > 0 && own.every((r) => r.failed + r.errors + (r.warnings ?? 0) === 0 && r.incomplete !== true));
+}
+
 const EXIT_ONLY_NEXT = 'Only an exit code line was recognised, and an exit code alone cannot show a criterion. Pipe the check\'s output in front of it: { your-command; echo "exit code: $?"; } 2>&1 | claude-referee done --criteria "...". If the tool prints nothing when it passes (eslint, tsc), word the criterion as its exit status, e.g. "eslint exits with code 0".';
 const UNPARSED_NEXT = 'No recognised runner summary or exit code in the evidence, so it cannot count as met. Pipe the runner\'s full output, or add an exit code line: { your-command; echo "exit code: $?"; } 2>&1 | claude-referee done --criteria "..."';
 
-const CLEAN_CRITERION = new RegExp(String.raw`\b(?:lint\w*|clean|warning[- ]?free|no warnings?|${LINTERS.join("|")})\b`, "i");
+const GENERIC_CLEAN = String.raw`lint\w*|clean|warning[- ]?free|no warnings?`;
+const CLEAN_CRITERION = new RegExp(String.raw`\b(?:${GENERIC_CLEAN}|${LINTERS.join("|")})\b`, "i");
+const GENERIC_CRITERION = new RegExp(String.raw`\b(?:${GENERIC_CLEAN})\b`, "i");
+const NAMED_LINTERS = LINTERS.map((name) => [name, new RegExp(String.raw`\b${name}\b`, "i")] as const);
 const WARN_WORDS = /\b(?:warnings?|notices?|deprecat\w*)\b/i;
 const WARN_NEGATED = /\b(?:0|no|zero|without) (?:warnings?|notices?)\b/gi;
 const WARN_FLAG = /--?[\w-]*warn[\w-]*(?:[ =]\S+)?/gi;
@@ -167,7 +175,8 @@ export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, crit
       const buildCap = raw === "met" && buildClaim;
       const noTestsCap = raw === "met" && (logSaysNoTests || buildCap);
       const incompleteCap = raw === "met" && hasIncomplete(parsed);
-      const warningCap = raw === "met" && warnCap && CLEAN_CRITERION.test(withoutStepLists(criterion));
+      const claim = withoutStepLists(criterion);
+      const warningCap = raw === "met" && warnCap && CLEAN_CRITERION.test(claim) && !namesOnlyCleanLinters(parsed, claim);
       const verdict: Verdict = raw === "met" && (parsed.trust === "unparsed" || parsed.conflict || skipCap || noTestsCap || incompleteCap || warningCap) ? "unsure" : raw;
       const uncovered = verdict !== "met" && parsed.trust === "parsed" ? uncoveredKinds(criterion, runnerNames) : [];
       return { i: i + 1, verdict, p, skipCap, noTestsCap, buildCap, buildClaim, incompleteCap, warningCap, uncovered };
@@ -217,7 +226,7 @@ export const done: Command = {
       run: "With --run: true (the receipt keeps it, never the command)",
       ran: "With --run: the detected command that ran. When the output was parsed, its name (a leading `cd <folder> && ` removed, 80 characters at most) also goes to Jev as a fact, so a criterion that names the command can be judged",
       runners: "Parsed counts per recognised runner",
-      reason: "exit_code_nonzero when the evidence has a non-zero exit code (missing, Jev not asked, requests 0; the receipt is still written, and --dry-run gives the same verdict); skipped_tests, no_tests_run, incomplete_run or warning_in_log when met was capped at unsure because tests were skipped, risky, incomplete or ended in an expected failure (a known issue), the log says no tests ran or shows only a build (or an oxlint run) for a test criterion, the parsed run is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion (one that says lint, clean or no warnings, or names a linter such as oxlint, eslint, ruff or phpstan, other than in a plain list of a script's steps such as composer test (pint, phpstan)) has a warning behind it (a parsed linter's warnings; warning or problem wording, or a swallowed exit code, in a log with only an exit code; or, when a test or build runner is parsed and no linter is, a linter's warning or error line, such as file:line:col: warning, or a linter summary with a count above 0); no_tests_run also, without a cap, when the verdict is already not met, the parsed runners are only build or lint runners and none failed, and a criterion claims tests (the next step then says so); criterion_not_covered when the verdict is not met, no cap applies, and a lint, build or typecheck criterion has no parsed runner of that kind (only a test runner's summary was recognised, for example), so that check's output never reached Jev; it never changes the verdict",
+      reason: "exit_code_nonzero when the evidence has a non-zero exit code (missing, Jev not asked, requests 0; the receipt is still written, and --dry-run gives the same verdict); skipped_tests, no_tests_run, incomplete_run or warning_in_log when met was capped at unsure because tests were skipped, risky, incomplete or ended in an expected failure (a known issue), the log says no tests ran or shows only a build (or an oxlint run) for a test criterion, the parsed run is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion (one that says lint, clean or no warnings, or names a linter such as oxlint, eslint, ruff or phpstan, other than in a plain list of a script's steps such as composer test (pint, phpstan)) has a warning behind it (a parsed linter's warnings; warning or problem wording, or a swallowed exit code, in a log with only an exit code; or, when a test or build runner is parsed and no linter is, a linter's warning or error line, such as file:line:col: warning, or a linter summary with a count above 0), unless every linter the criterion names has its own clean parsed summary and it has no lint, clean or no-warnings wording (phpstan reports no errors next to another tool's warnings); no_tests_run also, without a cap, when the verdict is already not met, the parsed runners are only build or lint runners and none failed, and a criterion claims tests (the next step then says so); criterion_not_covered when the verdict is not met, no cap applies, and a lint, build or typecheck criterion has no parsed runner of that kind (only a test runner's summary was recognised, for example), so that check's output never reached Jev; it never changes the verdict",
       p: "Lowest probability that a criterion holds",
       criteria: "Per criterion, by position, when more than one; reason criterion_not_covered on a criterion that is not met and has no parsed runner of its kind",
       next_step: "Only when not met",

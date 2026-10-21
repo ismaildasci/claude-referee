@@ -1,4 +1,4 @@
-// docs/decisions/php-agent-diagnostic-cap.md: PHP agent JSON summaries do not vouch for another linter's diagnostic lines, so the warning cap still applies.
+// docs/decisions/php-agent-diagnostic-cap.md: PHP agent JSON summaries do not vouch for another linter's diagnostic lines, so the warning cap still applies (criteria naming only those clean linters: named-linter-cap.test.ts).
 // Every line below is invented to mirror the real shapes (glued JSON summaries, oxlint agent-format heads, a silent type check, an exit line); no real log text is committed.
 
 import assert from "node:assert/strict";
@@ -25,8 +25,8 @@ const WARNINGS = [
 const WITH_WARNINGS = lines(SUMMARIES, "$ fmt --check web/", "All matched files use the correct format.", ...WARNINGS, PHPSTAN, "$ type-check --noEmit", "exit code: 0");
 const WITHOUT_WARNINGS = lines(SUMMARIES, "$ fmt --check web/", "All matched files use the correct format.", PHPSTAN, "$ type-check --noEmit", "exit code: 0");
 
-test("C1: lint, clean and tool-named criteria are capped when another linter's warning line is in the log", () => {
-  for (const criterion of ["lint is clean", "there are no lint warnings", "phpstan reports no errors", "pint, phpstan and rector report no problems"]) {
+test("C1: lint and clean criteria are capped when another linter's warning line is in the log", () => {
+  for (const criterion of ["lint is clean", "there are no lint warnings"]) {
     assert.deepEqual(verdictOf(WITH_WARNINGS, criterion), { verdict: "unsure", reason: "warning_in_log" }, criterion);
   }
 });

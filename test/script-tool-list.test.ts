@@ -44,14 +44,14 @@ test("S1: claim wording in the list, a linter outside a list and a lint claim st
   for (const c of [
     "composer test (lint clean) exits with code 0",
     "composer test (no warnings) exits with code 0",
-    "composer test (phpstan no errors) exits with code 0",
-    "composer test (phpstan 0 errors) exits with code 0",
+    "composer test (oxlint no errors) exits with code 0",
+    "composer test (eslint 0 errors) exits with code 0",
     "composer test (lint hatasız) exits with code 0",
     "composer test (lint succeeds) exits with code 0",
-    "phpstan exits with code 0",
+    "oxlint exits with code 0",
     "lint is clean",
-    "composer test (pint, phpstan) exits 0; phpstan 0 errors",
-    "composer test and phpstan exit with code 0",
+    "composer test (pint, oxlint) exits 0; oxlint 0 errors",
+    "composer test and oxlint exit with code 0",
     "npm run check (oxlint) passes and oxlint exits 0",
   ]) {
     assert.deepEqual(verdictOf(LOG, c), { verdict: "unsure", reason: "warning_in_log" }, c);
@@ -61,7 +61,13 @@ test("S1: claim wording in the list, a linter outside a list and a lint claim st
   }
 });
 
+test("S1: a linter named outside a list whose own summary is clean and parsed is met (named-linter-cap.md)", () => {
+  for (const c of ["composer test (phpstan 0 errors) exits with code 0", "phpstan exits with code 0", "composer test (pint, phpstan) exits 0; phpstan 0 errors", "composer test and phpstan exit with code 0"]) {
+    assert.deepEqual(verdictOf(LOG, c), { verdict: "met", reason: undefined }, c);
+  }
+});
+
 test("S1: a list that is not right after a script command is unchanged", () => {
-  assert.deepEqual(verdictOf(LOG, "the checks (pint, rector, phpstan) exit with code 0"), { verdict: "unsure", reason: "warning_in_log" });
-  assert.deepEqual(verdictOf(LOG, "composer test exits with code 0 (pint, phpstan)"), { verdict: "unsure", reason: "warning_in_log" });
+  assert.deepEqual(verdictOf(LOG, "the checks (oxlint, rector, eslint) exit with code 0"), { verdict: "unsure", reason: "warning_in_log" });
+  assert.deepEqual(verdictOf(LOG, "composer test exits with code 0 (oxlint, eslint)"), { verdict: "unsure", reason: "warning_in_log" });
 });

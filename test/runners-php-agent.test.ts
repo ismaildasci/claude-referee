@@ -79,7 +79,8 @@ test("B2/B6: a failed summary next to exit code 0 is a conflict and never met; p
 test("composite logs keep the existing caps: warnings from another linter cap a lint criterion, and a criterion about tests still needs test results", () => {
   const composite = `Found 4 warnings and 0 errors.\nFinished in 900ms on 400 files with 116 rules using 8 threads.\n${PINT_PASS}\n${STAN_PASS}\n${EXIT}`;
   assert.deepEqual(verdictOf(composite, "composer run check exits with code 0"), { verdict: "met", reason: undefined });
-  assert.deepEqual(verdictOf(composite, "phpstan reports no errors"), { verdict: "unsure", reason: "warning_in_log" });
+  assert.deepEqual(verdictOf(composite, "phpstan reports no errors"), { verdict: "met", reason: undefined }, "a clean parsed linter named alone (named-linter-cap.md)");
+  assert.deepEqual(verdictOf(composite, "lint is clean"), { verdict: "unsure", reason: "warning_in_log" });
   assert.deepEqual(verdictOf(composite, "composer test exits with code 0"), { verdict: "met", reason: undefined }, "a script's name is not a test claim (test-in-command-name.md)");
   assert.deepEqual(verdictOf(composite, "all tests pass"), { verdict: "unsure", reason: "no_tests_run" });
 });
