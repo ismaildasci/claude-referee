@@ -87,8 +87,15 @@ Written after the code.
 
 - **N1:** `test/named-linter-cap.test.ts` has 4 tests. The two that lift a verdict fail without the change. The two that pin the caps pass either way. The assertions of the three records listed under the cost were changed as described there. The full suite passes, 1221 of 1221.
 - **N2:** the 153 stored logs went through `doneRequest` at `4c39c4c` and with the change. 0 sent states changed. At a stubbed 0.98, 5 results moved, all `unsure` (`warning_in_log`) to `met`, and they are exactly the 5 named under Why. 0 results moved at 0.6 and at 0.1.
-- **N3:** the `eval score --suite all --fail-on violated` output is byte-identical before and after the build. So is each done suite's own score: verdict counts, precision and recall. `ci:local` result: see the commit's CI.
-- **N4:** no live probe, as registered. The request is unchanged.
+- **N3:** the `eval score --suite all --fail-on violated` output is byte-identical before and after the build. So is each done suite's own score: verdict counts, precision and recall. `ci:local` exited 0 with 1221 of 1221 tests on four Node versions, and the done gate on its output was `met` 0.99 (receipt `rmvibogggzzy9`).
+- **N4:** the registration skipped a live probe because the request is unchanged. That holds against main, but the receipts' 0.90 and 0.73 answered the live build's request, which still carried the zero test counts. So a probe ran after the commit: the shipped bundle, `done --fresh`, a temporary data directory, the invented composer fixture, three asks per model.
+
+| criterion | jev-1.13.0 | jev-1.14.0 |
+| --- | --- | --- |
+| `pint, rector and phpstan all pass with 0 errors` | `met` 0.97 | `met` 0.98 to 0.99 |
+| `the command finished with exit code 0, phpstan reported 0 errors and rector totals report 0 changed files` | `met` 0.77 to 0.79 | `met` 0.77 to 0.82 |
+| `pint passed, rector 0 errors, phpstan 0 errors` | `met` 0.97 | `met` 0.98 |
+| `lint is clean` | Jev 0.94, `unsure` (`warning_in_log`) | Jev 0.96 to 0.97, `unsure` (`warning_in_log`) |
 
 Limits:
 - The rule trusts a named linter's parsed summary over every other line in the log.
