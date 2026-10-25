@@ -1,5 +1,5 @@
 // done: does the check output show each criterion holds? One request; every criterion is a Noul on the same evidence.
-// Recognised runner output is parsed in code and only those facts reach Jev (Pint, PHPStan and Rector without zero test counts); unrecognised output can never become met. Under done --run with exit 0, a silent tsc or vue-tsc echo that ends the output is one more runner fact.
+// Recognised runner output is parsed in code and only those facts reach Jev (Pint, PHPStan and Rector without zero test counts); unrecognised output can never become met. Under done --run with exit 0, a silent tsc or vue-tsc echo that ends the output is one more runner fact, and the CLI's own `$ <command>` line is dropped when only that lets the log parse (a silent eslint run).
 // A non-zero exit code in the evidence is missing without a request (a zero-request receipt; --dry-run prints that verdict); skipped, risky or incomplete tests, or a skip marker anywhere in the log, cap met at unsure.
 // A lint or clean criterion (lint, clean, no warnings, or a linter's name such as oxlint, not counting a plain step list after a script command) is capped at unsure when only an exit code backs it and the log shows a warning, notice, failure or skip message or a swallowed exit code, or when a test or build runner is parsed but no linter is and the log has a linter's warning or error line or a linter summary with a count above 0.
 // A parsed run that is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion with parsed warnings, is capped the same way; a criterion that names only linters whose own parsed facts are clean, with no lint, clean or no-warnings wording, is not capped for warnings.
@@ -134,7 +134,10 @@ function factsOf(parsed: ParsedEvidence, ran?: string): Record<string, unknown> 
 
 // `exitCode` is the check's own exit status when the CLI ran it (done --run): a stray "exit code 1" printed by the check itself must not outvote it.
 export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, criteria: readonly string[], evidence: string, exitCode?: number, ran?: string): { planned: Planned[]; finish: (outcomes: Outcome[]) => Result } {
-  const piped = parseEvidence(evidence);
+  const full = parseEvidence(evidence);
+  const echo = `$ ${ran}\n`;
+  const bare = ran !== undefined && exitCode === 0 && full.trust !== "parsed" && evidence.startsWith(echo) ? parseEvidence(evidence.slice(echo.length)) : null;
+  const piped = bare?.trust === "parsed" ? bare : full;
   const tail = ran !== undefined && exitCode === 0 ? silentTypecheckTail(evidence) : null;
   const read: ParsedEvidence = tail === null ? piped : { ...piped, trust: "parsed", runners: [...piped.runners, buildOnly(mk(tail, {}, [], `${tail} printed no diagnostics and exited 0`, false))] };
   const failing = read.runners.some((r) => r.failed + r.errors > 0);
