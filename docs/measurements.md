@@ -146,7 +146,7 @@ Run on 2026-09-30 (UTC) and 2026-10-01 against `jev-1.13.0`, from one machine, w
 | A Choice with 256 options | 400 | `Too many choices. Must have at most 255 choices.` |
 | Model `no-such-model` | 400 | `Unknown model: no-such-model` |
 
-- The documented upper limits are enforced with 400, a status the [API page](https://docs.typesafe.ai/api.md) doesn't list; it lists 401, 422, 429 and 529.
+- The documented upper limits are enforced with 400, a status the API page did not list at the time (it listed 401, 422, 429 and 529). Since 2026-10-25 the [errors page](https://docs.typesafe.ai/api/errors.md) lists 400 for a broken request rule and 413 for a body over 32 MiB.
 - The [Score page](https://docs.typesafe.ai/primitives/score.md) says a Score should have at least two levels. A one-level Score was accepted with 200.
 - The probe recorded four headers if present: `x-typesafe-request-id`, `x-ratelimit-*`, `retry-after` and `retry-after-ms`. Only `x-typesafe-request-id` came back, on every response. None of the seven responses was a 429.
 

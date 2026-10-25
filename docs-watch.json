@@ -1,26 +1,28 @@
 {
   "models.md": {
-    "sha256": "02b7682a7176d2d6649a2fa4588df45cbbaa3c3460f721828d632a7577e606df",
+    "sha256": "bed299c24098aaf2223f2244127041fcc5d0c3a77a2cbaa4daf7eb14bd755343",
     "facts": {
       "rate_limits": "",
       "models": [
-        "jev-1.13",
         "jev-1.13.0",
+        "jev-1.13.md",
         "jev-1.14.0"
       ]
     }
   },
   "api.md": {
-    "sha256": "37f0f3a41917e17592876f67848bd63329ba576081a89704f28210f0efc3c0f6",
+    "sha256": "5e6261f6f6212c6cf75fd55cc2856184b355a6400673b18314e85505e6219820",
     "facts": {}
   },
   "llms.txt": {
-    "sha256": "99f746d2570aa97898ad0e62042b9b5b703e54c3f1142ce4cf4b7ff15b5782ae",
+    "sha256": "e817e47899099364d29633f157ac5de74f936c849bdf5a14382e31ba4a09c688",
     "facts": {
-      "links": 128,
+      "links": 131,
       "paths": [
         "agent-skill.md",
-        "api.md",
+        "api/errors.md",
+        "api/list-models.md",
+        "api/system-one.md",
         "concepts/how-to-build-with-system-one.md",
         "concepts/state.md",
         "concepts/system-one.md",
@@ -49,6 +51,7 @@
         "cookbooks/twitch_chat_filter.md",
         "demos.md",
         "demos/smart-home.md",
+        "https://api.typesafe.ai/openapi.json",
         "images.md",
         "introduction.md",
         "introduction/coding-agents.md",
@@ -151,7 +154,7 @@
     }
   },
   "model-jaggedness/jev-1.13.md": {
-    "sha256": "ae4e822c759ce6665553a676c7bfa9371374e02685b4dacb1851a330875e5950",
+    "sha256": "f4bef6bdad41b84d4e8f7a14e9ce38aa9f8a55714b294ecf30b191482439affe",
     "facts": {
       "reviewed": "2026-10-02"
     }
