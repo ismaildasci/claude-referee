@@ -1,0 +1,4 @@
+{"suite":"done-run-silent","case":"drs-01","split":"dev","model":"jev-1.13.0","pack":"generic@0.1.0","qhash":"46450bcd639d","shash":"5412771f5156","answers":{"c1":{"type":"noul","noul":0.94}},"recorded_at":"2026-10-25T16:59:59.467Z"}
+{"suite":"done-run-silent","case":"drs-02","split":"dev","model":"jev-1.13.0","pack":"generic@0.1.0","qhash":"46450bcd639d","shash":"1cb108bf16ff","answers":{"c1":{"type":"noul","noul":0.95}},"recorded_at":"2026-10-25T16:59:59.468Z"}
+{"suite":"done-run-silent","case":"drs-03","split":"dev","model":"jev-1.13.0","pack":"generic@0.1.0","qhash":"5b762de40bcc","shash":"5412771f5156","answers":{"c1":{"type":"noul","noul":0.97}},"recorded_at":"2026-10-25T16:59:59.468Z"}
+{"suite":"done-run-silent","case":"drs-04","split":"dev","model":"jev-1.13.0","pack":"generic@0.1.0","qhash":"46450bcd639d","shash":"1e4639407097","answers":{"c1":{"type":"noul","noul":0.2}},"recorded_at":"2026-10-25T16:59:59.468Z"}

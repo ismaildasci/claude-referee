@@ -52,3 +52,5 @@ Written after the code.
 | `Pest reports all tests passed and the exit code is 0`, 1 failing | missing 0.02 | missing 0.02 | missing 0.01 | missing 0.01 |
 
 No wrong `met`: the failing log stays `missing` on both builds. `php artisan test` is `met` near the 0.70 bar on 1.14, so a run that names that command can still come back `unsure`.
+
+Recorded suite (added 2026-10-25, after the push): `jev-evals/done-pest`, 6 invented dev cases recorded on `jev-1.13.0`. Passing log under `Pest reports all tests passed and the exit code is 0` 0.98, `The Pest suite passes with no failed tests` 0.97, `all tests pass` 0.97, `php artisan test passes with no failures` 0.77 (all `met`); a failing log with a hand-written exit code 0 0.02 and a log cut before its summary 0.01 (`missing`). Score: pass, 0 wrong `met`.

@@ -172,7 +172,9 @@ function request(context: Context, pack: Pack, suite: Suite, item: EvalCase, abl
   } else if (command === "done") {
     const evidence = doneEvidence(typeof item["evidence"] === "string" ? item["evidence"] : "");
     if (!evidence.trim()) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: the evidence is empty.`);
-    ({ planned, finish } = doneRequest(pack, undefined, criteriaFor(suite, item), evidence));
+    const run = item["run"] as { command?: unknown; exit_code?: unknown } | undefined;
+    if (run !== undefined && (typeof run.command !== "string" || !Number.isInteger(run.exit_code))) throw new RefereeError("bad_input", `Suite ${suite.name}, case ${item.id}: run needs a command string and an integer exit_code.`);
+    ({ planned, finish } = run === undefined ? doneRequest(pack, undefined, criteriaFor(suite, item), evidence) : doneRequest(pack, undefined, criteriaFor(suite, item), evidence, run.exit_code as number, run.command as string));
   } else if (command === "judge") {
     const text = typeof item["text"] === "string" ? item["text"] : "";
     if (!suite.config.question) throw new RefereeError("bad_input", `Suite ${suite.name}: a judge suite needs "question" in suite.json.`);
@@ -436,7 +438,7 @@ export const evalCommand: Command = {
     inputs: {
       "record | score": "Positional action.",
       "--suite <name|all>": "A directory under the evals dir with suite.json, cases.jsonl and, once recorded, recorded.jsonl. 'all' takes every suite; score then skips suites without recordings.",
-      "--evals-dir <dir>": "Where the suites live; default jev-evals in the current directory. A suite.json names its command (done, claims or its old name verify, judge, stop or decide) and may name a pack, which an explicit --pack overrides (a decide case has decision, context, options and an expected option name; a judge suite also names its question, and its cases have text and an expected yes, no or review).",
+      "--evals-dir <dir>": "Where the suites live; default jev-evals in the current directory. A suite.json names its command (done, claims or its old name verify, judge, stop or decide) and may name a pack, which an explicit --pack overrides (a done case may add run: {command, exit_code} to be judged as done --run passes them, its evidence starting with `$ <command>`; a decide case has decision, context, options and an expected option name; a judge suite also names its question, and its cases have text and an expected yes, no or review).",
       "--split <dev|holdout>": "record and score: only cases from this split, so dev can be recorded before the hold-out.",
       "--sweep <from:to:step>": "score: precision, recall and wrong positives per threshold; suggests one only with at least 10 cases per class.",
       "--ablation <context|reversed>": "decide suites only. record: record answers with the context text left out of the request (reversed needs no new recording). score: rescore with that element removed and report the change against the full run; context needs those answers recorded first.",

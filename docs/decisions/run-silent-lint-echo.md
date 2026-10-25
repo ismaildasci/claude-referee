@@ -46,3 +46,5 @@ Written after the code.
 | eslint, 1 printed warning | missing 0.20-0.21 | missing 0.20-0.21 | missing 0.15-0.16 | missing 0.15-0.16 |
 
 The real eslint runs were `unsure` 0.68 on 1.14 with the project's own longer echo, at the edge of the 0.70 bar that the invented `before` rows sit on. No wrong `met`: the warned fixture stays `missing` on both builds.
+
+Recorded suite (added 2026-10-25, after the push): `jev-evals/done-run-silent`, 5 invented dev cases with `run: {command, exit_code}` (a new `eval` case field), recorded on `jev-1.13.0`. Silent eslint `lint is clean` 0.94, silent oxlint behind `cd api && ` 0.95, `eslint reports 0 errors and 0 warnings` 0.97 (all `met`); a printed warning 0.20 (`missing`); exit code 1 decided in code. Score: pass, 0 wrong `met`.

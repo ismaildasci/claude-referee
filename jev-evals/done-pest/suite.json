@@ -1,0 +1,1 @@
+{"command": "done", "positive": "met", "max_wrong_positive": 0, "note": "Invented in the shape of real Pest 5.3 output for docs/decisions/pest-runner-label.md (runner labelled pest). Passing logs expect met, also under criteria that name Pest or php artisan test; a failing log with a hand-written exit code 0 and a log cut before its summary expect not met."}

@@ -290,3 +290,19 @@ test("record refuses suites on different packs in one run, and --pack still over
   const forced = await evalRun(["score", "--suite", "b-i18n", "--evals-dir", root, "--pack", "generic"]);
   assert.equal(forced.out["error"], "bad_pack");
 });
+
+test("a done case with run is judged as done --run passes it: the CLI's command line and exit code reach doneRequest", async () => {
+  const evidence = "$ npm run lint\n\n> app@1.0.0 lint\n> eslint .\nexit code: 0\n";
+  const states: unknown[] = [];
+  const root = suite([{ id: "run", split: "dev", expected: "met", criterion: "lint is clean", run: { command: "npm run lint", exit_code: 0 }, evidence }, { id: "piped", split: "dev", expected: "met", criterion: "lint is clean", evidence }]);
+  const { code } = await record(root, [], (request) => {
+    states.push(request.state);
+    return Object.fromEntries(Object.keys(request.questions).map((id) => [id, { type: "noul", noul: 0.95 }]));
+  });
+  assert.equal(code, 0);
+  const facts = states.map((s) => (s as { evidence: { trust: string; ran?: string } }).evidence).sort((a, b) => a.trust.localeCompare(b.trust));
+  assert.deepEqual(facts.map((f) => [f.trust, f.ran]), [["exit_code", undefined], ["parsed", "npm run lint"]]);
+  const bad = await record(suite([{ id: "bad", split: "dev", expected: "met", criterion: "lint is clean", run: { command: "npm run lint" }, evidence }]));
+  assert.equal(bad.out["error"], "bad_input");
+  assert.equal(bad.requests, 0);
+});
