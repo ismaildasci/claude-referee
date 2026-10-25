@@ -28,7 +28,7 @@ The agent-format parser also reads objects whose tool is `pest`, `phpunit` or `p
 
 ## Cost, stated up front
 
-About 40 lines in `src/engine/runners/php-agent.ts`, one runner kind (`paratest`), and tests. Failing test names from pao go to Jev, as failing names from every other test parser already do ([privacy.md](../privacy.md) lists failing test names). Fitted to pao 1.1.5's source; only `pest` has real samples here (2 stored logs, one project); `phpunit` and `paratest` share the same code in pao and were not run.
+About 40 lines in `src/engine/runners/php-agent.ts`, one runner kind (`paratest`), and tests. Failing test names from pao go to Jev, as failing names from every other test parser already do ([privacy.md](../privacy.md) lists failing test names). Fitted to pao 1.1.5's source; only `pest` has real samples here (2 stored logs, one project); `phpunit` and `paratest` share the same code in pao and were not run. pao picks the driver by the binary name (`Execution::start`), so `pest --parallel` still reports `pest`; a direct `paratest` run, as in a PHPUnit project run in parallel, reports `paratest`, and a criterion that names PHPUnit then meets a `paratest` runner (read from the source, not run).
 
 ## Decision
 
