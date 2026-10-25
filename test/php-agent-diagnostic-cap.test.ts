@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { doneRequest } from "../src/cli/commands/done.ts";
 import { loadPack, packDirs } from "../src/engine/pack.ts";
-import { SUMMARY_ONLY } from "../src/engine/runners/kinds.ts";
+import { RUNNER_KINDS, SUMMARY_ONLY } from "../src/engine/runners/kinds.ts";
 import { parsers as phpAgent } from "../src/engine/runners/php-agent.ts";
 
 const pack = loadPack("generic", packDirs(process.env));
@@ -46,6 +46,8 @@ test("C2: a failing summary is still missing, the cap never lifts a verdict", ()
   assert.equal(verdictOf(failing, "lint is clean", 0.02).verdict, "missing");
 });
 
-test("SUMMARY_ONLY is exactly the set of runners php-agent.ts parses", () => {
-  assert.deepEqual([...SUMMARY_ONLY].sort(), phpAgent.map((p) => p.name).sort());
+test("SUMMARY_ONLY is exactly the set of non-test runners php-agent.ts parses (pao test lines are full test facts, docs/decisions/pao-test-json.md)", () => {
+  const isTest = (name: string) => RUNNER_KINDS[name]?.includes("test") === true;
+  assert.deepEqual([...SUMMARY_ONLY].sort(), phpAgent.map((p) => p.name).filter((n) => !isTest(n)).sort());
+  assert.deepEqual(phpAgent.map((p) => p.name).filter(isTest).sort(), ["paratest", "pest", "phpunit"]);
 });

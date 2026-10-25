@@ -16,6 +16,7 @@ export const RUNNER_KINDS: Readonly<Record<string, readonly CheckKind[]>> = {
   pytest: ["test"],
   unittest: ["test"],
   phpunit: ["test"],
+  paratest: ["test"],
   rspec: ["test"],
   "go test": ["test"],
   "cargo test": ["test"],
