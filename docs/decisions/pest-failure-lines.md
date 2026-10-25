@@ -21,7 +21,7 @@ The `jest` parser, which already owns Pest's `Tests:` summary, also reads Pest's
 
 The failure count is the largest of these and the summary's `failed`, never their sum. With `exit code: 0` any of them is a conflict (`unsure`); with a non-zero code nothing changes (`missing` before any request).
 
-The runner keeps the `jest` label, as [parser-defects-2026-10-06.md](parser-defects-2026-10-06.md) decided (rule 4): a `pest` label would change the facts of the recorded hold-out case `h6-f-07` and make its answer stale.
+The runner keeps the `jest` label, as [parser-defects-2026-10-06.md](parser-defects-2026-10-06.md) decided (rule 4): a `pest` label would change the facts of the recorded hold-out case `h6-f-07` and make its answer stale. (Reversed on 2026-10-25: [pest-runner-label.md](pest-runner-label.md).)
 
 ## Bars
 

@@ -8,6 +8,7 @@ export const SUMMARY_ONLY: ReadonlySet<string> = new Set(["pint", "phpstan", "re
 
 export const RUNNER_KINDS: Readonly<Record<string, readonly CheckKind[]>> = {
   jest: ["test"],
+  pest: ["test"],
   vitest: ["test"],
   mocha: ["test"],
   "node:test": ["test"],

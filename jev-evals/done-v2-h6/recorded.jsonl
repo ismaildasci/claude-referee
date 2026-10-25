@@ -37,3 +37,4 @@
 {"suite":"done-v2-h6","case":"h6-f-07","split":"holdout","model":"jev-1.13.0","pack":"generic@0.1.0","qhash":"3c4a05d05ac2","shash":"66eaf6696a86","answers":{"c1":{"type":"noul","noul":0.97}},"recorded_at":"2026-10-09T15:03:08.714Z"}
 {"suite":"done-v2-h6","case":"h6-f-08","split":"holdout","model":"jev-1.13.0","pack":"generic@0.1.0","qhash":"3c4a05d05ac2","shash":"e2de22882ba4","answers":{"c1":{"type":"noul","noul":0.29}},"recorded_at":"2026-10-09T15:03:08.715Z"}
 {"suite":"done-v2-h6","case":"h6-f-10","split":"holdout","model":"jev-1.13.0","pack":"generic@0.1.0","qhash":"3c4a05d05ac2","shash":"300d6348a450","answers":{"c1":{"type":"noul","noul":0.27}},"recorded_at":"2026-10-09T15:03:08.715Z"}
+{"suite":"done-v2-h6","case":"h6-f-07","split":"holdout","model":"jev-1.13.0","pack":"generic@0.1.0","qhash":"3c4a05d05ac2","shash":"87e704e0f050","answers":{"c1":{"type":"noul","noul":0.97}},"recorded_at":"2026-10-25T16:37:31.574Z"}

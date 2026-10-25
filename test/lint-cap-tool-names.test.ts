@@ -244,8 +244,8 @@ test("R3 leaves met, covered criteria, exit-code-only logs and earlier reasons a
 });
 
 test("R3: every runner name a parser emits has a kind, and every kind entry is emitted", () => {
-  const emitted = parseEvidence("$ flutter test --no-pub\n00:00 +0: adds one to input values\n00:00 +1: All tests passed!\nexit code: 0\n").runners.map((r) => r.runner);
-  assert.deepEqual(emitted, ["flutter test"]);
+  const emitted = ["$ flutter test --no-pub\n00:00 +0: adds one to input values\n00:00 +1: All tests passed!\nexit code: 0\n", "  Tests:    3 passed (5 assertions)\nexit code: 0\n"].flatMap((log) => parseEvidence(log).runners.map((r) => r.runner));
+  assert.deepEqual(emitted, ["flutter test", "pest"]);
   const names = [...[...python, ...js, ...compiled, ...phpRuby, ...more, ...suites, ...scenarios, ...builds, ...native, ...moreTools, ...bun, ...oxlintParsers, ...phpAgent].map((p) => p.name), ...emitted, ...SILENT_TYPECHECKS];
   assert.deepEqual(names.filter((n) => RUNNER_KINDS[n] === undefined), []);
   assert.deepEqual(Object.keys(RUNNER_KINDS).filter((n) => !names.includes(n)), []);
