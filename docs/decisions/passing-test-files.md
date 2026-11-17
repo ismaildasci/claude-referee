@@ -81,3 +81,4 @@ The first version sent the facts on every clean run. Three measurements narrowed
 - A list longer than 20 is cut; `files_passed` still carries the full count, and a criterion naming a file beyond the cut reads as not shown.
 - Evidence longer than the clip (first 2,000 and last 12,000 characters) can lose `✓` lines from its middle.
 - One session supplied all 77 calls; the reach on other projects is not measured.
+- **vitest 5 hides the file lines from coding agents.** vitest 5.1.0 prints no `✓ <file>` lines when it detects a coding agent (seen with Claude Code's `AI_AGENT` and `CLAUDECODE` variables set; with a clean environment or `--reporter=default` it prints them). Then only `files_passed` is sent. The stored logs came from vitest 3.2.7, which prints them. Found on 2026-11-17 while probing [done-run-scoped.md](done-run-scoped.md), whose command fact carries the paths instead.

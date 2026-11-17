@@ -20,7 +20,7 @@ The CLI is `node "${CLAUDE_PLUGIN_ROOT}/dist/cli.mjs" <command>`. Every command 
 node "${CLAUDE_PLUGIN_ROOT}/dist/cli.mjs" done --run test
 ```
 
-`--run` takes a family (test, typecheck, lint, build, check, ci, verify) or the exact command the project's manifest defines, runs it in the manifest folder and judges all of its output; it refuses anything else, exits 3 unless the verdict is `met`, and without `--criteria` asks the family's question. Prefer it to piping. Pipe only for a check it does not list:
+`--run` takes a family (test, typecheck, lint, build, check, ci, verify) or the exact command the project's manifest defines, runs it in the manifest folder and judges all of its output; it refuses anything else, exits 3 unless the verdict is `met`, and without `--criteria` asks the family's question. For a few files it also takes `--run "eslint <paths>"` or `--run "vitest run <paths>"`: paths only, no flags, and the criterion must name one of the paths as a path (the default one does). Prefer it to piping. Pipe only for a check it does not list:
 
 ```bash
 npm test 2>&1 | node "${CLAUDE_PLUGIN_ROOT}/dist/cli.mjs" done --criteria "all tests pass" --evidence -
