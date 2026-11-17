@@ -1,4 +1,4 @@
-// Parsers for jest, vitest, mocha, eslint, tsc and node:test output. Only structured markers and counts are read; prose in the log is ignored. Pest and Collision output goes to jest: its "Tests:" line, namespaced FAIL/FAILED headers, "⨯" lines (with such a header) and compact "⨯" marks; with an "(N assertions)" summary or a Pest failure mark the runner is labelled pest.
+// Parsers for jest, vitest, mocha, eslint, tsc and node:test output. Only structured markers and counts are read; prose in the log is ignored. Pest and Collision output goes to jest: its "Tests:" line, namespaced FAIL/FAILED headers, "⨯" lines (with such a header) and compact "⨯" marks; with an "(N assertions)" summary or a Pest failure mark the runner is labelled pest. A "●" line whose name starts with "(SSG) " is the Next.js route legend, not a jest failure (docs/decisions/next-legend-jest.md).
 // Worst case wins: a failure marker anywhere beats a passing summary line, and a log cut off before its summary never counts as a pass; a tsc -b status line ("[t] " or "t - " lead) makes a tsc run, cut off on a dry run, a skipped project, a watch restart after the last Found, or (no Found line after its header) a clip marker, no header, a listed project but the last (a solution root) with no status, or a last status still waiting for its build. A tsc -b with no Found or error line (nor an "error TSn:" token the error parser misses), not cut, whose clock-stamped last header is followed only by clock-stamped status lines, blank lines and exit lines, and where every project of that list ends in "Building project" or "is up to date because" (an absolute-path "Building project", printed by TS 5/6 before compiling, only when a later status line follows), passes that many projects with its last status line, clock removed, as summary.
 // node:test details with no summary or failure marker (a tail in one error block) are one failure, cut off, unless a todo's "⚠ name (Xms)" owns them; assertion props any logged error has count only without a jest/vitest/bun/mocha summary; a TAP hookFailed block under "# fail 0" fails.
 
@@ -103,7 +103,7 @@ function parseJest(text: string): RunnerFacts | null {
     if (h !== null) {
       const name = h[1] ?? "";
       if (/^Test suite failed to run\b/.test(name)) runErrors += 1;
-      else if (!/^(?:Console|Validation Warning|Deprecation Warning)\b/.test(name)) ids.add(name);
+      else if (!/^(?:Console|Validation Warning|Deprecation Warning)\b|^\s*\(SSG\)\s/.test(name)) ids.add(name);
       continue;
     }
     const f = /^\s*FAIL\s+(\S*[./]\S*)(?:\s+\(.*\))?\s*$/.exec(l);

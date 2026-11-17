@@ -53,6 +53,18 @@ test("next build: success, ESLint warnings and the route table as the completion
   assert.deepEqual({ e: warn?.errors, w: warn?.warnings }, { e: 0, w: 1 });
 });
 
+test("next build: the route legend's SSG line is not a jest failure (docs/decisions/next-legend-jest.md)", () => {
+  const routes = "├ ● /blog/[slug]\n│ ├ /blog/first\n│ └ /blog/second\n└ ○ /_not-found\n";
+  const legend = "●  (SSG)      prerendered as static HTML (uses generateStaticParams)\nƒ  (Dynamic)  server-rendered on demand\n";
+  const parsed = parseEvidence(`${NEXT16.replace("└ ○ /_not-found\n", routes)}${legend}\nexit code: 0\n`);
+  assert.deepEqual(parsed.runners.map((r) => [r.runner, r.failed, r.errors, r.failing.length]), [["next build", 0, 0, 0]]);
+  assert.equal(parsed.conflict, false);
+  const summary = parseEvidence("  ● (SSG) pages › renders\n\n    expect(received).toBe(expected)\n\nTests:       1 failed, 4 passed, 5 total\n");
+  assert.deepEqual(summary.runners.map((r) => [r.runner, r.failed]), [["jest", 1]]);
+  const header = parseEvidence("  ● math › adds\n\n    expect(received).toBe(expected)\n");
+  assert.deepEqual(header.runners.map((r) => [r.runner, r.failed, r.failing]), [["jest", 1, ["math › adds"]]]);
+});
+
 test("next build: type, lint, module and prerender errors", () => {
   for (const log of [
     "  ▲ Next.js 14.2.35\n   Creating an optimized production build ...\n ✓ Compiled successfully\n   Linting and checking validity of types ...\nFailed to compile.\n\n./app/page.tsx:1:7\nType error: Type 'string' is not assignable to type 'number'.\n\nNext.js build worker exited with code: 1 and signal: null\n",
