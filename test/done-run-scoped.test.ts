@@ -1,10 +1,10 @@
 // docs/decisions/done-run-scoped.md: `done --run "<tool> <paths>"` runs eslint or vitest on existing paths inside the project, only when a script already runs the tool with no config-changing flag and its binary is in node_modules.
 // Projects are invented temp folders with fake tools in node_modules/.bin; the fake Jev answers 0.9. S1 resolution, S2 no shell, S3 scope cap, S4 facts; the cases an independent review added are marked (review).
+// Every test is POSIX-only: `--run` is refused on Windows before any of this code runs, and the fixtures use symlinks, sh scripts and "/" paths.
 
 import assert from "node:assert/strict";
 import { chmodSync, existsSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
-import { test } from "node:test";
 import { posixTest } from "./posix-test.ts";
 import { commands } from "../src/cli/commands/index.ts";
 import { run } from "../src/cli/run.ts";
@@ -56,7 +56,7 @@ const refusal = (spec: string, dir: string, root = dir): string => {
   }
 };
 
-test("S1: eslint and vitest resolve with paths; folders are shown with a slash; any other first word is left to the family rule", () => {
+posixTest("S1: eslint and vitest resolve with paths; folders are shown with a slash; any other first word is left to the family rule", () => {
   const dir = project({ eslint: SILENT, vitest: VITEST }, { lint: "eslint . && tsc", test: "vitest" });
   const lint = scopedCheck("eslint src/a.js src/b.js", dir, dir);
   assert.deepEqual([lint?.family, lint?.tool, lint?.shown, lint?.criterion, lint?.dir], ["lint", "eslint", "eslint src/a.js src/b.js", "eslint finds no problems in src/a.js, src/b.js", dir]);
@@ -72,7 +72,7 @@ test("S1: eslint and vitest resolve with paths; folders are shown with a slash; 
   assert.equal(scopedCheck("eslint a.js", join(dir, "src"), dir)?.command.endsWith(`'${join(dir, "src", "a.js")}'`), true);
 });
 
-test("S1 (review): the default criterion names only the paths the 80-character command fact shows", () => {
+posixTest("S1 (review): the default criterion names only the paths the 80-character command fact shows", () => {
   const dir = project({ eslint: SILENT });
   mkdirSync(join(dir, "src", "components", "forms"), { recursive: true });
   const long = ["Button", "Input", "Select", "Checkbox", "Radio", "Toggle", "Slider"].map((n) => `src/components/forms/${n}.component.js`);
@@ -86,7 +86,7 @@ test("S1 (review): the default criterion names only the paths the 80-character c
   assert.equal(five?.criterion, "eslint finds no problems in src/a.js, src/b.js, src/a.js, src/b.js, src/a.js and 2 more");
 });
 
-test("S1: a flag, a missing or outside path, a tool no script runs, a missing or outside binary, too many paths and a second line are refused, each for its own reason", () => {
+posixTest("S1: a flag, a missing or outside path, a tool no script runs, a missing or outside binary, too many paths and a second line are refused, each for its own reason", () => {
   const dir = project({ eslint: SILENT });
   const outside = tempDir();
   writeFileSync(join(outside, "evil.js"), "");
@@ -114,7 +114,7 @@ test("S1: a flag, a missing or outside path, a tool no script runs, a missing or
   assert.match(refusal("eslint src/a.js", linked), /eslint is not installed in this project's node_modules/);
 });
 
-test("S1 (review): a script that gives the tool a config-changing flag stops the scoped run; --ext stops folders only", () => {
+posixTest("S1 (review): a script that gives the tool a config-changing flag stops the scoped run; --ext stops folders only", () => {
   assert.match(refusal("eslint src/a.js", project({ eslint: SILENT }, { lint: "eslint -c strict.config.js ." })), /runs eslint with -c, which a run on paths would drop/);
   assert.match(refusal("eslint src/a.js", project({ eslint: SILENT }, { lint: "eslint .", "lint:strict": "eslint --config=strict.js ." })), /runs eslint with --config/);
   assert.match(refusal("vitest src/a.test.js", project({ vitest: VITEST }, { test: "vitest run --config vitest.e2e.config.ts" })), /runs vitest with --config/);
@@ -126,7 +126,7 @@ test("S1 (review): a script that gives the tool a config-changing flag stops the
   for (const body of ["echo eslint is not used here", "biome lint # eslint was removed", "npm run eslint", "typedoc --plugin eslint", "vp lint", ""]) assert.equal(toolFlags([body], "eslint"), null, body);
 });
 
-test("S3 (review): a criterion names the scope only with a path-like word that is a covered path, its tail, or under a covered folder", () => {
+posixTest("S3 (review): a criterion names the scope only with a path-like word that is a covered path, its tail, or under a covered folder", () => {
   const dir = project({ eslint: SILENT });
   const scope = (spec: string) => scopedCheck(spec, dir, dir)?.scope ?? [];
   const file = scope("eslint src/a.js src/index.js");
