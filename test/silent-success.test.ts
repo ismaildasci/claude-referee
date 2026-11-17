@@ -36,6 +36,19 @@ test("extra output, a non-zero or missing exit, a second script and printed warn
   assert.deepEqual(names("exit code: 0\n"), []);
 });
 
+test("pnpm's head, which adds the folder and may lack a name or version, is read; other text after the script name is not a head", () => {
+  for (const head of ["> web@1.0.0 lint /home/dev/my app", "> web@1.0.0 lint ~/code/web", "> @ lint /srv/web", "> web@ lint /srv/web", "> @scope/web@1.0.0 lint C:\\code\\web"]) {
+    assert.deepEqual(names(log('eslint --ext ".js,.vue" --ignore-path .gitignore . --cache', "exit code: 0\n", head)), ["eslint"], head);
+  }
+  for (const head of ["> web@1.0.0 lint and more", "> web@1.0.0 lint ./relative", "> web@1.0.0 lint src"]) assert.deepEqual(names(log("eslint .", "exit code: 0\n", head)), [], head);
+  const pnpm = "> web@1.0.0 lint /srv/web";
+  for (const command of ["eslint . --quiet", "eslint . -f json", "eslint . --fix", "eslint . || true"]) assert.deepEqual(names(log(command, "exit code: 0\n", pnpm)), [], command);
+  assert.deepEqual(names(log("oxlint src/", "src/a.ts:7:42: warning eslint(no-useless-escape): Unnecessary escape\nexit code: 0\n", pnpm)), []);
+  assert.deepEqual(names(log("eslint .", "eslint: 131 files, 0 errors\nexit code: 0\n", pnpm)), []);
+  assert.deepEqual(names(log("eslint .", "exit code: 1\n", pnpm)), []);
+  assert.deepEqual(names(`${log("eslint .", "exit code: 0\n", pnpm)}${log("oxlint src/", "exit code: 0\n", "> web@1.0.0 lint2 /srv/web")}`), []);
+});
+
 test("a combined log with test output keeps its own reading", () => {
   const combined = `${log("eslint .", "npm run lint exit code: 0\n")}\nℹ tests 3\nℹ pass 3\nℹ fail 0\n`;
   assert.deepEqual(names(combined).filter((n) => n === "eslint"), []);

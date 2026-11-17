@@ -25,6 +25,12 @@ test("R1: under --run a silent eslint or oxlint run behind the CLI's command lin
   assert.deepEqual(ask(lines("$ npm run lint", ...ESLINT, "exit code: 0")), { verdict: "met", reason: undefined, runners: [], trust: "exit_code" });
 });
 
+test("pnpm: under --run a silent eslint run behind pnpm's head with the folder is a clean run (docs/decisions/pnpm-silent-head.md)", () => {
+  const PNPM = ["", "> web@0.1.0 lint /srv/web", '> eslint --ext ".js,.vue" --ignore-path .gitignore . --cache'];
+  assert.deepEqual(ask(lines("$ pnpm run lint", ...PNPM, "exit code: 0"), "pnpm run lint"), { verdict: "met", reason: undefined, runners: ["eslint"], trust: "parsed" });
+  assert.equal(ask(lines("$ pnpm run lint", ...PNPM, "Done in 1.2s", "exit code: 0"), "pnpm run lint").trust, "exit_code");
+});
+
 test("R1: the silent reading's exclusions still hold under --run", () => {
   const run = (...l: string[]) => ask(lines("$ npm run lint", ...l, "exit code: 0"), "npm run lint");
   for (const command of ["> eslint . --quiet", "> eslint . -f json", "> eslint . --fix", "> eslint . || true"]) assert.equal(run("", "> web@1.0.0 lint", command).trust, "exit_code", command);

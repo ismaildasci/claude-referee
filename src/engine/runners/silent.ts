@@ -1,11 +1,12 @@
 // Silent success: an npm script echo for eslint or oxlint, then nothing but exit lines of 0, is a clean run (docs/decisions/silent-success-reading.md).
 // Every other shape stays on the exit-code reading: flags that hide or redirect output, shell operators, extra output, a second script, a non-zero exit.
+// The head is npm's `> pkg@ver script` or pnpm's, which adds the folder and may have no name or version: `> @ script /folder` (docs/decisions/pnpm-silent-head.md).
 
 import type { RunnerParser } from "./types.ts";
 import { buildOnly, exitMatches, mk, prepare } from "./util.ts";
 
 const TOOLS = new Set(["eslint", "oxlint"]);
-const HEAD = /^> \S+@\S+ \S+\s*$/;
+const HEAD = /^> \S*@\S* \S+(?: (?:[/~]|[A-Za-z]:[\\/]).*)?\s*$/;
 const COMMAND = /^> (.+?)\s*$/;
 const SHELL = /[|&;<>$()`]/;
 const HIDING = /^(?:--quiet|-q|--silent|--format(?:=.*)?|-f|--output-file(?:=.*)?|-o|--fix|--fix-dry-run|.*no-error.*)$/;
