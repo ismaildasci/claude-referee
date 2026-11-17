@@ -1,4 +1,4 @@
-// Parsers for jest, vitest, mocha, eslint, tsc and node:test output. Only structured markers and counts are read; prose in the log is ignored. Pest and Collision output goes to jest: its "Tests:" line, namespaced FAIL/FAILED headers, "⨯" lines (with such a header) and compact "⨯" marks; with an "(N assertions)" summary or a Pest failure mark the runner is labelled pest. A "●" line whose name starts with "(SSG) " is the Next.js route legend, not a jest failure (docs/decisions/next-legend-jest.md).
+// Parsers for jest, vitest, mocha, eslint, tsc and node:test output. Only structured markers and counts are read; prose in the log is ignored. Pest and Collision output goes to jest: its "Tests:" line, namespaced FAIL/FAILED headers, "⨯" lines (with such a header) and compact "⨯" marks; with an "(N assertions)" summary or a Pest failure mark the runner is labelled pest. A "●" line whose name starts with "(SSG) " is the Next.js route legend, not a jest failure (docs/decisions/next-legend-jest.md). A clean vitest run (0 failed, 0 errors, 0 skipped, both summary lines) also carries files_passed and up to 20 passing_files names from its "✓ file (N tests)" lines (docs/decisions/passing-test-files.md).
 // Worst case wins: a failure marker anywhere beats a passing summary line, and a log cut off before its summary never counts as a pass; a tsc -b status line ("[t] " or "t - " lead) makes a tsc run, cut off on a dry run, a skipped project, a watch restart after the last Found, or (no Found line after its header) a clip marker, no header, a listed project but the last (a solution root) with no status, or a last status still waiting for its build. A tsc -b with no Found or error line (nor an "error TSn:" token the error parser misses), not cut, whose clock-stamped last header is followed only by clock-stamped status lines, blank lines and exit lines, and where every project of that list ends in "Building project" or "is up to date because" (an absolute-path "Building project", printed by TS 5/6 before compiling, only when a later status line follows), passes that many projects with its last status line, clock removed, as summary.
 // node:test details with no summary or failure marker (a tail in one error block) are one failure, cut off, unless a todo's "⚠ name (Xms)" owns them; assertion props any logged error has count only without a jest/vitest/bun/mocha summary; a TAP hookFailed block under "# fail 0" fails.
 
@@ -9,6 +9,8 @@ const ANSI = /\u001b\[[0-9;?]*[ -/]*[@-~]/g;
 const MAX_FAILING = 10;
 const MAX_NAME = 120;
 const MAX_SUMMARY = 200;
+const MAX_FILES = 20;
+const FILE_NAME = /^[\w@.+\-/\\[\]()]+$/;
 
 interface Counts {
   passed: number;
@@ -130,8 +132,11 @@ function parseVitest(text: string): RunnerFacts | null {
   const ids = new Set<string>();
   const loadFails = new Set<string>();
   const markedFiles = new Set<string>();
+  const passingFiles = new Set<string>();
   let unhandled = 0;
   for (const l of lines) {
+    const ok = /^\s*✓ (\S+) \(\d+ tests?\)/.exec(l);
+    if (ok !== null && FILE_NAME.test(ok[1] ?? "") && (ok[1] ?? "").length <= MAX_NAME) passingFiles.add(ok[1] ?? "");
     const f = /^\s*FAIL\s+(\S.*?)\s*$/.exec(l);
     if (f !== null) {
       const id = f[1] ?? "";
@@ -151,7 +156,7 @@ function parseVitest(text: string): RunnerFacts | null {
   if (tests.line === null && files.line === null && noFiles === null && marked === 0 && unhandled === 0) return null;
   const failed = Math.max(tests.failedMax, ids.size, ids.size === 0 && markedFiles.size > 0 ? markedFiles.size : 0);
   const errors = Math.max(loadFails.size, unhandled, failed === 0 ? files.failedMax : 0);
-  return facts("vitest", {
+  const run = facts("vitest", {
     passed: tests.last.passed,
     failed,
     errors,
@@ -160,6 +165,8 @@ function parseVitest(text: string): RunnerFacts | null {
     failing: ids.size + loadFails.size > 0 ? [...ids, ...loadFails] : markedFiles,
     summary: tests.line ?? files.line ?? noFiles,
   });
+  if (failed + errors + tests.last.skipped + tests.last.expected + files.last.skipped > 0 || tests.line === null || files.line === null || files.last.passed === 0) return run;
+  return { ...run, files_passed: files.last.passed, ...(passingFiles.size > 0 ? { passing_files: [...passingFiles].slice(0, MAX_FILES) } : {}) };
 }
 
 function parseMocha(text: string): RunnerFacts | null {

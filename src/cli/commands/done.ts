@@ -3,6 +3,7 @@
 // A non-zero exit code in the evidence is missing without a request (a zero-request receipt; --dry-run prints that verdict); skipped, risky or incomplete tests, or a skip marker anywhere in the log, cap met at unsure.
 // A lint or clean criterion (lint, clean, no warnings, or a linter's name such as oxlint, not counting a plain step list after a script command) is capped at unsure when only an exit code backs it and the log shows a warning, notice, failure or skip message or a swallowed exit code, or when a test or build runner is parsed but no linter is and the log has a linter's warning or error line or a linter summary with a count above 0.
 // A parsed run that is cut off, empty, cancelled, flaky or changed files, or a lint or clean criterion with parsed warnings, is capped the same way; a criterion that names only linters whose own parsed facts are clean, with no lint, clean or no-warnings wording, is not capped for warnings.
+// A clean vitest run whose evidence has an exit code of 0 also sends the count and up to 20 names of its passing test files, only when every criterion mentions tests (the letters test or spec) and none names a lint, build or typecheck check that no parsed runner covers (docs/decisions/passing-test-files.md).
 // Expected failures (known issues) cap met like skips; a test criterion backed only by build runners or oxlint (no test results) is capped as no tests run; a lint, build or typecheck criterion with no parsed runner of its kind gets a reason, never another verdict.
 
 import type { EntryType, Questions } from "@typesafe-ai/sdk";
@@ -126,10 +127,12 @@ export function hasLinterDiagnostic(evidence: string): boolean {
 export const bareCommand = (command: string): string => command.replace(/^cd (?:"[^"]*"|\S+) && /, "").slice(0, 80);
 
 const TEST_COUNTS: ReadonlySet<string> = new Set(["passed", "failed", "skipped"]);
-const sentRunner = ({ build_only: _buildOnly, ...r }: RunnerFacts): object => (SUMMARY_ONLY.has(r.runner) ? Object.fromEntries(Object.entries(r).filter(([k, v]) => !(TEST_COUNTS.has(k) && v === 0))) : r);
+const ABOUT_TESTS = /test|spec/i;
+const sentRunner = ({ build_only: _buildOnly, files_passed, passing_files, ...r }: RunnerFacts, files: boolean): object =>
+  SUMMARY_ONLY.has(r.runner) ? Object.fromEntries(Object.entries(r).filter(([k, v]) => !(TEST_COUNTS.has(k) && v === 0))) : files && files_passed !== undefined ? { ...r, files_passed, ...(passing_files ? { passing_files } : {}) } : r;
 
-function factsOf(parsed: ParsedEvidence, ran?: string): Record<string, unknown> {
-  return { trust: parsed.trust, ...(ran !== undefined && parsed.trust === "parsed" ? { ran: bareCommand(ran) } : {}), exit_code: parsed.exit_code, exit_lines: parsed.exit_lines, ...(parsed.trust === "exit_code" && parsed.command_lines.length > 0 ? { command_lines: parsed.command_lines } : {}), runners: parsed.runners.map(sentRunner), conflict: parsed.conflict, lines: parsed.lines };
+function factsOf(parsed: ParsedEvidence, files: boolean, ran?: string): Record<string, unknown> {
+  return { trust: parsed.trust, ...(ran !== undefined && parsed.trust === "parsed" ? { ran: bareCommand(ran) } : {}), exit_code: parsed.exit_code, exit_lines: parsed.exit_lines, ...(parsed.trust === "exit_code" && parsed.command_lines.length > 0 ? { command_lines: parsed.command_lines } : {}), runners: parsed.runners.map((r) => sentRunner(r, files)), conflict: parsed.conflict, lines: parsed.lines };
 }
 
 // `exitCode` is the check's own exit status when the CLI ran it (done --run): a stray "exit code 1" printed by the check itself must not outvote it.
@@ -207,7 +210,9 @@ export function doneRequest(pack: Pack, thresholds: Thresholds | undefined, crit
       next_step: verdict === "met" ? undefined : noTestsCapped && verdict === "unsure" ? (per.some((c) => c.noTestsCap && !c.buildCap) ? NO_TESTS_NEXT : BUILD_ONLY_NEXT) : skipCapped && verdict === "unsure" ? SKIPPED_NEXT : incompleteCapped && verdict === "unsure" ? INCOMPLETE_NEXT : warningCapped && verdict === "unsure" ? (diagnosticCap ? DIAGNOSTIC_NEXT : WARNING_NEXT) : buildOnlyUnmet ? BUILD_ONLY_NEXT : notCovered.length > 0 ? notCoveredNext(runnerNames, notCovered, per.length > 1) : parsed.trust === "unparsed" && per.every((c) => c.verdict !== "missing") ? UNPARSED_NEXT : parsed.trust === "exit_code" && verdict === "missing" ? EXIT_ONLY_NEXT : NEXT[verdict],
     };
   };
-  const state = (parsed.trust === "unparsed" ? { evidence } : { evidence: factsOf(parsed, ran) }) as EntryType;
+  const kinds = parsed.runners.map((r) => r.runner);
+  const files = parsed.exit_code === 0 && criteria.every((criterion) => ABOUT_TESTS.test(criterion) && uncoveredKinds(criterion, kinds).length === 0);
+  const state = (parsed.trust === "unparsed" ? { evidence } : { evidence: factsOf(parsed, files, ran) }) as EntryType;
   return { planned: [{ id: "done", state, questions }], finish };
 }
 
@@ -219,7 +224,7 @@ export const done: Command = {
       "--criteria <text>": "What must hold, e.g. \"all tests pass\". Repeat for several; max 10.",
       "--run <check>": "Instead of piping evidence: run the project's detected check yourself and judge all of its output. Give a family (test, typecheck, lint, build, check, ci, verify) or the exact detected command; anything else is refused and nothing runs. The check runs in the manifest folder with stdout and stderr in order, no stdin and no TypeSafe key variables, and `exit code: N` is appended. Without --criteria the family sets one (all tests pass, lint is clean, the typecheck passes, the build succeeds, all checks pass). Exits 3 unless the verdict is met (an explicit --fail-on wins). With --dry-run the check still runs; nothing is sent. Not on Windows.",
       "--timeout <seconds>": "With --run: kill the check after this many seconds (default 600, at most 3600); the evidence then ends in exit code 124, so nothing is met.",
-      "--evidence <file|->": "The check output. '-' or omitted reads stdin. ANSI colours are stripped; long output keeps its first 2,000 and last 12,000 characters. Output from a recognised test runner, linter or type checker, or with an exit code line, is parsed in code and only those facts are sent (with --run, also the detected command's name); anything else is sent as text and can never count as met.",
+      "--evidence <file|->": "The check output. '-' or omitted reads stdin. ANSI colours are stripped; long output keeps its first 2,000 and last 12,000 characters. Output from a recognised test runner, linter or type checker, or with an exit code line, is parsed in code and only those facts are sent (with --run, also the detected command's name; for a clean vitest run with exit code 0, when every criterion is about tests, also the count and up to 20 names of its passing test files); anything else is sent as text and can never count as met.",
     },
     outputs: {
       verdict: "met, unsure or missing; the lowest across criteria",

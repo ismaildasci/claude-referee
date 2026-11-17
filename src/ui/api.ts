@@ -272,7 +272,7 @@ export function flow(ctx: UiContext, query: { days?: unknown; command?: unknown 
 
 const SENT = [
   { when: "Every call that asks Jev", what: "The pack's question text and the input it asks about, redacted first" },
-  { when: "done", what: "Your criterion and the output you pipe in; recognised runner output is parsed in code and only counts, exit code, failing test names and the matched summary and exit-code lines go out" },
+  { when: "done", what: "Your criterion and the output you pipe in; recognised runner output is parsed in code and only counts, exit code, failing test names and the matched summary and exit-code lines go out; a clean vitest run with exit code 0 under test criteria also sends the count and up to 20 names of its passing test files" },
   { when: "decide", what: "The decision, inline context, option texts and context_files contents, asked in two option orders" },
   { when: "judge, claims and verify", what: "The items, claims and source text you pass in" },
   { when: "look (experimental)", what: "Your criteria and the image files you name with --image, unredacted: pixels cannot be redacted, so a screenshot can show secrets" },
