@@ -24,3 +24,9 @@ The weekly watcher hashes TypeSafe's `models.md`, `api.md` and `llms.txt`. TypeS
 - Any edit of the jaggedness page, including a typo, turns the weekly run red until someone reads the diff and runs `--update`.
 - A notice shows only in the run's annotations; nobody is paged.
 - The SDK changelogs say nothing about the HTTP API beyond what a release note mentions.
+
+## Update (2026-11-17)
+
+TypeSafe moved the page: `model-jaggedness/jev-1.13.md` now redirects to one `model-jaggedness.md` for every model, with no "last reviewed" date, and a model changelog (`changelog.md`) lists what each Jev release changes. The scheduled run had been red since the move. The watcher now reads `model-jaggedness.md` and records its section headings (10 on 2026-11-17, 9 failure modes) in place of the date, and reads `changelog.md` and records its release names (`Jev 1.14`), so a new Jev release fails the run by name. `test/docs-watch.test.ts` covers both. The snapshot was updated the same day: 144 links in `llms.txt` (15 added, 2 removed; the link count was 131), `models.md` lists `jev-1.13.0` and `jev-1.14.0`.
+
+Read on that day and not acted on: the models page documents a long-context header that raises both context limits to 262k tokens ("slower and less accurate"); claude-referee does not send it.

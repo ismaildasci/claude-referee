@@ -30,7 +30,7 @@ test("latestRelease reads the newest version from Markdown and from the HTML hea
   assert.equal(latestRelease("# Changelog\n\nNothing yet."), null);
 });
 
-test("a changed SDK version gives a notice and is not a changed page; the jaggedness page date is a fact", () => {
+test("a changed SDK version gives a notice and is not a changed page; the jaggedness sections and the changelog releases are facts", () => {
   const recorded = { python: { version: "0.7.3", date: "2026-10-09" }, javascript: { version: "0.6.0", date: "2026-09-15" } };
   assert.deepEqual(infoNotes(recorded, recorded), []);
   const notes = infoNotes(recorded, { ...recorded, python: { version: "0.8.0", date: "2026-10-20" } });
@@ -38,11 +38,14 @@ test("a changed SDK version gives a notice and is not a changed page; the jagged
   assert.match(notes[0] ?? "", /python SDK is now 0\.8\.0 \(2026-10-20\), was 0\.7\.3/);
   assert.match(infoNotes(recorded, { ...recorded, javascript: null })[0] ?? "", /javascript SDK changelog could not be read/);
   assert.match(infoNotes(undefined, recorded)[0] ?? "", /unrecorded/);
-  const page = "model-jaggedness/jev-1.13.md";
-  const text = "# Jev 1.13 jaggedness\n**Applies to `jev-1.13`.** Last reviewed 2026-10-02.\n";
-  assert.deepEqual(facts(page, text), { reviewed: "2026-10-02" });
-  const entry = (t: string) => ({ sha256: sha256(t), facts: facts(page, t) });
-  assert.equal(compare({ [page]: entry(text) }, { [page]: entry(text.replace("10-02", "10-20")) })[0]?.page, page);
+  const page = "model-jaggedness.md";
+  const text = "# Model jaggedness\n\n## Literal reading\n\nText.\n\n## Math and Numbers\n\n### Counting\n";
+  assert.deepEqual(facts(page, text), { sections: ["Literal reading", "Math and Numbers"] });
+  const entry = (name: string, t: string) => ({ sha256: sha256(t), facts: facts(name, t) });
+  assert.deepEqual(compare({ [page]: entry(page, text) }, { [page]: entry(page, `${text}\n## Generation\n`) })[0], { page, was: { sections: ["Literal reading", "Math and Numbers"] }, now: { sections: ["Literal reading", "Math and Numbers", "Generation"] } });
+  const log = "# Model changelog\n\n**Jev 1.14**\n\nOctober 14, 2026\n\n* Model ID `jev-1.14.0`.\n";
+  assert.deepEqual(facts("changelog.md", log), { releases: ["Jev 1.14"] });
+  assert.deepEqual(compare({ "changelog.md": entry("changelog.md", log) }, { "changelog.md": entry("changelog.md", `# Model changelog\n\n**Jev 1.15**\n\n${log}`) })[0]?.now, { releases: ["Jev 1.15", "Jev 1.14"] });
 });
 
 test("a changed llms.txt names the added and removed pages, also when the link count stays the same, and still compares an old snapshot by hash", () => {

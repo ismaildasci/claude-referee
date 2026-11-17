@@ -1,5 +1,5 @@
-// Docs watcher: hashes TypeSafe's models.md, api.md, llms.txt and the Jev jaggedness page and compares them with docs-watch.json. Run weekly in CI, no key needed.
-// llms.txt also records its link paths, so a change names the added and removed pages (a snapshot without paths still compares by hash).
+// Docs watcher: hashes TypeSafe's models.md, api.md, llms.txt, the Jev jaggedness page and the model changelog and compares them with docs-watch.json. Run weekly in CI, no key needed.
+// llms.txt also records its link paths, so a change names the added and removed pages (a snapshot without paths still compares by hash); the jaggedness page records its section headings and the changelog its release names.
 // Exit 1 when a page changed or can't be fetched; --update records the current hashes. The SDK changelog versions only print ::notice:: lines and never fail.
 
 import { createHash } from "node:crypto";
@@ -7,7 +7,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const BASE = "https://docs.typesafe.ai/";
-export const PAGES = ["models.md", "api.md", "llms.txt", "model-jaggedness/jev-1.13.md"];
+export const PAGES = ["models.md", "api.md", "llms.txt", "model-jaggedness.md", "changelog.md"];
 export const SDK_CHANGELOGS = { python: "sdk/python/changelog.md", javascript: "sdk/javascript/changelog.md" };
 const FILE = fileURLToPath(new URL("../docs-watch.json", import.meta.url));
 
@@ -16,7 +16,8 @@ export const sha256 = (text) => createHash("sha256").update(text).digest("hex");
 export function facts(page, text) {
   if (page === "models.md") return { rate_limits: (text.match(/^.*Rate limits.*\|.*$/m) ?? [""])[0].trim(), models: [...new Set(text.match(/jev-[0-9][\w.]*/g) ?? [])].sort() };
   if (page === "llms.txt") return { links: (text.match(/^- \[/gm) ?? []).length, paths: [...text.matchAll(/^- \[[^\]]*\]\(([^)\s]+)\)/gm)].map((m) => m[1].replace(BASE, "")).sort() };
-  if (page === "model-jaggedness/jev-1.13.md") return { reviewed: (text.match(/Last reviewed (\d{4}-\d{2}-\d{2})/) ?? [])[1] ?? null };
+  if (page === "model-jaggedness.md") return { sections: [...text.matchAll(/^## (.+?)\s*$/gm)].map((m) => m[1]) };
+  if (page === "changelog.md") return { releases: [...text.matchAll(/^\*\*(Jev [\d.]+)\*\*\s*$/gm)].map((m) => m[1]) };
   return {};
 }
 
